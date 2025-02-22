@@ -6,9 +6,10 @@ license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 repository.workspace = true
+readme.workspace = true
 
 description = """
-Fluent assertions for testing in Rust.
+Fluent assertions for testing in the Rust programming language.
 """
 keywords = ["assertions", "testing", "fluent", "matchers"]
 categories = ["development-tools::testing", "no-std"]
