@@ -1,0 +1,24 @@
+# Rust Cargo
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Eclipse
+.project
+.settings/
+
+# Intellij IDEA
+.idea/*
+!.idea/runConfigurations/
+*.iml
+
+# VS Code
+.vscode/
+
+# Sublime Text
+*.sublime-workspace
+
+# Cargo Mutants
+mutants.out/
+mutants.out.old/
+

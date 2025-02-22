@@ -1,0 +1,62 @@
+[workspace]
+resolver = "2"
+members = [
+    "asserting",
+]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["haraldmaida"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+rust-version = "1.78.0"
+repository = "https://github.com/innoave/asserting"
+
+[workspace.dependencies]
+# workspace dependencies
+asserting = { version = "0.1", path = "asserting" }
+
+# 3rd party dependencies
+
+# dev-dependencies
+proptest = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unstable_features = "forbid"
+bare_trait_objects = "warn"
+deprecated = "warn"
+explicit_outlives_requirements = "warn"
+noop_method_call = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+rust_2021_incompatible_closure_captures = "warn"
+rust_2021_incompatible_or_patterns = "warn"
+rust_2021_prefixes_incompatible_syntax = "warn"
+rust_2021_prelude_collisions = "warn"
+single_use_lifetimes = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_crate_dependencies = "warn"
+unused_extern_crates = "warn"
+unused_import_braces = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+dead_code = "warn"
+#missing_docs = "warn"  # uncomment when working on docs
+#variant_size_differences = "warn"  # enable when working on performance
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+enum_glob_use = "deny"
+expect_used = "deny"
+future_not_send = "allow"
+missing_const_for_fn = "warn"
+module_name_repetitions = "allow"
+unwrap_used = "deny"
+missing_errors_doc = "allow"  # remove when working on docs
+missing_panics_doc = "allow"  # remove when working on docs
+
+[profile.dev.package.proptest]
+opt-level = 3
+overflow-checks = false

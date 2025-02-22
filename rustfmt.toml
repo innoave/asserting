@@ -1,0 +1,12 @@
+edition = "2021"
+
+match_block_trailing_comma = true
+use_field_init_shorthand = true
+use_try_shorthand = true
+
+# The following lines may be uncommented on nightly Rust.
+# Once these features have stabilized, they should be added to the always-enabled options above.
+#format_strings = false
+#imports_granularity = "Crate"
+#normalize_comments = true
+#wrap_comments = true
