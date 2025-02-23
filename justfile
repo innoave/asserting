@@ -15,15 +15,15 @@ default:
 
 # build the crate for debugging
 build:
-    cargo build --workspace --all-features
+    cargo build --all-features
 
 # check syntax in all targets
 check:
-    cargo check --workspace --all-targets --all-features
+    cargo check --all-targets --all-features
 
 # linting code using Clippy
 lint:
-    cargo clippy --workspace --all-targets --all-features
+    cargo clippy --all-targets --all-features
 
 # run all tests
 test:
@@ -31,13 +31,13 @@ test:
 
 # run code coverage (does not include doc-tests)
 code-coverage:
-    cargo +nightly llvm-cov clean --workspace
+    cargo +nightly llvm-cov clean
     cargo +nightly llvm-cov --branch --all-features --no-report
     cargo +nightly llvm-cov report --html --open --ignore-filename-regex "tests|test_dsl"
 
 # build the crate for release
 build-release:
-    cargo build --release --workspace
+    cargo build --release
 
 # clean the workspace
 clean:
@@ -45,4 +45,4 @@ clean:
 
 # generate and open docs locally
 doc:
-    cargo +nightly doc --workspace --all-features --no-deps --open
+    cargo +nightly doc --all-features --no-deps --open
