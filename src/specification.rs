@@ -167,14 +167,14 @@ where
     }
 
     fn failed(self) {
-        panic_for_failed_assertion::<S, E, ()>(&Asserted {
+        panic_for_failed_assertion::<S, E>(&Asserted {
             actual: self.subject,
             expected: self.expected,
         });
     }
 }
 
-pub fn panic_for_failed_assertion<S, E, R>(error: &Asserted<'_, S, E>)
+fn panic_for_failed_assertion<S, E>(error: &Asserted<'_, S, E>)
 where
     S: Debug,
     E: Debug,
