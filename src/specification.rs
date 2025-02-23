@@ -1,6 +1,6 @@
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::ops::Deref;
+use core::fmt::Debug;
+use core::marker::PhantomData;
+use core::ops::Deref;
 
 pub type Subject<'a, T> = Oob<'a, T>;
 pub type Expected<'a, T> = Oob<'a, T>;
@@ -94,28 +94,45 @@ impl<'a, S, R> Spec<'a, S, R> {
 
     pub fn assertion_with<E>(self, expected: Expected<'a, E>) -> Assertion<'a, S, E, R> {
         Assertion {
+            subject: self.subject,
             subject_name: self.subject_name,
             location: self.location,
             description: self.description,
-            result: AssertionResult {
-                actual: self.subject,
-                expected,
-            },
+            expected,
             return_type: self.return_type,
         }
     }
 }
 
-pub struct AssertionResult<'a, S, E> {
+#[must_use]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AssertionResult<'a, S, E> {
+    Passed,
+    Failed(Asserted<'a, S, E>),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Asserted<'a, S, E> {
     actual: Subject<'a, S>,
     expected: Expected<'a, E>,
 }
 
+impl<S, E> Asserted<'_, S, E> {
+    pub fn actual(&self) -> &S {
+        &self.actual
+    }
+
+    pub fn expected(&self) -> &E {
+        &self.expected
+    }
+}
+
 pub struct Assertion<'a, S, E, R> {
+    subject: Subject<'a, S>,
     subject_name: Option<&'a str>,
     location: Option<Location<'a>>,
     description: Option<&'a str>,
-    result: AssertionResult<'a, S, E>,
+    expected: Expected<'a, E>,
     return_type: PhantomData<R>,
 }
 
@@ -125,15 +142,18 @@ pub trait AssertionStrategy<R> {
     fn failed(self) -> R;
 }
 
-impl<'a, S, E> AssertionStrategy<Result<(), AssertionResult<'a, S, E>>>
-    for Assertion<'a, S, E, Result<(), AssertionResult<'a, S, E>>>
+impl<'a, S, E> AssertionStrategy<AssertionResult<'a, S, E>>
+    for Assertion<'a, S, E, AssertionResult<'a, S, E>>
 {
-    fn passed(self) -> Result<(), AssertionResult<'a, S, E>> {
-        Ok(())
+    fn passed(self) -> AssertionResult<'a, S, E> {
+        AssertionResult::Passed
     }
 
-    fn failed(self) -> Result<(), AssertionResult<'a, S, E>> {
-        Err(self.result)
+    fn failed(self) -> AssertionResult<'a, S, E> {
+        AssertionResult::Failed(Asserted {
+            actual: self.subject,
+            expected: self.expected,
+        })
     }
 }
 
@@ -147,11 +167,14 @@ where
     }
 
     fn failed(self) {
-        panic_for_failed_assertion::<S, E, ()>(&self.result);
+        panic_for_failed_assertion::<S, E, ()>(&Asserted {
+            actual: self.subject,
+            expected: self.expected,
+        });
     }
 }
 
-pub fn panic_for_failed_assertion<S, E, R>(error: &AssertionResult<'_, S, E>)
+pub fn panic_for_failed_assertion<S, E, R>(error: &Asserted<'_, S, E>)
 where
     S: Debug,
     E: Debug,
@@ -168,6 +191,6 @@ pub fn assert_that<'a, T>(subject: impl Into<Subject<'a, T>>) -> Spec<'a, T, ()>
 
 pub fn check_that<'a, S, E, R>(
     subject: impl Into<Subject<'a, S>>,
-) -> Spec<'a, S, AssertionResult<'a, S, E>> {
+) -> Spec<'a, S, Asserted<'a, S, E>> {
     Spec::new(subject)
 }

@@ -15,6 +15,15 @@ where
             self.assertion_with(expected).failed()
         }
     }
+
+    fn is_not_equal_to(self, expected: impl Into<Expected<'a, E>>) -> R {
+        let expected = expected.into();
+        if self.subject().ne(&expected) {
+            self.assertion_with(expected).passed()
+        } else {
+            self.assertion_with(expected).failed()
+        }
+    }
 }
 
 #[cfg(test)]
