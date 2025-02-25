@@ -10,13 +10,13 @@ mod std {
     pub use std::*;
 }
 
-pub mod assertion;
-pub mod specification;
-
-mod equality;
+pub mod assertions;
+pub mod spec;
 
 pub mod prelude {
     pub use super::assert_that;
-    pub use super::assertion::*;
-    pub use super::specification::*;
+    pub use super::assertions::*;
+    pub use super::spec::*;
 }
+
+mod equality;

@@ -1,5 +1,5 @@
-use crate::assertion::IsEqualTo;
-use crate::specification::{Assertion, AssertionStrategy, Subject};
+use crate::assertions::IsEqualTo;
+use crate::spec::{Assertion, AssertionStrategy, Subject};
 
 impl<'a, S, E, R> IsEqualTo<'a, E, R> for Subject<'a, S, R>
 where
