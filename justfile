@@ -7,7 +7,11 @@ alias c := check
 alias cc := code-coverage
 alias d := doc
 alias l := lint
+alias la := lint-all-features
+alias ln := lint-no-std
 alias t := test
+alias ta := test-all-features
+alias tn := test-no-std
 
 # list recipies
 default:
@@ -23,11 +27,29 @@ check:
 
 # linting code using Clippy
 lint:
+    just lint-all-features
+    just lint-no-std
+
+# linting code using Clippy --all-features
+lint-all-features:
     cargo clippy --all-targets --all-features
+
+# linting code using Clippy - no-std
+lint-no-std:
+    cargo clippy --all-targets --no-default-features
 
 # run all tests
 test:
+    just test-all-features
+    just test-no-std
+
+# run tests for all features
+test-all-features:
     cargo test --all-features
+
+# run tests for no-std
+test-no-std:
+    cargo test --no-default-features
 
 # run code coverage (does not include doc-tests)
 code-coverage:
