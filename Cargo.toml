@@ -21,7 +21,6 @@ std = []
 [dependencies]
 
 [dev-dependencies]
-proptest = "1"
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -58,7 +57,3 @@ module_name_repetitions = "allow"
 unwrap_used = "deny"
 missing_errors_doc = "allow"  # remove when working on docs
 missing_panics_doc = "allow"  # remove when working on docs
-
-[profile.dev.package.proptest]
-opt-level = 3
-overflow-checks = false
