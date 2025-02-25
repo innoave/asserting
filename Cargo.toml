@@ -15,7 +15,7 @@ keywords = ["assertions", "testing", "fluent", "matchers"]
 categories = ["development-tools::testing", "no-std"]
 
 [features]
-default = []
+default = ["std"]
 std = []
 
 [dependencies]

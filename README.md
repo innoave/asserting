@@ -8,7 +8,38 @@
 
 A fluent assertion library for the Rust programming language.
 
+## Colored failure messages
 
+Default colors are <span style="color: green">green</span> and <span style="color: red">red</span>.
+
+### Switch off colored output
+
+in `~/.cargo/config.toml` add:
+
+```toml
+[env]
+ASSERTING_MESSAGES_COLORED = "off"
+```
+
+no coloring in failure messages.
+
+### Use color vision deficiency (CVD) friendly colors:
+
+in `~/.cargo/config.toml` add:
+
+```toml
+[env]
+ASSERTING_MESSAGES_COLORED = "cvd"
+```
+
+uses <span style="color: blue">blue</span> and <span style="color: red">red</span>.
+
+good choice for CVD friendly colors is:
+
+    BLUE:    HEX #005AB5
+             R 0 G 90 B 181
+    RED:     HEX #DC3220
+             R 220 G 50 B 32
 
 <!-- Badges and related URLs -->
 
@@ -29,3 +60,4 @@ A fluent assertion library for the Rust programming language.
 [code-coverage-badge]: https://codecov.io/github/innoave/asserting/graph/badge.svg?token=o0w7R7J0Op
 
 [code-coverage-url]: https://codecov.io/github/innoave/asserting
+ 

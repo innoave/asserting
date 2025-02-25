@@ -1,5 +1,5 @@
 use crate::assertion::IsEqualTo;
-use crate::specification::{Assertion, AssertionStrategy, Expected, Spec};
+use crate::specification::{Assertion, AssertionStrategy, Spec};
 
 impl<'a, S, E, R> IsEqualTo<'a, E, R> for Spec<'a, S, R>
 where
@@ -7,21 +7,19 @@ where
     E: 'a,
     Assertion<'a, S, E, R>: AssertionStrategy<R>,
 {
-    fn is_equal_to(self, expected: impl Into<Expected<'a, E>>) -> R {
-        let expected = expected.into();
+    fn is_equal_to(self, expected: E) -> R {
         if self.subject().eq(&expected) {
-            self.assertion_with(expected).passed()
+            self.assertion_with("is equal to", expected).passed()
         } else {
-            self.assertion_with(expected).failed()
+            self.assertion_with("is equal to", expected).failed()
         }
     }
 
-    fn is_not_equal_to(self, expected: impl Into<Expected<'a, E>>) -> R {
-        let expected = expected.into();
+    fn is_not_equal_to(self, expected: E) -> R {
         if self.subject().ne(&expected) {
-            self.assertion_with(expected).passed()
+            self.assertion_with("is not equal to", expected).passed()
         } else {
-            self.assertion_with(expected).failed()
+            self.assertion_with("is not equal to", expected).failed()
         }
     }
 }

@@ -1,5 +1,4 @@
-use crate::equality::IsEqualTo;
-use crate::specification::assert_that;
+use crate::prelude::*;
 use proptest::prelude::*;
 
 //

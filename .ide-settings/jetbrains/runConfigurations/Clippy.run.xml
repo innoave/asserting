@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Clippy" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="buildProfileId" value="dev" />
     <option name="command" value="clippy --all-targets --all-features" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
