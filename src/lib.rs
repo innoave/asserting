@@ -19,4 +19,5 @@ pub mod prelude {
     pub use super::spec::*;
 }
 
+mod boolean;
 mod equality;

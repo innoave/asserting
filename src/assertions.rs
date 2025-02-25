@@ -8,3 +8,9 @@ where
 
     fn is_not_equal_to(self, expected: E) -> R;
 }
+
+pub trait IsTrue<R> {
+    fn is_true(self) -> R;
+
+    fn is_false(self) -> R;
+}
