@@ -1,7 +1,7 @@
 use crate::assertion::IsEqualTo;
-use crate::specification::{Assertion, AssertionStrategy, Spec};
+use crate::specification::{Assertion, AssertionStrategy, Subject};
 
-impl<'a, S, E, R> IsEqualTo<'a, E, R> for Spec<'a, S, R>
+impl<'a, S, E, R> IsEqualTo<'a, E, R> for Subject<'a, S, R>
 where
     S: 'a + PartialEq<E>,
     E: 'a,

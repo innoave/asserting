@@ -31,8 +31,8 @@ impl Display for Location<'_> {
     }
 }
 
-#[must_use = "a spec does nothing unless an assertion method is called"]
-pub struct Spec<'a, S, R> {
+#[must_use = "a subject does nothing unless an assertion method is called"]
+pub struct Subject<'a, S, R> {
     subject: S,
     subject_name: Option<&'a str>,
     location: Option<Location<'a>>,
@@ -40,7 +40,7 @@ pub struct Spec<'a, S, R> {
     return_type: PhantomData<R>,
 }
 
-impl<'a, S, R> Spec<'a, S, R> {
+impl<'a, S, R> Subject<'a, S, R> {
     pub const fn new(subject: S) -> Self {
         Self {
             subject,
@@ -269,12 +269,12 @@ where
 }
 
 #[track_caller]
-pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, ()> {
-    Spec::new(subject)
+pub const fn assert_that<'a, S>(subject: S) -> Subject<'a, S, ()> {
+    Subject::new(subject)
 }
 
-pub const fn check_that<'a, S, E>(subject: S) -> Spec<'a, S, AssertionResult<'a, S, E>> {
-    Spec::new(subject)
+pub const fn check_that<'a, S, E>(subject: S) -> Subject<'a, S, AssertionResult<'a, S, E>> {
+    Subject::new(subject)
 }
 
 #[cfg(test)]
