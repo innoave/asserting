@@ -1,7 +1,7 @@
-use crate::assertions::IsTrue;
+use crate::assertions::AssertBoolean;
 use crate::spec::{Assertion, AssertionStrategy, Subject};
 
-impl<'a, R> IsTrue<R> for Subject<'a, bool, R>
+impl<'a, R> AssertBoolean<R> for Subject<'a, bool, R>
 where
     Assertion<'a, bool, bool, R>: AssertionStrategy<R>,
 {
