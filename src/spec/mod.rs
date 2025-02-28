@@ -22,14 +22,38 @@ macro_rules! assert_that {
 /// - [`core::panic::Location`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Location<'a> {
-    file: &'a str,
-    line: u32,
-    column: u32,
+    pub file: &'a str,
+    pub line: u32,
+    pub column: u32,
 }
 
 impl Display for Location<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}:{}:{}", self.file, self.line, self.column)
+    }
+}
+
+impl<'a> Location<'a> {
+    #[must_use]
+    pub const fn new(file: &'a str, line: u32, column: u32) -> Self {
+        Self { file, line, column }
+    }
+}
+
+impl Location<'_> {
+    #[must_use]
+    pub const fn file(&self) -> &str {
+        self.file
+    }
+
+    #[must_use]
+    pub const fn line(&self) -> u32 {
+        self.line
+    }
+
+    #[must_use]
+    pub const fn column(&self) -> u32 {
+        self.column
     }
 }
 
