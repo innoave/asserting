@@ -28,3 +28,7 @@ pub trait AssertHasValue<'a, E, R> {
 pub trait AssertHasError<'a, E, R> {
     fn has_error(self, expected: E) -> R;
 }
+
+pub trait AssertContains<'a, E, R> {
+    fn contains(self, pattern: E) -> R;
+}

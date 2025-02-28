@@ -25,3 +25,4 @@ pub mod prelude {
 mod boolean;
 mod equality;
 mod option;
+mod string;
