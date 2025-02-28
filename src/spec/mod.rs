@@ -112,19 +112,6 @@ pub struct Assertion<'a, S, E, R> {
     return_type: PhantomData<R>,
 }
 
-#[must_use]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AssertionResult<'a, S, E> {
-    asserted: Asserted<'a, S, E>,
-    status: AssertionStatus,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AssertionStatus {
-    Passed,
-    Failed,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Asserted<'a, S, E> {
     description: Option<&'a str>,
@@ -172,6 +159,19 @@ impl<S, E> Asserted<'_, S, E> {
     pub const fn expected(&self) -> &E {
         &self.expected
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AssertionStatus {
+    Passed,
+    Failed,
+}
+
+#[must_use]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AssertionResult<'a, S, E> {
+    asserted: Asserted<'a, S, E>,
+    status: AssertionStatus,
 }
 
 pub trait AssertionStrategy<R> {
