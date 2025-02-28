@@ -19,7 +19,7 @@ pub mod spec;
 pub mod prelude {
     pub use super::assert_that;
     pub use super::assertions::*;
-    pub use super::spec::*;
+    pub use super::spec::{assert_that, check_that, AssertionStatus, Location};
 }
 
 mod boolean;
