@@ -16,6 +16,15 @@ macro_rules! assert_that {
     };
 }
 
+#[track_caller]
+pub const fn assert_that<'a, S>(subject: S) -> Subject<'a, S, ()> {
+    Subject::new(subject)
+}
+
+pub const fn check_that<'a, S, E>(subject: S) -> Subject<'a, S, AssertionResult<'a, S, E>> {
+    Subject::new(subject)
+}
+
 /// Code location.
 ///
 /// # Related
@@ -185,17 +194,15 @@ impl<S, E> Asserted<'_, S, E> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AssertionStatus {
-    Passed,
-    Failed,
+#[must_use]
+pub enum AssertionResult<'a, S, E> {
+    Passed(Assertion<'a, S, E, Self>),
+    Failed(AssertionFailure<'a, S, E>),
 }
 
-#[must_use]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AssertionResult<'a, S, E> {
+pub struct AssertionFailure<'a, S, E> {
     asserted: Asserted<'a, S, E>,
-    status: AssertionStatus,
 }
 
 pub trait AssertionStrategy<R> {
@@ -208,17 +215,13 @@ impl<'a, S, E> AssertionStrategy<AssertionResult<'a, S, E>>
     for Assertion<'a, S, E, AssertionResult<'a, S, E>>
 {
     fn passed(self) -> AssertionResult<'a, S, E> {
-        AssertionResult {
-            asserted: self.into(),
-            status: AssertionStatus::Passed,
-        }
+        AssertionResult::Passed(self)
     }
 
     fn failed(self) -> AssertionResult<'a, S, E> {
-        AssertionResult {
+        AssertionResult::Failed(AssertionFailure {
             asserted: self.into(),
-            status: AssertionStatus::Failed,
-        }
+        })
     }
 }
 
@@ -234,9 +237,8 @@ where
     fn failed(self) {
         panic!(
             "{}",
-            AssertionResult {
+            AssertionFailure {
                 asserted: self.into(),
-                status: AssertionStatus::Failed,
             }
         );
     }
@@ -248,23 +250,27 @@ where
     E: Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Asserted {
-            description,
-            assertion_phrase,
-            location,
-            subject_name,
-            actual,
-            expected,
-        } = &self.asserted;
-
-        match self.status {
-            AssertionStatus::Passed => {
-                writeln!(f, "assertion passed: ")?;
+        match self {
+            AssertionResult::Passed(assertion) => {
+                write!(f, "{assertion}")
             },
-            AssertionStatus::Failed => {
-                write!(f, "assertion failed: ")?;
+            AssertionResult::Failed(failure) => {
+                write!(f, "{failure}")
             },
         }
+    }
+}
+
+impl<S, E, R> Display for Assertion<'_, S, E, R> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let Assertion {
+            subject_name,
+            description,
+            assertion_phrase,
+            ..
+        } = self;
+
+        write!(f, "assertion passed: ")?;
 
         match (description, subject_name) {
             (Some(description), Some(subject_name)) => {
@@ -281,33 +287,65 @@ where
             },
         }
 
-        if self.status != AssertionStatus::Passed {
-            writeln!(f, "   but was: {actual:?}")?;
-            writeln!(f, "  expected: {expected:?}")?;
-            if let Some(location) = location {
-                writeln!(f, "at location: {location}")?;
-            }
-        }
         Ok(())
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+impl<S, E> Display for AssertionFailure<'_, S, E>
+where
+    S: Debug,
+    E: Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let Asserted {
+            description,
+            assertion_phrase,
+            location,
+            subject_name,
+            actual,
+            expected,
+        } = &self.asserted;
+
+        write!(f, "assertion failed: ")?;
+
+        match (description, subject_name) {
+            (Some(description), Some(subject_name)) => {
+                writeln!(f, "{description} {subject_name} {assertion_phrase}")?;
+            },
+            (Some(description), None) => {
+                writeln!(f, "{description}")?;
+            },
+            (None, Some(subject_name)) => {
+                writeln!(f, "expected {subject_name} {assertion_phrase}")?;
+            },
+            (None, None) => {
+                writeln!(f, "{assertion_phrase}")?;
+            },
+        }
+
+        writeln!(f, "   but was: {actual:?}")?;
+        writeln!(f, "  expected: {expected:?}")?;
+        if let Some(location) = location {
+            writeln!(f, "at location: {location}")?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub struct Unknown;
 
 impl Debug for Unknown {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "_")
+        write!(f, "{self}")
     }
 }
 
-#[track_caller]
-pub const fn assert_that<'a, S>(subject: S) -> Subject<'a, S, ()> {
-    Subject::new(subject)
-}
-
-pub const fn check_that<'a, S, E>(subject: S) -> Subject<'a, S, AssertionResult<'a, S, E>> {
-    Subject::new(subject)
+impl Display for Unknown {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "_")
+    }
 }
 
 #[cfg(test)]
