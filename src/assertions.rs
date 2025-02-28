@@ -32,3 +32,7 @@ pub trait AssertHasError<'a, E, R> {
 pub trait AssertContains<'a, E, R> {
     fn contains(self, pattern: E) -> R;
 }
+
+pub trait AssertContainsAnyOf<'a, E, R> {
+    fn contains_any_of(self, pattern: E) -> R;
+}
