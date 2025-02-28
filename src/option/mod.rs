@@ -1,32 +1,37 @@
 use crate::assertions::{AssertHasValue, AssertOption};
 use crate::prelude::{Assertion, AssertionStrategy};
-use crate::spec::Subject;
+use crate::spec::{Subject, Unknown};
+use crate::std::fmt::Debug;
+#[cfg(not(any(feature = "std", test)))]
+use alloc::format;
 
 impl<'a, U, R> AssertOption<'a, R> for Subject<'a, Option<U>, R>
 where
-    Assertion<'a, Option<U>, (), R>: AssertionStrategy<R>,
+    U: 'a,
+    Assertion<'a, Option<U>, Option<Unknown>, R>: AssertionStrategy<R>,
 {
     fn is_some(self) -> R {
         if self.subject().is_some() {
-            self.assertion_with("is some", ()).passed()
+            self.assertion_with("is some", Some(Unknown)).passed()
         } else {
-            self.assertion_with("is some", ()).failed()
+            self.assertion_with("is some", Some(Unknown)).failed()
         }
     }
 
     fn is_none(self) -> R {
         if self.subject().is_none() {
-            self.assertion_with("is none", ()).passed()
+            self.assertion_with("is none", None).passed()
         } else {
-            self.assertion_with("is none", ()).failed()
+            self.assertion_with("is none", None).failed()
         }
     }
 }
 
 impl<'a, U, E, R> AssertHasValue<'a, E, R> for Subject<'a, Option<U>, R>
 where
+    E: Debug,
     U: 'a + PartialEq<E>,
-    Assertion<'a, Option<U>, E, R>: AssertionStrategy<R>,
+    Assertion<'a, Option<U>, Option<E>, R>: AssertionStrategy<R>,
 {
     fn has_value(self, expected: E) -> R {
         if self
@@ -34,9 +39,11 @@ where
             .as_ref()
             .is_some_and(|value| value == &expected)
         {
-            self.assertion_with("has some value", expected).passed()
+            self.assertion_with(format!("has some value {expected:?}"), Some(expected))
+                .passed()
         } else {
-            self.assertion_with("has none value", expected).failed()
+            self.assertion_with(format!("has some value {expected:?}"), Some(expected))
+                .failed()
         }
     }
 }

@@ -74,6 +74,20 @@ fn str_is_not_equal_to_string() {
     assert_that(subject).is_not_equal_to("est commodo eleifend imperdiet".to_string());
 }
 
+#[test]
+fn check_string_is_equal_to_str_fails() {
+    assert_eq!(
+        check_that(String::new())
+            .named("my_thing")
+            .is_equal_to("aute duis eleifend molestie")
+            .to_string(),
+        r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
+   but was: ""
+  expected: "aute duis eleifend molestie"
+"#
+    );
+}
+
 //
 // Integer
 //
@@ -106,6 +120,20 @@ fn i32_is_not_equal_to_i32() {
     assert_that(subject).is_not_equal_to(-42);
 }
 
+#[test]
+fn check_i32_is_equal_to_i32_fails() {
+    assert_eq!(
+        check_that(42)
+            .named("my_thing")
+            .is_equal_to(-42)
+            .to_string(),
+        r"assertion failed: expected my_thing is equal to -42
+   but was: 42
+  expected: -42
+"
+    );
+}
+
 //
 // bool
 //
@@ -122,4 +150,18 @@ fn bool_is_not_equal_to_bool() {
     let subject: bool = true;
 
     assert_that(subject).is_not_equal_to(false);
+}
+
+#[test]
+fn check_bool_is_not_equal_to_false_fails() {
+    assert_eq!(
+        check_that(false)
+            .named("my_thing")
+            .is_not_equal_to(false)
+            .to_string(),
+        r"assertion failed: expected my_thing is not equal to false
+   but was: false
+  expected: false
+"
+    );
 }

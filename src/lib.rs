@@ -1,6 +1,9 @@
 #![cfg_attr(not(any(feature = "std", test)), no_std)]
 
 #[cfg(not(any(feature = "std", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "std", test)))]
 mod std {
     pub use core::*;
 }

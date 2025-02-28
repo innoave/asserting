@@ -1,5 +1,7 @@
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::marker::PhantomData;
+#[cfg(not(any(feature = "std", test)))]
+use alloc::string::String;
 
 #[macro_export]
 macro_rules! assert_that {
@@ -32,6 +34,7 @@ impl Display for Location<'_> {
 }
 
 #[must_use = "a subject does nothing unless an assertion method is called"]
+#[derive(Debug, Clone, Copy)]
 pub struct Subject<'a, S, R> {
     subject: S,
     subject_name: Option<&'a str>,
@@ -84,7 +87,7 @@ impl<'a, S, R> Subject<'a, S, R> {
 
     pub fn assertion_with<E>(
         self,
-        assertion_phrase: &'a str,
+        assertion_phrase: impl Into<String>,
         expected: E,
     ) -> Assertion<'a, S, E, R> {
         Assertion {
@@ -92,7 +95,7 @@ impl<'a, S, R> Subject<'a, S, R> {
             subject_name: self.subject_name,
             location: self.location,
             description: self.description,
-            assertion_phrase,
+            assertion_phrase: assertion_phrase.into(),
             expected,
             return_type: self.return_type,
         }
@@ -104,13 +107,13 @@ pub struct Assertion<'a, S, E, R> {
     subject_name: Option<&'a str>,
     location: Option<Location<'a>>,
     description: Option<&'a str>,
-    assertion_phrase: &'a str,
+    assertion_phrase: String,
     expected: E,
     return_type: PhantomData<R>,
 }
 
 #[must_use]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssertionResult<'a, S, E> {
     asserted: Asserted<'a, S, E>,
     status: AssertionStatus,
@@ -122,10 +125,10 @@ pub enum AssertionStatus {
     Failed,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Asserted<'a, S, E> {
     description: Option<&'a str>,
-    assertion_phrase: &'a str,
+    assertion_phrase: String,
     location: Option<Location<'a>>,
     subject_name: Option<&'a str>,
     actual: S,
@@ -150,8 +153,8 @@ impl<S, E> Asserted<'_, S, E> {
         self.description
     }
 
-    pub const fn assertion_phrase(&self) -> &str {
-        self.assertion_phrase
+    pub fn assertion_phrase(&self) -> &str {
+        &self.assertion_phrase
     }
 
     pub const fn location(&self) -> Option<Location<'_>> {
@@ -241,16 +244,13 @@ where
 
         match (description, subject_name) {
             (Some(description), Some(subject_name)) => {
-                writeln!(
-                    f,
-                    "{description} {subject_name} {assertion_phrase} {expected:?}"
-                )?;
+                writeln!(f, "{description} {subject_name} {assertion_phrase}")?;
             },
             (Some(description), None) => {
                 writeln!(f, "{description}")?;
             },
             (None, Some(subject_name)) => {
-                writeln!(f, "{subject_name} {assertion_phrase} {expected:?}")?;
+                writeln!(f, "expected {subject_name} {assertion_phrase}")?;
             },
             (None, None) => {
                 writeln!(f, "{assertion_phrase}")?;
@@ -258,13 +258,22 @@ where
         }
 
         if self.status != AssertionStatus::Passed {
+            writeln!(f, "   but was: {actual:?}")?;
             writeln!(f, "  expected: {expected:?}")?;
-            writeln!(f, "    actual: {actual:?}")?;
             if let Some(location) = location {
                 writeln!(f, "at location: {location}")?;
             }
         }
         Ok(())
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct Unknown;
+
+impl Debug for Unknown {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "_")
     }
 }
 
