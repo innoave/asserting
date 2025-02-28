@@ -1,6 +1,4 @@
-use crate::assertions::{AssertHasValue, AssertOption};
-use crate::prelude::{Assertion, AssertionStrategy};
-use crate::spec::{Subject, Unknown};
+use crate::prelude::*;
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::format;
