@@ -24,6 +24,13 @@ pub trait AssertOption {
     fn is_none(self) -> Self;
 }
 
+pub trait AssertResult {
+    #[track_caller]
+    fn is_ok(self) -> Self;
+
+    fn is_err(self) -> Self;
+}
+
 pub trait AssertHasValue<E> {
     #[track_caller]
     fn has_value(self, expected: E) -> Self;

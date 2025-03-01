@@ -25,4 +25,5 @@ mod boolean;
 mod equality;
 mod expectations;
 mod option;
+mod result;
 mod string;
