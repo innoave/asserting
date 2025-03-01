@@ -70,49 +70,57 @@ fn option_of_custom_struct_has_value() {
 }
 
 #[test]
-fn check_option_of_custom_struct_is_some_fails() {
+fn verify_option_of_custom_struct_is_some_fails() {
     #[derive(Debug)]
     struct MyStruct;
 
     let subject: Option<MyStruct> = None;
 
     assert_eq!(
-        check_that(subject).named("my_thing").is_some().to_string(),
-        r"assertion failed: expected my_thing is some
+        verify_that(subject)
+            .named("my_thing")
+            .is_some()
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is Some(_)
    but was: None
   expected: Some(_)
-"
+"]
     );
 }
 
 #[test]
-fn check_option_of_custom_struct_is_none_fails() {
+fn verify_option_of_custom_struct_is_none_fails() {
     #[derive(Debug)]
     struct MyStruct;
 
     let subject: Option<MyStruct> = Some(MyStruct);
 
     assert_eq!(
-        check_that(subject).named("my_thing").is_none().to_string(),
-        r"assertion failed: expected my_thing is none
+        verify_that(subject)
+            .named("my_thing")
+            .is_none()
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is None
    but was: Some(MyStruct)
   expected: None
-"
+"]
     );
 }
 
 #[test]
-fn check_option_of_string_has_some_value_fails() {
+fn verify_option_of_string_has_some_value_fails() {
     let subject = Some("labore dolore voluptate culpa".to_string());
 
     assert_eq!(
-        check_that(subject)
+        verify_that(subject)
             .named("my_thing")
             .has_value("labore dolores voluptate culpa")
-            .to_string(),
-        r#"assertion failed: expected my_thing has some value "labore dolores voluptate culpa"
+            .display_failures(),
+        &[
+            r#"assertion failed: expected my_thing is some containing "labore dolores voluptate culpa"
    but was: Some("labore dolore voluptate culpa")
   expected: Some("labore dolores voluptate culpa")
 "#
+        ]
     );
 }

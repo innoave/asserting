@@ -1,49 +1,91 @@
-use crate::assertions::{AssertHasValue, AssertOption};
-use crate::spec::{Assertion, AssertionStrategy, Subject, Unknown};
+use crate::expectations::{AssertHasValue, AssertOption};
+use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
-use alloc::format;
+use alloc::{format, string::String};
 
-impl<'a, U, R> AssertOption<'a, R> for Subject<'a, Option<U>, R>
+impl<S, R> AssertOption for Spec<'_, Option<S>, R>
 where
-    U: 'a,
-    Assertion<'a, Option<U>, Option<Unknown>, R>: AssertionStrategy<R>,
+    S: Debug,
+    R: FailingStrategy,
 {
-    fn is_some(self) -> R {
-        if self.subject().is_some() {
-            self.assertion_with("is some", Some(Unknown)).passed()
-        } else {
-            self.assertion_with("is some", Some(Unknown)).failed()
-        }
+    fn is_some(self) -> Self {
+        self.expecting(IsSome)
     }
 
-    fn is_none(self) -> R {
-        if self.subject().is_none() {
-            self.assertion_with("is none", None).passed()
-        } else {
-            self.assertion_with("is none", None).failed()
-        }
+    fn is_none(self) -> Self {
+        self.expecting(IsNone)
     }
 }
 
-impl<'a, U, E, R> AssertHasValue<'a, E, R> for Subject<'a, Option<U>, R>
+impl<S, E, R> AssertHasValue<E> for Spec<'_, Option<S>, R>
 where
+    S: PartialEq<E> + Debug,
     E: Debug,
-    U: 'a + PartialEq<E>,
-    Assertion<'a, Option<U>, Option<E>, R>: AssertionStrategy<R>,
+    R: FailingStrategy,
 {
-    fn has_value(self, expected: E) -> R {
-        if self
-            .subject()
+    fn has_value(self, expected: E) -> Self {
+        self.expecting(HasValue { expected })
+    }
+}
+
+struct IsSome;
+
+impl<T> Expectation<Option<T>> for IsSome
+where
+    T: Debug,
+{
+    fn test(&self, subject: &Option<T>) -> bool {
+        subject.is_some()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+        format!(
+            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            Some(Unknown),
+            Some(Unknown)
+        )
+    }
+}
+
+struct IsNone;
+
+impl<T> Expectation<Option<T>> for IsNone
+where
+    T: Debug,
+{
+    fn test(&self, subject: &Option<T>) -> bool {
+        subject.is_none()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+        format!(
+            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            None::<Unknown>, None::<Unknown>
+        )
+    }
+}
+
+struct HasValue<E> {
+    expected: E,
+}
+
+impl<T, E> Expectation<Option<T>> for HasValue<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Option<T>) -> bool {
+        subject
             .as_ref()
-            .is_some_and(|value| value == &expected)
-        {
-            self.assertion_with(format!("has some value {expected:?}"), Some(expected))
-                .passed()
-        } else {
-            self.assertion_with(format!("has some value {expected:?}"), Some(expected))
-                .failed()
-        }
+            .is_some_and(|value| value == &self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+        format!("expected {expression} is some containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            &self.expected,
+            Some(&self.expected),
+        )
     }
 }
 
