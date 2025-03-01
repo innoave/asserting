@@ -226,6 +226,21 @@ impl Display for AssertFailure<'_> {
     }
 }
 
+#[allow(clippy::must_use_candidate)]
+impl AssertFailure<'_> {
+    pub const fn description(&self) -> Option<&str> {
+        self.description
+    }
+
+    pub fn message(&self) -> &str {
+        &self.message
+    }
+
+    pub const fn location(&self) -> Option<Location<'_>> {
+        self.location
+    }
+}
+
 pub trait FailingStrategy {
     fn do_fail_with(&self, failures: &[AssertFailure<'_>]);
 }
