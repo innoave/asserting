@@ -1,3 +1,4 @@
+use crate::expectations::*;
 use crate::prelude::*;
 
 //
@@ -8,7 +9,9 @@ use crate::prelude::*;
 fn string_is_equal_to_string() {
     let subject: String = "stet invidunt gubergren iusto".to_string();
 
-    assert_that(subject).is_equal_to("stet invidunt gubergren iusto".to_string());
+    assert_that(subject)
+        .is_equal_to("stet invidunt gubergren iusto".to_string())
+        .is_not_equal_to("bruno");
 }
 
 #[test]
@@ -75,16 +78,19 @@ fn str_is_not_equal_to_string() {
 }
 
 #[test]
-fn check_string_is_equal_to_str_fails() {
+fn verify_string_is_equal_to_str_fails() {
+    use crate::expectations::*;
     assert_eq!(
-        check_that(String::new())
+        verify_that(String::new())
             .named("my_thing")
             .is_equal_to("aute duis eleifend molestie")
-            .to_string(),
-        r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
+            .display_failures(),
+        &[
+            r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
    but was: ""
   expected: "aute duis eleifend molestie"
 "#
+        ]
     );
 }
 
@@ -121,16 +127,16 @@ fn i32_is_not_equal_to_i32() {
 }
 
 #[test]
-fn check_i32_is_equal_to_i32_fails() {
+fn verify_i32_is_equal_to_i32_fails() {
     assert_eq!(
-        check_that(42)
+        verify_that(42)
             .named("my_thing")
             .is_equal_to(-42)
-            .to_string(),
-        r"assertion failed: expected my_thing is equal to -42
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is equal to -42
    but was: 42
   expected: -42
-"
+"]
     );
 }
 
@@ -153,15 +159,15 @@ fn bool_is_not_equal_to_bool() {
 }
 
 #[test]
-fn check_bool_is_not_equal_to_false_fails() {
+fn verify_bool_is_not_equal_to_false_fails() {
     assert_eq!(
-        check_that(false)
+        verify_that(false)
             .named("my_thing")
             .is_not_equal_to(false)
-            .to_string(),
-        r"assertion failed: expected my_thing is not equal to false
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is not equal to false
    but was: false
   expected: false
-"
+"]
     );
 }

@@ -11,12 +11,15 @@ fn bool_is_false() {
 }
 
 #[test]
-fn check_bool_is_true_fails() {
+fn verify_bool_is_true_fails() {
     assert_eq!(
-        check_that(false).named("my_thing").is_true().to_string(),
-        r"assertion failed: expected my_thing is true
+        verify_that(false)
+            .named("my_thing")
+            .is_true()
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is true
    but was: false
   expected: true
-"
+"]
     );
 }

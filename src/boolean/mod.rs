@@ -1,24 +1,48 @@
-use crate::assertions::AssertBoolean;
-use crate::spec::{Assertion, AssertionStrategy, Subject};
+use crate::expectations::AssertBoolean;
+use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+#[cfg(not(any(feature = "std", test)))]
+use alloc::{format, string::String};
 
-impl<'a, R> AssertBoolean<R> for Subject<'a, bool, R>
+impl<R> AssertBoolean for Spec<'_, bool, R>
 where
-    Assertion<'a, bool, bool, R>: AssertionStrategy<R>,
+    R: FailingStrategy,
 {
-    fn is_true(self) -> R {
-        if *self.subject() {
-            self.assertion_with("is true", true).passed()
-        } else {
-            self.assertion_with("is true", true).failed()
-        }
+    fn is_true(self) -> Self {
+        self.expecting(IsTrue)
     }
 
-    fn is_false(self) -> R {
-        if *self.subject() {
-            self.assertion_with("is false", true).failed()
-        } else {
-            self.assertion_with("is false", true).passed()
-        }
+    fn is_false(self) -> Self {
+        self.expecting(IsFalse)
+    }
+}
+
+struct IsTrue;
+
+impl Expectation<bool> for IsTrue {
+    fn test(&self, subject: &bool) -> bool {
+        *subject
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+        format!(
+            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            true, true
+        )
+    }
+}
+
+struct IsFalse;
+
+impl Expectation<bool> for IsFalse {
+    fn test(&self, subject: &bool) -> bool {
+        !*subject
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+        format!(
+            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            false, false
+        )
     }
 }
 
