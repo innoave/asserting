@@ -1,6 +1,37 @@
 use crate::prelude::*;
 
 #[test]
+fn string_has_length() {
+    let subject: String = "aute lobortis voluptua pariatur".to_string();
+
+    assert_that(subject).has_length(31);
+}
+
+#[test]
+fn str_has_length() {
+    let subject: &str = "ad fugiat duo erat";
+
+    assert_that(subject).has_length(18);
+}
+
+#[test]
+fn verify_str_has_length_fails() {
+    let subject: &str = "officia volutpat duis iriure";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length(29)
+        .display_failures();
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing has length 29
+   but was: 28
+  expected: 29
+"]
+    );
+}
+
+#[test]
 fn string_contains_other_str() {
     let subject: String = "illum kasd nostrud possim".to_string();
 

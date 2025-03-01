@@ -1,8 +1,40 @@
-use crate::expectations::{AssertContains, AssertContainsAnyOf};
+use crate::expectations::{AssertContains, AssertContainsAnyOf, AssertHasLength};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
+
+impl<S, R> AssertHasLength for Spec<'_, S, R>
+where
+    S: AsRef<str>,
+    R: FailingStrategy,
+{
+    fn has_length(self, expected: usize) -> Self {
+        self.expecting(HasLength { expected })
+    }
+}
+
+struct HasLength {
+    expected: usize,
+}
+
+impl<S> Expectation<S> for HasLength
+where
+    S: AsRef<str>,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().len() == self.expected
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} has length {}\n   but was: {}\n  expected: {}",
+            self.expected,
+            actual.as_ref().len(),
+            self.expected
+        )
+    }
+}
 
 // We implement `AssertContains` for different `Pattern` types as the
 // [`core::str::pattern`] API is not stabilized as of February 2025;

@@ -41,6 +41,11 @@ pub trait AssertHasError<E> {
     fn has_error(self, expected: E) -> Self;
 }
 
+pub trait AssertHasLength {
+    #[track_caller]
+    fn has_length(self, expected: usize) -> Self;
+}
+
 pub trait AssertContains<E> {
     #[track_caller]
     fn contains(self, pattern: E) -> Self;
