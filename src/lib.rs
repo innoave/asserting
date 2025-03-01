@@ -19,10 +19,12 @@ pub mod spec;
 pub mod prelude {
     pub use super::assert_that;
     pub use super::assertions::*;
-    pub use super::spec::{assert_that, check_that, Location};
+    pub use super::expectations::*;
+    pub use super::spec::{assert_that, check_that, expect_that, verify_that, Location};
 }
 
 mod boolean;
 mod equality;
+mod expectations;
 mod option;
 mod string;

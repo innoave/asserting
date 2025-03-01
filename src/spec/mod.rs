@@ -25,6 +25,20 @@ pub const fn check_that<'a, S, E>(subject: S) -> Subject<'a, S, AssertionResult<
     Subject::new(subject)
 }
 
+pub const fn expect_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
+    Spec::new(subject, PanicOnFail)
+}
+
+pub const fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
+    Spec::new(subject, CollectFailures)
+}
+
+pub trait Expectation<S> {
+    fn test(&self, subject: &S) -> bool;
+
+    fn message(&self, subject_name: Option<&str>, subject: &S) -> String;
+}
+
 /// Code location.
 ///
 /// # Related
@@ -63,6 +77,117 @@ impl Location<'_> {
     #[must_use]
     pub const fn column(&self) -> u32 {
         self.column
+    }
+}
+
+pub struct Spec<'a, S, R> {
+    subject: S,
+    subject_name: Option<&'a str>,
+    description: Option<&'a str>,
+    location: Option<Location<'a>>,
+    failures: Vec<AssertFailure<'a>>,
+    failing_strategy: R,
+}
+
+impl<S, R> Spec<'_, S, R> {
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub const fn new(subject: S, failing_strategy: R) -> Self {
+        Self {
+            subject,
+            subject_name: None,
+            description: None,
+            location: None,
+            failures: vec![],
+            failing_strategy,
+        }
+    }
+
+    pub fn failures(&self) -> &[AssertFailure<'_>] {
+        &self.failures
+    }
+
+    pub fn display_failures(&self) -> Vec<String> {
+        self.failures.iter().map(ToString::to_string).collect()
+    }
+}
+
+impl<'a, S, R> Spec<'a, S, R> {
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub const fn named(mut self, description: &'a str) -> Self {
+        self.subject_name = Some(description);
+        self
+    }
+}
+
+impl<S, R> Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    #[allow(clippy::needless_pass_by_value)]
+    #[must_use]
+    pub fn expecting(mut self, expectation: impl Expectation<S>) -> Self {
+        if !expectation.test(&self.subject) {
+            let message = expectation.message(self.subject_name, &self.subject);
+            let failure = AssertFailure {
+                description: self.description,
+                message,
+                location: self.location,
+            };
+            self.failures.push(failure);
+            self.failing_strategy.do_fail_with(&self.failures);
+        }
+        self
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AssertFailure<'a> {
+    description: Option<&'a str>,
+    message: String,
+    location: Option<Location<'a>>,
+}
+
+impl Display for AssertFailure<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.description {
+            None => {
+                writeln!(f, "assertion failed: {}", &self.message)?;
+            },
+            Some(description) => {
+                writeln!(f, "assertion failed: {description}\n{}", &self.message)?;
+            },
+        }
+        if let Some(location) = self.location {
+            writeln!(f, "located at: {location}")?;
+        }
+        Ok(())
+    }
+}
+
+pub trait FailingStrategy {
+    fn do_fail_with(&self, failures: &[AssertFailure<'_>]);
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PanicOnFail;
+
+impl FailingStrategy for PanicOnFail {
+    fn do_fail_with(&self, failures: &[AssertFailure<'_>]) {
+        let message = failures
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join("\n");
+        panic!("{}", message);
+    }
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CollectFailures;
+
+impl FailingStrategy for CollectFailures {
+    fn do_fail_with(&self, _failures: &[AssertFailure<'_>]) {
+        // do nothing by design
     }
 }
 
