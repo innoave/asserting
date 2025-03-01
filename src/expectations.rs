@@ -8,6 +8,13 @@ pub trait AssertEquality<E> {
     fn is_not_equal_to(self, expected: E) -> Self;
 }
 
+pub trait AssertEmptiness {
+    #[track_caller]
+    fn is_empty(self) -> Self;
+
+    fn is_not_empty(self) -> Self;
+}
+
 pub trait AssertBoolean {
     #[track_caller]
     fn is_true(self) -> Self;

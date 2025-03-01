@@ -1,6 +1,70 @@
 use crate::prelude::*;
 
 #[test]
+fn string_is_empty() {
+    let subject: String = String::new();
+
+    assert_that(subject).is_empty();
+}
+
+#[test]
+fn string_is_not_empty() {
+    let subject: String = "ABC".to_string();
+
+    assert_that(subject).is_not_empty();
+}
+
+#[test]
+fn str_is_empty() {
+    let subject: &str = "";
+
+    assert_that(subject).is_empty();
+}
+
+#[test]
+fn str_is_not_empty() {
+    let subject: &str = "ABC";
+
+    assert_that(subject).is_not_empty();
+}
+
+#[test]
+fn verify_str_is_empty_fails() {
+    let subject: &str = "ABC";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_empty()
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing is empty
+   but was: "ABC"
+  expected: <empty>
+"#]
+    );
+}
+
+#[test]
+fn verify_string_is_not_empty_fails() {
+    let subject: String = String::new();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_not_empty()
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing is not empty
+   but was: ""
+  expected: <non-empty>
+"#]
+    );
+}
+
+#[test]
 fn string_has_length() {
     let subject: String = "aute lobortis voluptua pariatur".to_string();
 

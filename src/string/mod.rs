@@ -1,8 +1,54 @@
-use crate::expectations::{AssertContains, AssertContainsAnyOf, AssertHasLength};
+use crate::expectations::{AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertHasLength};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
+
+impl<S, R> AssertEmptiness for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn is_empty(self) -> Self {
+        self.expecting(IsEmpty)
+    }
+
+    fn is_not_empty(self) -> Self {
+        self.expecting(IsNotEmpty)
+    }
+}
+
+struct IsEmpty;
+
+impl<S> Expectation<S> for IsEmpty
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!("expected {expression} is empty\n   but was: {actual:?}\n  expected: <empty>")
+    }
+}
+
+struct IsNotEmpty;
+
+impl<S> Expectation<S> for IsNotEmpty
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        !subject.as_ref().is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} is not empty\n   but was: {actual:?}\n  expected: <non-empty>",
+        )
+    }
+}
 
 impl<S, R> AssertHasLength for Spec<'_, S, R>
 where
