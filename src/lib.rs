@@ -13,6 +13,8 @@ mod std {
     pub use std::*;
 }
 
+pub mod assertions;
+pub mod expectations;
 pub mod spec;
 
 pub mod prelude {
@@ -21,10 +23,8 @@ pub mod prelude {
     pub use super::spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail};
 }
 
-mod assertions;
 mod boolean;
 mod equality;
-mod expectations;
 mod option;
 mod result;
 mod string;
