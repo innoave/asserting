@@ -72,3 +72,15 @@ pub trait AssertEndsWith<E> {
     #[track_caller]
     fn ends_with(self, pattern: E) -> Self;
 }
+
+#[cfg(feature = "panic")]
+pub trait AssertPanics {
+    #[track_caller]
+    fn does_not_panic(self) -> Self;
+
+    #[track_caller]
+    fn panics(self) -> Self;
+
+    #[track_caller]
+    fn panics_with_message(self, message: impl Into<String>) -> Self;
+}

@@ -21,6 +21,9 @@ pub mod prelude {
     pub use super::assert_that;
     pub use super::assertions::*;
     pub use super::spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail};
+
+    #[cfg(feature = "panic")]
+    pub use super::spec::{assert_that_code, verify_that_code};
 }
 
 mod boolean;
@@ -29,3 +32,6 @@ mod option;
 mod predicate;
 mod result;
 mod string;
+
+#[cfg(feature = "panic")]
+mod panic;

@@ -57,3 +57,40 @@ pub struct Predicate<F> {
     pub predicate: F,
     pub message: Option<String>,
 }
+
+#[cfg(feature = "panic")]
+pub use panic::DoesNotPanic;
+#[cfg(feature = "panic")]
+pub use panic::DoesPanic;
+
+#[cfg(feature = "panic")]
+mod panic {
+    use core::any::Any;
+    use core::cell::RefCell;
+    use std::rc::Rc;
+
+    #[derive(Default)]
+    pub struct DoesPanic {
+        pub(crate) expected_message: Option<String>,
+        pub(crate) actual_message: Rc<RefCell<Option<String>>>,
+    }
+
+    impl DoesPanic {
+        #[must_use]
+        pub fn with_any_message() -> Self {
+            Self::default()
+        }
+
+        pub fn with_message(message: impl Into<String>) -> Self {
+            Self {
+                expected_message: Some(message.into()),
+                actual_message: Rc::new(RefCell::new(None)),
+            }
+        }
+    }
+
+    #[derive(Default)]
+    pub struct DoesNotPanic {
+        pub(crate) actual_message: Rc<RefCell<Option<Box<dyn Any + Send>>>>,
+    }
+}

@@ -1,0 +1,117 @@
+use crate::assertions::AssertPanics;
+use crate::expectations::{DoesNotPanic, DoesPanic};
+use crate::spec::{Code, Expectation, Expression, FailingStrategy, Spec};
+use crate::std::any::Any;
+use crate::std::panic;
+
+const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";
+const UNKNOWN_PANIC_MESSAGE: &str = "<unknown panic message>";
+
+impl<S, R> AssertPanics for Spec<'_, Code<S>, R>
+where
+    S: FnOnce(),
+    R: FailingStrategy,
+{
+    fn does_not_panic(self) -> Self {
+        self.expecting(DoesNotPanic::default())
+    }
+
+    fn panics(self) -> Self {
+        self.expecting(DoesPanic::default())
+    }
+
+    fn panics_with_message(self, message: impl Into<String>) -> Self {
+        self.expecting(DoesPanic::with_message(message))
+    }
+}
+
+impl<S> Expectation<Code<S>> for DoesNotPanic
+where
+    S: FnOnce(),
+{
+    fn test(&self, subject: &Code<S>) -> bool {
+        if let Some(function) = subject.take() {
+            let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
+            match result {
+                Ok(()) => true,
+                Err(panic_message) => {
+                    *self.actual_message.borrow_mut() = Some(panic_message);
+                    false
+                },
+            }
+        } else {
+            *self.actual_message.borrow_mut() = Some(Box::new(ONLY_ONE_EXPECTATION));
+            false
+        }
+    }
+
+    fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
+        let actual_message = self.actual_message.borrow();
+        let panic_message = read_panic_message(actual_message.as_ref())
+            .unwrap_or_else(|| "<unknown panic message>".to_string());
+
+        if panic_message == ONLY_ONE_EXPECTATION {
+            format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
+        } else {
+            format!(
+                "expected {expression} to not panic, but did panic\n  with message: {panic_message:?}"
+            )
+        }
+    }
+}
+
+impl<S> Expectation<Code<S>> for DoesPanic
+where
+    S: FnOnce(),
+{
+    fn test(&self, subject: &Code<S>) -> bool {
+        if let Some(function) = subject.take() {
+            let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
+            match result {
+                Ok(()) => false,
+                Err(panic_message) => {
+                    let panic_message = read_panic_message(Some(panic_message).as_ref())
+                        .unwrap_or_else(|| UNKNOWN_PANIC_MESSAGE.to_string());
+                    let test_result = if let Some(expected_message) = &self.expected_message {
+                        &panic_message == expected_message
+                    } else {
+                        // did panic - panic message should not be asserted
+                        true
+                    };
+                    *self.actual_message.borrow_mut() = Some(panic_message);
+                    test_result
+                },
+            }
+        } else {
+            *self.actual_message.borrow_mut() = Some(ONLY_ONE_EXPECTATION.to_string());
+            false
+        }
+    }
+
+    fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
+        let panic_message = self.actual_message.borrow();
+        if let Some(actual_message) = panic_message.as_ref() {
+            if actual_message == ONLY_ONE_EXPECTATION {
+                format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
+            } else if let Some(expected_message) = &self.expected_message {
+                format!("expected {expression} to panic with message {expected_message:?}\n   but was: {actual_message:?}\n  expected: {expected_message:?}")
+            } else {
+                format!("expected {expression} to panic, but did not panic")
+            }
+        } else {
+            format!("expected {expression} to panic, but did not panic")
+        }
+    }
+}
+
+fn read_panic_message(error: Option<&Box<dyn Any + Send>>) -> Option<String> {
+    error.and_then(|message| {
+        message
+            .downcast_ref::<String>()
+            .cloned()
+            .or_else(|| message.downcast_ref::<&str>().map(ToString::to_string))
+    })
+}
+
+#[cfg(test)]
+mod tests;

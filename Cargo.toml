@@ -15,7 +15,9 @@ keywords = ["assertions", "testing", "fluent", "matchers"]
 categories = ["development-tools::testing", "no-std"]
 
 [features]
-default = ["std"]
+default = ["std", "code", "panic"]
+code = ["std"]
+panic = ["code", "std"]
 std = []
 
 [dependencies]
@@ -55,6 +57,7 @@ future_not_send = "allow"
 if_not_else = "allow"
 missing_const_for_fn = "warn"
 module_name_repetitions = "allow"
+option_if_let_else = "allow"
 unwrap_used = "deny"
 missing_errors_doc = "allow"  # remove when working on docs
 missing_panics_doc = "allow"  # remove when working on docs
