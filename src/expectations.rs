@@ -41,3 +41,11 @@ pub struct Contains<E> {
 pub struct ContainsAnyOf<E> {
     pub expected: E,
 }
+
+pub struct StartWith<E> {
+    pub expected: E,
+}
+
+pub struct EndsWith<E> {
+    pub expected: E,
+}

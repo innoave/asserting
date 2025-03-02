@@ -103,6 +103,13 @@ fn string_contains_other_str() {
 }
 
 #[test]
+fn string_contains_other_string() {
+    let subject: String = "consectetuer nulla anim nihil".to_string();
+
+    assert_that(subject).contains(" nulla ".to_string());
+}
+
+#[test]
 fn str_contains_other_str() {
     let subject: &str = "consectetuer duis quis veniam";
 
@@ -231,5 +238,165 @@ fn verify_str_contains_any_of_char_of_a_borrowed_array_of_chars_fails() {
   expected: ['x', 'y', 'z']
 "#
         ]
+    );
+}
+
+#[test]
+fn string_starts_with_str() {
+    let subject: String = "wisi option excepteur labore".to_string();
+
+    assert_that(subject).starts_with("wisi");
+}
+
+#[test]
+fn string_starts_with_string() {
+    let subject: String = "sanctus stet eirmod voluptate".to_string();
+
+    assert_that(subject).starts_with("sanctus ".to_string());
+}
+
+#[test]
+fn string_starts_with_char() {
+    let subject: String = "odio gubergren aliquip blandit".to_string();
+
+    assert_that(subject).starts_with('o');
+}
+
+#[test]
+fn str_starts_with_str() {
+    let subject: &str = "stet nam consetetur placerat";
+
+    assert_that(subject).starts_with("stet na");
+}
+
+#[test]
+fn str_starts_with_string() {
+    let subject: &str = "dolores invidunt exerci nostrud";
+
+    assert_that(subject).starts_with("dolor".to_string());
+}
+
+#[test]
+fn str_starts_with_char() {
+    let subject: &str = "odio gubergren aliquip blandit";
+
+    assert_that(subject).starts_with('o');
+}
+
+#[test]
+fn verify_string_starts_with_str_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .starts_with("false start")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to start with "false start"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: "false start"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_starts_with_char_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .starts_with('X')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing to start with 'X'
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: 'X'
+"#]
+    );
+}
+
+#[test]
+fn string_ends_with_str() {
+    let subject: String = "wisi option excepteur labore".to_string();
+
+    assert_that(subject).ends_with("labore");
+}
+
+#[test]
+fn string_ends_with_string() {
+    let subject: String = "sanctus stet eirmod voluptate".to_string();
+
+    assert_that(subject).ends_with(" voluptate".to_string());
+}
+
+#[test]
+fn string_ends_with_char() {
+    let subject: String = "odio gubergren aliquip blandit".to_string();
+
+    assert_that(subject).ends_with('t');
+}
+
+#[test]
+fn str_ends_with_str() {
+    let subject: &str = "stet nam consetetur placerat";
+
+    assert_that(subject).ends_with("etur placerat");
+}
+
+#[test]
+fn str_ends_with_string() {
+    let subject: &str = "dolores invidunt exerci nostrud";
+
+    assert_that(subject).ends_with("rud".to_string());
+}
+
+#[test]
+fn str_ends_with_char() {
+    let subject: &str = "odio gubergren aliquip blandit";
+
+    assert_that(subject).ends_with('t');
+}
+
+#[test]
+fn verify_string_ends_with_str_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .ends_with("abrupt end")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to start with "abrupt end"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: "abrupt end"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_ends_with_char_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .ends_with('Z')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing to start with 'Z'
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: 'Z'
+"#]
     );
 }

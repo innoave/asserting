@@ -62,3 +62,13 @@ pub trait AssertContainsAnyOf<E> {
     #[track_caller]
     fn contains_any_of(self, pattern: E) -> Self;
 }
+
+pub trait AssertStartsWith<E> {
+    #[track_caller]
+    fn starts_with(self, pattern: E) -> Self;
+}
+
+pub trait AssertEndsWith<E> {
+    #[track_caller]
+    fn ends_with(self, pattern: E) -> Self;
+}

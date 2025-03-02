@@ -1,5 +1,10 @@
-use crate::assertions::{AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertHasLength};
-use crate::expectations::{Contains, ContainsAnyOf, HasLength, IsEmpty, IsNotEmpty};
+use crate::assertions::{
+    AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertEndsWith, AssertHasLength,
+    AssertStartsWith,
+};
+use crate::expectations::{
+    Contains, ContainsAnyOf, EndsWith, HasLength, IsEmpty, IsNotEmpty, StartWith,
+};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -239,6 +244,162 @@ where
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
             "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S, R> AssertStartsWith<&str> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn starts_with(self, pattern: &str) -> Self {
+        self.expecting(StartWith { expected: pattern })
+    }
+}
+
+impl<S, R> AssertStartsWith<String> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn starts_with(self, pattern: String) -> Self {
+        self.expecting(StartWith { expected: pattern })
+    }
+}
+
+impl<S, R> AssertStartsWith<char> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn starts_with(self, expected: char) -> Self {
+        self.expecting(StartWith { expected })
+    }
+}
+
+impl<S> Expectation<S> for StartWith<&str>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().starts_with(self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S> Expectation<S> for StartWith<String>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().starts_with(&self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S> Expectation<S> for StartWith<char>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().starts_with(self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S, R> AssertEndsWith<&str> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn ends_with(self, pattern: &str) -> Self {
+        self.expecting(EndsWith { expected: pattern })
+    }
+}
+
+impl<S, R> AssertEndsWith<String> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn ends_with(self, pattern: String) -> Self {
+        self.expecting(EndsWith { expected: pattern })
+    }
+}
+
+impl<S, R> AssertEndsWith<char> for Spec<'_, S, R>
+where
+    S: AsRef<str> + Debug,
+    R: FailingStrategy,
+{
+    fn ends_with(self, expected: char) -> Self {
+        self.expecting(EndsWith { expected })
+    }
+}
+
+impl<S> Expectation<S> for EndsWith<&str>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().ends_with(self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S> Expectation<S> for EndsWith<String>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().ends_with(&self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            self.expected, self.expected
+        )
+    }
+}
+
+impl<S> Expectation<S> for EndsWith<char>
+where
+    S: AsRef<str> + Debug,
+{
+    fn test(&self, subject: &S) -> bool {
+        subject.as_ref().ends_with(self.expected)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
         )
     }
