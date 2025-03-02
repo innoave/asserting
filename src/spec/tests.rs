@@ -86,3 +86,46 @@ fn verify_that_option_is_some_chained_with_has_value_fails_as_none() {
         ]
     );
 }
+
+#[test]
+fn verify_that_a_subject_with_custom_description_is_equal_to_fails() {
+    let an_anwser = 51;
+
+    let failures = verify_that(an_anwser)
+        .described_as("the answer to all important questions is 42")
+        .is_equal_to(42)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: the answer to all important questions is 42
+expected subject is equal to 42
+   but was: 51
+  expected: 42
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_that_a_subject_with_custom_name_and_custom_description_is_equal_to_fails() {
+    let subject = 51;
+
+    let failures = verify_that(subject)
+        .named("answer")
+        .described_as("the answer to all important questions is 42")
+        .is_equal_to(42)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: the answer to all important questions is 42
+expected answer is equal to 42
+   but was: 51
+  expected: 42
+"
+        ]
+    );
+}

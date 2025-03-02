@@ -176,6 +176,12 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 
     #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub const fn described_as(mut self, description: &'a str) -> Self {
+        self.description = Some(description);
+        self
+    }
+
+    #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn at_location(mut self, location: Location<'a>) -> Self {
         self.location = Some(location);
         self
