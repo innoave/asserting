@@ -205,6 +205,7 @@ where
     }
 
     #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
     pub fn satisfies<P>(self, predicate: P) -> Self
     where
         P: Fn(&S) -> bool,
@@ -216,6 +217,7 @@ where
     }
 
     #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
     pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
     where
         P: Fn(&S) -> bool,
