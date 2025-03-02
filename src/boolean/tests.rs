@@ -23,3 +23,17 @@ fn verify_bool_is_true_fails() {
 "]
     );
 }
+
+#[test]
+fn verify_bool_is_false_fails() {
+    assert_eq!(
+        verify_that(true)
+            .named("my_thing")
+            .is_false()
+            .display_failures(),
+        &[r"assertion failed: expected my_thing is false
+   but was: true
+  expected: false
+"]
+    );
+}

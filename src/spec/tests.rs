@@ -1,4 +1,29 @@
 use crate::prelude::*;
+use crate::spec::{AssertFailure, Expression};
+
+#[test]
+fn default_of_expression_is_subject() {
+    assert_that!(&*Expression::default()).is_equal_to("subject");
+}
+
+#[test]
+fn location_display_format() {
+    let location = Location::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(format!("{}", location)).is_equal_to("src/my_module/my_test.rs:54:13");
+}
+
+#[test]
+fn assert_failure_display_format() {
+    let failure = AssertFailure {
+        description: Some("this thing is the best"),
+        message: "but this thing is the worst\ninstead it should be the best".to_string(),
+        location: Some(Location::new("src/thing_module/thing_test.rs", 54, 13)),
+    };
+
+    assert_that!(format!("{}", failure))
+        .is_equal_to("assertion failed: this thing is the best\nbut this thing is the worst\ninstead it should be the best\n");
+}
 
 #[test]
 fn assert_that_macro_with_owned_string_subject() {
@@ -19,6 +44,16 @@ fn assert_that_macro_with_borrowed_str_subject() {
     let input_string = "adipiscing rebum amet iusto";
 
     assert_that!(input_string).is_equal_to("adipiscing rebum amet iusto");
+}
+
+#[test]
+#[should_panic(
+    expected = "assertion failed: expected ultimate_answer is equal to 42\n   but was: 51\n  expected: 42\n"
+)]
+fn assert_that_macro_is_equal_to_with_integers_fails() {
+    let ultimate_answer = 51;
+
+    assert_that!(ultimate_answer).is_equal_to(42);
 }
 
 #[test]

@@ -167,6 +167,22 @@ fn verify_string_contains_other_string_fails() {
 }
 
 #[test]
+fn verify_string_contains_char_fails() {
+    let subject: String = "consectetur ex hendrerit officia".to_string();
+
+    assert_eq!(
+        verify_that(subject)
+            .named("my_thing")
+            .contains('Q')
+            .display_failures(),
+        &[r#"assertion failed: expected my_thing to contain 'Q'
+   but was: "consectetur ex hendrerit officia"
+  expected: 'Q'
+"#]
+    );
+}
+
+#[test]
 fn string_contains_any_char_of_a_slice_of_chars() {
     let subject: String = "dolore reprehenderit erat duis".to_string();
 
@@ -304,6 +320,26 @@ fn verify_string_starts_with_str_fails() {
 }
 
 #[test]
+fn verify_string_starts_with_string_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .starts_with("false start".to_string())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to start with "false start"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: "false start"
+"#
+        ]
+    );
+}
+
+#[test]
 fn verify_string_starts_with_char_fails() {
     let subject: String = "possim deserunt obcaecat hendrerit".to_string();
 
@@ -370,6 +406,26 @@ fn verify_string_ends_with_str_fails() {
     let failures = verify_that(subject)
         .named("my_thing")
         .ends_with("abrupt end")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to start with "abrupt end"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: "abrupt end"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_ends_with_string_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .ends_with("abrupt end".to_string())
         .display_failures();
 
     assert_eq!(
