@@ -1,3 +1,4 @@
+use crate::expectations::Predicate;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
 #[cfg(not(any(feature = "std", test)))]
@@ -192,22 +193,48 @@ impl<S, R> Spec<'_, S, R>
 where
     R: FailingStrategy,
 {
-    #[allow(clippy::needless_pass_by_value)]
+    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
     #[track_caller]
-    #[must_use]
     pub fn expecting(mut self, expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
             let expression = self.expression.unwrap_or_default();
             let message = expectation.message(expression, &self.subject);
-            let failure = AssertFailure {
-                description: self.description,
-                message,
-                location: self.location,
-            };
-            self.failures.push(failure);
-            self.failing_strategy.do_fail_with(&self.failures);
+            self.do_fail_with_message(message);
         }
         self
+    }
+
+    #[allow(clippy::return_self_not_must_use)]
+    pub fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(Predicate {
+            predicate,
+            message: None,
+        })
+    }
+
+    #[allow(clippy::return_self_not_must_use)]
+    pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(Predicate {
+            predicate,
+            message: Some(message.into()),
+        })
+    }
+
+    fn do_fail_with_message(&mut self, message: impl Into<String>) {
+        let message = message.into();
+        let failure = AssertFailure {
+            description: self.description,
+            message,
+            location: self.location,
+        };
+        self.failures.push(failure);
+        self.failing_strategy.do_fail_with(&self.failures);
     }
 }
 

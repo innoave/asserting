@@ -1,3 +1,6 @@
+#[cfg(not(any(feature = "std", test)))]
+use alloc::string::String;
+
 pub struct IsTrue;
 
 pub struct IsFalse;
@@ -48,4 +51,9 @@ pub struct StartWith<E> {
 
 pub struct EndsWith<E> {
     pub expected: E,
+}
+
+pub struct Predicate<F> {
+    pub predicate: F,
+    pub message: Option<String>,
 }

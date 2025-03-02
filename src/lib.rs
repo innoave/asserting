@@ -26,5 +26,6 @@ pub mod prelude {
 mod boolean;
 mod equality;
 mod option;
+mod predicate;
 mod result;
 mod string;
