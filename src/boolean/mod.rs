@@ -1,4 +1,5 @@
-use crate::expectations::AssertBoolean;
+use crate::assertions::AssertBoolean;
+use crate::expectations::{IsFalse, IsTrue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
@@ -16,8 +17,6 @@ where
     }
 }
 
-struct IsTrue;
-
 impl Expectation<bool> for IsTrue {
     fn test(&self, subject: &bool) -> bool {
         *subject
@@ -30,8 +29,6 @@ impl Expectation<bool> for IsTrue {
         )
     }
 }
-
-struct IsFalse;
 
 impl Expectation<bool> for IsFalse {
     fn test(&self, subject: &bool) -> bool {

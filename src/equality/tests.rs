@@ -78,7 +78,7 @@ fn str_is_not_equal_to_string() {
 
 #[test]
 fn verify_string_is_equal_to_str_fails() {
-    use crate::expectations::*;
+    use crate::assertions::*;
     assert_eq!(
         verify_that(String::new())
             .named("my_thing")

@@ -1,4 +1,5 @@
-use crate::expectations::AssertEquality;
+use crate::assertions::AssertEquality;
+use crate::expectations::{IsEqualTo, IsNotEqualTo};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -19,10 +20,6 @@ where
     }
 }
 
-struct IsEqualTo<E> {
-    expected: E,
-}
-
 impl<S, E> Expectation<S> for IsEqualTo<E>
 where
     S: PartialEq<E> + Debug,
@@ -38,10 +35,6 @@ where
             &self.expected, &self.expected
         )
     }
-}
-
-struct IsNotEqualTo<E> {
-    expected: E,
 }
 
 impl<S, E> Expectation<S> for IsNotEqualTo<E>

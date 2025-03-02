@@ -1,4 +1,5 @@
-use crate::expectations::{AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertHasLength};
+use crate::assertions::{AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertHasLength};
+use crate::expectations::{HasLength, IsEmpty, IsNotEmpty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -18,8 +19,6 @@ where
     }
 }
 
-struct IsEmpty;
-
 impl<S> Expectation<S> for IsEmpty
 where
     S: AsRef<str> + Debug,
@@ -32,8 +31,6 @@ where
         format!("expected {expression} is empty\n   but was: {actual:?}\n  expected: <empty>")
     }
 }
-
-struct IsNotEmpty;
 
 impl<S> Expectation<S> for IsNotEmpty
 where
@@ -56,12 +53,10 @@ where
     R: FailingStrategy,
 {
     fn has_length(self, expected: usize) -> Self {
-        self.expecting(HasLength { expected })
+        self.expecting(HasLength {
+            expected_length: expected,
+        })
     }
-}
-
-struct HasLength {
-    expected: usize,
 }
 
 impl<S> Expectation<S> for HasLength
@@ -69,15 +64,15 @@ where
     S: AsRef<str>,
 {
     fn test(&self, subject: &S) -> bool {
-        subject.as_ref().len() == self.expected
+        subject.as_ref().len() == self.expected_length
     }
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
             "expected {expression} has length {}\n   but was: {}\n  expected: {}",
-            self.expected,
+            self.expected_length,
             actual.as_ref().len(),
-            self.expected
+            self.expected_length
         )
     }
 }

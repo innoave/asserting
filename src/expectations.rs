@@ -1,64 +1,35 @@
-#![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
+pub struct IsTrue;
 
-pub trait AssertEquality<E> {
-    #[track_caller]
-    fn is_equal_to(self, expected: E) -> Self;
+pub struct IsFalse;
 
-    #[track_caller]
-    fn is_not_equal_to(self, expected: E) -> Self;
+pub struct IsEqualTo<E> {
+    pub expected: E,
 }
 
-pub trait AssertEmptiness {
-    #[track_caller]
-    fn is_empty(self) -> Self;
-
-    fn is_not_empty(self) -> Self;
+pub struct IsNotEqualTo<E> {
+    pub expected: E,
 }
 
-pub trait AssertBoolean {
-    #[track_caller]
-    fn is_true(self) -> Self;
+pub struct IsSome;
 
-    #[track_caller]
-    fn is_false(self) -> Self;
+pub struct IsNone;
+
+pub struct HasValue<E> {
+    pub expected: E,
 }
 
-pub trait AssertOption {
-    #[track_caller]
-    fn is_some(self) -> Self;
+pub struct IsOk;
 
-    #[track_caller]
-    fn is_none(self) -> Self;
+pub struct IsErr;
+
+pub struct HasError<E> {
+    pub expected: E,
 }
 
-pub trait AssertResult {
-    #[track_caller]
-    fn is_ok(self) -> Self;
+pub struct IsEmpty;
 
-    fn is_err(self) -> Self;
-}
+pub struct IsNotEmpty;
 
-pub trait AssertHasValue<E> {
-    #[track_caller]
-    fn has_value(self, expected: E) -> Self;
-}
-
-pub trait AssertHasError<E> {
-    #[track_caller]
-    fn has_error(self, expected: E) -> Self;
-}
-
-pub trait AssertHasLength {
-    #[track_caller]
-    fn has_length(self, expected: usize) -> Self;
-}
-
-pub trait AssertContains<E> {
-    #[track_caller]
-    fn contains(self, pattern: E) -> Self;
-}
-
-pub trait AssertContainsAnyOf<E> {
-    #[track_caller]
-    fn contains_any_of(self, pattern: E) -> Self;
+pub struct HasLength {
+    pub expected_length: usize,
 }

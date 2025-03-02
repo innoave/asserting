@@ -1,4 +1,5 @@
-use crate::expectations::{AssertHasValue, AssertOption};
+use crate::assertions::{AssertHasValue, AssertOption};
+use crate::expectations::{HasValue, IsNone, IsSome};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -29,8 +30,6 @@ where
     }
 }
 
-struct IsSome;
-
 impl<T> Expectation<Option<T>> for IsSome
 where
     T: Debug,
@@ -48,8 +47,6 @@ where
     }
 }
 
-struct IsNone;
-
 impl<T> Expectation<Option<T>> for IsNone
 where
     T: Debug,
@@ -64,10 +61,6 @@ where
             None::<Unknown>, None::<Unknown>
         )
     }
-}
-
-struct HasValue<E> {
-    expected: E,
 }
 
 impl<T, E> Expectation<Option<T>> for HasValue<E>

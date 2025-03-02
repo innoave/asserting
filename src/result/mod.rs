@@ -1,4 +1,5 @@
-use crate::expectations::AssertResult;
+use crate::assertions::AssertResult;
+use crate::expectations::{HasError, HasValue, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
@@ -44,8 +45,6 @@ where
     }
 }
 
-struct IsOk;
-
 impl<T, E> Expectation<Result<T, E>> for IsOk
 where
     T: Debug,
@@ -63,8 +62,6 @@ where
         )
     }
 }
-
-struct IsErr;
 
 impl<T, E> Expectation<Result<T, E>> for IsErr
 where
@@ -84,10 +81,6 @@ where
     }
 }
 
-struct HasValue<X> {
-    expected: X,
-}
-
 impl<T, E, X> Expectation<Result<T, E>> for HasValue<X>
 where
     T: PartialEq<X> + Debug,
@@ -105,10 +98,6 @@ where
             Ok::<_, E>(&self.expected),
         )
     }
-}
-
-struct HasError<X> {
-    expected: X,
 }
 
 impl<T, E, X> Expectation<Result<T, E>> for HasError<X>

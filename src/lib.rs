@@ -17,10 +17,11 @@ pub mod spec;
 
 pub mod prelude {
     pub use super::assert_that;
-    pub use super::expectations::*;
+    pub use super::assertions::*;
     pub use super::spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail};
 }
 
+mod assertions;
 mod boolean;
 mod equality;
 mod expectations;
