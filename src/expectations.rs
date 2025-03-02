@@ -33,3 +33,11 @@ pub struct IsNotEmpty;
 pub struct HasLength {
     pub expected_length: usize,
 }
+
+pub struct Contains<E> {
+    pub expected: E,
+}
+
+pub struct ContainsAnyOf<E> {
+    pub expected: E,
+}

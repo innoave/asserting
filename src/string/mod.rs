@@ -1,5 +1,5 @@
 use crate::assertions::{AssertContains, AssertContainsAnyOf, AssertEmptiness, AssertHasLength};
-use crate::expectations::{HasLength, IsEmpty, IsNotEmpty};
+use crate::expectations::{Contains, ContainsAnyOf, HasLength, IsEmpty, IsNotEmpty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -88,7 +88,7 @@ where
     R: FailingStrategy,
 {
     fn contains(self, pattern: &'a str) -> Self {
-        self.expecting(ContainsStrPattern { pattern })
+        self.expecting(Contains { expected: pattern })
     }
 }
 
@@ -98,7 +98,7 @@ where
     R: FailingStrategy,
 {
     fn contains(self, pattern: String) -> Self {
-        self.expecting(ContainsStringPattern { pattern })
+        self.expecting(Contains { expected: pattern })
     }
 }
 
@@ -108,55 +108,43 @@ where
     R: FailingStrategy,
 {
     fn contains(self, expected: char) -> Self {
-        self.expecting(ContainsChar { expected })
+        self.expecting(Contains { expected })
     }
 }
 
-struct ContainsStrPattern<'a> {
-    pattern: &'a str,
-}
-
-impl<S> Expectation<S> for ContainsStrPattern<'_>
+impl<S> Expectation<S> for Contains<&str>
 where
     S: AsRef<str> + Debug,
 {
     fn test(&self, subject: &S) -> bool {
-        subject.as_ref().contains(self.pattern)
+        subject.as_ref().contains(self.expected)
     }
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.pattern, self.pattern
+            self.expected, self.expected
         )
     }
 }
 
-struct ContainsStringPattern {
-    pattern: String,
-}
-
-impl<S> Expectation<S> for ContainsStringPattern
+impl<S> Expectation<S> for Contains<String>
 where
     S: AsRef<str> + Debug,
 {
     fn test(&self, subject: &S) -> bool {
-        subject.as_ref().contains(&self.pattern)
+        subject.as_ref().contains(&self.expected)
     }
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.pattern, self.pattern
+            self.expected, self.expected
         )
     }
 }
 
-struct ContainsChar {
-    expected: char,
-}
-
-impl<S> Expectation<S> for ContainsChar
+impl<S> Expectation<S> for Contains<char>
 where
     S: AsRef<str> + Debug,
 {
@@ -184,7 +172,7 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: &'a [char]) -> Self {
-        self.expecting(ContainsAnyOfCharSlice { expected })
+        self.expecting(ContainsAnyOf { expected })
     }
 }
 
@@ -194,7 +182,7 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: [char; N]) -> Self {
-        self.expecting(ContainsAnyOfCharArray { expected })
+        self.expecting(ContainsAnyOf { expected })
     }
 }
 
@@ -204,15 +192,11 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: &'a [char; N]) -> Self {
-        self.expecting(ContainsAnyOfBorrowedCharArray { expected })
+        self.expecting(ContainsAnyOf { expected })
     }
 }
 
-struct ContainsAnyOfCharSlice<'a> {
-    expected: &'a [char],
-}
-
-impl<S> Expectation<S> for ContainsAnyOfCharSlice<'_>
+impl<S> Expectation<S> for ContainsAnyOf<&[char]>
 where
     S: AsRef<str> + Debug,
 {
@@ -228,11 +212,7 @@ where
     }
 }
 
-struct ContainsAnyOfCharArray<const N: usize> {
-    expected: [char; N],
-}
-
-impl<S, const N: usize> Expectation<S> for ContainsAnyOfCharArray<N>
+impl<S, const N: usize> Expectation<S> for ContainsAnyOf<[char; N]>
 where
     S: AsRef<str> + Debug,
 {
@@ -248,11 +228,7 @@ where
     }
 }
 
-struct ContainsAnyOfBorrowedCharArray<'a, const N: usize> {
-    expected: &'a [char; N],
-}
-
-impl<S, const N: usize> Expectation<S> for ContainsAnyOfBorrowedCharArray<'_, N>
+impl<S, const N: usize> Expectation<S> for ContainsAnyOf<&[char; N]>
 where
     S: AsRef<str> + Debug,
 {
