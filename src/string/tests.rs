@@ -96,6 +96,32 @@ fn verify_str_has_length_fails() {
 }
 
 #[test]
+fn string_has_length_in_range() {
+    let subject: String = "fugiat vero cillum dolore".to_string();
+
+    assert_that(subject).has_length_in_range(1..=25);
+}
+
+#[test]
+fn verify_has_length_in_range_fails() {
+    let subject: String = "fugiat vero cillum dolore".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_in_range(1..=24)
+        .display_failures();
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has length in range 1..=24
+   but was: 25
+  expected: 1..=24
+"
+        ]
+    );
+}
+
+#[test]
 fn string_contains_other_str() {
     let subject: String = "illum kasd nostrud possim".to_string();
 

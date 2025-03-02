@@ -1,3 +1,4 @@
+use crate::std::ops::RangeInclusive;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::string::String;
 
@@ -11,6 +12,30 @@ pub struct IsEqualTo<E> {
 
 pub struct IsNotEqualTo<E> {
     pub expected: E,
+}
+
+pub struct IsLessThan<E> {
+    pub expected: E,
+}
+
+pub struct IsLessThanOrEqualTo<E> {
+    pub expected: E,
+}
+
+pub struct IsGreaterThan<E> {
+    pub expected: E,
+}
+
+pub struct IsGreaterThanOrEqualTo<E> {
+    pub expected: E,
+}
+
+pub struct IsInRange<E> {
+    pub expected_range: RangeInclusive<E>,
+}
+
+pub struct IsNotInRange<E> {
+    pub expected_range: RangeInclusive<E>,
 }
 
 pub struct IsSome;
@@ -35,6 +60,10 @@ pub struct IsNotEmpty;
 
 pub struct HasLength {
     pub expected_length: usize,
+}
+
+pub struct HasLengthInRange {
+    pub expected_range: RangeInclusive<usize>,
 }
 
 pub struct Contains<E> {

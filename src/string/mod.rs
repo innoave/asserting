@@ -3,10 +3,11 @@ use crate::assertions::{
     AssertStartsWith,
 };
 use crate::expectations::{
-    Contains, ContainsAnyOf, EndsWith, HasLength, IsEmpty, IsNotEmpty, StartWith,
+    Contains, ContainsAnyOf, EndsWith, HasLength, HasLengthInRange, IsEmpty, IsNotEmpty, StartWith,
 };
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
+use crate::std::ops::RangeInclusive;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
 
@@ -57,9 +58,13 @@ where
     S: AsRef<str>,
     R: FailingStrategy,
 {
-    fn has_length(self, expected: usize) -> Self {
-        self.expecting(HasLength {
-            expected_length: expected,
+    fn has_length(self, expected_length: usize) -> Self {
+        self.expecting(HasLength { expected_length })
+    }
+
+    fn has_length_in_range(self, range: RangeInclusive<usize>) -> Self {
+        self.expecting(HasLengthInRange {
+            expected_range: range,
         })
     }
 }
@@ -78,6 +83,24 @@ where
             self.expected_length,
             actual.as_ref().len(),
             self.expected_length
+        )
+    }
+}
+
+impl<S> Expectation<S> for HasLengthInRange
+where
+    S: AsRef<str>,
+{
+    fn test(&self, subject: &S) -> bool {
+        self.expected_range.contains(&subject.as_ref().len())
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+        format!(
+            "expected {expression} has length in range {:?}\n   but was: {}\n  expected: {:?}",
+            self.expected_range,
+            actual.as_ref().len(),
+            self.expected_range
         )
     }
 }

@@ -1,11 +1,35 @@
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
+use crate::std::ops::RangeInclusive;
+
 pub trait AssertEquality<E> {
     #[track_caller]
     fn is_equal_to(self, expected: E) -> Self;
 
     #[track_caller]
     fn is_not_equal_to(self, expected: E) -> Self;
+}
+
+pub trait AssertOrder<E> {
+    #[track_caller]
+    fn is_less_than(self, expected: E) -> Self;
+
+    #[track_caller]
+    fn is_greater_than(self, expected: E) -> Self;
+
+    #[track_caller]
+    fn is_less_than_or_equal_to(self, expected: E) -> Self;
+
+    #[track_caller]
+    fn is_greater_than_or_equal_to(self, expected: E) -> Self;
+}
+
+pub trait AssertInRange<E> {
+    #[track_caller]
+    fn is_in_range(self, range: RangeInclusive<E>) -> Self;
+
+    #[track_caller]
+    fn is_not_in_range(self, range: RangeInclusive<E>) -> Self;
 }
 
 pub trait AssertEmptiness {
@@ -51,6 +75,9 @@ pub trait AssertHasError<E> {
 pub trait AssertHasLength {
     #[track_caller]
     fn has_length(self, expected: usize) -> Self;
+
+    #[track_caller]
+    fn has_length_in_range(self, range: RangeInclusive<usize>) -> Self;
 }
 
 pub trait AssertContains<E> {

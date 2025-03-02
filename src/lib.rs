@@ -29,7 +29,9 @@ pub mod prelude {
 mod boolean;
 mod equality;
 mod option;
+mod order;
 mod predicate;
+mod range;
 mod result;
 mod string;
 
