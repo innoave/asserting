@@ -1,6 +1,14 @@
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
+use crate::spec::Spec;
 use crate::std::ops::RangeInclusive;
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Order {
+    #[default]
+    Ascending,
+    Descending,
+}
 
 pub trait AssertEquality<E> {
     #[track_caller]
@@ -72,17 +80,28 @@ pub trait AssertHasError<E> {
     fn has_error(self, expected: E) -> Self;
 }
 
-pub trait AssertHasLength {
+pub trait AssertHasLength<E> {
     #[track_caller]
-    fn has_length(self, expected: usize) -> Self;
+    fn has_length(self, expected: E) -> Self;
 
     #[track_caller]
-    fn has_length_in_range(self, range: RangeInclusive<usize>) -> Self;
+    fn has_length_in_range(self, range: RangeInclusive<E>) -> Self;
 }
 
-pub trait AssertContains<E> {
+pub trait AssertStringPattern<E> {
     #[track_caller]
     fn contains(self, pattern: E) -> Self;
+
+    #[track_caller]
+    fn starts_with(self, pattern: E) -> Self;
+
+    #[track_caller]
+    fn ends_with(self, pattern: E) -> Self;
+}
+
+pub trait AssertIteratorContains<'a, U, E, R> {
+    #[track_caller]
+    fn contains(self, element: E) -> Spec<'a, U, R>;
 }
 
 pub trait AssertContainsAnyOf<E> {
@@ -90,24 +109,97 @@ pub trait AssertContainsAnyOf<E> {
     fn contains_any_of(self, pattern: E) -> Self;
 }
 
-pub trait AssertStartsWith<E> {
-    #[track_caller]
-    fn starts_with(self, pattern: E) -> Self;
-}
-
-pub trait AssertEndsWith<E> {
-    #[track_caller]
-    fn ends_with(self, pattern: E) -> Self;
-}
-
+/// Assert that the code under test panics, panics with a certain message or
+/// does not panic.
 #[cfg(feature = "panic")]
 pub trait AssertPanics {
+    /// Verifies that the actual code under test does not panic.
     #[track_caller]
     fn does_not_panic(self) -> Self;
 
+    /// Verifies that the actual code under test panics with any message.
     #[track_caller]
     fn panics(self) -> Self;
 
+    /// Verifies that the actual code under test panics with the given
+    /// message.
     #[track_caller]
     fn panics_with_message(self, message: impl Into<String>) -> Self;
+}
+
+/// Assert values in an ordered collection which can iterate over its values in
+/// a defined order.
+pub trait AssertContainsInOrder<E> {
+    /// Verifies that the actual collection/iterator contains exactly the given
+    /// values and nothing else in the given order.
+    #[track_caller]
+    fn contains_exactly(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains the given sequence
+    /// of values in the given order and without extra values between the
+    /// sequence values.
+    ///
+    /// May contain more values as in the given sequence before and after the
+    /// sequence.
+    #[track_caller]
+    fn contains_sequence(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains all the given
+    /// values and in the given order, possible with other values between them.
+    #[track_caller]
+    fn contains_all_of_in_order(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains the given values
+    /// as the first elements in order.
+    #[track_caller]
+    fn starts_with(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains the given values
+    /// as the last elements in order.
+    #[track_caller]
+    fn ends_with(self, expected: E) -> Self;
+}
+
+/// Assert values in a collection which iterates over its values in an
+/// unspecified order.
+pub trait AssertContainsInAnyOrder<E> {
+    /// Verifies that the actual collection/iterator contains exactly the given
+    /// values and nothing else in any order.
+    #[track_caller]
+    fn contains_exactly_in_any_order(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains at least one of
+    /// the given values.
+    #[track_caller]
+    fn contains_any_of(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains the given values
+    /// in any order.
+    ///
+    /// The collection/iterator may contain more values than the given ones, but
+    /// at least all the specified ones.
+    #[track_caller]
+    fn contains_all_of(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains only the given
+    /// values and nothing else in any order and ignoring duplicates.
+    #[track_caller]
+    fn contains_only(self, expected: E) -> Self;
+
+    /// Verifies that the actual collection/iterator contains the given values
+    /// only once.
+    ///
+    /// The collection/iterator must contain all specified values and each of
+    /// them exactly once. It may contain more values than the given ones.
+    #[track_caller]
+    fn contains_only_once(self, expected: E) -> Self;
+}
+
+/// Assert the order of the values within a collection.
+pub trait AssertIsSorted {
+    /// Verifies that the actual collection is sorted.
+    ///
+    /// This assertion is available for ordered collections only.
+    #[track_caller]
+    fn is_sorted(self, order: Order) -> Self;
 }

@@ -58,15 +58,15 @@ pub struct IsEmpty;
 
 pub struct IsNotEmpty;
 
-pub struct HasLength {
-    pub expected_length: usize,
+pub struct HasLength<E> {
+    pub expected_length: E,
 }
 
-pub struct HasLengthInRange {
-    pub expected_range: RangeInclusive<usize>,
+pub struct HasLengthInRange<E> {
+    pub expected_range: RangeInclusive<E>,
 }
 
-pub struct Contains<E> {
+pub struct IterContains<E> {
     pub expected: E,
 }
 
@@ -82,6 +82,22 @@ pub struct EndsWith<E> {
     pub expected: E,
 }
 
+pub struct StringContains<E> {
+    pub expected: E,
+}
+
+pub struct StringContainsAnyOf<E> {
+    pub expected: E,
+}
+
+pub struct StringStartWith<E> {
+    pub expected: E,
+}
+
+pub struct StringEndsWith<E> {
+    pub expected: E,
+}
+
 pub struct Predicate<F> {
     pub predicate: F,
     pub message: Option<String>,
@@ -94,8 +110,8 @@ pub use panic::DoesPanic;
 
 #[cfg(feature = "panic")]
 mod panic {
-    use core::any::Any;
-    use core::cell::RefCell;
+    use std::any::Any;
+    use std::cell::RefCell;
     use std::rc::Rc;
 
     #[derive(Default)]

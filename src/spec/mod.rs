@@ -60,7 +60,7 @@ where
     Spec::new(Code::from(code), CollectFailures)
 }
 
-pub trait Expectation<S> {
+pub trait Expectation<S: ?Sized> {
     fn test(&self, subject: &S) -> bool;
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String;
@@ -203,6 +203,20 @@ impl<'a, S, R> Spec<'a, S, R> {
         self.location = Some(location);
         self
     }
+
+    pub fn map<F, U>(self, mapper: F) -> Spec<'a, U, R>
+    where
+        F: FnOnce(S) -> U,
+    {
+        Spec {
+            subject: mapper(self.subject),
+            expression: self.expression,
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            failing_strategy: self.failing_strategy,
+        }
+    }
 }
 
 impl<S, R> Spec<'_, S, R>
@@ -340,7 +354,7 @@ pub use code::Code;
 
 #[cfg(feature = "code")]
 mod code {
-    use core::cell::RefCell;
+    use std::cell::RefCell;
     use std::rc::Rc;
 
     #[cfg(feature = "std")]

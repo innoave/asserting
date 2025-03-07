@@ -1,6 +1,95 @@
 use crate::prelude::*;
 
 #[test]
+fn string_is_equal_to_string() {
+    let subject: String = "stet invidunt gubergren iusto".to_string();
+
+    assert_that(subject)
+        .is_equal_to("stet invidunt gubergren iusto".to_string())
+        .is_not_equal_to("bruno");
+}
+
+#[test]
+fn string_is_equal_to_str() {
+    let subject: String = "adipisici mollit hendrerit nostrud".to_string();
+
+    assert_that(subject).is_equal_to("adipisici mollit hendrerit nostrud");
+}
+
+#[test]
+fn string_ref_is_equal_to_str() {
+    let subject: &String = &"duo exerci laborum doming".to_string();
+
+    assert_that(subject).is_equal_to("duo exerci laborum doming");
+}
+
+#[test]
+fn str_is_equal_to_str() {
+    let subject: &str = "id elit vero praesent";
+
+    assert_that(subject).is_equal_to("id elit vero praesent");
+}
+
+#[test]
+fn str_is_equal_to_string() {
+    let subject: &str = "ex tincidunt nam cupiditat";
+
+    assert_that(subject).is_equal_to("ex tincidunt nam cupiditat");
+}
+
+#[test]
+fn string_is_not_equal_to_string() {
+    let subject: String = "volutpat voluptate nibh volutpat".to_string();
+
+    assert_that(subject).is_not_equal_to("wisi nihil commodi ex".to_string());
+}
+
+#[test]
+fn string_is_not_equal_to_str() {
+    let subject: String = "consectetuer qui tincidunt adipiscing".to_string();
+
+    assert_that(subject).is_not_equal_to("takimata wisi dolor vulputate");
+}
+
+#[test]
+fn string_ref_is_not_equal_to_str() {
+    let subject: String = "sunt facer clita delenit".to_string();
+
+    assert_that(&subject).is_not_equal_to("tation zzril proident suscipit");
+}
+
+#[test]
+fn str_is_not_equal_to_str() {
+    let subject: &str = "cum consectetur sadipscing vulputate";
+
+    assert_that(subject).is_not_equal_to("quod accumsan veniam doming");
+}
+
+#[test]
+fn str_is_not_equal_to_string() {
+    let subject: &str = "veniam mollit incidunt tincidunt";
+
+    assert_that(subject).is_not_equal_to("est commodo eleifend imperdiet".to_string());
+}
+
+#[test]
+fn verify_string_is_equal_to_str_fails() {
+    use crate::assertions::*;
+    assert_eq!(
+        verify_that(String::new())
+            .named("my_thing")
+            .is_equal_to("aute duis eleifend molestie")
+            .display_failures(),
+        &[
+            r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
+   but was: ""
+  expected: "aute duis eleifend molestie"
+"#
+        ]
+    );
+}
+
+#[test]
 fn string_is_empty() {
     let subject: String = String::new();
 
@@ -24,6 +113,42 @@ fn str_is_empty() {
 #[test]
 fn str_is_not_empty() {
     let subject: &str = "ABC";
+
+    assert_that(subject).is_not_empty();
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_str_is_empty() {
+    use crate::std::ffi::OsStr;
+    let subject: &OsStr = OsStr::new("");
+
+    assert_that(subject).is_empty();
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_str_is_not_empty() {
+    use crate::std::ffi::OsStr;
+    let subject: &OsStr = OsStr::new("officia praesent minim feugait");
+
+    assert_that(subject).is_not_empty();
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_string_is_empty() {
+    use crate::std::ffi::OsString;
+    let subject: OsString = OsString::new();
+
+    assert_that(subject).is_empty();
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_string_is_not_empty() {
+    use crate::std::ffi::OsString;
+    let subject: OsString = OsString::from("anim ea aute aliqua");
 
     assert_that(subject).is_not_empty();
 }
@@ -76,6 +201,24 @@ fn str_has_length() {
     let subject: &str = "ad fugiat duo erat";
 
     assert_that(subject).has_length(18);
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_str_has_length() {
+    use crate::std::ffi::OsStr;
+    let subject: &OsStr = OsStr::new("A");
+
+    assert_that(subject).has_length(1);
+}
+
+#[cfg(feature = "std")]
+#[test]
+fn os_string_has_length() {
+    use crate::std::ffi::OsString;
+    let subject: OsString = OsString::from("ABC");
+
+    assert_that(subject).has_length(3);
 }
 
 #[test]
