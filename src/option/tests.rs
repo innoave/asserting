@@ -76,11 +76,13 @@ fn verify_option_of_custom_struct_is_some_fails() {
 
     let subject: Option<MyStruct> = None;
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_some()
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .is_some()
-            .display_failures(),
+        failures,
         &[r"assertion failed: expected my_thing is Some(_)
    but was: None
   expected: Some(_)
@@ -95,11 +97,13 @@ fn verify_option_of_custom_struct_is_none_fails() {
 
     let subject: Option<MyStruct> = Some(MyStruct);
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_none()
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .is_none()
-            .display_failures(),
+        failures,
         &[r"assertion failed: expected my_thing is None
    but was: Some(MyStruct)
   expected: None
@@ -111,11 +115,13 @@ fn verify_option_of_custom_struct_is_none_fails() {
 fn verify_option_of_string_has_some_value_fails() {
     let subject = Some("labore dolore voluptate culpa".to_string());
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_value("labore dolores voluptate culpa")
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .has_value("labore dolores voluptate culpa")
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing is some containing "labore dolores voluptate culpa"
    but was: Some("labore dolore voluptate culpa")

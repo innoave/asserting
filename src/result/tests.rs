@@ -31,11 +31,13 @@ fn verify_result_of_custom_types_is_ok_fails() {
 
     let subject: Result<MyValue, MyError> = Err(MyError("aute nam ad amet".to_string()));
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_ok()
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .is_ok()
-            .display_failures(),
+        failures,
         &[r#"assertion failed: expected my_thing is Ok(_)
    but was: Err(MyError("aute nam ad amet"))
   expected: Ok(_)
@@ -54,11 +56,13 @@ fn verify_result_of_custom_types_is_err_fails() {
 
     let subject: Result<MyValue, MyError> = Ok(MyValue(42));
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_err()
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .is_err()
-            .display_failures(),
+        failures,
         &[r"assertion failed: expected my_thing is Err(_)
    but was: Ok(MyValue(42))
   expected: Err(_)
@@ -103,11 +107,13 @@ fn verify_result_of_custom_types_has_value_fails() {
 
     let subject: Result<MyValue, MyError> = Err(MyError("amet esse rebum feugait".to_string()));
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_value(MyValue("sea non obcaecat nostrud".to_string()))
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .has_value(MyValue("sea non obcaecat nostrud".to_string()))
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing is ok containing MyValue("sea non obcaecat nostrud")
    but was: Err(MyError("amet esse rebum feugait"))
@@ -128,11 +134,13 @@ fn verify_result_of_custom_types_has_error_fails() {
 
     let subject: Result<MyValue, MyError> = Ok(MyValue(42));
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_error(MyError(-1))
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .has_error(MyError(-1))
-            .display_failures(),
+        failures,
         &[
             r"assertion failed: expected my_thing is error containing MyError(-1)
    but was: Ok(MyValue(42))

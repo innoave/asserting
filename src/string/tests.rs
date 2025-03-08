@@ -74,12 +74,13 @@ fn str_is_not_equal_to_string() {
 
 #[test]
 fn verify_string_is_equal_to_str_fails() {
-    use crate::assertions::*;
+    let failures = verify_that(String::new())
+        .named("my_thing")
+        .is_equal_to("aute duis eleifend molestie")
+        .display_failures();
+
     assert_eq!(
-        verify_that(String::new())
-            .named("my_thing")
-            .is_equal_to("aute duis eleifend molestie")
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
    but was: ""
@@ -229,6 +230,7 @@ fn verify_str_has_length_fails() {
         .named("my_thing")
         .has_length(29)
         .display_failures();
+
     assert_eq!(
         failures,
         &[r"assertion failed: expected my_thing has length 29
@@ -253,6 +255,7 @@ fn verify_has_length_in_range_fails() {
         .named("my_thing")
         .has_length_in_range(1..=24)
         .display_failures();
+
     assert_eq!(
         failures,
         &[
@@ -303,11 +306,13 @@ fn str_contains_a_char() {
 fn verify_string_contains_other_str_fails() {
     let subject: String = "invidunt eos hendrerit commodo".to_string();
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains("not a substring")
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains("not a substring")
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing to contain "not a substring"
    but was: "invidunt eos hendrerit commodo"
@@ -321,11 +326,13 @@ fn verify_string_contains_other_str_fails() {
 fn verify_string_contains_other_string_fails() {
     let subject: String = "invidunt eos hendrerit commodo".to_string();
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains("not a substring".to_string())
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains("not a substring".to_string())
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing to contain "not a substring"
    but was: "invidunt eos hendrerit commodo"
@@ -339,11 +346,13 @@ fn verify_string_contains_other_string_fails() {
 fn verify_string_contains_char_fails() {
     let subject: String = "consectetur ex hendrerit officia".to_string();
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains('Q')
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains('Q')
-            .display_failures(),
+        failures,
         &[r#"assertion failed: expected my_thing to contain 'Q'
    but was: "consectetur ex hendrerit officia"
   expected: 'Q'
@@ -376,11 +385,13 @@ fn string_contains_any_char_of_a_borrowed_array_of_chars() {
 fn verify_str_contains_any_char_of_a_slice_of_chars_fails() {
     let subject: &str = "luptatum in nihil laoreet";
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains_any_of(&['x', 'y', 'z'][..])
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains_any_of(&['x', 'y', 'z'][..])
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
@@ -394,11 +405,13 @@ fn verify_str_contains_any_char_of_a_slice_of_chars_fails() {
 fn verify_string_contains_any_of_char_of_an_array_of_chars_fails() {
     let subject: String = "luptatum in nihil laoreet".to_string();
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains_any_of(['x', 'y', 'z'])
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains_any_of(['x', 'y', 'z'])
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
@@ -412,11 +425,13 @@ fn verify_string_contains_any_of_char_of_an_array_of_chars_fails() {
 fn verify_str_contains_any_of_char_of_a_borrowed_array_of_chars_fails() {
     let subject: &str = "luptatum in nihil laoreet";
 
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .contains_any_of(&['x', 'y', 'z'])
+        .display_failures();
+
     assert_eq!(
-        verify_that(subject)
-            .named("my_thing")
-            .contains_any_of(&['x', 'y', 'z'])
-            .display_failures(),
+        failures,
         &[
             r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
