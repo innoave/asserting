@@ -22,7 +22,7 @@ pub struct IsLessThan<E> {
     pub expected: E,
 }
 
-pub struct IsLessThanOrEqualTo<E> {
+pub struct IsAtMost<E> {
     pub expected: E,
 }
 
@@ -30,7 +30,7 @@ pub struct IsGreaterThan<E> {
     pub expected: E,
 }
 
-pub struct IsGreaterThanOrEqualTo<E> {
+pub struct IsAtLeast<E> {
     pub expected: E,
 }
 

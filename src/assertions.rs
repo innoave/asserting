@@ -26,10 +26,10 @@ pub trait AssertOrder<E> {
     fn is_greater_than(self, expected: E) -> Self;
 
     #[track_caller]
-    fn is_less_than_or_equal_to(self, expected: E) -> Self;
+    fn is_at_most(self, expected: E) -> Self;
 
     #[track_caller]
-    fn is_greater_than_or_equal_to(self, expected: E) -> Self;
+    fn is_at_least(self, expected: E) -> Self;
 }
 
 pub trait AssertInRange<E> {

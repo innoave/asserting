@@ -55,56 +55,52 @@ fn verify_i32_is_greater_than_other_i32_fails() {
 }
 
 #[test]
-fn i32_is_less_than_or_equal_to_other_i32() {
+fn i32_is_at_most_other_i32() {
     let subject = 42;
 
-    assert_that(subject).is_less_than_or_equal_to(42);
+    assert_that(subject).is_at_most(42);
 }
 
 #[test]
-fn verify_i32_is_less_than_or_equal_to_other_i32_fails() {
+fn verify_i32_is_at_most_other_i32_fails() {
     let subject = 42;
 
     let failures = verify_that(subject)
         .named("my_thing")
-        .is_less_than_or_equal_to(41)
+        .is_at_most(41)
         .display_failures();
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing is less than or equal to 41
+        &[r"assertion failed: expected my_thing is at most 41
    but was: 42
   expected: <= 41
-"
-        ]
+"]
     );
 }
 
 #[test]
-fn i32_is_greater_than_or_equal_to_other_i32() {
+fn i32_is_at_least_other_i32() {
     let subject = 42;
 
-    assert_that(subject).is_greater_than_or_equal_to(42);
+    assert_that(subject).is_at_least(42);
 }
 
 #[test]
-fn verify_i32_is_greater_than_or_equal_to_other_i32_fails() {
+fn verify_i32_is_at_least_other_i32_fails() {
     let subject = 42;
 
     let failures = verify_that(subject)
         .named("my_thing")
-        .is_greater_than_or_equal_to(43)
+        .is_at_least(43)
         .display_failures();
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing is greater than or equal to 43
+        &[r"assertion failed: expected my_thing is at least 43
    but was: 42
   expected: >= 43
-"
-        ]
+"]
     );
 }
 
@@ -163,55 +159,51 @@ fn verify_char_is_greater_than_other_char_fails() {
 }
 
 #[test]
-fn char_is_less_than_or_equal_to_other_char() {
+fn char_is_at_most_other_char() {
     let subject = 'C';
 
-    assert_that(subject).is_less_than_or_equal_to('C');
+    assert_that(subject).is_at_most('C');
 }
 
 #[test]
-fn verify_char_is_less_than_or_equal_to_other_char_fails() {
+fn verify_char_is_at_most_other_char_fails() {
     let subject = 'C';
 
     let failures = verify_that(subject)
         .named("my_thing")
-        .is_less_than_or_equal_to('B')
+        .is_at_most('B')
         .display_failures();
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing is less than or equal to 'B'
+        &[r"assertion failed: expected my_thing is at most 'B'
    but was: 'C'
   expected: <= 'B'
-"
-        ]
+"]
     );
 }
 
 #[test]
-fn char_is_greater_than_or_equal_to_other_char() {
+fn char_is_at_least_other_char() {
     let subject = 'D';
 
-    assert_that(subject).is_greater_than_or_equal_to('D');
+    assert_that(subject).is_at_least('D');
 }
 
 #[test]
-fn verify_char_is_greater_than_or_equal_to_other_char_fails() {
+fn verify_char_is_at_least_other_char_fails() {
     let subject = 'D';
 
     let failures = verify_that(subject)
         .named("my_thing")
-        .is_greater_than_or_equal_to('E')
+        .is_at_least('E')
         .display_failures();
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing is greater than or equal to 'E'
+        &[r"assertion failed: expected my_thing is at least 'E'
    but was: 'D'
   expected: >= 'E'
-"
-        ]
+"]
     );
 }

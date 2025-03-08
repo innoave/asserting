@@ -1,5 +1,5 @@
 use crate::assertions::AssertOrder;
-use crate::expectations::{IsGreaterThan, IsGreaterThanOrEqualTo, IsLessThan, IsLessThanOrEqualTo};
+use crate::expectations::{IsAtLeast, IsAtMost, IsGreaterThan, IsLessThan};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(any(feature = "std", test)))]
@@ -19,12 +19,12 @@ where
         self.expecting(IsGreaterThan { expected })
     }
 
-    fn is_less_than_or_equal_to(self, expected: E) -> Self {
-        self.expecting(IsLessThanOrEqualTo { expected })
+    fn is_at_most(self, expected: E) -> Self {
+        self.expecting(IsAtMost { expected })
     }
 
-    fn is_greater_than_or_equal_to(self, expected: E) -> Self {
-        self.expecting(IsGreaterThanOrEqualTo { expected })
+    fn is_at_least(self, expected: E) -> Self {
+        self.expecting(IsAtLeast { expected })
     }
 }
 
@@ -45,7 +45,7 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for IsLessThanOrEqualTo<E>
+impl<S, E> Expectation<S> for IsAtMost<E>
 where
     S: PartialOrd<E> + Debug,
     E: Debug,
@@ -56,7 +56,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
-            "expected {expression} is less than or equal to {:?}\n   but was: {actual:?}\n  expected: <= {:?}",
+            "expected {expression} is at most {:?}\n   but was: {actual:?}\n  expected: <= {:?}",
             self.expected, self.expected,
         )
     }
@@ -79,7 +79,7 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for IsGreaterThanOrEqualTo<E>
+impl<S, E> Expectation<S> for IsAtLeast<E>
 where
     S: PartialOrd<E> + Debug,
     E: Debug,
@@ -90,7 +90,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
-            "expected {expression} is greater than or equal to {:?}\n   but was: {actual:?}\n  expected: >= {:?}",
+            "expected {expression} is at least {:?}\n   but was: {actual:?}\n  expected: >= {:?}",
             self.expected, self.expected,
         )
     }
