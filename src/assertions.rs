@@ -127,13 +127,53 @@ pub trait AssertPanics {
     fn panics_with_message(self, message: impl Into<String>) -> Self;
 }
 
-/// Assert values in an ordered collection which can iterate over its values in
-/// a defined order.
-pub trait AssertContainsInOrder<E> {
+/// Assert values in a collection.
+///
+/// These assertions do not rely on the order in which the collection iterates
+/// over its values.
+pub trait AssertContainsInAnyOrder<'a, S, E, R> {
+    /// Verifies that the actual collection/iterator contains exactly the given
+    /// values and nothing else in any order.
+    #[track_caller]
+    fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, S, R>;
+
+    /// Verifies that the actual collection/iterator contains at least one of
+    /// the given values.
+    #[track_caller]
+    fn contains_any_of(self, expected: E) -> Spec<'a, S, R>;
+
+    /// Verifies that the actual collection/iterator contains the given values
+    /// in any order.
+    ///
+    /// The collection/iterator may contain more values than the given ones, but
+    /// at least all the specified ones.
+    #[track_caller]
+    fn contains_all_of(self, expected: E) -> Spec<'a, S, R>;
+
+    /// Verifies that the actual collection/iterator contains only the given
+    /// values and nothing else in any order and ignoring duplicates.
+    ///
+    /// The collection may contain fewer values than the expected ones.
+    #[track_caller]
+    fn contains_only(self, expected: E) -> Spec<'a, S, R>;
+
+    /// Verifies that the actual collection/iterator contains only the given
+    /// values in any order and each of them only once.
+    ///
+    /// The collection may contain fewer values than the expected ones.
+    #[track_caller]
+    fn contains_only_once(self, expected: E) -> Spec<'a, S, R>;
+}
+
+/// Assert values in an ordered collection.
+///
+/// These assertions are applicable to collections which iterate over their
+/// values in a defined order.
+pub trait AssertContainsInOrder<'a, S, E, R> {
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in the given order.
     #[track_caller]
-    fn contains_exactly(self, expected: E) -> Self;
+    fn contains_exactly(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains the given sequence
     /// of values in the given order and without extra values between the
@@ -142,64 +182,29 @@ pub trait AssertContainsInOrder<E> {
     /// May contain more values as in the given sequence before and after the
     /// sequence.
     #[track_caller]
-    fn contains_sequence(self, expected: E) -> Self;
+    fn contains_sequence(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains all the given
     /// values and in the given order, possible with other values between them.
     #[track_caller]
-    fn contains_all_of_in_order(self, expected: E) -> Self;
+    fn contains_all_in_order(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// as the first elements in order.
     #[track_caller]
-    fn starts_with(self, expected: E) -> Self;
+    fn starts_with(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// as the last elements in order.
     #[track_caller]
-    fn ends_with(self, expected: E) -> Self;
-}
-
-/// Assert values in a collection which iterates over its values in an
-/// unspecified order.
-pub trait AssertContainsInAnyOrder<E> {
-    /// Verifies that the actual collection/iterator contains exactly the given
-    /// values and nothing else in any order.
-    #[track_caller]
-    fn contains_exactly_in_any_order(self, expected: E) -> Self;
-
-    /// Verifies that the actual collection/iterator contains at least one of
-    /// the given values.
-    #[track_caller]
-    fn contains_any_of(self, expected: E) -> Self;
-
-    /// Verifies that the actual collection/iterator contains the given values
-    /// in any order.
-    ///
-    /// The collection/iterator may contain more values than the given ones, but
-    /// at least all the specified ones.
-    #[track_caller]
-    fn contains_all_of(self, expected: E) -> Self;
-
-    /// Verifies that the actual collection/iterator contains only the given
-    /// values and nothing else in any order and ignoring duplicates.
-    #[track_caller]
-    fn contains_only(self, expected: E) -> Self;
-
-    /// Verifies that the actual collection/iterator contains the given values
-    /// only once.
-    ///
-    /// The collection/iterator must contain all specified values and each of
-    /// them exactly once. It may contain more values than the given ones.
-    #[track_caller]
-    fn contains_only_once(self, expected: E) -> Self;
+    fn ends_with(self, expected: E) -> Spec<'a, S, R>;
 }
 
 /// Assert the order of the values within a collection.
+///
+/// These assertions are applicable to ordered collections only.
 pub trait AssertIsSorted {
     /// Verifies that the actual collection is sorted.
-    ///
-    /// This assertion is available for ordered collections only.
     #[track_caller]
     fn is_sorted(self, order: Order) -> Self;
 }

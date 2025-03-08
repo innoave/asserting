@@ -24,6 +24,7 @@ panic = ["code", "std"]
 std = []
 
 [dependencies]
+hashbrown = "0.15"
 
 [dev-dependencies]
 
