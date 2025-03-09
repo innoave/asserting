@@ -109,29 +109,11 @@ pub trait AssertIteratorContains<'a, U, E, R> {
     fn contains(self, element: E) -> Spec<'a, U, R>;
 }
 
-/// Assert that the code under test panics, panics with a certain message or
-/// does not panic.
-#[cfg(feature = "panic")]
-pub trait AssertPanics {
-    /// Verifies that the actual code under test does not panic.
-    #[track_caller]
-    fn does_not_panic(self) -> Self;
-
-    /// Verifies that the actual code under test panics with any message.
-    #[track_caller]
-    fn panics(self) -> Self;
-
-    /// Verifies that the actual code under test panics with the given
-    /// message.
-    #[track_caller]
-    fn panics_with_message(self, message: impl Into<String>) -> Self;
-}
-
 /// Assert values in a collection.
 ///
 /// These assertions do not rely on the order in which the collection iterates
 /// over its values.
-pub trait AssertContainsInAnyOrder<'a, S, E, R> {
+pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in any order.
     #[track_caller]
@@ -169,7 +151,7 @@ pub trait AssertContainsInAnyOrder<'a, S, E, R> {
 ///
 /// These assertions are applicable to collections which iterate over their
 /// values in a defined order.
-pub trait AssertContainsInOrder<'a, S, E, R> {
+pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in the given order.
     #[track_caller]
@@ -207,4 +189,22 @@ pub trait AssertIsSorted {
     /// Verifies that the actual collection is sorted.
     #[track_caller]
     fn is_sorted(self, order: Order) -> Self;
+}
+
+/// Assert that the code under test panics, panics with a certain message or
+/// does not panic.
+#[cfg(feature = "panic")]
+pub trait AssertPanics {
+    /// Verifies that the actual code under test does not panic.
+    #[track_caller]
+    fn does_not_panic(self) -> Self;
+
+    /// Verifies that the actual code under test panics with any message.
+    #[track_caller]
+    fn panics(self) -> Self;
+
+    /// Verifies that the actual code under test panics with the given
+    /// message.
+    #[track_caller]
+    fn panics_with_message(self, message: impl Into<String>) -> Self;
 }

@@ -1,4 +1,4 @@
-use crate::assertions::{AssertContainsInAnyOrder, AssertIteratorContains};
+use crate::assertions::{AssertIteratorContains, AssertIteratorContainsInAnyOrder};
 use crate::expectations::{
     IterContains, IterContainsAllOf, IterContainsAnyOf, IterContainsExactlyInAnyOrder,
     IterContainsOnly, IterContainsOnlyOnce,
@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<'a, S, T, E, R> AssertContainsInAnyOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
+impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     T: PartialEq<<E as IntoIterator>::Item> + Debug,
