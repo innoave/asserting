@@ -1,4 +1,4 @@
-use crate::assertions::AssertPanics;
+use crate::assertions::AssertCodePanics;
 use crate::expectations::{DoesNotPanic, DoesPanic};
 use crate::spec::{Code, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
@@ -7,7 +7,7 @@ use crate::std::panic;
 const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";
 const UNKNOWN_PANIC_MESSAGE: &str = "<unknown panic message>";
 
-impl<S, R> AssertPanics for Spec<'_, Code<S>, R>
+impl<S, R> AssertCodePanics for Spec<'_, Code<S>, R>
 where
     S: FnOnce(),
     R: FailingStrategy,

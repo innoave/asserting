@@ -194,7 +194,7 @@ pub trait AssertIsSorted {
 /// Assert that the code under test panics, panics with a certain message or
 /// does not panic.
 #[cfg(feature = "panic")]
-pub trait AssertPanics {
+pub trait AssertCodePanics {
     /// Verifies that the actual code under test does not panic.
     #[track_caller]
     fn does_not_panic(self) -> Self;
