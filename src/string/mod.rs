@@ -33,7 +33,7 @@ impl LengthProperty for String {
 #[cfg(feature = "std")]
 mod os_string {
     use crate::properties::{IsEmptyProperty, LengthProperty};
-    use crate::std::ffi::{OsStr, OsString};
+    use crate::std::ffi::{CStr, CString, OsStr, OsString};
 
     impl IsEmptyProperty for OsString {
         fn is_empty_property(&self) -> bool {
@@ -56,6 +56,18 @@ mod os_string {
     impl LengthProperty for &OsStr {
         fn length_property(&self) -> usize {
             self.len()
+        }
+    }
+
+    impl IsEmptyProperty for CString {
+        fn is_empty_property(&self) -> bool {
+            self.is_empty()
+        }
+    }
+
+    impl IsEmptyProperty for CStr {
+        fn is_empty_property(&self) -> bool {
+            self.is_empty()
         }
     }
 }
