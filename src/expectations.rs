@@ -70,22 +70,6 @@ pub struct HasLengthInRange<E> {
     pub expected_range: RangeInclusive<E>,
 }
 
-pub struct IterContains<E> {
-    pub expected: E,
-}
-
-pub struct ContainsAnyOf<E> {
-    pub expected: E,
-}
-
-pub struct StartWith<E> {
-    pub expected: E,
-}
-
-pub struct EndsWith<E> {
-    pub expected: E,
-}
-
 pub struct StringContains<E> {
     pub expected: E,
 }
@@ -99,6 +83,10 @@ pub struct StringStartWith<E> {
 }
 
 pub struct StringEndsWith<E> {
+    pub expected: E,
+}
+
+pub struct IterContains<E> {
     pub expected: E,
 }
 
@@ -166,6 +154,91 @@ impl<E> IterContainsOnlyOnce<E> {
             expected,
             extra: Rc::new(RefCell::new(HashSet::new())),
             duplicates: Rc::new(RefCell::new(HashSet::new())),
+        }
+    }
+}
+
+pub struct IterContainsExactly<E> {
+    pub(crate) expected: Vec<E>,
+    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub(crate) out_of_order: Rc<RefCell<HashSet<usize>>>,
+}
+
+impl<E> IterContainsExactly<E> {
+    #[must_use]
+    pub fn new(expected: Vec<E>) -> Self {
+        Self {
+            expected,
+            missing: Rc::new(RefCell::new(HashSet::new())),
+            extra: Rc::new(RefCell::new(HashSet::new())),
+            out_of_order: Rc::new(RefCell::new(HashSet::new())),
+        }
+    }
+}
+
+pub struct IterContainsSequence<E> {
+    pub(crate) expected: Vec<E>,
+    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+}
+
+impl<E> IterContainsSequence<E> {
+    #[must_use]
+    pub fn new(expected: Vec<E>) -> Self {
+        Self {
+            expected,
+            missing: Rc::new(RefCell::new(HashSet::new())),
+            extra: Rc::new(RefCell::new(HashSet::new())),
+        }
+    }
+}
+
+pub struct IterContainsAllInOrder<E> {
+    pub(crate) expected: Vec<E>,
+    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+}
+
+impl<E> IterContainsAllInOrder<E> {
+    #[must_use]
+    pub fn new(expected: Vec<E>) -> Self {
+        Self {
+            expected,
+            missing: Rc::new(RefCell::new(HashSet::new())),
+        }
+    }
+}
+
+pub struct IterStartsWith<E> {
+    pub(crate) expected: Vec<E>,
+    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+}
+
+impl<E> IterStartsWith<E> {
+    #[must_use]
+    pub fn new(expected: Vec<E>) -> Self {
+        Self {
+            expected,
+            missing: Rc::new(RefCell::new(HashSet::new())),
+            extra: Rc::new(RefCell::new(HashSet::new())),
+        }
+    }
+}
+
+pub struct IterEndsWith<E> {
+    pub(crate) expected: Vec<E>,
+    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+}
+
+impl<E> IterEndsWith<E> {
+    #[must_use]
+    pub fn new(expected: Vec<E>) -> Self {
+        Self {
+            expected,
+            missing: Rc::new(RefCell::new(HashSet::new())),
+            extra: Rc::new(RefCell::new(HashSet::new())),
         }
     }
 }

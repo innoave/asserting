@@ -1,12 +1,18 @@
-use crate::assertions::{AssertIteratorContains, AssertIteratorContainsInAnyOrder};
-use crate::expectations::{
-    IterContains, IterContainsAllOf, IterContainsAnyOf, IterContainsExactlyInAnyOrder,
-    IterContainsOnly, IterContainsOnlyOnce,
+use crate::assertions::{
+    AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
 };
+use crate::expectations::{
+    IterContains, IterContainsAllInOrder, IterContainsAllOf, IterContainsAnyOf,
+    IterContainsExactly, IterContainsExactlyInAnyOrder, IterContainsOnly, IterContainsOnlyOnce,
+    IterContainsSequence, IterEndsWith, IterStartsWith,
+};
+use crate::properties::DefinedOrder;
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
+use crate::std::mem;
 #[cfg(not(any(feature = "std", test)))]
-use alloc::{format, string::String, vec::Vec};
+use alloc::{format, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 
 impl<'a, S, T, E, R> AssertIteratorContains<'a, Vec<T>, E, R> for Spec<'a, S, R>
@@ -105,7 +111,7 @@ where
         let extra = collect_values(&self.extra.borrow(), actual);
 
         format!(
-            r"expected {expression} to contain exactly in any order {:?}
+            r"expected {expression} contains exactly in any order {:?}
    but was: {actual:?}
   expected: {:?}
    missing: {missing:?}
@@ -131,7 +137,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
         format!(
-            r"expected {expression} to contain any of {:?}, but contained none of them
+            r"expected {expression} contains any of {:?}, but contained none of them
    but was: {actual:?}
   expected: {:?}",
             &self.expected, &self.expected
@@ -160,7 +166,7 @@ where
         let missing = collect_values(&self.missing.borrow(), &self.expected);
 
         format!(
-            r"expected {expression} to contain all of {:?}
+            r"expected {expression} contains all of {:?}
    but was: {actual:?}
   expected: {:?}
    missing: {missing:?}",
@@ -190,7 +196,7 @@ where
         let extra = collect_values(&self.extra.borrow(), actual);
 
         format!(
-            r"expected {expression} to contain only {:?}
+            r"expected {expression} contains only {:?}
    but was: {actual:?}
   expected: {:?}
      extra: {extra:?}",
@@ -226,11 +232,314 @@ where
         let duplicates = collect_values(&self.duplicates.borrow(), actual);
 
         format!(
-            r"expected {expression} to contain only once {:?}
+            r"expected {expression} contains only once {:?}
      but was: {actual:?}
     expected: {:?}
        extra: {extra:?}
   duplicates: {duplicates:?}",
+            &self.expected, &self.expected
+        )
+    }
+}
+
+impl<'a, S, T, E, R> AssertIteratorContainsInOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
+where
+    S: IntoIterator<Item = T>,
+    <S as IntoIterator>::IntoIter: DefinedOrder,
+    E: IntoIterator,
+    <E as IntoIterator>::IntoIter: DefinedOrder,
+    <E as IntoIterator>::Item: Debug,
+    T: PartialEq<<E as IntoIterator>::Item> + Debug,
+    R: FailingStrategy,
+{
+    fn contains_exactly(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.map(Vec::from_iter)
+            .expecting(IterContainsExactly::new(Vec::from_iter(expected)))
+    }
+
+    fn contains_sequence(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.map(Vec::from_iter)
+            .expecting(IterContainsSequence::new(Vec::from_iter(expected)))
+    }
+
+    fn contains_all_in_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.map(Vec::from_iter)
+            .expecting(IterContainsAllInOrder::new(Vec::from_iter(expected)))
+    }
+
+    fn starts_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.map(Vec::from_iter)
+            .expecting(IterStartsWith::new(Vec::from_iter(expected)))
+    }
+
+    fn ends_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.map(Vec::from_iter)
+            .expecting(IterEndsWith::new(Vec::from_iter(expected)))
+    }
+}
+
+impl<T, E> Expectation<Vec<T>> for IterContainsExactly<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Vec<T>) -> bool {
+        let mut maybe_extras = Vec::new();
+        let mut maybe_missing = Vec::new();
+        let mut expected_iter = self.expected.iter().enumerate();
+        let mut subject_iter = subject.iter().enumerate();
+        loop {
+            match (expected_iter.next(), subject_iter.next()) {
+                (Some((expected_index, expected_value)), Some((subject_index, actual_value))) => {
+                    if actual_value == expected_value {
+                        continue;
+                    }
+                    maybe_missing.push((expected_index, expected_value));
+                    maybe_extras.push((subject_index, actual_value));
+                },
+                (Some(expected), None) => maybe_missing.push(expected),
+                (None, Some(actual)) => maybe_extras.push(actual),
+                (None, None) => break,
+            }
+        }
+
+        let mut missing = self.missing.borrow_mut();
+        let mut extra = self.extra.borrow_mut();
+        let mut out_of_order = self.out_of_order.borrow_mut();
+
+        for (expected_index, expected_value) in maybe_missing {
+            if let Some(index) = maybe_extras
+                .iter()
+                .position(|(_, value)| *value == expected_value)
+            {
+                let (subject_index, _) = maybe_extras.remove(index);
+                out_of_order.insert(subject_index);
+            } else {
+                missing.insert(expected_index);
+            }
+        }
+        for (subject_index, _) in maybe_extras {
+            extra.insert(subject_index);
+        }
+
+        out_of_order.is_empty() && extra.is_empty() && missing.is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let extra = collect_values(&self.extra.borrow(), actual);
+        let out_of_order = collect_values(&self.out_of_order.borrow(), actual);
+
+        format!(
+            r"expected {expression} contains exactly in order {:?}
+       but was: {actual:?}
+      expected: {:?}
+       missing: {missing:?}
+         extra: {extra:?}
+  out-of-order: {out_of_order:?}",
+            &self.expected, &self.expected
+        )
+    }
+}
+
+impl<T, E> Expectation<Vec<T>> for IterContainsSequence<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Vec<T>) -> bool {
+        let subject_length = subject.len();
+        let sequence_length = self.expected.len();
+        let possible_sequence_starts = if sequence_length >= subject_length {
+            vec![0]
+        } else {
+            (0..=subject_length - sequence_length).collect()
+        };
+        let mut best_missing = self.missing.borrow_mut();
+        let mut best_extra = self.extra.borrow_mut();
+        let mut best_match_count = 0;
+        let mut missing = HashSet::new();
+        let mut extra = HashSet::new();
+        let mut match_count = 0;
+        for start_index in possible_sequence_starts {
+            let mut expected_iter = self.expected.iter().enumerate();
+            let mut subject_iter = subject.iter().enumerate().skip(start_index);
+            loop {
+                match (expected_iter.next(), subject_iter.next()) {
+                    (
+                        Some((expected_index, expected_value)),
+                        Some((subject_index, actual_value)),
+                    ) => {
+                        if actual_value == expected_value {
+                            match_count += 1;
+                            continue;
+                        }
+                        missing.insert(expected_index);
+                        extra.insert(subject_index);
+                    },
+                    (Some((expected_index, _)), None) => {
+                        missing.insert(expected_index);
+                    },
+                    (None, _) => break,
+                }
+            }
+            if missing.is_empty() && extra.is_empty() {
+                *best_missing = HashSet::new();
+                *best_extra = HashSet::new();
+                return true;
+            }
+            match match_count.cmp(&best_match_count) {
+                Ordering::Less => {
+                    missing.clear();
+                    extra.clear();
+                },
+                Ordering::Equal => {
+                    best_missing.extend(mem::replace(&mut missing, HashSet::new()));
+                    best_extra.extend(mem::replace(&mut extra, HashSet::new()));
+                },
+                Ordering::Greater => {
+                    best_match_count = match_count;
+                    *best_missing = mem::replace(&mut missing, HashSet::new());
+                    *best_extra = mem::replace(&mut extra, HashSet::new());
+                },
+            }
+            match_count = 0;
+        }
+        false
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let extra = collect_values(&self.extra.borrow(), actual);
+
+        format!(
+            r"expected {expression} contains sequence {:?}
+       but was: {actual:?}
+      expected: {:?}
+       missing: {missing:?}
+         extra: {extra:?}",
+            &self.expected, &self.expected
+        )
+    }
+}
+
+impl<T, E> Expectation<Vec<T>> for IterContainsAllInOrder<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Vec<T>) -> bool {
+        let mut missing = self.missing.borrow_mut();
+        let mut last_match_index = 0;
+        for (expected_index, expected) in self.expected.iter().enumerate() {
+            if let Some((subject_index, _)) = subject
+                .iter()
+                .enumerate()
+                .skip(last_match_index)
+                .find(|(_, actual)| *actual == expected)
+            {
+                last_match_index = subject_index + 1;
+            } else {
+                missing.insert(expected_index);
+            }
+        }
+        missing.is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+        let missing = collect_values(&self.missing.borrow(), &self.expected);
+
+        format!(
+            r"expected {expression} contains all of {:?} in order
+       but was: {actual:?}
+      expected: {:?}
+       missing: {missing:?}",
+            &self.expected, &self.expected
+        )
+    }
+}
+
+impl<T, E> Expectation<Vec<T>> for IterStartsWith<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Vec<T>) -> bool {
+        let mut missing = self.missing.borrow_mut();
+        let mut extra = self.extra.borrow_mut();
+        let mut expected_iter = self.expected.iter().enumerate();
+        let mut subject_iter = subject.iter().enumerate();
+        loop {
+            match (expected_iter.next(), subject_iter.next()) {
+                (Some((expected_index, expected)), Some((subject_index, actual))) => {
+                    if actual == expected {
+                        continue;
+                    }
+                    missing.insert(expected_index);
+                    extra.insert(subject_index);
+                },
+                (Some((expected_index, _)), None) => {
+                    missing.insert(expected_index);
+                },
+                (None, _) => break,
+            }
+        }
+        extra.is_empty() && missing.is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let extra = collect_values(&self.extra.borrow(), actual);
+
+        format!(
+            r"expected {expression} starts with {:?}
+   but was: {actual:?}
+  expected: {:?}
+   missing: {missing:?}
+     extra: {extra:?}",
+            &self.expected, &self.expected
+        )
+    }
+}
+
+impl<T, E> Expectation<Vec<T>> for IterEndsWith<E>
+where
+    T: PartialEq<E> + Debug,
+    E: Debug,
+{
+    fn test(&self, subject: &Vec<T>) -> bool {
+        let mut missing = self.missing.borrow_mut();
+        let mut extra = self.extra.borrow_mut();
+        let mut expected_iter = self.expected.iter().enumerate().rev();
+        let mut subject_iter = subject.iter().enumerate().rev();
+        loop {
+            match (expected_iter.next(), subject_iter.next()) {
+                (Some((expected_index, expected)), Some((subject_index, actual))) => {
+                    if actual == expected {
+                        continue;
+                    }
+                    missing.insert(expected_index);
+                    extra.insert(subject_index);
+                },
+                (Some((expected_index, _)), None) => {
+                    missing.insert(expected_index);
+                },
+                (None, _) => break,
+            }
+        }
+        extra.is_empty() && missing.is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let extra = collect_values(&self.extra.borrow(), actual);
+
+        format!(
+            r"expected {expression} ends with {:?}
+   but was: {actual:?}
+  expected: {:?}
+   missing: {missing:?}
+     extra: {extra:?}",
             &self.expected, &self.expected
         )
     }

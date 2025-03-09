@@ -1,8 +1,10 @@
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
+use crate::prelude::DefinedOrder;
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
+use crate::std::str::Chars;
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
 
@@ -33,7 +35,7 @@ impl LengthProperty for String {
 #[cfg(feature = "std")]
 mod os_string {
     use crate::properties::{IsEmptyProperty, LengthProperty};
-    use crate::std::ffi::{CStr, CString, OsStr, OsString};
+    use crate::std::ffi::{OsStr, OsString};
 
     impl IsEmptyProperty for OsString {
         fn is_empty_property(&self) -> bool {
@@ -58,6 +60,12 @@ mod os_string {
             self.len()
         }
     }
+}
+
+#[cfg(feature = "std")]
+mod c_string {
+    use crate::properties::IsEmptyProperty;
+    use crate::std::ffi::{CStr, CString};
 
     impl IsEmptyProperty for CString {
         fn is_empty_property(&self) -> bool {
@@ -65,12 +73,14 @@ mod os_string {
         }
     }
 
-    impl IsEmptyProperty for CStr {
+    impl IsEmptyProperty for &CStr {
         fn is_empty_property(&self) -> bool {
             self.is_empty()
         }
     }
 }
+
+impl DefinedOrder for Chars<'_> {}
 
 // We implement `AssertContains` for different `Pattern` types as the
 // [`core::str::pattern`] API is not stabilized as of February 2025;

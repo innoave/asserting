@@ -258,6 +258,7 @@ where
         })
     }
 
+    #[track_caller]
     fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
