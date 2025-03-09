@@ -3,13 +3,6 @@
 use crate::spec::Spec;
 use crate::std::ops::RangeInclusive;
 
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Order {
-    #[default]
-    Ascending,
-    Descending,
-}
-
 pub trait AssertEquality<E> {
     #[track_caller]
     fn is_equal_to(self, expected: E) -> Self;
@@ -186,9 +179,13 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
 ///
 /// These assertions are applicable to ordered collections only.
 pub trait AssertIsSorted {
-    /// Verifies that the actual collection is sorted.
+    /// Verifies that the actual collection is sorted in ascending order.
     #[track_caller]
-    fn is_sorted(self, order: Order) -> Self;
+    fn is_sorted_ascending(self) -> Self;
+
+    /// Verifies that the actual collection is sorted in descending order.
+    #[track_caller]
+    fn is_sorted_descending(self) -> Self;
 }
 
 /// Assert that the code under test panics, panics with a certain message or
