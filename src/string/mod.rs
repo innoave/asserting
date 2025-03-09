@@ -1,4 +1,4 @@
-use crate::assertions::{AssertContainsAnyOf, AssertStringPattern};
+use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
@@ -281,7 +281,7 @@ where
 // assertion for array/slice of chars as expected value, but not the
 // [`AssertContains`] assertion.
 
-impl<'a, S, R> AssertContainsAnyOf<&'a [char]> for Spec<'a, S, R>
+impl<'a, S, R> AssertStringContainsAnyOf<&'a [char]> for Spec<'a, S, R>
 where
     S: 'a + AsRef<str> + Debug,
     R: FailingStrategy,
@@ -291,7 +291,7 @@ where
     }
 }
 
-impl<'a, S, R, const N: usize> AssertContainsAnyOf<[char; N]> for Spec<'a, S, R>
+impl<'a, S, R, const N: usize> AssertStringContainsAnyOf<[char; N]> for Spec<'a, S, R>
 where
     S: 'a + AsRef<str> + Debug,
     R: FailingStrategy,
@@ -301,7 +301,7 @@ where
     }
 }
 
-impl<'a, S, R, const N: usize> AssertContainsAnyOf<&'a [char; N]> for Spec<'a, S, R>
+impl<'a, S, R, const N: usize> AssertStringContainsAnyOf<&'a [char; N]> for Spec<'a, S, R>
 where
     S: 'a + AsRef<str> + Debug,
     R: FailingStrategy,

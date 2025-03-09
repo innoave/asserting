@@ -99,14 +99,14 @@ pub trait AssertStringPattern<E> {
     fn ends_with(self, pattern: E) -> Self;
 }
 
+pub trait AssertStringContainsAnyOf<E> {
+    #[track_caller]
+    fn contains_any_of(self, pattern: E) -> Self;
+}
+
 pub trait AssertIteratorContains<'a, U, E, R> {
     #[track_caller]
     fn contains(self, element: E) -> Spec<'a, U, R>;
-}
-
-pub trait AssertContainsAnyOf<E> {
-    #[track_caller]
-    fn contains_any_of(self, pattern: E) -> Self;
 }
 
 /// Assert that the code under test panics, panics with a certain message or
