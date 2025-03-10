@@ -1,9 +1,6 @@
-use crate::std::cell::RefCell;
 use crate::std::ops::RangeInclusive;
-#[cfg(any(feature = "std", test))]
-use crate::std::rc::Rc;
 #[cfg(not(any(feature = "std", test)))]
-use alloc::{rc::Rc, string::String, vec::Vec};
+use alloc::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
 pub struct IsTrue;
@@ -91,9 +88,9 @@ pub struct IterContains<E> {
 }
 
 pub struct IterContainsExactlyInAnyOrder<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
 }
 
 impl<E> IterContainsExactlyInAnyOrder<E> {
@@ -101,8 +98,8 @@ impl<E> IterContainsExactlyInAnyOrder<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
-            extra: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
         }
     }
 }
@@ -112,8 +109,8 @@ pub struct IterContainsAnyOf<E> {
 }
 
 pub struct IterContainsAllOf<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
 }
 
 impl<E> IterContainsAllOf<E> {
@@ -121,14 +118,14 @@ impl<E> IterContainsAllOf<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
         }
     }
 }
 
 pub struct IterContainsOnly<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub extra: HashSet<usize>,
 }
 
 impl<E> IterContainsOnly<E> {
@@ -136,15 +133,15 @@ impl<E> IterContainsOnly<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            extra: Rc::new(RefCell::new(HashSet::new())),
+            extra: HashSet::new(),
         }
     }
 }
 
 pub struct IterContainsOnlyOnce<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) duplicates: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub extra: HashSet<usize>,
+    pub duplicates: HashSet<usize>,
 }
 
 impl<E> IterContainsOnlyOnce<E> {
@@ -152,17 +149,17 @@ impl<E> IterContainsOnlyOnce<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            extra: Rc::new(RefCell::new(HashSet::new())),
-            duplicates: Rc::new(RefCell::new(HashSet::new())),
+            extra: HashSet::new(),
+            duplicates: HashSet::new(),
         }
     }
 }
 
 pub struct IterContainsExactly<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) out_of_order: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
+    pub out_of_order: HashSet<usize>,
 }
 
 impl<E> IterContainsExactly<E> {
@@ -170,17 +167,17 @@ impl<E> IterContainsExactly<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
-            extra: Rc::new(RefCell::new(HashSet::new())),
-            out_of_order: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
+            out_of_order: HashSet::new(),
         }
     }
 }
 
 pub struct IterContainsSequence<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
 }
 
 impl<E> IterContainsSequence<E> {
@@ -188,15 +185,15 @@ impl<E> IterContainsSequence<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
-            extra: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
         }
     }
 }
 
 pub struct IterContainsAllInOrder<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
 }
 
 impl<E> IterContainsAllInOrder<E> {
@@ -204,15 +201,15 @@ impl<E> IterContainsAllInOrder<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
         }
     }
 }
 
 pub struct IterStartsWith<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
 }
 
 impl<E> IterStartsWith<E> {
@@ -220,16 +217,16 @@ impl<E> IterStartsWith<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
-            extra: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
         }
     }
 }
 
 pub struct IterEndsWith<E> {
-    pub(crate) expected: Vec<E>,
-    pub(crate) missing: Rc<RefCell<HashSet<usize>>>,
-    pub(crate) extra: Rc<RefCell<HashSet<usize>>>,
+    pub expected: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
 }
 
 impl<E> IterEndsWith<E> {
@@ -237,8 +234,8 @@ impl<E> IterEndsWith<E> {
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
-            missing: Rc::new(RefCell::new(HashSet::new())),
-            extra: Rc::new(RefCell::new(HashSet::new())),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
         }
     }
 }
@@ -256,13 +253,11 @@ pub use panic::DoesPanic;
 #[cfg(feature = "panic")]
 mod panic {
     use std::any::Any;
-    use std::cell::RefCell;
-    use std::rc::Rc;
 
     #[derive(Default)]
     pub struct DoesPanic {
-        pub(crate) expected_message: Option<String>,
-        pub(crate) actual_message: Rc<RefCell<Option<String>>>,
+        pub expected_message: Option<String>,
+        pub actual_message: Option<String>,
     }
 
     impl DoesPanic {
@@ -274,13 +269,13 @@ mod panic {
         pub fn with_message(message: impl Into<String>) -> Self {
             Self {
                 expected_message: Some(message.into()),
-                actual_message: Rc::new(RefCell::new(None)),
+                actual_message: None,
             }
         }
     }
 
     #[derive(Default)]
     pub struct DoesNotPanic {
-        pub(crate) actual_message: Rc<RefCell<Option<Box<dyn Any + Send>>>>,
+        pub actual_message: Option<Box<dyn Any + Send>>,
     }
 }

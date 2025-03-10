@@ -61,7 +61,7 @@ where
 }
 
 pub trait Expectation<S: ?Sized> {
-    fn test(&self, subject: &S) -> bool;
+    fn test(&mut self, subject: &S) -> bool;
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String;
 }
@@ -225,7 +225,7 @@ where
 {
     #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
     #[track_caller]
-    pub fn expecting(mut self, expectation: impl Expectation<S>) -> Self {
+    pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
             let expression = self.expression.unwrap_or_default();
             let message = expectation.message(expression, &self.subject);

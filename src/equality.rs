@@ -25,7 +25,7 @@ where
     S: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject == &self.expected
     }
 
@@ -42,7 +42,7 @@ where
     S: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject != &self.expected
     }
 

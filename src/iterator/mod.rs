@@ -33,7 +33,7 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
+    fn test(&mut self, subject: &Vec<T>) -> bool {
         subject.iter().any(|e| e == &self.expected)
     }
 
@@ -85,9 +85,9 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut missing = self.missing.borrow_mut();
-        let mut extra = self.extra.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let missing = &mut self.missing;
+        let extra = &mut self.extra;
         *extra = (0..subject.len()).collect();
 
         let mut subject_values = subject.iter().enumerate().collect::<Vec<_>>();
@@ -107,8 +107,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
-        let extra = collect_values(&self.extra.borrow(), actual);
+        let missing = collect_values(&self.missing, &self.expected);
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains exactly in any order {:?}
@@ -126,7 +126,7 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
+    fn test(&mut self, subject: &Vec<T>) -> bool {
         for expected in &self.expected {
             if subject.iter().any(|value| value == expected) {
                 return true;
@@ -150,8 +150,8 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut missing = self.missing.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let missing = &mut self.missing;
 
         for (expected_index, expected) in self.expected.iter().enumerate() {
             if !subject.iter().any(|value| value == expected) {
@@ -163,7 +163,7 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let missing = collect_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?}
@@ -180,8 +180,8 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut extra = self.extra.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let extra = &mut self.extra;
 
         for (actual_index, value) in subject.iter().enumerate() {
             if !self.expected.iter().any(|expected| value == expected) {
@@ -193,7 +193,7 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let extra = collect_values(&self.extra.borrow(), actual);
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains only {:?}
@@ -210,9 +210,9 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut extra = self.extra.borrow_mut();
-        let mut duplicates = self.duplicates.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let extra = &mut self.extra;
+        let duplicates = &mut self.duplicates;
 
         for (actual_index, value) in subject.iter().enumerate() {
             if let Some(expected) = self.expected.iter().find(|expected| value == *expected) {
@@ -228,8 +228,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let extra = collect_values(&self.extra.borrow(), actual);
-        let duplicates = collect_values(&self.duplicates.borrow(), actual);
+        let extra = collect_values(&self.extra, actual);
+        let duplicates = collect_values(&self.duplicates, actual);
 
         format!(
             r"expected {expression} contains only once {:?}
@@ -283,7 +283,7 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
+    fn test(&mut self, subject: &Vec<T>) -> bool {
         let mut maybe_extras = Vec::new();
         let mut maybe_missing = Vec::new();
         let mut expected_iter = self.expected.iter().enumerate();
@@ -303,9 +303,9 @@ where
             }
         }
 
-        let mut missing = self.missing.borrow_mut();
-        let mut extra = self.extra.borrow_mut();
-        let mut out_of_order = self.out_of_order.borrow_mut();
+        let missing = &mut self.missing;
+        let extra = &mut self.extra;
+        let out_of_order = &mut self.out_of_order;
 
         for (expected_index, expected_value) in maybe_missing {
             if let Some(index) = maybe_extras
@@ -326,9 +326,9 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
-        let extra = collect_values(&self.extra.borrow(), actual);
-        let out_of_order = collect_values(&self.out_of_order.borrow(), actual);
+        let missing = collect_values(&self.missing, &self.expected);
+        let extra = collect_values(&self.extra, actual);
+        let out_of_order = collect_values(&self.out_of_order, actual);
 
         format!(
             r"expected {expression} contains exactly in order {:?}
@@ -347,7 +347,7 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
+    fn test(&mut self, subject: &Vec<T>) -> bool {
         let subject_length = subject.len();
         let sequence_length = self.expected.len();
         let possible_sequence_starts = if sequence_length >= subject_length {
@@ -355,8 +355,8 @@ where
         } else {
             (0..=subject_length - sequence_length).collect()
         };
-        let mut best_missing = self.missing.borrow_mut();
-        let mut best_extra = self.extra.borrow_mut();
+        let best_missing = &mut self.missing;
+        let best_extra = &mut self.extra;
         let mut best_match_count = 0;
         let mut missing = HashSet::new();
         let mut extra = HashSet::new();
@@ -409,8 +409,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
-        let extra = collect_values(&self.extra.borrow(), actual);
+        let missing = collect_values(&self.missing, &self.expected);
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains sequence {:?}
@@ -428,8 +428,8 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut missing = self.missing.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let missing = &mut self.missing;
         let mut last_match_index = 0;
         for (expected_index, expected) in self.expected.iter().enumerate() {
             if let Some((subject_index, _)) = subject
@@ -447,7 +447,7 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
+        let missing = collect_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?} in order
@@ -464,9 +464,9 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut missing = self.missing.borrow_mut();
-        let mut extra = self.extra.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let missing = &mut self.missing;
+        let extra = &mut self.extra;
         let mut expected_iter = self.expected.iter().enumerate();
         let mut subject_iter = subject.iter().enumerate();
         loop {
@@ -488,8 +488,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
-        let extra = collect_values(&self.extra.borrow(), actual);
+        let missing = collect_values(&self.missing, &self.expected);
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} starts with {:?}
@@ -507,9 +507,9 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Vec<T>) -> bool {
-        let mut missing = self.missing.borrow_mut();
-        let mut extra = self.extra.borrow_mut();
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        let missing = &mut self.missing;
+        let extra = &mut self.extra;
         let mut expected_iter = self.expected.iter().enumerate().rev();
         let mut subject_iter = subject.iter().enumerate().rev();
         loop {
@@ -531,8 +531,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
-        let missing = collect_values(&self.missing.borrow(), &self.expected);
-        let extra = collect_values(&self.extra.borrow(), actual);
+        let missing = collect_values(&self.missing, &self.expected);
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} ends with {:?}

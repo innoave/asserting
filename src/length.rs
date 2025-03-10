@@ -26,7 +26,7 @@ impl<S> Expectation<S> for IsEmpty
 where
     S: IsEmptyProperty + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.is_empty_property()
     }
 
@@ -39,7 +39,7 @@ impl<S> Expectation<S> for IsNotEmpty
 where
     S: IsEmptyProperty + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         !subject.is_empty_property()
     }
 
@@ -70,7 +70,7 @@ impl<S> Expectation<S> for HasLength<usize>
 where
     S: LengthProperty + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.length_property() == self.expected_length
     }
 
@@ -88,7 +88,7 @@ impl<S> Expectation<S> for HasLengthInRange<usize>
 where
     S: LengthProperty + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         self.expected_range.contains(&subject.length_property())
     }
 

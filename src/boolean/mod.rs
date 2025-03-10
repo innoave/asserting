@@ -18,7 +18,7 @@ where
 }
 
 impl Expectation<bool> for IsTrue {
-    fn test(&self, subject: &bool) -> bool {
+    fn test(&mut self, subject: &bool) -> bool {
         *subject
     }
 
@@ -31,7 +31,7 @@ impl Expectation<bool> for IsTrue {
 }
 
 impl Expectation<bool> for IsFalse {
-    fn test(&self, subject: &bool) -> bool {
+    fn test(&mut self, subject: &bool) -> bool {
         !*subject
     }
 

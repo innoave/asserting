@@ -50,7 +50,7 @@ where
     T: Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Result<T, E>) -> bool {
+    fn test(&mut self, subject: &Result<T, E>) -> bool {
         subject.is_ok()
     }
 
@@ -68,7 +68,7 @@ where
     T: Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Result<T, E>) -> bool {
+    fn test(&mut self, subject: &Result<T, E>) -> bool {
         subject.is_err()
     }
 
@@ -87,7 +87,7 @@ where
     E: Debug,
     X: Debug,
 {
-    fn test(&self, subject: &Result<T, E>) -> bool {
+    fn test(&mut self, subject: &Result<T, E>) -> bool {
         subject.as_ref().is_ok_and(|value| value == &self.expected)
     }
 
@@ -106,7 +106,7 @@ where
     E: PartialEq<X> + Debug,
     X: Debug,
 {
-    fn test(&self, subject: &Result<T, E>) -> bool {
+    fn test(&mut self, subject: &Result<T, E>) -> bool {
         subject.as_ref().is_err_and(|err| err == &self.expected)
     }
 

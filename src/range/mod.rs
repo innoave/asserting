@@ -30,7 +30,7 @@ where
     S: PartialOrd<E> + Debug,
     E: PartialOrd<S> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         self.expected_range.contains(subject)
     }
 
@@ -49,7 +49,7 @@ where
     S: PartialOrd<E> + Debug,
     E: PartialOrd<S> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         !self.expected_range.contains(subject)
     }
 

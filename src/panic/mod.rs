@@ -29,25 +29,24 @@ impl<S> Expectation<Code<S>> for DoesNotPanic
 where
     S: FnOnce(),
 {
-    fn test(&self, subject: &Code<S>) -> bool {
+    fn test(&mut self, subject: &Code<S>) -> bool {
         if let Some(function) = subject.take() {
             let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
             match result {
                 Ok(()) => true,
                 Err(panic_message) => {
-                    *self.actual_message.borrow_mut() = Some(panic_message);
+                    self.actual_message = Some(panic_message);
                     false
                 },
             }
         } else {
-            *self.actual_message.borrow_mut() = Some(Box::new(ONLY_ONE_EXPECTATION));
+            self.actual_message = Some(Box::new(ONLY_ONE_EXPECTATION));
             false
         }
     }
 
     fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
-        let actual_message = self.actual_message.borrow();
-        let panic_message = read_panic_message(actual_message.as_ref())
+        let panic_message = read_panic_message(self.actual_message.as_ref())
             .unwrap_or_else(|| "<unknown panic message>".to_string());
 
         if panic_message == ONLY_ONE_EXPECTATION {
@@ -64,7 +63,7 @@ impl<S> Expectation<Code<S>> for DoesPanic
 where
     S: FnOnce(),
 {
-    fn test(&self, subject: &Code<S>) -> bool {
+    fn test(&mut self, subject: &Code<S>) -> bool {
         if let Some(function) = subject.take() {
             let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
             match result {
@@ -78,19 +77,18 @@ where
                         // did panic - panic message should not be asserted
                         true
                     };
-                    *self.actual_message.borrow_mut() = Some(panic_message);
+                    self.actual_message = Some(panic_message);
                     test_result
                 },
             }
         } else {
-            *self.actual_message.borrow_mut() = Some(ONLY_ONE_EXPECTATION.to_string());
+            self.actual_message = Some(ONLY_ONE_EXPECTATION.to_string());
             false
         }
     }
 
     fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
-        let panic_message = self.actual_message.borrow();
-        if let Some(actual_message) = panic_message.as_ref() {
+        if let Some(actual_message) = self.actual_message.as_ref() {
             if actual_message == ONLY_ONE_EXPECTATION {
                 format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
             } else if let Some(expected_message) = &self.expected_message {

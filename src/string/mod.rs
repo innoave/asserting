@@ -145,7 +145,7 @@ impl<S> Expectation<S> for StringContains<&str>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(self.expected)
     }
 
@@ -161,7 +161,7 @@ impl<S> Expectation<S> for StringContains<String>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(&self.expected)
     }
 
@@ -177,7 +177,7 @@ impl<S> Expectation<S> for StringContains<char>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(self.expected)
     }
 
@@ -193,7 +193,7 @@ impl<S> Expectation<S> for StringStartWith<&str>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().starts_with(self.expected)
     }
 
@@ -209,7 +209,7 @@ impl<S> Expectation<S> for StringStartWith<String>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().starts_with(&self.expected)
     }
 
@@ -225,7 +225,7 @@ impl<S> Expectation<S> for StringStartWith<char>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().starts_with(self.expected)
     }
 
@@ -241,7 +241,7 @@ impl<S> Expectation<S> for StringEndsWith<&str>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().ends_with(self.expected)
     }
 
@@ -257,7 +257,7 @@ impl<S> Expectation<S> for StringEndsWith<String>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().ends_with(&self.expected)
     }
 
@@ -273,7 +273,7 @@ impl<S> Expectation<S> for StringEndsWith<char>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().ends_with(self.expected)
     }
 
@@ -325,7 +325,7 @@ impl<S> Expectation<S> for StringContainsAnyOf<&[char]>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(self.expected)
     }
 
@@ -341,7 +341,7 @@ impl<S, const N: usize> Expectation<S> for StringContainsAnyOf<[char; N]>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(self.expected)
     }
 
@@ -357,7 +357,7 @@ impl<S, const N: usize> Expectation<S> for StringContainsAnyOf<&[char; N]>
 where
     S: AsRef<str> + Debug,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         subject.as_ref().contains(self.expected)
     }
 

@@ -7,7 +7,7 @@ impl<S, P> Expectation<S> for Predicate<P>
 where
     P: Fn(&S) -> bool,
 {
-    fn test(&self, subject: &S) -> bool {
+    fn test(&mut self, subject: &S) -> bool {
         (self.predicate)(subject)
     }
 

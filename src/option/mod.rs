@@ -34,7 +34,7 @@ impl<T> Expectation<Option<T>> for IsSome
 where
     T: Debug,
 {
-    fn test(&self, subject: &Option<T>) -> bool {
+    fn test(&mut self, subject: &Option<T>) -> bool {
         subject.is_some()
     }
 
@@ -51,7 +51,7 @@ impl<T> Expectation<Option<T>> for IsNone
 where
     T: Debug,
 {
-    fn test(&self, subject: &Option<T>) -> bool {
+    fn test(&mut self, subject: &Option<T>) -> bool {
         subject.is_none()
     }
 
@@ -68,7 +68,7 @@ where
     T: PartialEq<E> + Debug,
     E: Debug,
 {
-    fn test(&self, subject: &Option<T>) -> bool {
+    fn test(&mut self, subject: &Option<T>) -> bool {
         subject
             .as_ref()
             .is_some_and(|value| value == &self.expected)
