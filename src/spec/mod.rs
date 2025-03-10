@@ -204,6 +204,13 @@ impl<'a, S, R> Spec<'a, S, R> {
         self
     }
 
+    pub fn extracting<F, U>(self, extractor: F) -> Spec<'a, U, R>
+    where
+        F: FnOnce(S) -> U,
+    {
+        self.mapping(extractor)
+    }
+
     pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
