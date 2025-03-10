@@ -204,7 +204,7 @@ impl<'a, S, R> Spec<'a, S, R> {
         self
     }
 
-    pub fn map<F, U>(self, mapper: F) -> Spec<'a, U, R>
+    pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {

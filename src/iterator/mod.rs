@@ -23,7 +23,7 @@ where
     R: FailingStrategy,
 {
     fn contains(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContains { expected })
     }
 }
@@ -54,28 +54,28 @@ where
     R: FailingStrategy,
 {
     fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsExactlyInAnyOrder::new(Vec::from_iter(expected)))
     }
 
     fn contains_any_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter).expecting(IterContainsAnyOf {
+        self.mapping(Vec::from_iter).expecting(IterContainsAnyOf {
             expected: Vec::from_iter(expected),
         })
     }
 
     fn contains_all_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsAllOf::new(Vec::from_iter(expected)))
     }
 
     fn contains_only(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsOnly::new(Vec::from_iter(expected)))
     }
 
     fn contains_only_once(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsOnlyOnce::new(Vec::from_iter(expected)))
     }
 }
@@ -253,27 +253,27 @@ where
     R: FailingStrategy,
 {
     fn contains_exactly(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsExactly::new(Vec::from_iter(expected)))
     }
 
     fn contains_sequence(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsSequence::new(Vec::from_iter(expected)))
     }
 
     fn contains_all_in_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterContainsAllInOrder::new(Vec::from_iter(expected)))
     }
 
     fn starts_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterStartsWith::new(Vec::from_iter(expected)))
     }
 
     fn ends_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.map(Vec::from_iter)
+        self.mapping(Vec::from_iter)
             .expecting(IterEndsWith::new(Vec::from_iter(expected)))
     }
 }
