@@ -1,3 +1,13 @@
+//! Definitions of the assertions that are provided by this crate.
+//!
+//! Assertions define the methods that are used to assert that the actual test
+//! result is as expected. Assertions are defined by traits that are implemented
+//! for one or several types. An assertion can be applied to all types that
+//! implement this assertion.
+//!
+//! All assertions provided by this crate are defined in this module. Browse
+//! over the traits in this module to get information about all provided
+//! assertions.
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
 use crate::spec::Spec;
