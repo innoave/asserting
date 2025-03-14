@@ -1,3 +1,5 @@
+//! Implementation of assertions for `Option` values.
+
 use crate::assertions::{AssertHasValue, AssertOption};
 use crate::expectations::{HasValue, IsNone, IsSome};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};

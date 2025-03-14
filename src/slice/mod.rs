@@ -1,3 +1,5 @@
+//! Implementation of assertions for `slice` values.
+
 use crate::prelude::{IsEmptyProperty, LengthProperty};
 
 impl<T> IsEmptyProperty for &[T] {

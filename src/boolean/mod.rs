@@ -1,3 +1,5 @@
+//! Implementation of assertions for values of type `bool`.
+
 use crate::assertions::AssertBoolean;
 use crate::expectations::{IsFalse, IsTrue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};

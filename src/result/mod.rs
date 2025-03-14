@@ -1,3 +1,5 @@
+//! Implementation of assertions for `Result` values.
+
 use crate::assertions::AssertResult;
 use crate::expectations::{HasError, HasValue, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};

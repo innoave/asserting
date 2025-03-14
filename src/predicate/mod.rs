@@ -1,3 +1,5 @@
+//! Implementation of the predicate assertion.
+
 use crate::expectations::Predicate;
 use crate::spec::{Expectation, Expression};
 #[cfg(not(feature = "std"))]

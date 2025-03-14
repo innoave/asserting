@@ -1,3 +1,5 @@
+//! Implementations of assertions for `Iterator` values.
+
 use crate::assertions::{
     AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
 };

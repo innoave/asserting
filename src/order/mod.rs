@@ -1,3 +1,5 @@
+//! Implementation of order assertions.
+
 use crate::assertions::AssertOrder;
 use crate::expectations::{IsAtLeast, IsAtMost, IsGreaterThan, IsLessThan};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};

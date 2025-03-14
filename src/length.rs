@@ -1,3 +1,5 @@
+//! Implementations of the emptiness and length assertions.
+
 use crate::assertions::AssertHasLength;
 use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
 use crate::prelude::{AssertEmptiness, LengthProperty};

@@ -1,3 +1,5 @@
+//! Implementation of assertions for collections and iterators.
+
 use crate::prelude::{DefinedOrder, IsEmptyProperty, LengthProperty};
 use crate::std::{array, slice};
 use hashbrown::{HashMap, HashSet};

@@ -1,3 +1,5 @@
+//! Implementation of assertions for `Vec` values.
+
 use crate::prelude::{IsEmptyProperty, LengthProperty};
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;

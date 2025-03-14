@@ -1,3 +1,11 @@
+//! Implementation of assertions for string values.
+//!
+//! String assertions are implemented for all string types of Rust:
+//!
+//! * `String` and `str`
+//! * `OsString` and `OsStr`
+//! * `CString` and `CStr`
+
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
 use crate::prelude::DefinedOrder;

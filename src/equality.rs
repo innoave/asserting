@@ -1,3 +1,5 @@
+//! Implementation of the equality assertions.
+
 use crate::assertions::AssertEquality;
 use crate::expectations::{IsEqualTo, IsNotEqualTo};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};

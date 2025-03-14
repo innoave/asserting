@@ -1,3 +1,5 @@
+//! Implementation of assertions for `Range` and `RangeInclusive` values.
+
 use crate::assertions::AssertInRange;
 use crate::expectations::{IsInRange, IsNotInRange};
 use crate::properties::IsEmptyProperty;

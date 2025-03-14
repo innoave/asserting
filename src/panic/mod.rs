@@ -1,3 +1,5 @@
+//! Implementation of assertions for code that should or should not panic.
+
 use crate::assertions::AssertCodePanics;
 use crate::expectations::{DoesNotPanic, DoesPanic};
 use crate::spec::{Code, Expectation, Expression, FailingStrategy, Spec};
