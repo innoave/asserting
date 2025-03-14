@@ -10,8 +10,8 @@ use crate::std::ops::RangeInclusive;
 ///
 /// ## Examples
 ///
-/// we can assert that a value of type `String` is equal to an expected value
-/// of type `&str`:
+/// assert that a value of type `String` is equal to an expected value of type
+/// `&str`:
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -21,7 +21,7 @@ use crate::std::ops::RangeInclusive;
 /// assert_that!(subject).is_equal_to("ea rebum dignissim suscipit");
 /// ```
 ///
-/// or we can assert that two integers are equal:
+/// assert that two integers are equal:
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -265,28 +265,113 @@ pub trait AssertHasLength<E> {
     fn has_length_in_range(self, range: RangeInclusive<E>) -> Self;
 }
 
+/// Assert whether a subject of the `Option` type holds some value or has none.
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = Some("nisl possim nobis non".to_string());
+/// assert_that!(subject).is_some();
+///
+/// #[derive(Debug)]
+/// struct MyType;
+///
+/// let subject: Option<MyType> = None;
+/// assert_that!(subject).is_none();
+/// ```
 pub trait AssertOption {
+    /// Verifies that the subject has some value.
     #[track_caller]
     fn is_some(self) -> Self;
 
+    /// Verifies that the subject has no value.
     #[track_caller]
     fn is_none(self) -> Self;
 }
 
+/// Assert whether a subject of the `Result` type holds some value or an error.
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Result<f64, String> = Ok(-3.14);
+/// assert_that!(subject).is_ok();
+///
+/// let subject: Result<(), String> = Err("consequat sanctus ea exercitation".to_string());
+/// assert_that!(subject).is_err();
+/// ```
 pub trait AssertResult {
+    /// Verifies that the subject has an ok value.
     #[track_caller]
     fn is_ok(self) -> Self;
 
+    /// Verifies that the subject has an err value.
     #[track_caller]
     fn is_err(self) -> Self;
 }
 
+/// Assert that a subject of some container type holds a value that is equal to
+/// the expected one.
+///
+/// This assertion is implemented for the `Option` type and the `Result` type.
+/// For `Option` it compares the value to the expected one if it has some or
+/// fails if it holds none. For `Result` it compares the ok value to the
+/// expected one if it is an ok or fails if it holds an error.
+///
+/// The value type of the `Option` or `Result` must implement `PartialEq<E>`
+/// where `E` is the type of the expected value.
+///
+/// To assert the error value of a `Result` use [`AssertHasError::has_error`].
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = Some(-3.14);
+/// assert_that!(subject).has_value(-3.14);
+///
+/// let subject: Result<f64, String> = Ok(6.28);
+/// assert_that!(subject).has_value(6.28);
+/// ```
 pub trait AssertHasValue<E> {
+    /// Verifies that the subject holds a value that is equal to the expected
+    /// one.
+    ///
+    /// For `Option` it compares the value in `Some(value)` and for `Result`
+    /// it compares the value in `Ok(value)`. If an `Option` is `None` or a
+    /// `Result` is `Err(error)` than the assertion fails.
     #[track_caller]
     fn has_value(self, expected: E) -> Self;
 }
 
+/// Assert that a subject of some container type holds an error value that is
+/// equal to the expected one.
+///
+/// This assertion is implemented for the `Result` type. It compares the value
+/// in `Err(value)` with the expected one. The error type in the `Result` must
+/// implement `PartialEq<E>` where `E` is the type of the expected error value.
+///
+/// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Result<(), String> = Err("labore gubergren ut ipsum".to_string());
+/// assert_that!(subject).has_error("labore gubergren ut ipsum");
+/// ```
 pub trait AssertHasError<E> {
+    /// Verifies that the subject holds an error value that is equal to the
+    /// expected one.
+    ///
+    /// For `Result` it compares the value in `Err(value)`. If the `Result`
+    /// holds an `Ok(value)` the assertion fails.
     #[track_caller]
     fn has_error(self, expected: E) -> Self;
 }
