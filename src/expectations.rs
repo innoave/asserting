@@ -1,5 +1,5 @@
 use crate::std::ops::RangeInclusive;
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{string::String, vec::Vec};
 use hashbrown::HashSet;
 

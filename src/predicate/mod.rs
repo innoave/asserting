@@ -1,6 +1,6 @@
 use crate::expectations::Predicate;
 use crate::spec::{Expectation, Expression};
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
 impl<S, P> Expectation<S> for Predicate<P>

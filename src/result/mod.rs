@@ -3,7 +3,7 @@ use crate::expectations::{HasError, HasValue, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
 impl<T, E, R> AssertResult for Spec<'_, Result<T, E>, R>

@@ -11,7 +11,7 @@ use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 

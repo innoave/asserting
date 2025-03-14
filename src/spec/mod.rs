@@ -1,7 +1,7 @@
 use crate::expectations::Predicate;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{
     string::{String, ToString},
     vec,

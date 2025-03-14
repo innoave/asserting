@@ -4,7 +4,7 @@ use crate::properties::IsEmptyProperty;
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::{Range, RangeBounds, RangeInclusive};
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
 impl<T> IsEmptyProperty for Range<T>

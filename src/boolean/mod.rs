@@ -1,7 +1,7 @@
 use crate::assertions::AssertBoolean;
 use crate::expectations::{IsFalse, IsTrue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
 impl<R> AssertBoolean for Spec<'_, bool, R>

@@ -5,7 +5,7 @@ use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
 impl IsEmptyProperty for &str {

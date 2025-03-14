@@ -8,7 +8,7 @@ impl<T, const N: usize> DefinedOrder for array::IntoIter<T, N> {}
 impl<T> DefinedOrder for slice::Iter<'_, T> {}
 impl<T> DefinedOrder for slice::IterMut<'_, T> {}
 
-#[cfg(any(feature = "std", test))]
+#[cfg(feature = "std")]
 mod std {
     use crate::prelude::{IsEmptyProperty, LengthProperty};
     use crate::properties::DefinedOrder;
@@ -122,7 +122,7 @@ mod std {
     }
 }
 
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 mod no_std {
     use crate::prelude::{IsEmptyProperty, LengthProperty};
     use crate::properties::DefinedOrder;

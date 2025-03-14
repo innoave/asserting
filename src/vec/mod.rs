@@ -1,5 +1,5 @@
 use crate::prelude::{IsEmptyProperty, LengthProperty};
-#[cfg(not(any(feature = "std", test)))]
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 impl<T> IsEmptyProperty for Vec<T> {
