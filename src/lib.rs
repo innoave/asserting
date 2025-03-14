@@ -29,6 +29,7 @@ pub mod prelude {
 }
 
 mod boolean;
+mod collection;
 mod equality;
 mod integer;
 mod iterator;

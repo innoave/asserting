@@ -1,10 +1,29 @@
 use crate::assertions::AssertInRange;
 use crate::expectations::{IsInRange, IsNotInRange};
+use crate::properties::IsEmptyProperty;
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
-use crate::std::ops::{RangeBounds, RangeInclusive};
+use crate::std::ops::{Range, RangeBounds, RangeInclusive};
 #[cfg(not(any(feature = "std", test)))]
 use alloc::{format, string::String};
+
+impl<T> IsEmptyProperty for Range<T>
+where
+    T: PartialEq,
+{
+    fn is_empty_property(&self) -> bool {
+        self.start == self.end
+    }
+}
+
+impl<T> IsEmptyProperty for RangeInclusive<T>
+where
+    T: PartialOrd,
+{
+    fn is_empty_property(&self) -> bool {
+        self.start() > self.end()
+    }
+}
 
 impl<S, E, R> AssertInRange<E> for Spec<'_, S, R>
 where

@@ -1,6 +1,3 @@
-use crate::std::array;
-use crate::std::slice;
-
 pub trait IsEmptyProperty {
     fn is_empty_property(&self) -> bool;
 }
@@ -16,54 +13,38 @@ pub trait DefinedOrder {}
 impl<C> DefinedOrder for &C where C: DefinedOrder + ?Sized {}
 impl<C> DefinedOrder for &mut C where C: DefinedOrder + ?Sized {}
 
-impl<T> DefinedOrder for [T] {}
-impl<T, const N: usize> DefinedOrder for [T; N] {}
-impl<T, const N: usize> DefinedOrder for array::IntoIter<T, N> {}
-impl<T> DefinedOrder for slice::Iter<'_, T> {}
-impl<T> DefinedOrder for slice::IterMut<'_, T> {}
-
-#[cfg(any(feature = "std", test))]
-mod std {
-    use crate::properties::DefinedOrder;
-    use std::{
-        collections::{btree_set, linked_list, vec_deque, BTreeSet, LinkedList, VecDeque},
-        vec,
-    };
-    impl<T> DefinedOrder for Vec<T> {}
-    impl<T> DefinedOrder for vec::IntoIter<T> {}
-    impl<T> DefinedOrder for BTreeSet<T> {}
-    impl<T> DefinedOrder for btree_set::IntoIter<T> {}
-    impl<T> DefinedOrder for btree_set::Iter<'_, T> {}
-    impl<T> DefinedOrder for LinkedList<T> {}
-    impl<T> DefinedOrder for linked_list::IntoIter<T> {}
-    impl<T> DefinedOrder for linked_list::Iter<'_, T> {}
-    impl<T> DefinedOrder for linked_list::IterMut<'_, T> {}
-    impl<T> DefinedOrder for VecDeque<T> {}
-    impl<T> DefinedOrder for vec_deque::IntoIter<T> {}
-    impl<T> DefinedOrder for vec_deque::Iter<'_, T> {}
-    impl<T> DefinedOrder for vec_deque::IterMut<'_, T> {}
+impl<T> IsEmptyProperty for &T
+where
+    T: IsEmptyProperty + ?Sized,
+{
+    fn is_empty_property(&self) -> bool {
+        <T as IsEmptyProperty>::is_empty_property(self)
+    }
 }
 
-#[cfg(not(any(feature = "std", test)))]
-mod no_std {
-    use crate::properties::DefinedOrder;
-    use alloc::{
-        collections::{btree_set, linked_list, vec_deque, BTreeSet, LinkedList, VecDeque},
-        vec,
-        vec::Vec,
-    };
+impl<T> IsEmptyProperty for &mut T
+where
+    T: IsEmptyProperty + ?Sized,
+{
+    fn is_empty_property(&self) -> bool {
+        <T as IsEmptyProperty>::is_empty_property(self)
+    }
+}
 
-    impl<T> DefinedOrder for Vec<T> {}
-    impl<T> DefinedOrder for vec::IntoIter<T> {}
-    impl<T> DefinedOrder for BTreeSet<T> {}
-    impl<T> DefinedOrder for btree_set::IntoIter<T> {}
-    impl<T> DefinedOrder for btree_set::Iter<'_, T> {}
-    impl<T> DefinedOrder for LinkedList<T> {}
-    impl<T> DefinedOrder for linked_list::IntoIter<T> {}
-    impl<T> DefinedOrder for linked_list::Iter<'_, T> {}
-    impl<T> DefinedOrder for linked_list::IterMut<'_, T> {}
-    impl<T> DefinedOrder for VecDeque<T> {}
-    impl<T> DefinedOrder for vec_deque::IntoIter<T> {}
-    impl<T> DefinedOrder for vec_deque::Iter<'_, T> {}
-    impl<T> DefinedOrder for vec_deque::IterMut<'_, T> {}
+impl<T> LengthProperty for &T
+where
+    T: LengthProperty + ?Sized,
+{
+    fn length_property(&self) -> usize {
+        <T as LengthProperty>::length_property(self)
+    }
+}
+
+impl<T> LengthProperty for &mut T
+where
+    T: LengthProperty + ?Sized,
+{
+    fn length_property(&self) -> usize {
+        <T as LengthProperty>::length_property(self)
+    }
 }
