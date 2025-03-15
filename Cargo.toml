@@ -18,10 +18,9 @@ categories = ["development-tools::testing", "no-std"]
 all-features = true
 
 [features]
-default = ["std", "code", "panic", "float"]
-code = ["std"]
+default = ["std", "panic", "float"]
 float = ["dep:float-cmp"]
-panic = ["code", "std"]
+panic = ["std"]
 std = []
 
 [dependencies]

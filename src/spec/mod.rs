@@ -37,7 +37,8 @@ macro_rules! verify_that {
     };
 }
 
-#[macro_export]
+#[cfg(feature = "panic")]
+#[cfg_attr(feature = "panic", macro_export)]
 macro_rules! assert_that_code {
     ($subject:expr) => {
         $crate::prelude::assert_that_code($subject)
@@ -50,7 +51,8 @@ macro_rules! assert_that_code {
     };
 }
 
-#[macro_export]
+#[cfg(feature = "panic")]
+#[cfg_attr(feature = "panic", macro_export)]
 macro_rules! verify_that_code {
     ($subject:expr) => {
         $crate::prelude::verify_that_code($subject)
@@ -73,7 +75,7 @@ pub const fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
     Spec::new(subject, CollectFailures)
 }
 
-#[cfg(feature = "code")]
+#[cfg(feature = "panic")]
 pub fn assert_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, PanicOnFail>
 where
     S: FnOnce(),
@@ -81,7 +83,7 @@ where
     Spec::new(Code::from(code), PanicOnFail)
 }
 
-#[cfg(feature = "code")]
+#[cfg(feature = "panic")]
 pub fn verify_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, CollectFailures>
 where
     S: FnOnce(),
@@ -445,18 +447,16 @@ impl Display for Unknown {
     }
 }
 
-#[cfg(feature = "code")]
+#[cfg(feature = "panic")]
 pub use code::Code;
 
-#[cfg(feature = "code")]
+#[cfg(feature = "panic")]
 mod code {
     use std::cell::RefCell;
     use std::rc::Rc;
 
-    #[cfg(feature = "std")]
     pub struct Code<F>(Rc<RefCell<Option<F>>>);
 
-    #[cfg(feature = "std")]
     impl<F> From<F> for Code<F>
     where
         F: FnOnce(),
@@ -466,7 +466,6 @@ mod code {
         }
     }
 
-    #[cfg(feature = "std")]
     impl<F> Code<F> {
         #[must_use]
         pub fn take(&self) -> Option<F> {

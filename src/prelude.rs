@@ -14,13 +14,17 @@
 //! assert_that!("iusto obcaecat stet eos").starts_with("iusto").ends_with(" eos");
 //! ```
 
-pub use super::assert_that;
-pub use super::assert_that_code;
-pub use super::assertions::*;
-pub use super::properties::*;
-pub use super::spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail};
-pub use super::verify_that;
-pub use super::verify_that_code;
+pub use super::{
+    assert_that,
+    assertions::*,
+    properties::*,
+    spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail},
+    verify_that,
+};
 
 #[cfg(feature = "panic")]
-pub use super::spec::{assert_that_code, verify_that_code};
+pub use super::{
+    assert_that_code,
+    spec::{assert_that_code, verify_that_code},
+    verify_that_code,
+};
