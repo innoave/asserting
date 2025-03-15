@@ -12,6 +12,8 @@
 
 use crate::spec::Spec;
 use crate::std::ops::RangeInclusive;
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
 
 /// Assert whether two values are equal or not.
 ///
@@ -37,6 +39,68 @@ pub trait AssertEquality<E> {
     /// Verifies that subject is not equal to some other value.
     #[track_caller]
     fn is_not_equal_to(self, expected: E) -> Self;
+}
+
+/// Assert approximate equality for floating point numbers.
+pub trait AssertIsCloseToWithinMargin<E, M> {
+    /// Verifies that the actual value is approximately equal to the expected
+    /// value.
+    ///
+    /// For the comparison the epsilon and ULPS values of the given margin are
+    /// used.
+    ///
+    /// The following articles describe the challenges with comparing floating
+    /// point numbers and the meaning of the epsilon and ULPS values:
+    ///
+    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    #[track_caller]
+    fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
+
+    /// Verifies that the actual value not approximately equal to the expected
+    /// value.
+    ///
+    /// For the comparison the epsilon and ULPS values of the given margin are
+    /// used.
+    ///
+    /// The following articles describe the challenges with comparing floating
+    /// point numbers and the meaning of the epsilon and ULPS values:
+    ///
+    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    #[track_caller]
+    fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
+}
+
+/// Assert approximate equality for floating point numbers.
+pub trait AssertIsCloseToWithDefaultMargin<E> {
+    /// Verifies that the actual value is approximately equal to the expected
+    /// value.
+    ///
+    /// For the approximation a default margin with 4 * epsilon and 4 * ULPS is
+    /// used.
+    ///
+    /// The following articles describe the challenges with comparing floating
+    /// point numbers and the meaning of the epsilon and ULPS values:
+    ///
+    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    #[track_caller]
+    fn is_close_to(self, expected: E) -> Self;
+
+    /// Verifies that the actual value not approximately equal to the expected
+    /// value.
+    ///
+    /// For the approximation a default margin with 4 * epsilon and 4 * ULPS is
+    /// used.
+    ///
+    /// The following articles describe the challenges with comparing floating
+    /// point numbers and the meaning of the epsilon and ULPS values:
+    ///
+    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    #[track_caller]
+    fn is_not_close_to(self, expected: E) -> Self;
 }
 
 /// Assert whether a value is greater than or less than another value, as well
@@ -485,7 +549,6 @@ pub trait AssertIsSorted {
 
 /// Assert that the code under test panics, panics with a certain message or
 /// does not panic.
-#[cfg(feature = "panic")]
 pub trait AssertCodePanics {
     /// Verifies that the actual code under test does not panic.
     #[track_caller]

@@ -18,13 +18,17 @@ categories = ["development-tools::testing", "no-std"]
 all-features = true
 
 [features]
-default = ["std", "code", "panic"]
+default = ["std", "code", "panic", "float"]
 code = ["std"]
+float = ["dep:float-cmp"]
 panic = ["code", "std"]
 std = []
 
 [dependencies]
 hashbrown = "0.15"
+
+# optional
+float-cmp = { version = "0.10", optional = true }
 
 [dev-dependencies]
 

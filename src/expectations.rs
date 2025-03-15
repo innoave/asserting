@@ -15,6 +15,58 @@ pub struct IsNotEqualTo<E> {
     pub expected: E,
 }
 
+pub struct IsCloseTo<E, M> {
+    pub expected: E,
+    pub margin: M,
+}
+
+impl<E, M> IsCloseTo<E, M>
+where
+    M: Default,
+{
+    #[must_use]
+    pub fn new(expected: E) -> Self {
+        Self {
+            expected,
+            margin: M::default(),
+        }
+    }
+}
+
+impl<E, M> IsCloseTo<E, M> {
+    #[must_use]
+    pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
+        self.margin = margin.into();
+        self
+    }
+}
+
+pub struct IsNotCloseTo<E, M> {
+    pub expected: E,
+    pub margin: M,
+}
+
+impl<E, M> IsNotCloseTo<E, M>
+where
+    M: Default,
+{
+    #[must_use]
+    pub fn new(expected: E) -> Self {
+        Self {
+            expected,
+            margin: M::default(),
+        }
+    }
+}
+
+impl<E, M> IsNotCloseTo<E, M> {
+    #[must_use]
+    pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
+        self.margin = margin.into();
+        self
+    }
+}
+
 pub struct IsLessThan<E> {
     pub expected: E,
 }

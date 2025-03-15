@@ -245,6 +245,9 @@ mod slice;
 mod string;
 mod vec;
 
+#[cfg(feature = "float")]
+mod float;
+
 #[cfg(feature = "panic")]
 mod panic;
 
