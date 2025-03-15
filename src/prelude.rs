@@ -1,5 +1,5 @@
-//! Re-export of all types, traits and functions that are needed to write
-//! assertions in tests.
+//! Re-export of all types, traits, functions and macros that are needed to
+//! write assertions in tests.
 //!
 //! When writing assertions in tests importing this prelude is all that should
 //! be needed.
@@ -15,9 +15,12 @@
 //! ```
 
 pub use super::assert_that;
+pub use super::assert_that_code;
 pub use super::assertions::*;
 pub use super::properties::*;
 pub use super::spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail};
+pub use super::verify_that;
+pub use super::verify_that_code;
 
 #[cfg(feature = "panic")]
 pub use super::spec::{assert_that_code, verify_that_code};

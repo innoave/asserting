@@ -1,4 +1,6 @@
 use crate::prelude::*;
+#[cfg(not(feature = "std"))]
+use alloc::string::{String, ToString};
 
 #[test]
 fn option_of_i32_is_none() {

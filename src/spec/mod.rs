@@ -1,8 +1,11 @@
+//! This is the core of the `asserting` crate.
+
 use crate::expectations::Predicate;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
 #[cfg(not(feature = "std"))]
 use alloc::{
+    borrow::ToOwned,
     string::{String, ToString},
     vec,
     vec::Vec,
@@ -25,6 +28,32 @@ macro_rules! assert_that {
 macro_rules! verify_that {
     ($subject:expr) => {
         $crate::prelude::verify_that($subject)
+            .named(&stringify!($subject).replace("\n", " "))
+            .at_location($crate::prelude::Location {
+                file: file!(),
+                line: line!(),
+                column: column!(),
+            })
+    };
+}
+
+#[macro_export]
+macro_rules! assert_that_code {
+    ($subject:expr) => {
+        $crate::prelude::assert_that_code($subject)
+            .named(&stringify!($subject).replace("\n", " "))
+            .at_location($crate::prelude::Location {
+                file: file!(),
+                line: line!(),
+                column: column!(),
+            })
+    };
+}
+
+#[macro_export]
+macro_rules! verify_that_code {
+    ($subject:expr) => {
+        $crate::prelude::verify_that_code($subject)
             .named(&stringify!($subject).replace("\n", " "))
             .at_location($crate::prelude::Location {
                 file: file!(),
@@ -134,12 +163,71 @@ impl Location<'_> {
     }
 }
 
+/// Code location.
+///
+/// # Related
+/// - [`core::panic::Location`]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct OwnedLocation {
+    pub file: String,
+    pub line: u32,
+    pub column: u32,
+}
+
+impl Display for OwnedLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        #[cfg(not(test))]
+        let file = self.file.clone();
+        #[cfg(test)]
+        let file = self.file.replace('\\', "/");
+        write!(f, "{file}:{}:{}", self.line, self.column)
+    }
+}
+
+impl OwnedLocation {
+    #[must_use]
+    pub fn new(file: impl Into<String>, line: u32, column: u32) -> Self {
+        Self {
+            file: file.into(),
+            line,
+            column,
+        }
+    }
+}
+
+impl From<Location<'_>> for OwnedLocation {
+    fn from(value: Location<'_>) -> Self {
+        Self {
+            file: value.file.into(),
+            line: value.line,
+            column: value.column,
+        }
+    }
+}
+
+impl OwnedLocation {
+    #[must_use]
+    pub fn file(&self) -> &str {
+        &self.file
+    }
+
+    #[must_use]
+    pub const fn line(&self) -> u32 {
+        self.line
+    }
+
+    #[must_use]
+    pub const fn column(&self) -> u32 {
+        self.column
+    }
+}
+
 pub struct Spec<'a, S, R> {
     subject: S,
     expression: Option<Expression<'a>>,
     description: Option<&'a str>,
     location: Option<Location<'a>>,
-    failures: Vec<AssertFailure<'a>>,
+    failures: Vec<AssertFailure>,
     failing_strategy: R,
 }
 
@@ -176,8 +264,8 @@ impl<S, R> Spec<'_, S, R> {
         &self.failing_strategy
     }
 
-    pub fn failures(&self) -> &[AssertFailure<'_>] {
-        &self.failures
+    pub fn failures(&self) -> Vec<AssertFailure> {
+        self.failures.clone()
     }
 
     pub fn display_failures(&self) -> Vec<String> {
@@ -269,9 +357,9 @@ where
     fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
-            description: self.description,
+            description: self.description.map(ToOwned::to_owned),
             message,
-            location: self.location,
+            location: self.location.map(OwnedLocation::from),
         };
         self.failures.push(failure);
         self.failing_strategy.do_fail_with(&self.failures);
@@ -279,15 +367,15 @@ where
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AssertFailure<'a> {
-    description: Option<&'a str>,
+pub struct AssertFailure {
+    description: Option<String>,
     message: String,
-    location: Option<Location<'a>>,
+    location: Option<OwnedLocation>,
 }
 
-impl Display for AssertFailure<'_> {
+impl Display for AssertFailure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self.description {
+        match &self.description {
             None => {
                 writeln!(f, "assertion failed: {}", &self.message)?;
             },
@@ -300,22 +388,22 @@ impl Display for AssertFailure<'_> {
 }
 
 #[allow(clippy::must_use_candidate)]
-impl AssertFailure<'_> {
-    pub const fn description(&self) -> Option<&str> {
-        self.description
+impl AssertFailure {
+    pub const fn description(&self) -> Option<&String> {
+        self.description.as_ref()
     }
 
     pub fn message(&self) -> &str {
         &self.message
     }
 
-    pub const fn location(&self) -> Option<Location<'_>> {
-        self.location
+    pub const fn location(&self) -> Option<&OwnedLocation> {
+        self.location.as_ref()
     }
 }
 
 pub trait FailingStrategy {
-    fn do_fail_with(&self, failures: &[AssertFailure<'_>]);
+    fn do_fail_with(&self, failures: &[AssertFailure]);
 }
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
@@ -323,7 +411,7 @@ pub struct PanicOnFail;
 
 impl FailingStrategy for PanicOnFail {
     #[track_caller]
-    fn do_fail_with(&self, failures: &[AssertFailure<'_>]) {
+    fn do_fail_with(&self, failures: &[AssertFailure]) {
         let message = failures
             .iter()
             .map(ToString::to_string)
@@ -337,7 +425,7 @@ impl FailingStrategy for PanicOnFail {
 pub struct CollectFailures;
 
 impl FailingStrategy for CollectFailures {
-    fn do_fail_with(&self, _failures: &[AssertFailure<'_>]) {
+    fn do_fail_with(&self, _failures: &[AssertFailure]) {
         // do nothing by design
     }
 }

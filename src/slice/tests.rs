@@ -1,5 +1,11 @@
 use crate::prelude::*;
 use crate::std::slice;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 
 #[test]
 fn slice_is_equal_to_a_vec() {

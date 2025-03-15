@@ -1,4 +1,10 @@
 use crate::prelude::*;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 
 #[test]
 fn vec_is_equal_to_another_vec() {

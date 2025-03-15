@@ -20,24 +20,13 @@ use crate::std::ops::RangeInclusive;
 ///
 /// ## Examples
 ///
-/// assert that a value of type `String` is equal to an expected value of type
-/// `&str`:
-///
 /// ```
 /// use asserting::prelude::*;
 ///
 /// let subject = "ea rebum dignissim suscipit".to_string();
-///
 /// assert_that!(subject).is_equal_to("ea rebum dignissim suscipit");
-/// ```
-///
-/// assert that two integers are equal:
-///
-/// ```
-/// use asserting::prelude::*;
 ///
 /// let the_answer = 42;
-///
 /// assert_that!(the_answer).is_equal_to(42);
 /// ```
 pub trait AssertEquality<E> {
@@ -90,11 +79,12 @@ pub trait AssertOrder<E> {
     fn is_at_least(self, expected: E) -> Self;
 }
 
-/// Assert whether a value is within an expected range. The expected range must
-/// be a closed range with both ends inclusive.
+/// Assert whether a value is within an expected range.
+///
+/// The expected range must be a closed range with both ends inclusive.
 ///
 /// These assertions are implemented for all types `T` that implement
-/// `PartialOrd<E>` with `E` being the type of the expected values and `E` must
+/// `PartialOrd<E>` with `E` being the type of the expected value. And `E` must
 /// implement `PartialOrd<T>`.
 ///
 /// ## Examples

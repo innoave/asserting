@@ -1,5 +1,10 @@
 use crate::prelude::*;
-use crate::spec::{AssertFailure, Expression};
+use crate::spec::{AssertFailure, Expression, OwnedLocation};
+#[cfg(not(feature = "std"))]
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 
 #[test]
 fn default_of_expression_is_subject() {
@@ -16,9 +21,9 @@ fn location_display_format() {
 #[test]
 fn assert_failure_display_format() {
     let failure = AssertFailure {
-        description: Some("this thing is the best"),
+        description: Some("this thing is the best".to_string()),
         message: "but this thing is the worst\ninstead it should be the best".to_string(),
-        location: Some(Location::new("src/thing_module/thing_test.rs", 54, 13)),
+        location: Some(OwnedLocation::new("src/thing_module/thing_test.rs", 54, 13)),
     };
 
     assert_that!(format!("{}", failure))
