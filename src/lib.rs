@@ -159,13 +159,13 @@
 //!
 //! is equivalent to calling the function [`assert_that`] and then calling
 //! the methods [`named`](spec::Spec::named) and
-//! [`at_location`](spec::Spec::at_location) on the returned [`Spec`], like so:
+//! [`at_location`](spec::Spec::located_at) on the returned [`Spec`], like so:
 //!
 //! ```
 //! # use asserting::prelude::*;
 //! assert_that(7 * 6)
 //!     .named("7 * 6")
-//!     .at_location(
+//!     .located_at(
 //!         Location {
 //!             file: file!(),
 //!             line: line!(),

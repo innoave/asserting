@@ -16,7 +16,7 @@ macro_rules! assert_that {
     ($subject:expr) => {
         $crate::prelude::assert_that($subject)
             .named(&stringify!($subject).replace("\n", " "))
-            .at_location($crate::prelude::Location {
+            .located_at($crate::prelude::Location {
                 file: file!(),
                 line: line!(),
                 column: column!(),
@@ -29,7 +29,7 @@ macro_rules! verify_that {
     ($subject:expr) => {
         $crate::prelude::verify_that($subject)
             .named(&stringify!($subject).replace("\n", " "))
-            .at_location($crate::prelude::Location {
+            .located_at($crate::prelude::Location {
                 file: file!(),
                 line: line!(),
                 column: column!(),
@@ -43,7 +43,7 @@ macro_rules! assert_that_code {
     ($subject:expr) => {
         $crate::prelude::assert_that_code($subject)
             .named(&stringify!($subject).replace("\n", " "))
-            .at_location($crate::prelude::Location {
+            .located_at($crate::prelude::Location {
                 file: file!(),
                 line: line!(),
                 column: column!(),
@@ -57,7 +57,7 @@ macro_rules! verify_that_code {
     ($subject:expr) => {
         $crate::prelude::verify_that_code($subject)
             .named(&stringify!($subject).replace("\n", " "))
-            .at_location($crate::prelude::Location {
+            .located_at($crate::prelude::Location {
                 file: file!(),
                 line: line!(),
                 column: column!(),
@@ -289,7 +289,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn at_location(mut self, location: Location<'a>) -> Self {
+    pub const fn located_at(mut self, location: Location<'a>) -> Self {
         self.location = Some(location);
         self
     }
