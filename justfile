@@ -36,7 +36,7 @@ lint-all-features:
 
 # linting code using Clippy - no-std
 lint-no-std:
-    cargo clippy --all-targets --no-default-features
+    cargo clippy --all-targets --no-default-features --features "float"
 
 # run all tests
 test:
@@ -49,7 +49,7 @@ test-all-features:
 
 # run tests for no-std
 test-no-std:
-    cargo test --no-default-features
+    cargo test --no-default-features --features "float"
 
 # run code coverage (does not include doc-tests)
 code-coverage:

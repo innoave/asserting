@@ -1,6 +1,8 @@
 use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
 use crate::expectations::{IsCloseTo, IsNotCloseTo};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String};
 use float_cmp::{ApproxEq, F32Margin, F64Margin};
 
 impl<R> AssertIsCloseToWithDefaultMargin<f32> for Spec<'_, f32, R>
