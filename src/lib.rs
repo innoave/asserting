@@ -159,7 +159,7 @@
 //!
 //! is equivalent to calling the function [`assert_that`] and then calling
 //! the methods [`named`](spec::Spec::named) and
-//! [`at_location`](spec::Spec::located_at) on the returned [`Spec`], like so:
+//! [`located_at`](spec::Spec::located_at) on the returned [`Spec`], like so:
 //!
 //! ```
 //! # use asserting::prelude::*;
