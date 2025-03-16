@@ -7,7 +7,7 @@
 //! * express the intent of an assertion
 //! * an assertion reads more like natural english
 //! * concise and expressive assertions for more complex types like collections
-//! * different and more informative error messages for specific assertions
+//! * distinct and more informative error messages for specific assertions
 //! * easy spotting the difference between the expected and the actual value
 //! * chaining of multiple assertions on the same subject
 //!
