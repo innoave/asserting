@@ -444,7 +444,7 @@ fn verify_str_contains_any_char_of_a_slice_of_chars_fails() {
 }
 
 #[test]
-fn verify_string_contains_any_of_char_of_an_array_of_chars_fails() {
+fn verify_string_contains_any_char_of_an_array_of_chars_fails() {
     let subject: String = "luptatum in nihil laoreet".to_string();
 
     let failures = verify_that(subject)
@@ -464,7 +464,7 @@ fn verify_string_contains_any_of_char_of_an_array_of_chars_fails() {
 }
 
 #[test]
-fn verify_str_contains_any_of_char_of_a_borrowed_array_of_chars_fails() {
+fn verify_str_contains_any_char_of_a_borrowed_array_of_chars_fails() {
     let subject: &str = "luptatum in nihil laoreet";
 
     let failures = verify_that(subject)

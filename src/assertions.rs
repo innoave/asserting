@@ -440,23 +440,107 @@ pub trait AssertHasError<E> {
     fn has_error(self, expected: E) -> Self;
 }
 
+/// Assert that a string contains a substring or character.
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = "doming vulputate proident eum";
+///
+/// assert_that!(subject).contains("tate p");
+/// assert_that!(subject).contains('u');
+/// assert_that!(subject).starts_with("dom");
+/// assert_that!(subject).starts_with('d');
+/// assert_that!(subject).ends_with("t eum");
+/// assert_that!(subject).ends_with('m');
+/// ```
 pub trait AssertStringPattern<E> {
+    /// Verifies that a string contains a substring or character.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "doming vulputate proident eum";
+    ///
+    /// assert_that!(subject).contains("tate p");
+    /// assert_that!(subject).contains('u');
+    /// ```
     #[track_caller]
     fn contains(self, pattern: E) -> Self;
 
+    /// Verifies that a string starts with a substring or character.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "doming vulputate proident eum";
+    ///
+    /// assert_that!(subject).starts_with("dom");
+    /// assert_that!(subject).starts_with('d');
+    /// ```
     #[track_caller]
     fn starts_with(self, pattern: E) -> Self;
 
+    /// Verifies that a string ends with a substring or character.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "doming vulputate proident eum";
+    ///
+    /// assert_that!(subject).ends_with("t eum");
+    /// assert_that!(subject).ends_with('m');
+    /// ```
     #[track_caller]
     fn ends_with(self, pattern: E) -> Self;
 }
 
+/// Assert that a string contains any char from a collection of chars.
+///
+/// ## Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = "vel aliquip doming eros";
+///
+/// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
+/// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
+/// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z'][..]);
+/// ```
 pub trait AssertStringContainsAnyOf<E> {
+    /// Verifies that a string contains any char from a collection of chars.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "vel aliquip doming eros";
+    ///
+    /// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
+    /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
+    /// assert_that!(subject).contains_any_of(&['a', 'b',  'm', 'z'][..]);
+    /// ```
     #[track_caller]
     fn contains_any_of(self, pattern: E) -> Self;
 }
 
+/// Assert that an iterator or collection contains the expected value.
+///
+/// This assertion is implemented for any collection or iterator of items that
+/// that implement `PartialEq<E>` with `E` being the type of the expected value.
 pub trait AssertIteratorContains<'a, U, E, R> {
+    /// Verifies that the actual collection/iterator contains the expected
+    /// value.
     #[track_caller]
     fn contains(self, element: E) -> Spec<'a, U, R>;
 }
@@ -464,7 +548,9 @@ pub trait AssertIteratorContains<'a, U, E, R> {
 /// Assert values in a collection.
 ///
 /// These assertions do not rely on the order in which the collection iterates
-/// over its values.
+/// over its values. They are implemented for any iterator over items that
+/// implement `PartialEq<E>` with `E` being the type of the items in the
+/// expected collection or iterator.
 pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in any order.
