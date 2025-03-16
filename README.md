@@ -120,7 +120,7 @@ Default colors are <span style="color: green">green</span> and <span style="colo
 
 in `~/.cargo/config.toml` add:
 
-```toml
+```toml,no_sync
 [env]
 ASSERTING_MESSAGES_COLORED = "off"
 ```
@@ -131,7 +131,7 @@ no coloring in failure messages.
 
 in `~/.cargo/config.toml` add:
 
-```toml
+```toml,no_sync
 [env]
 ASSERTING_MESSAGES_COLORED = "cvd"
 ```

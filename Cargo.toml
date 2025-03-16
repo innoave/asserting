@@ -30,6 +30,7 @@ hashbrown = "0.15"
 float-cmp = { version = "0.10", optional = true }
 
 [dev-dependencies]
+version-sync = "0.9"
 
 [lints.rust]
 unsafe_code = "forbid"
