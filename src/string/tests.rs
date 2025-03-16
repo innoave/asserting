@@ -637,7 +637,7 @@ fn verify_string_ends_with_str_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing to start with "abrupt end"
+            r#"assertion failed: expected my_thing to end with "abrupt end"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "abrupt end"
 "#
@@ -657,7 +657,7 @@ fn verify_string_ends_with_string_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing to start with "abrupt end"
+            r#"assertion failed: expected my_thing to end with "abrupt end"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "abrupt end"
 "#
@@ -676,7 +676,7 @@ fn verify_string_ends_with_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to start with 'Z'
+        &[r#"assertion failed: expected my_thing to end with 'Z'
    but was: "possim deserunt obcaecat hendrerit"
   expected: 'Z'
 "#]

@@ -255,7 +255,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
         )
     }
@@ -271,7 +271,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
         )
     }
@@ -287,7 +287,7 @@ where
 
     fn message(&self, expression: Expression<'_>, actual: &S) -> String {
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
         )
     }
