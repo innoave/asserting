@@ -1,6 +1,7 @@
 //! This is the core of the `asserting` crate.
 
 use crate::expectations::Predicate;
+use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
 #[cfg(not(feature = "std"))]
@@ -393,12 +394,22 @@ where
     Spec::new(Code::from(code), CollectFailures).named("the closure")
 }
 
+/// An expectation defines a test for a property of the asserted subject.
+///
+/// It requires two methods: a `test()` method and a `message()` method.
+/// The `test()` method is called to verify whether an actual subject meets the
+/// expected property. In case the test of the expectation fails the `message()`
+/// method is called to form an expectation specific failure message.
 pub trait Expectation<S: ?Sized> {
+    /// Verifies whether the actual subject fulfills the expected property.
     fn test(&mut self, subject: &S) -> bool;
 
+    /// Forms a failure message for this expectation.
     fn message(&self, expression: Expression<'_>, actual: &S) -> String;
 }
 
+/// A textual representation of the expression or subject that is being
+/// asserted.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Expression<'a>(pub &'a str);
 
@@ -422,14 +433,20 @@ impl Deref for Expression<'_> {
     }
 }
 
-/// Code location.
+/// The location of an assertion in the source code respectively test code.
 ///
 /// # Related
 /// - [`core::panic::Location`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Location<'a> {
+    /// The file path of the source file where the assertion is located.
     pub file: &'a str,
+
+    /// The line number within the source file where the assertion is located.
     pub line: u32,
+
+    /// The column number on the line within the source file where the assertion
+    /// is located.
     pub column: u32,
 }
 
@@ -444,6 +461,7 @@ impl Display for Location<'_> {
 }
 
 impl<'a> Location<'a> {
+    /// Constructs a new `Location` with the given file, line and column.
     #[must_use]
     pub const fn new(file: &'a str, line: u32, column: u32) -> Self {
         Self { file, line, column }
@@ -451,30 +469,39 @@ impl<'a> Location<'a> {
 }
 
 impl Location<'_> {
+    /// Returns the file path of this location.
     #[must_use]
     pub const fn file(&self) -> &str {
         self.file
     }
 
+    /// Returns the line number of this location.
     #[must_use]
     pub const fn line(&self) -> u32 {
         self.line
     }
 
+    /// Returns the column number of this location.
     #[must_use]
     pub const fn column(&self) -> u32 {
         self.column
     }
 }
 
-/// Code location.
+/// An owned location in the source code respectively test code.
 ///
-/// # Related
-/// - [`core::panic::Location`]
+/// It is basically the same as [`Location`] but uses owned types instead of
+/// borrowed types for its fields.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct OwnedLocation {
+    /// The file path of the source file where the assertion is located.
     pub file: String,
+
+    /// The line number within the source file where the assertion is located.
     pub line: u32,
+
+    /// The column number on the line within the source file where the assertion
+    /// is located.
     pub column: u32,
 }
 
@@ -489,6 +516,7 @@ impl Display for OwnedLocation {
 }
 
 impl OwnedLocation {
+    /// Constructs a new `OwnedLocation` with the given file, line and column.
     #[must_use]
     pub fn new(file: impl Into<String>, line: u32, column: u32) -> Self {
         Self {
@@ -510,22 +538,37 @@ impl From<Location<'_>> for OwnedLocation {
 }
 
 impl OwnedLocation {
+    /// Returns the file path of this location.
     #[must_use]
     pub fn file(&self) -> &str {
         &self.file
     }
 
     #[must_use]
+    /// Returns the line number of this location.
     pub const fn line(&self) -> u32 {
         self.line
     }
 
     #[must_use]
+    /// Returns the column number of this location.
     pub const fn column(&self) -> u32 {
         self.column
     }
 }
 
+/// Data of an actual assertion.
+///
+/// It holds the data needed to execute an assertion such as the subject,
+/// the name of the subject or expression, an optional description of the
+/// current assertion and the location of the assertion in the source code
+/// respectively test code.
+///
+/// It also holds the concrete [`FailingStrategy`] on how to behave in case
+/// an assertion fails.
+///
+/// In case of the [`CollectFailures`] failing strategy the [`AssertFailure`]s
+/// are collected in this struct.
 pub struct Spec<'a, S, R> {
     subject: S,
     expression: Option<Expression<'a>>,
@@ -536,6 +579,8 @@ pub struct Spec<'a, S, R> {
 }
 
 impl<S, R> Spec<'_, S, R> {
+    /// Constructs a new `Spec` for the given subject and with the specified
+    /// failing strategy.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn new(subject: S, failing_strategy: R) -> Self {
         Self {
@@ -548,54 +593,100 @@ impl<S, R> Spec<'_, S, R> {
         }
     }
 
+    /// Returns the subject.
     pub const fn subject(&self) -> &S {
         &self.subject
     }
 
+    /// Returns the expression (or subject name) if one has been set.
     pub const fn expression(&self) -> Option<Expression<'_>> {
         self.expression
     }
 
+    /// Returns the location in source code or test code if it has been set.
     pub const fn location(&self) -> Option<Location<'_>> {
         self.location
     }
 
+    /// Returns the description or the assertion if it has been set.
     pub const fn description(&self) -> Option<&str> {
         self.description
     }
 
+    /// Returns the failing strategy that is used in case an assertion fails.
     pub const fn failing_strategy(&self) -> &R {
         &self.failing_strategy
     }
 
+    /// Returns the assertion failures that have been collected so far.
     pub fn failures(&self) -> Vec<AssertFailure> {
         self.failures.clone()
     }
 
+    /// Returns the assertion failures collected so far formatted as text.
     pub fn display_failures(&self) -> Vec<String> {
         self.failures.iter().map(ToString::to_string).collect()
     }
 }
 
 impl<'a, S, R> Spec<'a, S, R> {
+    /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn named(mut self, subject_name: &'a str) -> Self {
         self.expression = Some(Expression(subject_name));
         self
     }
 
+    /// Sets a custom description about what is being asserted.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn described_as(mut self, description: &'a str) -> Self {
         self.description = Some(description);
         self
     }
 
+    /// Sets the location of the assertion in the source code respectively test
+    /// code.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn located_at(mut self, location: Location<'a>) -> Self {
         self.location = Some(location);
         self
     }
 
+    /// Maps the current subject to some other value.
+    ///
+    /// It takes a closure that maps the current subject to a new subject and
+    /// returns a new `Spec` with the value returned by the closure as the new
+    /// subject. The new subject may have a different type than the original
+    /// subject. All other data like expression, description and location are
+    /// taken over from this `Spec` into the returned `Spec`.
+    ///
+    /// This function is useful when having a custom type and some specific
+    /// property of this type shall be asserted only.
+    ///
+    /// This is an alias function to the [`mapping()`](Spec::mapping) function.
+    /// Both functions do exactly the same. The idea is to provide different
+    /// names to be able to express the intent more clearly when used in
+    /// assertions.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// struct MyStruct {
+    ///     important_property: String,
+    ///     other_property: f64,
+    /// }
+    ///
+    /// let some_thing = MyStruct {
+    ///     important_property: "imperdiet aliqua zzril eiusmod".into(),
+    ///     other_property: 99.9,
+    /// };
+    ///
+    /// assert_that!(some_thing).extracting(|s| s.important_property)
+    ///     .is_equal_to("imperdiet aliqua zzril eiusmod");
+    ///
+    /// ```
     pub fn extracting<F, U>(self, extractor: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
@@ -603,6 +694,41 @@ impl<'a, S, R> Spec<'a, S, R> {
         self.mapping(extractor)
     }
 
+    /// Maps the current subject to some other value.
+    ///
+    /// It takes a closure that maps the current subject to a new subject and
+    /// returns a new `Spec` with the value returned by the closure as the new
+    /// subject. The new subject may have a different type than the original
+    /// subject. All other data like expression, description and location are
+    /// taken over from this `Spec` into the returned `Spec`.
+    ///
+    /// This function is useful if some type does not implement a trait that is
+    /// required for an assertion.
+    ///
+    /// `Spec` also provides the [`extracting()`](Spec::extracting) function,
+    /// which is an alias to this function. Both functions do exactly the same.
+    /// Choose that function of which its name expresses the intent more
+    /// clearly.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// struct Point {
+    ///     x: i64,
+    ///     y: i64,
+    /// }
+    ///
+    /// let target = Point { x: 12, y: -64 };
+    ///
+    /// assert_that!(target).mapping(|s| (s.x, s.y)).is_equal_to((12, -64));
+    /// ```
+    ///
+    /// The custom type `Point` does not implement the `PartialEq` trait nor
+    /// the `Debug` trait, which are both required for an `is_equal_to`
+    /// assertion. So we map the subject of the type `Point` to a tuple of its
+    /// fields.
     pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
@@ -622,6 +748,25 @@ impl<S, R> Spec<'_, S, R>
 where
     R: FailingStrategy,
 {
+    /// Asserts the given expectation.
+    ///
+    /// In case the expectation is not meet it does fail according the current
+    /// failing strategy of this `Spec`.
+    ///
+    /// This method is called from the implementations of the assertion traits
+    /// defined in the [`assertions`](crate::assertions) module. Implementations
+    /// of custom assertions will call this method with a proper expectation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::expectations::{IsEmpty, IsEqualTo};
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!(7 * 6).expecting(IsEqualTo {expected: 42 });
+    ///
+    /// assert_that!("").expecting(IsEmpty);
+    /// ```
     #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
     #[track_caller]
     pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
@@ -633,6 +778,37 @@ where
         self
     }
 
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with a
+    /// generic failure message and according to the current failing strategy of
+    /// this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies(is_odd);
+    ///
+    /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "assertion failed: expected 22 to satisfy the given predicate, but returned false\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a custom failure message instead of the
+    /// generic one use the method
+    /// [`satisfies_with_message`](Spec::satisfies_with_message).
     #[allow(clippy::return_self_not_must_use)]
     #[track_caller]
     pub fn satisfies<P>(self, predicate: P) -> Self
@@ -647,6 +823,39 @@ where
 
     #[allow(clippy::return_self_not_must_use)]
     #[track_caller]
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with the
+    /// provided failure message and according to the current failing strategy
+    /// of this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
+    ///
+    /// let failures = verify_that!(22)
+    ///         .satisfies_with_message("expected my number to be odd", is_odd)
+    ///         .display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "assertion failed: expected my number to be odd\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a generic failure message instead of
+    /// providing one use the method
+    /// [`satisfies`](Spec::satisfies).
     pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
     where
         P: Fn(&S) -> bool,
@@ -657,6 +866,8 @@ where
         })
     }
 
+    /// Fails the assertion according the current failing strategy of this
+    /// `Spec`.
     #[track_caller]
     fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
@@ -670,6 +881,9 @@ where
     }
 }
 
+/// An error describing a failed assertion.
+///
+/// This struct implements the [`std::error::Error`] trait.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssertFailure {
     description: Option<String>,
@@ -691,25 +905,40 @@ impl Display for AssertFailure {
     }
 }
 
+impl StdError for AssertFailure {}
+
 #[allow(clippy::must_use_candidate)]
 impl AssertFailure {
+    /// Returns the description of the assertion that failed.
     pub const fn description(&self) -> Option<&String> {
         self.description.as_ref()
     }
 
+    /// Returns the failure message of the assertion that failed.
     pub fn message(&self) -> &str {
         &self.message
     }
 
+    /// Returns the location of the assertion in the source code / test code if
+    /// it has been set in the [`Spec`].
     pub const fn location(&self) -> Option<&OwnedLocation> {
         self.location.as_ref()
     }
 }
 
+/// Defines the behavior when an assertion fails.
+///
+/// This crate provides two implementations:
+///
+/// * [`PanicOnFail`] - panics when an assertion fails
+/// * [`CollectFailures`] - collects [`AssertFailure`]s of assertions that have failed.
 pub trait FailingStrategy {
+    /// Reacts to an assertion that has failed with the [`AssertFailure`]s given
+    /// as argument.
     fn do_fail_with(&self, failures: &[AssertFailure]);
 }
 
+/// [`FailingStrategy`] that panics when an assertion fails.
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PanicOnFail;
 
@@ -725,6 +954,7 @@ impl FailingStrategy for PanicOnFail {
     }
 }
 
+/// [`FailingStrategy`] that collects the failures from failing assertions.
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CollectFailures;
 
@@ -734,6 +964,57 @@ impl FailingStrategy for CollectFailures {
     }
 }
 
+/// Used with generic types in expectations where the concrete type is not
+/// relevant for the failure message.
+///
+/// This type implements the std format trait [`std::fmt::Debug`] and
+/// [`std::fmt::Display`] which both format the value as "_".
+///
+/// ```
+/// # use asserting::prelude::*;
+/// # use asserting::spec::Unknown;
+/// assert_that!(format!("{:?}", Unknown)).is_equal_to("_");
+/// assert_that!(format!("{}", Unknown)).is_equal_to("_");
+/// ```
+///
+/// # Examples
+///
+/// This type is used to implement the expectations
+///
+/// * [`IsSome`](crate::expectations::IsSome)
+/// * [`IsNone`](crate::expectations::IsNone)
+/// * [`IsOk`](crate::expectations::IsOk)
+/// * [`IsErr`](crate::expectations::IsErr)
+///
+/// For example for implementing the function [`Expectation::message()`] for the
+/// [`IsOk`](crate::expectations::IsOk) expectation for `Result<T, E>` the
+/// concrete types for `T` and `E` are not relevant. The implementation of the
+/// trait looks like this:
+///
+/// ```no_run
+/// # use std::fmt::Debug;
+/// # use asserting::spec::Expectation;
+/// # use asserting::spec::Expression;
+/// # use asserting::spec::Unknown;
+/// # struct IsOk;
+/// impl<T, E> Expectation<Result<T, E>> for IsOk
+/// where
+///     T: Debug,
+///     E: Debug,
+/// {
+///     fn test(&mut self, subject: &Result<T, E>) -> bool {
+///         subject.is_ok()
+///     }
+///
+///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+///         format!(
+///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+///             Ok::<_, Unknown>(Unknown),
+///             Ok::<_, Unknown>(Unknown),
+///         )
+///     }
+/// }
+/// ```
 #[derive(Default, Clone, Copy, PartialEq, Eq)]
 pub struct Unknown;
 
@@ -757,6 +1038,7 @@ mod code {
     use std::cell::RefCell;
     use std::rc::Rc;
 
+    /// Wrapper type that holds a closure as code snippet.
     pub struct Code<F>(Rc<RefCell<Option<F>>>);
 
     impl<F> From<F> for Code<F>
@@ -769,6 +1051,7 @@ mod code {
     }
 
     impl<F> Code<F> {
+        /// Takes the closure out of this `Code` leaving it empty.
         #[must_use]
         pub fn take(&self) -> Option<F> {
             self.0.borrow_mut().take()

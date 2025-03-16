@@ -15,7 +15,7 @@ where
 
     fn message(&self, expression: Expression<'_>, _actual: &S) -> String {
         self.message.clone().unwrap_or_else(|| {
-            format!("expected {expression} to satisfy predicate, but returned false")
+            format!("expected {expression} to satisfy the given predicate, but returned false")
         })
     }
 }

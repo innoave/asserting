@@ -1,3 +1,7 @@
+//! Definitions of the expectations that are provided by this crate.
+
+#![allow(missing_docs)]
+
 use crate::std::ops::RangeInclusive;
 #[cfg(not(feature = "std"))]
 use alloc::{string::String, vec::Vec};

@@ -20,7 +20,7 @@ fn verify_that_subject_satisfies_predicate_fails() {
 
     assert_eq!(
         failures,
-        &["assertion failed: expected my_thing to satisfy predicate, but returned false\n"]
+        &["assertion failed: expected my_thing to satisfy the given predicate, but returned false\n"]
     );
 }
 
