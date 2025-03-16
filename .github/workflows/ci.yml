@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: -Dwarnings
+
+permissions:
+  contents: read
+
+jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+
+  fmt:
+    name: Rustfmt check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt
+      - run: cargo +nightly fmt --check --all
+
+  test:
+    name: Run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        rust:
+          - stable
+          - beta
+          - nightly
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --no-fail-fast
+  
+  no-std:
+    name: Test no-std support
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-default-features --features "float"
+
+  msrv:
+    name: Build with MSRV
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Get current MSRV from Cargo.toml
+        id: current_msrv
+        run: |
+          msrv=$(cat Cargo.toml | grep rust-version | sed 's/.* = "//; s/"//')
+          echo "msrv=$msrv" >> $GITHUB_OUTPUT
+      - name: Install MSRV toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ steps.current_msrv.outputs.msrv }}
+          override: true
+      - name: Run cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --all-features
+        env:
+          RUSTFLAGS: "" # remove -Dwarnings
+
+  doc:
+    name: API Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - uses: Swatinem/rust-cache@v2
+      - name: Run cargo doc
+        uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --all-features --no-deps
