@@ -158,6 +158,28 @@
 //! assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
 //! ```
 //!
+//! ## Assert that some code panics or does not panic
+//!
+//! ```
+//! # #[cfg(not(feature = "std"))]
+//! # fn main() {}
+//! # #[cfg(feature = "std")]
+//! # fn main() {
+//! use asserting::prelude::*;
+//!
+//! fn divide(a: i32, b: i32) -> i32 {
+//!     a / b
+//! }
+//!
+//! assert_that_code!(|| { divide(7, 0); }).panics();
+//!
+//! assert_that_code!(|| { divide(7, 0); })
+//!     .panics_with_message("attempt to divide by zero");
+//!
+//! assert_that_code!(|| { divide(7, 3); }).does_not_panic();
+//! # }
+//! ```
+//!
 //! # The `assert_that` and `verify_that` functions and macros
 //!
 //! Assertions can be written in two ways. The standard way that panics when

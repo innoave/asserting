@@ -119,6 +119,8 @@ macro_rules! verify_that {
 ///     a / b
 /// }
 ///
+/// assert_that_code!(|| { divide(7, 0); }).panics();
+///
 /// assert_that_code!(|| { divide(7, 0); })
 ///     .panics_with_message("attempt to divide by zero");
 ///
