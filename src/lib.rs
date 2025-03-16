@@ -11,7 +11,7 @@
 //! * easy spotting the difference between the expected and the actual value
 //! * chaining of multiple assertions on the same subject
 //!
-//! ## Usage
+//! # Usage
 //!
 //! To write fluent assertions in tests import this crate's `prelude`
 //! module in your test module, like so:
@@ -58,9 +58,9 @@
 //!   expected: 42
 //! ```
 //!
-//! ## Examples
+//! # Examples
 //!
-//! ### Basic assertions
+//! ## Basic assertions
 //!
 //! ```
 //! use asserting::prelude::*;
@@ -94,7 +94,7 @@
 //! assert_that!(subject).contains_exactly([1, 3, 5, 7, 9, 11]);
 //! ```
 //!
-//! ### Chaining assertions on the same subject
+//! ## Chaining assertions on the same subject
 //!
 //! ```
 //! use asserting::prelude::*;
@@ -109,7 +109,7 @@
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
 //!
-//! ## Writing assertions
+//! # Writing assertions
 //!
 //! Assertions can be written in two ways. The standard way that panics when
 //! an assertion fails or the alternative way that collects failures from
@@ -158,8 +158,8 @@
 //! ```
 //!
 //! is equivalent to calling the function [`assert_that`] and then calling
-//! the methods [`named`](spec::Spec::named) and
-//! [`located_at`](spec::Spec::located_at) on the returned [`Spec`], like so:
+//! the methods [`named()`] and [`located_at()`] on the returned [`Spec`],
+//! like so:
 //!
 //! ```
 //! # use asserting::prelude::*;
@@ -176,8 +176,8 @@
 //!
 //! When using the `verfiy_*` variants of the macros or functions for each
 //! failing assertion a failure of type [`AssertFailure`] is added to the
-//! [`Spec`]. We can read the failures collected by calling the
-//! [`failures`](spec::Spec::failures) method, like so:
+//! [`Spec`]. We can read the failures collected by calling the [`failures()`]
+//! method, like so:
 //!
 //! ```
 //! # use asserting::prelude::*;
@@ -208,6 +208,9 @@
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
 //! [`verify_that_code`]: spec::verify_that_code
+//! [`failures()`]: spec::Spec::failures
+//! [`named()`]: spec::Spec::named
+//! [`located_at()`]: spec::Spec::located_at
 
 #![cfg_attr(not(feature = "std"), no_std)]
 

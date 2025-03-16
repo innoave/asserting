@@ -20,7 +20,7 @@ use alloc::string::String;
 /// These assertions are implemented for all types that implement `PartialEq<E>`
 /// with `E` being the type of the expected value.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -110,7 +110,7 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// `PartialOrd<E>` with `E` being the type of the expected value the subject
 /// is being compared to.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -151,7 +151,7 @@ pub trait AssertOrder<E> {
 /// `PartialOrd<E>` with `E` being the type of the expected value. And `E` must
 /// implement `PartialOrd<T>`.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -177,7 +177,7 @@ pub trait AssertInRange<E> {
 
 /// Assert whether some value or expression is true or false.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -210,7 +210,7 @@ pub trait AssertBoolean {
 /// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
 /// * `HashMap`, `HashSet`, `BTreeSet`, etc.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
@@ -277,7 +277,7 @@ pub trait AssertEmptiness {
 /// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
 /// * `HashMap`, `HashSet`, `BTreeSet`, etc.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
@@ -331,7 +331,7 @@ pub trait AssertHasLength<E> {
 
 /// Assert whether a subject of the `Option` type holds some value or has none.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -357,7 +357,7 @@ pub trait AssertOption {
 
 /// Assert whether a subject of the `Result` type holds some value or an error.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -391,7 +391,7 @@ pub trait AssertResult {
 ///
 /// To assert the error value of a `Result` use [`AssertHasError::has_error`].
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -422,7 +422,7 @@ pub trait AssertHasValue<E> {
 ///
 /// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -442,7 +442,7 @@ pub trait AssertHasError<E> {
 
 /// Assert that a string contains a substring or character.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -459,7 +459,7 @@ pub trait AssertHasError<E> {
 pub trait AssertStringPattern<E> {
     /// Verifies that a string contains a substring or character.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -474,7 +474,7 @@ pub trait AssertStringPattern<E> {
 
     /// Verifies that a string starts with a substring or character.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -489,7 +489,7 @@ pub trait AssertStringPattern<E> {
 
     /// Verifies that a string ends with a substring or character.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -505,7 +505,7 @@ pub trait AssertStringPattern<E> {
 
 /// Assert that a string contains any char from a collection of chars.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -519,7 +519,7 @@ pub trait AssertStringPattern<E> {
 pub trait AssertStringContainsAnyOf<E> {
     /// Verifies that a string contains any char from a collection of chars.
     ///
-    /// ## Examples
+    /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;

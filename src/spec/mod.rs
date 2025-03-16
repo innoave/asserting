@@ -22,7 +22,7 @@ use alloc::{
 /// Assertions started with `assert_that!` will panic on the first failing
 /// assertion.
 ///
-/// ## Example
+/// # Example
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -64,7 +64,7 @@ macro_rules! assert_that {
 /// of the methods [`failures`](Spec::failures) or
 /// [`display_failures`](Spec::display_failures) on the [`Spec`].
 ///
-/// ## Example
+/// # Example
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -110,7 +110,7 @@ macro_rules! verify_that {
 /// Assertions started with `assert_that_code!` will panic on the first failing
 /// assertion.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -148,7 +148,7 @@ macro_rules! assert_that_code {
 /// one of the methods [`failures`](Spec::failures) or
 /// [`display_failures`](Spec::display_failures) on the [`Spec`].
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -216,7 +216,7 @@ macro_rules! verify_that_code {
 /// Note: It is not necessary to set the code location explicitly as this
 /// function is annotated with `#[track_caller]`.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -255,7 +255,7 @@ pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// "subject" is used. To set a specific text for the expression the method
 /// [`named`](Spec::named) must be called explicitly.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -312,7 +312,7 @@ pub const fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
 /// "the closure" is used. To set a specific text for the expression the method
 /// [`named`](Spec::named) must be called explicitly.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -350,7 +350,7 @@ where
 /// "the closure" is used. To set a specific text for the expression the method
 /// [`named`](Spec::named) must be called explicitly.
 ///
-/// ## Examples
+/// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;

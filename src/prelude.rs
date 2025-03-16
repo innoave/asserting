@@ -4,7 +4,7 @@
 //! When writing assertions in tests importing this prelude is all that should
 //! be needed.
 //!
-//! ## Example
+//! # Example
 //!
 //! ```
 //! use asserting::prelude::*;
