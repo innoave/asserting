@@ -158,7 +158,7 @@
 //! assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
 //! ```
 //!
-//! # Writing assertions
+//! # The `assert_that` and `verify_that` functions and macros
 //!
 //! Assertions can be written in two ways. The standard way that panics when
 //! an assertion fails or the alternative way that collects failures from
@@ -236,7 +236,7 @@
 //! ```
 //!
 //! or to get a list of formatted failure messages, we can call the
-//! [`display_failures`](spec::Spec::display_failures) method, like so:
+//! [`display_failures()`] method, like so:
 //!
 //! ```
 //! # use asserting::prelude::*;
@@ -257,6 +257,7 @@
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
 //! [`verify_that_code`]: spec::verify_that_code
+//! [`display_failures()`]: spec::Spec::display_failures
 //! [`failures()`]: spec::Spec::failures
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at

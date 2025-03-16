@@ -623,7 +623,7 @@ impl<S, R> Spec<'_, S, R> {
         self.failures.clone()
     }
 
-    /// Returns the assertion failures collected so far formatted as text.
+    /// Returns the assertion failures collected so far as formatted text.
     pub fn display_failures(&self) -> Vec<String> {
         self.failures.iter().map(ToString::to_string).collect()
     }
