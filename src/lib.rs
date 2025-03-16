@@ -109,6 +109,55 @@
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
 //!
+//! ## Asserting custom types
+//!
+//! We can extract a property of a custom type and assert its value:
+//!
+//! ```
+//! # use asserting::prelude::*;
+//! struct MyStruct {
+//!     important_property: String,
+//!     other_property: f64,
+//! }
+//!
+//! let some_thing = MyStruct {
+//!     important_property: "imperdiet aliqua zzril eiusmod".into(),
+//!     other_property: 99.9,
+//! };
+//!
+//! assert_that!(some_thing).extracting(|s| s.important_property)
+//!     .is_equal_to("imperdiet aliqua zzril eiusmod");
+//!
+//! ```
+//!
+//! Or we can map a custom type that does not implement a required trait to some
+//! supported type, e.g. a tuple in this example:
+//!
+//! ```
+//! # use asserting::prelude::*;
+//! struct Point {
+//!     x: i64,
+//!     y: i64,
+//! }
+//!
+//! let target = Point { x: 12, y: -64 };
+//!
+//! assert_that!(target).mapping(|s| (s.x, s.y)).is_equal_to((12, -64));
+//! ```
+//!
+//! ## Predicate as custom assertion
+//!
+//! We can use any predicate function for a custom assertion:
+//!
+//! ```
+//! # use asserting::prelude::*;
+//! fn is_odd(value: &i32) -> bool {
+//!     value & 1 == 1
+//! }
+//!
+//! assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
+//! ```
+//!
 //! # Writing assertions
 //!
 //! Assertions can be written in two ways. The standard way that panics when
