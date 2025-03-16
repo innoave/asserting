@@ -273,8 +273,221 @@
 //! ]);
 //! ```
 //!
+//! # Custom assertions
+//!
+//! `asserting` provides 3 ways to do custom assertions:
+//!
+//! 1. Predicate functions as custom assertions used with the [`Spec::satisfies()`] method
+//! 2. Custom expectations used with the [`Spec::expecting()`] method
+//! 3. Custom assertions methods
+//!
+//! How to use predicate functions as custom assertions is described on the
+//! [`Spec::satisfies()`] method and in the [Examples](#predicate-as-custom-assertion)
+//! chapter above.
+//!
+//! ## Writing custom expectations
+//!
+//! A custom expectation is any type that implements the [`Expectation`] trait.
+//! For example, lets assume we have a custom type `Either` and want to write
+//! an expectation that verifies that a value of type `Either` is a left value.
+//!
+//! ```no_run
+//! use asserting::spec::{Expectation, Expression, Unknown};
+//! use std::fmt::Debug;
+//!
+//! #[derive(Debug)]
+//! enum Either<L, R> {
+//!     Left(L),
+//!     Right(R),
+//! }
+//!
+//! struct IsLeft;
+//!
+//! impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! where
+//!     L: Debug,
+//!     R: Debug,
+//! {
+//!     fn test(&mut self, subject: &Either<L, R>) -> bool {
+//!         match subject {
+//!             Either::Left(_) => true,
+//!             _ => false,
+//!         }
+//!     }
+//!
+//!     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//!         format!(
+//!             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//!             Either::Left::<_, Unknown>(Unknown),
+//!             Either::Left::<_, Unknown>(Unknown),
+//!         )
+//!      }
+//! }
+//! ```
+//!
+//! We can now use the expectation `IsLeft` with the [`Spec::expecting()`]
+//! method:
+//!
+//! ```
+//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! # use std::fmt::Debug;
+//! #
+//! # #[derive(Debug)]
+//! # enum Either<L, R> {
+//! #     Left(L),
+//! #     Right(R),
+//! # }
+//! #
+//! # struct IsLeft;
+//! #
+//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # where
+//! #     L: Debug,
+//! #     R: Debug,
+//! # {
+//! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
+//! #         match subject {
+//! #             Either::Left(_) => true,
+//! #             _ => false,
+//! #         }
+//! #     }
+//! #
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #         format!(
+//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #         )
+//! #      }
+//! # }
+//! use asserting::prelude::*;
+//!
+//! let subject: Either<String, i64> = Either::Left("left value".to_string());
+//!
+//! assert_that!(subject).expecting(IsLeft);
+//! ```
+//!
+//! ## Providing a custom assertion method
+//!
+//! In the previous chapter we implement a custom expectation which can be used
+//! with the [`Spec::expecting()`] method. But this way is not very expressive.
+//!
+//! Additionally, we can implement a custom assertion method via an extension
+//! trait.
+//!
+//! ```
+//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! #
+//! # #[derive(Debug)]
+//! # enum Either<L, R> {
+//! #     Left(L),
+//! #     Right(R),
+//! # }
+//! #
+//! # struct IsLeft;
+//! #
+//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # where
+//! #     L: Debug,
+//! #     R: Debug,
+//! # {
+//! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
+//! #         match subject {
+//! #             Either::Left(_) => true,
+//! #             _ => false,
+//! #         }
+//! #     }
+//! #
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #         format!(
+//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #         )
+//! #      }
+//! # }
+//! use asserting::spec::{FailingStrategy, Spec};
+//! use std::fmt::Debug;
+//!
+//! pub trait AssertEither {
+//!     fn is_left(self) -> Self;
+//! }
+//!
+//! impl<L, R, Q> AssertEither for Spec<'_, Either<L, R>, Q>
+//! where
+//!     L: Debug,
+//!     R: Debug,
+//!     Q: FailingStrategy,
+//! {
+//!     fn is_left(self) -> Self {
+//!         self.expecting(IsLeft)
+//!     }
+//! }
+//! ```
+//!
+//! Now we can use the assertion method `is_left()` for asserting whether a
+//! subject of type `Either` is a left value.
+//!
+//! ```
+//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! # use std::fmt::Debug;
+//! #
+//! # #[derive(Debug)]
+//! # enum Either<L, R> {
+//! #     Left(L),
+//! #     Right(R),
+//! # }
+//! #
+//! # struct IsLeft;
+//! #
+//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # where
+//! #     L: Debug,
+//! #     R: Debug,
+//! # {
+//! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
+//! #         match subject {
+//! #             Either::Left(_) => true,
+//! #             _ => false,
+//! #         }
+//! #     }
+//! #
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #         format!(
+//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #             Either::Left::<_, Unknown>(Unknown),
+//! #         )
+//! #      }
+//! # }
+//! # use asserting::spec::{FailingStrategy, Spec};
+//! #
+//! # pub trait AssertEither {
+//! #     fn is_left(self) -> Self;
+//! # }
+//! #
+//! # impl<L, R, Q> AssertEither for Spec<'_, Either<L, R>, Q>
+//! # where
+//! #     L: Debug,
+//! #     R: Debug,
+//! #     Q: FailingStrategy,
+//! # {
+//! #     fn is_left(self) -> Self {
+//! #         self.expecting(IsLeft)
+//! #     }
+//! # }
+//! use asserting::prelude::*;
+//!
+//! let subject: Either<String, i64> = Either::Left("left value".to_string());
+//!
+//! assert_that!(subject).is_left();
+//! ```
+//!
 //! [`AssertFailure`]: spec::AssertFailure
+//! [`Expectation`]: spec::Expectation
 //! [`Spec`]: spec::Spec
+//! [`Spec::expecting()`]: spec::Spec::expecting
+//! [`Spec::satisfies()`]: spec::Spec::satisfies
 //! [`assert_that`]: spec::assert_that
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
