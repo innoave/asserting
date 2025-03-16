@@ -15,6 +15,7 @@ The goals for `asserting` are:
 4. do not require from asserted types to implement traits if it is not absolutely necessary
 5. support for asserting custom types with provided assertions
 6. writing custom assertions requires minimal effort
+7. no-std support
 
 ### Convenient to write
 
@@ -55,6 +56,16 @@ Easy to extend means that we can write assertions for custom types with minimal 
 1. use any predicate function as a custom assertion
 2. combine provided expectations to a custom assertion
 3. write custom assertions by implementing two simple traits
+
+## no-std support
+
+To use `asserting` in a no-std environment disable the default features. Features that do not
+require std can still be added.
+
+```toml
+[dev-dependencies]
+asserting = { version = "0.1", default-features = false, features = "float" }
+```
 
 ## Available Assertions
 
