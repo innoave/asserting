@@ -9,7 +9,7 @@ repository = "https://github.com/innoave/asserting"
 readme = "README.md"
 
 description = """
-Fluent assertions for testing in the Rust programming language.
+Fluent assertions for tests in Rust that are convenient to write and easy to extend.
 """
 keywords = ["assertions", "testing", "fluent", "matchers"]
 categories = ["development-tools::testing", "no-std"]
