@@ -2,7 +2,6 @@
 
 [![crates.io][crates-badge]][crates-url]
 [![docs.rs][docs-badge]][docs-url]
-[![Apache-2.0 licensed][license-badge]][license-url]
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
 
@@ -146,10 +145,6 @@ good choice for CVD friendly colors is:
 [docs-badge]: https://docs.rs/asserting/badge.svg
 
 [docs-url]: https://docs.rs/asserting
-
-[license-badge]: https://img.shields.io/github/license/innoave/asserting?color=blue
-
-[license-url]: https://github.com/innoave/asserting/blob/main/LICENSE-MIT
 
 [msrv-badge]: https://img.shields.io/crates/msrv/asserting?color=chocolate
 
