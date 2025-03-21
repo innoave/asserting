@@ -1,6 +1,6 @@
 //! Implementation of assertions for `Option` values.
 
-use crate::assertions::{AssertHasValue, AssertOption};
+use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::expectations::{HasValue, IsNone, IsSome};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
@@ -18,6 +18,20 @@ where
 
     fn is_none(self) -> Self {
         self.expecting(IsNone)
+    }
+}
+
+impl<'a, T, R> AssertOptionValue<'a, T, R> for Spec<'a, Option<T>, R>
+where
+    R: FailingStrategy,
+{
+    fn some(self) -> Spec<'a, T, R> {
+        self.mapping(|subject| match subject {
+            None => {
+                panic!("assertion failed: expected the subject to be `Some(_)`, but was `None`")
+            },
+            Some(value) => value,
+        })
     }
 }
 

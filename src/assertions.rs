@@ -355,6 +355,28 @@ pub trait AssertOption {
     fn is_none(self) -> Self;
 }
 
+/// Assert the option value by mapping the subject.
+///
+/// If the option is none, the assertion fails.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
+/// assert_that!(subject).some().contains_exactly([1, 2, 3]);
+///
+/// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
+/// assert_that!(subject).some().is_not_empty();
+/// ```
+pub trait AssertOptionValue<'a, T, R> {
+    /// Maps the subject to the option's value if it has some. Otherwise, this
+    /// assertion fails.
+    #[track_caller]
+    fn some(self) -> Spec<'a, T, R>;
+}
+
 /// Assert whether a subject of the `Result` type holds some value or an error.
 ///
 /// # Examples
@@ -376,6 +398,32 @@ pub trait AssertResult {
     /// Verifies that the subject has an err value.
     #[track_caller]
     fn is_err(self) -> Self;
+}
+
+/// Assert the result value or error by mapping the subject.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
+/// assert_that!(subject).ok().is_not_empty();
+///
+/// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
+/// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
+/// ```
+pub trait AssertResultValue<'a, T, E, R> {
+    /// Maps the subject to the result's ok value.
+    ///
+    /// If the result is an error this method panics.
+    #[track_caller]
+    fn ok(self) -> Spec<'a, T, R>;
+
+    /// Maps the subject to the result's err value.
+    ///
+    /// If the result is an ok value this method panics.
+    fn err(self) -> Spec<'a, E, R>;
 }
 
 /// Assert that a subject of some container type holds a value that is equal to

@@ -1,6 +1,10 @@
 use crate::prelude::*;
 #[cfg(not(feature = "std"))]
-use alloc::string::{String, ToString};
+use alloc::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 
 #[test]
 fn result_of_i32_is_ok() {
@@ -149,5 +153,43 @@ fn verify_result_of_custom_types_has_error_fails() {
   expected: Err(MyError(-1))
 "
         ]
+    );
+}
+
+#[test]
+fn map_result_with_ok_value_to_its_ok_value() {
+    let subject: Result<Vec<u64>, String> = Ok(vec![]);
+
+    assert_that(subject).ok().is_empty();
+}
+
+#[cfg(feature = "panic")]
+#[test]
+fn map_result_with_err_value_to_its_ok_value() {
+    let subject: Result<Vec<usize>, String> = Err("nam nihil iure liber".to_string());
+
+    assert_that_code(|| {
+        assert_that(subject).ok().is_not_empty();
+    })
+    .panics_with_message("assertion failed: expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`");
+}
+
+#[test]
+fn map_result_with_err_value_to_its_err_value() {
+    let subject: Result<(), String> = Err("tempor aliquip amet exerci".to_string());
+
+    assert_that(subject).err().is_not_empty();
+}
+
+#[cfg(feature = "panic")]
+#[test]
+fn map_result_with_ok_value_to_its_err_value() {
+    let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
+
+    assert_that_code(|| {
+        assert_that(subject).err().is_not_empty();
+    })
+    .panics_with_message(
+        "assertion failed: expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`",
     );
 }

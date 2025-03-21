@@ -1,6 +1,6 @@
 //! Implementation of assertions for `Result` values.
 
-use crate::assertions::AssertResult;
+use crate::assertions::{AssertResult, AssertResultValue};
 use crate::expectations::{HasError, HasValue, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
@@ -20,6 +20,30 @@ where
 
     fn is_err(self) -> Self {
         self.expecting(IsErr)
+    }
+}
+
+impl<'a, T, E, R> AssertResultValue<'a, T, E, R> for Spec<'a, Result<T, E>, R>
+where
+    T: Debug,
+    E: Debug,
+{
+    fn ok(self) -> Spec<'a, T, R> {
+        self.mapping(|subject| match subject {
+            Ok(value) => value,
+            Err(error) => {
+                panic!("assertion failed: expected the subject to be `Ok(_)`, but was `Err({error:?})`")
+            },
+        })
+    }
+
+    fn err(self) -> Spec<'a, E, R> {
+        self.mapping(|subject| match subject {
+            Ok(value) => {
+                panic!("assertion failed: expected the subject to be `Err(_)`, but was `Ok({value:?})`")
+            },
+            Err(error) => error,
+        })
     }
 }
 

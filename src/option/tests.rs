@@ -1,6 +1,9 @@
 use crate::prelude::*;
 #[cfg(not(feature = "std"))]
-use alloc::string::{String, ToString};
+use alloc::{
+    string::{String, ToString},
+    vec,
+};
 
 #[test]
 fn option_of_i32_is_none() {
@@ -131,4 +134,22 @@ fn verify_option_of_string_has_some_value_fails() {
 "#
         ]
     );
+}
+
+#[test]
+fn map_option_with_some_value_to_its_value() {
+    let subject = Some(vec![1, 2, 3]);
+
+    assert_that(subject).some().is_not_empty();
+}
+
+#[cfg(feature = "panic")]
+#[test]
+fn map_option_with_none_to_its_value() {
+    let subject: Option<Vec<usize>> = None;
+
+    assert_that_code(|| {
+        assert_that(subject).some().is_empty();
+    })
+    .panics_with_message("assertion failed: expected the subject to be `Some(_)`, but was `None`");
 }
