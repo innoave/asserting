@@ -258,10 +258,10 @@ To start assertions on code use the `assert_that_code!()` macro.
 
 [property based assertions]: https://docs.rs/asserting/#property-based-assertions
 
-[`assertions`]: https://docs.rs/asserting/assertions/
+[`assertions`]: https://docs.rs/asserting/latest/asserting/assertions/
 
-[`DefinedOrderProperty`]: https://docs.rs/asserting/properties/trait.DefinedOrderProperty.html
+[`DefinedOrderProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.DefinedOrderProperty.html
 
-[`IsEmptyProperty`]: https://docs.rs/asserting/properties/trait.IsEmptyProperty.html
+[`IsEmptyProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.IsEmptyProperty.html
 
-[`LengthProperty`]: https://docs.rs/asserting/properties/trait.LengthProperty.html
+[`LengthProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.LengthProperty.html
