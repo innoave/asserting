@@ -250,11 +250,11 @@ To start assertions on code use the `assert_that_code!()` macro.
 
 <!-- External Links -->
 
-[custom assertions]: https://docs.rs/asserting/#-custom-assertions
+[custom assertions]: https://docs.rs/asserting/#custom-assertions
 
-[predicate as custom assertion]: https://docs.rs/asserting/#-predicate-as-custom-assertion
+[predicate as custom assertion]: https://docs.rs/asserting/#predicate-as-custom-assertion
 
-[property based assertions]: https://docs.rs/asserting/#-property-based-assertions
+[property based assertions]: https://docs.rs/asserting/#property-based-assertions
 
 [`assertions`]: https://docs.rs/asserting/assertions/
 
