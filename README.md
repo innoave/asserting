@@ -58,8 +58,8 @@ Easy to extend means that we can write assertions for custom types with minimal 
    see "[property based assertions]")
 3. write custom assertions by implementing two simple traits (see "[custom assertions]")
 
-The mentioned references link to a chapter in the crate's documentation that describes a custom
-assertion with an example.
+The mentioned references link to a chapter in the crate's documentation that describes the
+possibilities for custom assertions including examples.
 
 ## no-std support
 
@@ -76,7 +76,7 @@ An allocator is still needed for no-std.
 ## Available Assertions
 
 This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list
-of available assertions including examples see the documentation of the [`assertions`] module.
+of available assertions including examples browse the documentation of the [`assertions`] module.
 
 ### Equality
 

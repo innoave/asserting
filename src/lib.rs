@@ -275,7 +275,7 @@
 //!
 //! # Custom assertions
 //!
-//! `asserting` provides 3 ways to do custom assertions:
+//! `asserting` provides 4 ways to do custom assertions:
 //!
 //! 1. Predicate functions as custom assertions used with the [`Spec::satisfies()`] method
 //! 2. Property base assertions for any type that implements a property trait
@@ -299,7 +299,7 @@
 //! simply need to implement the [`LengthProperty`] trait for this type.
 //!
 //! Let's assume we have a custom struct `PathWay` and we implement the
-//! [`LengthProperty] for `PathWay`:
+//! [`LengthProperty`] for `PathWay`:
 //!
 //! ```
 //! use asserting::properties::LengthProperty;
