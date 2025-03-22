@@ -15,7 +15,7 @@ The goals for `asserting` are:
 4. do not require from asserted types to implement traits if it is not absolutely necessary
 5. support for asserting custom types with provided assertions
 6. writing custom assertions requires minimal effort
-7. no-std support
+7. support no-std environments
 
 ### Convenient to write
 
@@ -53,9 +53,13 @@ Easy to extend means that we can write assertions for custom types with minimal 
 
 `asserting` provides three kinds of custom assertions:
 
-1. use any predicate function as a custom assertion
-2. combine provided expectations to a custom assertion
-3. write custom assertions by implementing two simple traits
+1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
+2. property based assertions can be used with any type that implements the related property (
+   see "[property based assertions]")
+3. write custom assertions by implementing two simple traits (see "[custom assertions]")
+
+The mentioned references link to a chapter in the crate's documentation that describes a custom
+assertion with an example.
 
 ## no-std support
 
@@ -67,7 +71,12 @@ require std can still be added.
 asserting = { version = "0.1", default-features = false, features = "float" }
 ```
 
+An allocator is still needed for no-std.
+
 ## Available Assertions
+
+This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list
+of available assertions including examples see the documentation of the [`assertions`] module.
 
 ### Equality
 
@@ -77,19 +86,6 @@ for all types that implement `PartialEq<E>` with `E` being the type of the expec
 |-----------------|----------------------------------------------------------|
 | is_equal_to     | verify that the subject is equal to an expected value    |
 | is_not_equal_to | verify that the subject is not equal to a specific value |                                                 
-
-Example:
-
-```rust
-#[test]
-fn the_message_is_right() {
-    let message = "lorem consectetur ipsum exercitation".to_string();
-
-    assert_that!(message).is_equal_to("lorem consectetur ipsum exercitation");
-}
-```
-
-Note: we do not have to write `.to_string()` on the expected `&str`.
 
 ### Order
 
@@ -112,40 +108,129 @@ being the type of the expected value.
 | is_in_range     | verify that the subject is in the expected range (closed range)      |                                                 
 | is_not_in_range | verify that the subject is not in the specified range (closed range) |
 
-## Colored failure messages
+### Float
 
-Default colors are <span style="color: green">green</span> and <span style="color: red">red</span>.
+for floating point numbers of type `f32` and `f64`.
 
-### Switch off colored output
+requires crate feature `float` which is enabled by default.
 
-in `~/.cargo/config.toml` add:
+| assertion                   | description                                                                                      |
+|-----------------------------|--------------------------------------------------------------------------------------------------|
+| is_close_to                 | verify that the subject is approximately equal to the expected value within a default margin     |                                                 
+| is_not_close_to             | verify that the subject is not approximately equal to the expected value within a default margin |
+| is_close_to_with_margin     | verify that the subject is approximately equal to the expected value within the given margin     |
+| is_not_close_to_with_margin | verify that the subject is not approximately equal to the expected value within the given margin |
 
-```toml,no_sync
-[env]
-ASSERTING_MESSAGES_COLORED = "off"
-```
+### Boolean
 
-no coloring in failure messages.
+for `bool`.
 
-### Use color vision deficiency (CVD) friendly colors:
+| assertion | description                      |
+|-----------|----------------------------------|
+| is_true   | verify that the subject is true  |                                                 
+| is_false  | verify that the subject is false |
 
-in `~/.cargo/config.toml` add:
+### String
 
-```toml,no_sync
-[env]
-ASSERTING_MESSAGES_COLORED = "cvd"
-```
+for all string types of Rust: `String`, `str`, `OsString`, `OsStr`, `CString` and `CStr`.
 
-uses <span style="color: blue">blue</span> and <span style="color: red">red</span>.
+| assertion           | description                                                              |
+|---------------------|--------------------------------------------------------------------------|
+| is_empty            | verify that a string is empty                                            |                                                 
+| is_not_empty        | verify that a string is not empty                                        |
+| has_length          | verify that a string has exactly the expected length                     |                                                 
+| has_length_in_range | verify that a string has a length that is in the expected range          |
+| contains            | verify that a string contains the expected substring or character        |
+| starts_with         | verify that a string starts with the expected substring or character     |
+| ends_with           | verify that a string ends with the expected substring or character       |
+| contains_any_of     | verify that a string contains any character from a collection of `char`s |
 
-good choice for CVD friendly colors is:
+### Option
 
-```text
-    BLUE:    HEX #005AB5
-             R 0 G 90 B 181
-    RED:     HEX #DC3220
-             R 220 G 50 B 32
-```
+for the `Option` type.
+
+| assertion | description                                                            |
+|-----------|------------------------------------------------------------------------|
+| is_some   | verify that an option has some value                                   |                                                 
+| is_none   | verify that an option has no value                                     |
+| has_value | verify that an option has a value equal to the expected one            |
+| some      | verify that an option has some value and map the subject to this value |
+
+### Result
+
+for the `Result` type.
+
+| assertion | description                                                                 |
+|-----------|-----------------------------------------------------------------------------|
+| is_some   | verify that a result has an ok value                                        |                                                 
+| is_none   | verify that a result has an err value                                       |
+| has_value | verify that a result has an ok value that is equal to the expected value    |
+| has_error | verify that a result has an err value that is equal to the expected error   |
+| ok        | verify that a result has an ok value and map the subject to this ok value   |
+| err       | verify that a result has an err value and map the subject to this err value |
+
+### Emptiness
+
+for collections and strings.
+
+| assertion    | description                          |
+|--------------|--------------------------------------|
+| is_empty     | verify that the subject is empty     |                                                 
+| is_not_empty | verify that the subject is not empty |
+
+The implementation of these assertions is based on the property trait [`IsEmptyProperty`].
+Implementing this property for any type enables these assertions for that type.
+
+### Length (Size)
+
+for collections and strings.
+
+| assertion           | description                                                        |
+|---------------------|--------------------------------------------------------------------|
+| has_length          | verify that the subject has exactly the expected length            |                                                 
+| has_length_in_range | verify that the subject has a length that is in the expected range |
+
+The implementation of these assertions is based on the property trait [`LengthProperty`].
+Implementing this property for any type enables these assertions for that type.
+
+### Iterator / Collection
+
+for all iterators.
+
+| assertion                     | description                                                                                                             |
+|-------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| contains                      | verify that an iterator/collection contains an item that is equal to the expected value                                 |                                                
+| contains_exactly_in_any_order | verify that an iterator/collection contains exactly the expected values and nothing else in any order                   |
+| contains_any_of               | verify that an iterator/collection contains at least one of the given values                                            |
+| contains_all_of               | verify that an iterator/collection contains all the expected values in any order (and maybe more)                       |
+| contains_only                 | verify that an iterator/collection contains only the given values and nothing else in any order and ignoring duplicates |
+| contains_only_once            | verify that an iterator/collection contains only the given values in any order and each of them only once               |
+
+for iterators that yield items in a well-defined order.
+
+All the above assertions provided for any kind of iterator plus the following:
+
+| assertion             | description                                                                                                                                      |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| contains_exactly      | verify that an iterator/collection contains exactly the expected values and nothing else in the given order                                      |
+| contains_sequence     | verify that an iterator/collection contains the given sequence of values in the given order and without extra values between the sequence values |
+| contains_all_in_order | verify that an iterator/collection contains all the given values and in the given order, possibly with other values between them                 |
+| starts_with           | verify that an iterator/collection contains the given values as the first elements in order                                                      |
+| ends_with             | verify that an iterator/collection contains the given values as the last elements in order                                                       |
+
+### Panic
+
+for code inside a closure.
+
+requires the crate feature `panic` which is enabled by default.
+
+| assertion           | description                                            |
+|---------------------|--------------------------------------------------------|
+| does_not_panic      | verify that some code does not panic                   |                                                
+| panics              | verify that some code panics                           |
+| panics_with_message | verify that some code panics with the expected message |
+
+To start assertions on code use the `assert_that_code!()` macro.
 
 <!-- Badges and related URLs -->
 
@@ -162,4 +247,19 @@ good choice for CVD friendly colors is:
 [code-coverage-badge]: https://codecov.io/github/innoave/asserting/graph/badge.svg?token=o0w7R7J0Op
 
 [code-coverage-url]: https://codecov.io/github/innoave/asserting
- 
+
+<!-- External Links -->
+
+[custom assertions]: https://docs.rs/asserting/#-custom-assertions
+
+[predicate as custom assertion]: https://docs.rs/asserting/#-predicate-as-custom-assertion
+
+[property based assertions]: https://docs.rs/asserting/#-property-based-assertions
+
+[`assertions`]: https://docs.rs/asserting/assertions/
+
+[`DefinedOrderProperty`]: https://docs.rs/asserting/properties/trait.DefinedOrderProperty.html
+
+[`IsEmptyProperty`]: https://docs.rs/asserting/properties/trait.IsEmptyProperty.html
+
+[`LengthProperty`]: https://docs.rs/asserting/properties/trait.LengthProperty.html
