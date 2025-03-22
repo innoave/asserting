@@ -8,7 +8,7 @@
 
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
-use crate::prelude::DefinedOrder;
+use crate::prelude::DefinedOrderProperty;
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
@@ -88,7 +88,7 @@ mod c_string {
     }
 }
 
-impl DefinedOrder for Chars<'_> {}
+impl DefinedOrderProperty for Chars<'_> {}
 
 // We implement `AssertContains` for different `Pattern` types as the
 // [`core::str::pattern`] API is not stabilized as of February 2025;

@@ -18,7 +18,7 @@
 //! Property traits that define a certain behavior of a type are often marker
 //! traits.
 //!
-//! An example for a behavior property is the [`DefinedOrder`] trait. It
+//! An example for a behavior property is the [`DefinedOrderProperty`] trait. It
 //! specifies that a collection's iterator yields the items in a well-defined
 //! order.
 
@@ -76,7 +76,7 @@ where
 
 /// Marker trait to specify whether a collection or iterator iterates over its
 /// elements in a well-defined order.
-pub trait DefinedOrder {}
+pub trait DefinedOrderProperty {}
 
-impl<C> DefinedOrder for &C where C: DefinedOrder + ?Sized {}
-impl<C> DefinedOrder for &mut C where C: DefinedOrder + ?Sized {}
+impl<C> DefinedOrderProperty for &C where C: DefinedOrderProperty + ?Sized {}
+impl<C> DefinedOrderProperty for &mut C where C: DefinedOrderProperty + ?Sized {}

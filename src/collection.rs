@@ -1,19 +1,19 @@
 //! Implementation of assertions for collections and iterators.
 
-use crate::prelude::{DefinedOrder, IsEmptyProperty, LengthProperty};
+use crate::prelude::{DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::std::{array, slice};
 use hashbrown::{HashMap, HashSet};
 
-impl<T> DefinedOrder for [T] {}
-impl<T, const N: usize> DefinedOrder for [T; N] {}
-impl<T, const N: usize> DefinedOrder for array::IntoIter<T, N> {}
-impl<T> DefinedOrder for slice::Iter<'_, T> {}
-impl<T> DefinedOrder for slice::IterMut<'_, T> {}
+impl<T> DefinedOrderProperty for [T] {}
+impl<T, const N: usize> DefinedOrderProperty for [T; N] {}
+impl<T, const N: usize> DefinedOrderProperty for array::IntoIter<T, N> {}
+impl<T> DefinedOrderProperty for slice::Iter<'_, T> {}
+impl<T> DefinedOrderProperty for slice::IterMut<'_, T> {}
 
 #[cfg(feature = "std")]
 mod std {
     use crate::prelude::{IsEmptyProperty, LengthProperty};
-    use crate::properties::DefinedOrder;
+    use crate::properties::DefinedOrderProperty;
     use std::{
         collections::{
             btree_map, btree_set, linked_list, vec_deque, BTreeMap, BTreeSet, BinaryHeap, HashMap,
@@ -22,22 +22,22 @@ mod std {
         vec,
     };
 
-    impl<T> DefinedOrder for Vec<T> {}
-    impl<T> DefinedOrder for vec::IntoIter<T> {}
-    impl<T> DefinedOrder for BTreeSet<T> {}
-    impl<T> DefinedOrder for btree_set::IntoIter<T> {}
-    impl<T> DefinedOrder for btree_set::Iter<'_, T> {}
-    impl<K, V> DefinedOrder for BTreeMap<K, V> {}
-    impl<K, V> DefinedOrder for btree_map::IntoIter<K, V> {}
-    impl<K, V> DefinedOrder for btree_map::Iter<'_, K, V> {}
-    impl<T> DefinedOrder for LinkedList<T> {}
-    impl<T> DefinedOrder for linked_list::IntoIter<T> {}
-    impl<T> DefinedOrder for linked_list::Iter<'_, T> {}
-    impl<T> DefinedOrder for linked_list::IterMut<'_, T> {}
-    impl<T> DefinedOrder for VecDeque<T> {}
-    impl<T> DefinedOrder for vec_deque::IntoIter<T> {}
-    impl<T> DefinedOrder for vec_deque::Iter<'_, T> {}
-    impl<T> DefinedOrder for vec_deque::IterMut<'_, T> {}
+    impl<T> DefinedOrderProperty for Vec<T> {}
+    impl<T> DefinedOrderProperty for vec::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for BTreeSet<T> {}
+    impl<T> DefinedOrderProperty for btree_set::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for btree_set::Iter<'_, T> {}
+    impl<K, V> DefinedOrderProperty for BTreeMap<K, V> {}
+    impl<K, V> DefinedOrderProperty for btree_map::IntoIter<K, V> {}
+    impl<K, V> DefinedOrderProperty for btree_map::Iter<'_, K, V> {}
+    impl<T> DefinedOrderProperty for LinkedList<T> {}
+    impl<T> DefinedOrderProperty for linked_list::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for linked_list::Iter<'_, T> {}
+    impl<T> DefinedOrderProperty for linked_list::IterMut<'_, T> {}
+    impl<T> DefinedOrderProperty for VecDeque<T> {}
+    impl<T> DefinedOrderProperty for vec_deque::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for vec_deque::Iter<'_, T> {}
+    impl<T> DefinedOrderProperty for vec_deque::IterMut<'_, T> {}
 
     impl<T> IsEmptyProperty for BinaryHeap<T> {
         fn is_empty_property(&self) -> bool {
@@ -127,7 +127,7 @@ mod std {
 #[cfg(not(feature = "std"))]
 mod no_std {
     use crate::prelude::{IsEmptyProperty, LengthProperty};
-    use crate::properties::DefinedOrder;
+    use crate::properties::DefinedOrderProperty;
     use alloc::{
         collections::{
             btree_set, linked_list, vec_deque, BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque,
@@ -136,19 +136,19 @@ mod no_std {
         vec::Vec,
     };
 
-    impl<T> DefinedOrder for Vec<T> {}
-    impl<T> DefinedOrder for vec::IntoIter<T> {}
-    impl<T> DefinedOrder for BTreeSet<T> {}
-    impl<T> DefinedOrder for btree_set::IntoIter<T> {}
-    impl<T> DefinedOrder for btree_set::Iter<'_, T> {}
-    impl<T> DefinedOrder for LinkedList<T> {}
-    impl<T> DefinedOrder for linked_list::IntoIter<T> {}
-    impl<T> DefinedOrder for linked_list::Iter<'_, T> {}
-    impl<T> DefinedOrder for linked_list::IterMut<'_, T> {}
-    impl<T> DefinedOrder for VecDeque<T> {}
-    impl<T> DefinedOrder for vec_deque::IntoIter<T> {}
-    impl<T> DefinedOrder for vec_deque::Iter<'_, T> {}
-    impl<T> DefinedOrder for vec_deque::IterMut<'_, T> {}
+    impl<T> DefinedOrderProperty for Vec<T> {}
+    impl<T> DefinedOrderProperty for vec::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for BTreeSet<T> {}
+    impl<T> DefinedOrderProperty for btree_set::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for btree_set::Iter<'_, T> {}
+    impl<T> DefinedOrderProperty for LinkedList<T> {}
+    impl<T> DefinedOrderProperty for linked_list::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for linked_list::Iter<'_, T> {}
+    impl<T> DefinedOrderProperty for linked_list::IterMut<'_, T> {}
+    impl<T> DefinedOrderProperty for VecDeque<T> {}
+    impl<T> DefinedOrderProperty for vec_deque::IntoIter<T> {}
+    impl<T> DefinedOrderProperty for vec_deque::Iter<'_, T> {}
+    impl<T> DefinedOrderProperty for vec_deque::IterMut<'_, T> {}
 
     impl<T> IsEmptyProperty for BinaryHeap<T> {
         fn is_empty_property(&self) -> bool {

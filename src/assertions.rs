@@ -88,7 +88,7 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
     #[track_caller]
     fn is_close_to(self, expected: E) -> Self;
 
-    /// Verifies that the actual value not approximately equal to the expected
+    /// Verifies that the actual value is not approximately equal to the expected
     /// value.
     ///
     /// For the approximation a default margin with 4 * epsilon and 4 * ULPS is

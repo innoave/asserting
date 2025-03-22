@@ -8,7 +8,7 @@ use crate::expectations::{
     IterContainsExactly, IterContainsExactlyInAnyOrder, IterContainsOnly, IterContainsOnlyOnce,
     IterContainsSequence, IterEndsWith, IterStartsWith,
 };
-use crate::properties::DefinedOrder;
+use crate::properties::DefinedOrderProperty;
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
@@ -247,9 +247,9 @@ where
 impl<'a, S, T, E, R> AssertIteratorContainsInOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrder,
+    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     E: IntoIterator,
-    <E as IntoIterator>::IntoIter: DefinedOrder,
+    <E as IntoIterator>::IntoIter: DefinedOrderProperty,
     <E as IntoIterator>::Item: Debug,
     T: PartialEq<<E as IntoIterator>::Item> + Debug,
     R: FailingStrategy,
