@@ -77,6 +77,8 @@ An allocator is still needed for no-std.
 
 This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list
 of available assertions including examples browse the documentation of the [`assertions`] module.
+The documentation of the assertion traits contain examples on how to use each assertion. The
+[crate level documentation][docs-url] contains lots of examples as a quick introduction.
 
 ### Equality
 
