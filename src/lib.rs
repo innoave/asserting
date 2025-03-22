@@ -278,12 +278,68 @@
 //! `asserting` provides 3 ways to do custom assertions:
 //!
 //! 1. Predicate functions as custom assertions used with the [`Spec::satisfies()`] method
-//! 2. Custom expectations used with the [`Spec::expecting()`] method
-//! 3. Custom assertions methods
+//! 2. Property base assertions for any type that implements a property trait
+//! 3. Custom expectations used with the [`Spec::expecting()`] method
+//! 4. Custom assertions methods
 //!
 //! How to use predicate functions as custom assertions is described on the
 //! [`Spec::satisfies()`] method and in the [Examples](#predicate-as-custom-assertion)
-//! chapter above.
+//! chapter above. The other 3 ways are described in the following subchapters.
+//!
+//! ## Property based assertions
+//!
+//! Some assertions provided by `asserting` are so-called property based
+//! assertions. They are implemented for all types that implement a related
+//! property trait.
+//!
+//! For example the `has_length()` assertion is implemented for all types that
+//! implement the [`LengthProperty`].
+//!
+//! If we want to provide the `has_length()` assertion for a custom type we
+//! simply need to implement the [`LengthProperty`] trait for this type.
+//!
+//! Let's assume we have a custom struct `PathWay` and we implement the
+//! [`LengthProperty] for `PathWay`:
+//!
+//! ```
+//! use asserting::properties::LengthProperty;
+//!
+//! #[derive(Debug)]
+//! struct PathWay {
+//!     len: usize
+//! }
+//!
+//! impl LengthProperty for PathWay {
+//!     fn length_property(&self) -> usize {
+//!         self.len
+//!     }
+//! }
+//! ```
+//!
+//! Then we can assert the length of a `PathWay` using the `has_length()`
+//! assertion:
+//!
+//! ```
+//! # use asserting::properties::LengthProperty;
+//! #
+//! # #[derive(Debug)]
+//! # struct PathWay {
+//! #    len: usize
+//! # }
+//! #
+//! # impl LengthProperty for PathWay {
+//! #     fn length_property(&self) -> usize {
+//! #         self.len
+//! #     }
+//! # }
+//! use asserting::prelude::*;
+//!
+//! let some_path = PathWay { len: 27 };
+//!
+//! assert_that!(some_path).has_length(27);
+//! ```
+//!
+//! Browse the [`properties`] module to see which property traits are available.
 //!
 //! ## Writing custom expectations
 //!
@@ -485,6 +541,7 @@
 //!
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
+//! [`LengthProperty`]: properties::LengthProperty
 //! [`Spec`]: spec::Spec
 //! [`Spec::expecting()`]: spec::Spec::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies

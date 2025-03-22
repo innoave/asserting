@@ -653,7 +653,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     fn contains_sequence(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains all the given
-    /// values and in the given order, possible with other values between them.
+    /// values and in the given order, possibly with other values between them.
     #[track_caller]
     fn contains_all_in_order(self, expected: E) -> Spec<'a, S, R>;
 
