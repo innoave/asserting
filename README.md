@@ -162,14 +162,15 @@ for the `Option` type.
 
 for the `Result` type.
 
-| assertion | description                                                                 |
-|-----------|-----------------------------------------------------------------------------|
-| is_ok     | verify that a result has an ok value                                        |                                                 
-| is_err    | verify that a result has an err value                                       |
-| has_value | verify that a result has an ok value that is equal to the expected value    |
-| has_error | verify that a result has an err value that is equal to the expected error   |
-| ok        | verify that a result has an ok value and map the subject to this ok value   |
-| err       | verify that a result has an err value and map the subject to this err value |
+| assertion         | description                                                                                              |
+|-------------------|----------------------------------------------------------------------------------------------------------|
+| is_ok             | verify that a result has an ok value                                                                     |                                                 
+| is_err            | verify that a result has an err value                                                                    |
+| has_value         | verify that a result has an ok value that is equal to the expected value                                 |
+| has_error         | verify that a result has an err value that is equal to the expected error                                |
+| has_error_message | verify that a result has an err value with a string representation that is equal to the expected message |
+| ok                | verify that a result has an ok value and map the subject to this ok value                                |
+| err               | verify that a result has an err value and map the subject to this err value                              |
 
 ### Emptiness
 

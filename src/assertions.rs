@@ -488,6 +488,39 @@ pub trait AssertHasError<E> {
     fn has_error(self, expected: E) -> Self;
 }
 
+/// Assert that a subject of some container type holds an error value that has
+/// a message equal to the expected message.
+///
+/// This is useful for opaque error types, that do not implement
+/// `PartialEq`. Since the `std::error::Error` trait requires that error
+/// types implement `Display`, the string representation of the error value
+/// is compared to an expected message string.
+///
+/// This assertion is implemented for the `Result` type. It compares the string
+/// representation of the error value with the expected message.
+///
+/// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
+///
+/// # Examples
+///
+/// ```
+/// use anyhow::anyhow;
+/// use asserting::prelude::*;
+///
+/// let subject: Result<(), anyhow::Error> = Err(anyhow!("mollit in ullamcorper no".to_string()));
+/// assert_that!(subject).has_error_message("mollit in ullamcorper no");
+/// ```
+pub trait AssertHasErrorMessage<'a, E, R> {
+    /// Verifies that the subject is an error value with the expected message.
+    ///
+    /// This is useful for opaque error types, that do not implement
+    /// `PartialEq`. Since the `std::error::Error` trait requires that error
+    /// types implement `Display`, the string representation of the error value
+    /// is compared to an expected message string.
+    #[track_caller]
+    fn has_error_message(self, expected_message: E) -> Spec<'a, String, R>;
+}
+
 /// Assert that a string contains a substring or character.
 ///
 /// # Examples

@@ -1,10 +1,12 @@
 use crate::prelude::*;
+use crate::std::fmt::{self, Display};
 #[cfg(not(feature = "std"))]
 use alloc::{
     string::{String, ToString},
     vec,
     vec::Vec,
 };
+use anyhow::anyhow;
 
 #[test]
 fn result_of_i32_is_ok() {
@@ -192,4 +194,28 @@ fn map_result_with_ok_value_to_its_err_value() {
     .panics_with_message(
         "assertion failed: expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`",
     );
+}
+
+#[test]
+fn result_error_has_message_for_an_anyhow_error() {
+    let subject: Result<(), anyhow::Error> = Err(anyhow!("id hendrerit clita kasd"));
+
+    assert_that!(subject).has_error_message("id hendrerit clita kasd");
+}
+
+#[test]
+fn result_error_has_message_for_custom_error_type() {
+    #[derive(Debug)]
+    struct OpaqueError(String);
+
+    impl Display for OpaqueError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str(&self.0)
+        }
+    }
+
+    let subject: Result<(), OpaqueError> =
+        Err(OpaqueError("soluta dolor vero takimata".to_string()));
+
+    assert_that!(subject).has_error_message("soluta dolor vero takimata");
 }
