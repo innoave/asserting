@@ -173,7 +173,7 @@ fn map_result_with_err_value_to_its_ok_value() {
     assert_that_code(|| {
         assert_that(subject).ok().is_not_empty();
     })
-    .panics_with_message("assertion failed: expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`");
+        .panics_with_message("assertion failed: expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn map_result_with_ok_value_to_its_err_value() {
 fn result_error_has_message_for_an_anyhow_error() {
     let subject: Result<(), anyhow::Error> = Err(anyhow!("id hendrerit clita kasd"));
 
-    assert_that!(subject).has_error_message("id hendrerit clita kasd");
+    assert_that(subject).has_error_message("id hendrerit clita kasd");
 }
 
 #[test]
@@ -217,5 +217,17 @@ fn result_error_has_message_for_custom_error_type() {
     let subject: Result<(), OpaqueError> =
         Err(OpaqueError("soluta dolor vero takimata".to_string()));
 
-    assert_that!(subject).has_error_message("soluta dolor vero takimata");
+    assert_that(subject).has_error_message("soluta dolor vero takimata");
+}
+
+#[cfg(feature = "panic")]
+#[test]
+fn verify_result_error_has_message_for_ok_value() {
+    let subject: Result<(), anyhow::Error> = Ok(());
+
+    assert_that_code(|| {
+        assert_that(subject).has_error_message("vulputate voluptate sanctus quod");
+    }).panics_with_message(
+        r#"assertion failed: expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
+    );
 }
