@@ -1,12 +1,15 @@
 //! Implementation of assertions for `Result` values.
 
-use crate::assertions::{AssertResult, AssertResultValue};
-use crate::expectations::{HasError, HasValue, IsErr, IsOk};
+use crate::assertions::{AssertHasErrorMessage, AssertResult, AssertResultValue};
+use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
-use crate::std::fmt::Debug;
+use crate::std::fmt::{Debug, Display};
 #[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 
 impl<T, E, R> AssertResult for Spec<'_, Result<T, E>, R>
 where
@@ -68,6 +71,26 @@ where
 {
     fn has_error(self, expected: X) -> Self {
         self.expecting(HasError { expected })
+    }
+}
+
+impl<'a, T, E, X, R> AssertHasErrorMessage<'a, X, R> for Spec<'a, Result<T, E>, R>
+where
+    T: Debug,
+    E: Display,
+    X: Debug,
+    String: PartialEq<X>,
+    R: FailingStrategy,
+{
+    fn has_error_message(self, expected: X) -> Spec<'a, String, R> {
+        self.mapping(|result| match result {
+            Ok(value) => panic!(
+                r"assertion failed: expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
+            ),
+            Err(error) => {
+                error.to_string()
+            },
+        }).expecting(IsEqualTo {expected})
     }
 }
 
