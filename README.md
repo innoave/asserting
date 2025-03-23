@@ -164,8 +164,8 @@ for the `Result` type.
 
 | assertion | description                                                                 |
 |-----------|-----------------------------------------------------------------------------|
-| is_some   | verify that a result has an ok value                                        |                                                 
-| is_none   | verify that a result has an err value                                       |
+| is_ok     | verify that a result has an ok value                                        |                                                 
+| is_err    | verify that a result has an err value                                       |
 | has_value | verify that a result has an ok value that is equal to the expected value    |
 | has_error | verify that a result has an err value that is equal to the expected error   |
 | ok        | verify that a result has an ok value and map the subject to this ok value   |
