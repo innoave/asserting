@@ -49,7 +49,7 @@ where
 
     fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
         let panic_message = read_panic_message(self.actual_message.as_ref())
-            .unwrap_or_else(|| "<unknown panic message>".to_string());
+            .unwrap_or_else(|| UNKNOWN_PANIC_MESSAGE.to_string());
 
         if panic_message == ONLY_ONE_EXPECTATION {
             format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
