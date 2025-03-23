@@ -517,6 +517,8 @@ pub trait AssertHasErrorMessage<'a, E, R> {
     /// `PartialEq`. Since the `std::error::Error` trait requires that error
     /// types implement `Display`, the string representation of the error value
     /// is compared to an expected message string.
+    ///
+    /// This method panics if the actual subject is not an error value.
     #[track_caller]
     fn has_error_message(self, expected_message: E) -> Spec<'a, String, R>;
 }
