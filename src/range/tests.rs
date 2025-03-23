@@ -115,3 +115,36 @@ fn verify_char_is_not_in_range_fails() {
         ]
     );
 }
+
+#[test]
+fn range_is_empty() {
+    let range = 1..1;
+
+    assert_that!(range.clone().count()).is_equal_to(0);
+    assert_that(range).is_empty();
+}
+
+#[test]
+#[allow(clippy::reversed_empty_ranges)]
+fn inclusive_range_is_empty() {
+    let range = 1..=0;
+
+    assert_that(range.clone().count()).is_equal_to(0);
+    assert_that(range).is_empty();
+}
+
+#[test]
+fn range_is_not_empty() {
+    let range = 1..2;
+
+    assert_that(range.clone().count()).is_equal_to(1);
+    assert_that(range).is_not_empty();
+}
+
+#[test]
+fn inclusive_range_is_not_empty() {
+    let range = 1..=1;
+
+    assert_that(range.clone().count()).is_equal_to(1);
+    assert_that(range).is_not_empty();
+}
