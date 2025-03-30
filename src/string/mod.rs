@@ -10,7 +10,7 @@ use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
 use crate::prelude::DefinedOrderProperty;
 use crate::properties::{IsEmptyProperty, LengthProperty};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
 #[cfg(not(feature = "std"))]
@@ -157,7 +157,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -173,7 +173,7 @@ where
         subject.as_ref().contains(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -189,7 +189,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -205,7 +205,7 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -221,7 +221,7 @@ where
         subject.as_ref().starts_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -237,7 +237,7 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -253,7 +253,7 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -269,7 +269,7 @@ where
         subject.as_ref().ends_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -285,7 +285,7 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -337,7 +337,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -353,7 +353,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected
@@ -369,7 +369,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
             self.expected, self.expected

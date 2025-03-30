@@ -3,7 +3,7 @@
 use crate::assertions::AssertInRange;
 use crate::expectations::{IsInRange, IsNotInRange};
 use crate::properties::IsEmptyProperty;
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::{Range, RangeBounds, RangeInclusive};
 #[cfg(not(feature = "std"))]
@@ -55,7 +55,7 @@ where
         self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is within range of {:?}\n   but was: {actual:?}\n  expected: {:?} <= x <= {:?}",
             self.expected_range,
@@ -74,7 +74,7 @@ where
         !self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is not within range of {:?}\n   but was: {actual:?}\n  expected: x < {:?} || x > {:?}",
             self.expected_range,

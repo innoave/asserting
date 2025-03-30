@@ -1,6 +1,6 @@
 use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
 use crate::expectations::{IsCloseTo, IsNotCloseTo};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 use float_cmp::{ApproxEq, F32Margin, F64Margin};
@@ -70,7 +70,7 @@ impl Expectation<f32> for IsCloseTo<f32, F32Margin> {
         subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f32) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f32, _format: &DiffFormat) -> String {
         format!("expected {expression} is close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
             &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
         )
@@ -82,7 +82,7 @@ impl Expectation<f32> for IsNotCloseTo<f32, F32Margin> {
         !subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f32) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f32, _format: &DiffFormat) -> String {
         format!("expected {expression} is not close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
             &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
         )
@@ -94,7 +94,7 @@ impl Expectation<f64> for IsCloseTo<f64, F64Margin> {
         subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f64) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f64, _format: &DiffFormat) -> String {
         format!("expected {expression} is close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
             &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
         )
@@ -106,7 +106,7 @@ impl Expectation<f64> for IsNotCloseTo<f64, F64Margin> {
         !subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f64) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f64, _format: &DiffFormat) -> String {
         format!("expected {expression} is not close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
             &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
         )

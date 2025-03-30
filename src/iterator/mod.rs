@@ -9,7 +9,7 @@ use crate::expectations::{
     IterContainsSequence, IterEndsWith, IterStartsWith,
 };
 use crate::properties::DefinedOrderProperty;
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
@@ -39,7 +39,7 @@ where
         subject.iter().any(|e| e == &self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected, &self.expected
@@ -108,7 +108,7 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
@@ -137,7 +137,7 @@ where
         false
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         format!(
             r"expected {expression} contains any of {:?}, but contained none of them
    but was: {actual:?}
@@ -164,7 +164,7 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
 
         format!(
@@ -194,7 +194,7 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let extra = collect_values(&self.extra, actual);
 
         format!(
@@ -229,7 +229,7 @@ where
         duplicates.is_empty() && extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let extra = collect_values(&self.extra, actual);
         let duplicates = collect_values(&self.duplicates, actual);
 
@@ -327,7 +327,7 @@ where
         out_of_order.is_empty() && extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
         let out_of_order = collect_values(&self.out_of_order, actual);
@@ -410,7 +410,7 @@ where
         false
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
@@ -448,7 +448,7 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
 
         format!(
@@ -489,7 +489,7 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
@@ -532,7 +532,7 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 

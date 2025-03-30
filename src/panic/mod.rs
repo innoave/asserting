@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertCodePanics;
 use crate::expectations::{DoesNotPanic, DoesPanic};
-use crate::spec::{Code, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{Code, DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
 use crate::std::panic;
 
@@ -47,7 +47,12 @@ where
         }
     }
 
-    fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        _actual: &Code<S>,
+        _format: &DiffFormat,
+    ) -> String {
         let panic_message = read_panic_message(self.actual_message.as_ref())
             .unwrap_or_else(|| UNKNOWN_PANIC_MESSAGE.to_string());
 
@@ -89,7 +94,12 @@ where
         }
     }
 
-    fn message(&self, expression: Expression<'_>, _actual: &Code<S>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        _actual: &Code<S>,
+        _format: &DiffFormat,
+    ) -> String {
         if let Some(actual_message) = self.actual_message.as_ref() {
             if actual_message == ONLY_ONE_EXPECTATION {
                 format!("error in test assertion: {ONLY_ONE_EXPECTATION}")

@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertOrder;
 use crate::expectations::{IsAtLeast, IsAtMost, IsGreaterThan, IsLessThan};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
@@ -39,7 +39,7 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is less than {:?}\n   but was: {actual:?}\n  expected: < {:?}",
             self.expected, self.expected,
@@ -56,7 +56,7 @@ where
         subject <= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is at most {:?}\n   but was: {actual:?}\n  expected: <= {:?}",
             self.expected, self.expected,
@@ -73,7 +73,7 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is greater than {:?}\n   but was: {actual:?}\n  expected: > {:?}",
             self.expected, self.expected,
@@ -90,7 +90,7 @@ where
         subject >= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is at least {:?}\n   but was: {actual:?}\n  expected: >= {:?}",
             self.expected, self.expected,

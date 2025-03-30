@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertBoolean;
 use crate::expectations::{IsFalse, IsTrue};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
@@ -24,7 +24,7 @@ impl Expectation<bool> for IsTrue {
         *subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &bool, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             true, true
@@ -37,7 +37,7 @@ impl Expectation<bool> for IsFalse {
         !*subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &bool, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             false, false

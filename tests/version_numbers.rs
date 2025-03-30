@@ -9,6 +9,7 @@ mod dummy_extern_uses {
     #[cfg(feature = "float")]
     use float_cmp as _;
     use hashbrown as _;
+    use sdiff as _;
 }
 
 #[test]

@@ -578,6 +578,7 @@ pub mod spec;
 
 mod boolean;
 mod collection;
+mod color;
 mod equality;
 mod integer;
 mod iterator;

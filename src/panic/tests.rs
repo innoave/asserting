@@ -51,7 +51,7 @@ fn code_does_panic_with_message_from_assertion() {
         assert_that(add(2, 3)).is_equal_to(4);
     })
     .panics_with_message(
-        "assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n",
+        "assertion failed: expected subject is equal to 4\n   but was: \u{1b}[31m5\u{1b}[0m\n  expected: \u{1b}[32m4\u{1b}[0m\n",
     );
 }
 
@@ -112,7 +112,7 @@ fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() 
         failures,
         &[
             r#"assertion failed: expected my_closure to panic with message "lobortis lorem aliquam ex"
-   but was: "assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n"
+   but was: "assertion failed: expected subject is equal to 4\n   but was: \u{1b}[31m5\u{1b}[0m\n  expected: \u{1b}[32m4\u{1b}[0m\n"
   expected: "lobortis lorem aliquam ex"
 "#
         ]

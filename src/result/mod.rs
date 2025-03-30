@@ -3,7 +3,7 @@
 use crate::assertions::{AssertHasErrorMessage, AssertResult, AssertResultValue};
 use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::{Debug, Display};
 #[cfg(not(feature = "std"))]
 use alloc::{
@@ -103,7 +103,12 @@ where
         subject.is_ok()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Result<T, E>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             Ok::<_, Unknown>(Unknown),
@@ -121,7 +126,12 @@ where
         subject.is_err()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Result<T, E>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             Err::<Unknown, Unknown>(Unknown),
@@ -140,7 +150,12 @@ where
         subject.as_ref().is_ok_and(|value| value == &self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Result<T, E>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is ok containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected,
@@ -159,7 +174,12 @@ where
         subject.as_ref().is_err_and(|err| err == &self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Result<T, E>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is error containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected,

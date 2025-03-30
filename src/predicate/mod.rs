@@ -1,7 +1,7 @@
 //! Implementation of the predicate assertion.
 
 use crate::expectations::Predicate;
-use crate::spec::{Expectation, Expression};
+use crate::spec::{DiffFormat, Expectation, Expression};
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
 
@@ -13,7 +13,7 @@ where
         (self.predicate)(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, _actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, _actual: &S, _format: &DiffFormat) -> String {
         self.message.clone().unwrap_or_else(|| {
             format!("expected {expression} to satisfy the given predicate, but returned false")
         })

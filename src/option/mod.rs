@@ -2,7 +2,7 @@
 
 use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::expectations::{HasValue, IsNone, IsSome};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
@@ -54,7 +54,12 @@ where
         subject.is_some()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Option<T>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             Some(Unknown),
@@ -71,7 +76,12 @@ where
         subject.is_none()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Option<T>,
+        _format: &DiffFormat,
+    ) -> String {
         format!(
             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
             None::<Unknown>, None::<Unknown>
@@ -90,7 +100,12 @@ where
             .is_some_and(|value| value == &self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Option<T>) -> String {
+    fn message(
+        &self,
+        expression: Expression<'_>,
+        actual: &Option<T>,
+        _format: &DiffFormat,
+    ) -> String {
         format!("expected {expression} is some containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected,
             Some(&self.expected),

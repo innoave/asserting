@@ -4,7 +4,7 @@ use crate::assertions::AssertHasLength;
 use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
 use crate::prelude::{AssertEmptiness, LengthProperty};
 use crate::properties::IsEmptyProperty;
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeInclusive;
 #[cfg(not(feature = "std"))]
@@ -32,7 +32,7 @@ where
         subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!("expected {expression} is empty\n   but was: {actual:?}\n  expected: <empty>")
     }
 }
@@ -45,7 +45,7 @@ where
         !subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is not empty\n   but was: {actual:?}\n  expected: <non-empty>",
         )
@@ -76,7 +76,7 @@ where
         subject.length_property() == self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} has length {}\n   but was: {}\n  expected: {}",
             self.expected_length,
@@ -94,7 +94,7 @@ where
         self.expected_range.contains(&subject.length_property())
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} has length in range {:?}\n   but was: {}\n  expected: {:?}",
             self.expected_range,

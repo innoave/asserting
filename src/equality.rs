@@ -1,8 +1,9 @@
 //! Implementation of the equality assertions.
 
 use crate::assertions::AssertEquality;
+use crate::color::mark_diff;
 use crate::expectations::{IsEqualTo, IsNotEqualTo};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 #[cfg(not(feature = "std"))]
 use alloc::{format, string::String};
@@ -31,10 +32,11 @@ where
         subject == &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let expected = &self.expected;
+        let (marked_actual, marked_expected) = mark_diff(actual, expected, format);
         format!(
-            "expected {expression} is equal to {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected, &self.expected
+            "expected {expression} is equal to {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
         )
     }
 }
@@ -48,7 +50,7 @@ where
         subject != &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is not equal to {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected, &self.expected

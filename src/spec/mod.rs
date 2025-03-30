@@ -1,5 +1,6 @@
 //! This is the core of the `asserting` crate.
 
+use crate::color;
 use crate::expectations::Predicate;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
@@ -236,7 +237,7 @@ macro_rules! verify_that_code {
 ///     .is_equal_to(42);
 /// ```
 #[track_caller]
-pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
+pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     Spec::new(subject, PanicOnFail)
 }
 
@@ -296,7 +297,7 @@ pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// ]);
 /// ```
 #[track_caller]
-pub const fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
+pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
     Spec::new(subject, CollectFailures)
 }
 
@@ -407,7 +408,7 @@ pub trait Expectation<S: ?Sized> {
     fn test(&mut self, subject: &S) -> bool;
 
     /// Forms a failure message for this expectation.
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String;
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String;
 }
 
 /// A textual representation of the expression or subject that is being
@@ -577,24 +578,11 @@ pub struct Spec<'a, S, R> {
     description: Option<&'a str>,
     location: Option<Location<'a>>,
     failures: Vec<AssertFailure>,
+    diff_format: DiffFormat,
     failing_strategy: R,
 }
 
 impl<S, R> Spec<'_, S, R> {
-    /// Constructs a new `Spec` for the given subject and with the specified
-    /// failing strategy.
-    #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn new(subject: S, failing_strategy: R) -> Self {
-        Self {
-            subject,
-            expression: None,
-            description: None,
-            location: None,
-            failures: vec![],
-            failing_strategy,
-        }
-    }
-
     /// Returns the subject.
     pub const fn subject(&self) -> &S {
         &self.subject
@@ -741,6 +729,7 @@ impl<'a, S, R> Spec<'a, S, R> {
             description: self.description,
             location: self.location,
             failures: self.failures,
+            diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
         }
     }
@@ -750,6 +739,21 @@ impl<S, R> Spec<'_, S, R>
 where
     R: FailingStrategy,
 {
+    /// Constructs a new `Spec` for the given subject and with the specified
+    /// failing strategy.
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub fn new(subject: S, failing_strategy: R) -> Self {
+        Self {
+            subject,
+            expression: None,
+            description: None,
+            location: None,
+            failures: vec![],
+            diff_format: failing_strategy.diff_format(),
+            failing_strategy,
+        }
+    }
+
     /// Asserts the given expectation.
     ///
     /// In case the expectation is not meet it does fail according the current
@@ -774,7 +778,7 @@ where
     pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
             let expression = self.expression.unwrap_or_default();
-            let message = expectation.message(expression, &self.subject);
+            let message = expectation.message(expression, &self.subject, &self.diff_format);
             self.do_fail_with_message(message);
         }
         self
@@ -928,6 +932,18 @@ impl AssertFailure {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Highlight {
+    pub(crate) start: &'static str,
+    pub(crate) end: &'static str,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DiffFormat {
+    pub(crate) actual: Highlight,
+    pub(crate) expected: Highlight,
+}
+
 /// Defines the behavior when an assertion fails.
 ///
 /// This crate provides two implementations:
@@ -938,6 +954,8 @@ pub trait FailingStrategy {
     /// Reacts to an assertion that has failed with the [`AssertFailure`]s given
     /// as argument.
     fn do_fail_with(&self, failures: &[AssertFailure]);
+
+    fn diff_format(&self) -> DiffFormat;
 }
 
 /// [`FailingStrategy`] that panics when an assertion fails.
@@ -954,6 +972,10 @@ impl FailingStrategy for PanicOnFail {
             .join("\n");
         panic!("{}", message);
     }
+
+    fn diff_format(&self) -> DiffFormat {
+        color::diff_format()
+    }
 }
 
 /// [`FailingStrategy`] that collects the failures from failing assertions.
@@ -963,6 +985,10 @@ pub struct CollectFailures;
 impl FailingStrategy for CollectFailures {
     fn do_fail_with(&self, _failures: &[AssertFailure]) {
         // do nothing by design
+    }
+
+    fn diff_format(&self) -> DiffFormat {
+        color::DIFF_FORMAT_NO_HIGHLIGHT
     }
 }
 
@@ -995,9 +1021,7 @@ impl FailingStrategy for CollectFailures {
 ///
 /// ```no_run
 /// # use std::fmt::Debug;
-/// # use asserting::spec::Expectation;
-/// # use asserting::spec::Expression;
-/// # use asserting::spec::Unknown;
+/// # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 /// # struct IsOk;
 /// impl<T, E> Expectation<Result<T, E>> for IsOk
 /// where
@@ -1008,7 +1032,7 @@ impl FailingStrategy for CollectFailures {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>) -> String {
+///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>, _format: DiffFormat) -> String {
 ///         format!(
 ///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),
