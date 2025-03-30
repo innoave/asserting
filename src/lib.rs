@@ -558,11 +558,35 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]
-extern crate alloc;
-
-#[cfg(not(feature = "std"))]
+#[allow(unused_imports)]
 mod std {
+    extern crate alloc;
+    pub use alloc::*;
     pub use core::*;
+
+    pub mod borrow {
+        extern crate alloc;
+        pub use alloc::borrow::*;
+        pub use core::borrow::*;
+    }
+
+    pub mod fmt {
+        extern crate alloc;
+        pub use alloc::fmt::*;
+        pub use core::fmt::*;
+    }
+
+    pub mod slice {
+        extern crate alloc;
+        pub use alloc::slice::*;
+        pub use core::slice::*;
+    }
+
+    pub mod str {
+        extern crate alloc;
+        pub use alloc::str::*;
+        pub use core::str::*;
+    }
 }
 
 #[cfg(feature = "std")]

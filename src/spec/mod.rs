@@ -5,8 +5,7 @@ use crate::expectations::Predicate;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
-#[cfg(not(feature = "std"))]
-use alloc::{
+use crate::std::{
     borrow::ToOwned,
     string::{String, ToString},
     vec,

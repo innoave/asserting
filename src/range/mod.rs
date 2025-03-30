@@ -6,8 +6,7 @@ use crate::properties::IsEmptyProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::{Range, RangeBounds, RangeInclusive};
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl<T> IsEmptyProperty for Range<T>
 where

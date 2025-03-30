@@ -5,8 +5,7 @@ use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
 use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::{Debug, Display};
-#[cfg(not(feature = "std"))]
-use alloc::{
+use crate::std::{
     format,
     string::{String, ToString},
 };

@@ -12,8 +12,7 @@
 
 use crate::spec::Spec;
 use crate::std::ops::RangeInclusive;
-#[cfg(not(feature = "std"))]
-use alloc::string::String;
+use crate::std::string::String;
 
 /// Assert whether two values are equal or not.
 ///

@@ -1,7 +1,6 @@
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
-#[cfg(not(feature = "std"))]
-use alloc::{
+use crate::std::{
     format,
     string::{String, ToString},
 };

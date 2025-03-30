@@ -5,8 +5,7 @@ use crate::color::mark_diff;
 use crate::expectations::{IsEqualTo, IsNotEqualTo};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl<S, E, R> AssertEquality<E> for Spec<'_, S, R>
 where

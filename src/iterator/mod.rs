@@ -13,8 +13,7 @@ use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String, vec, vec::Vec};
+use crate::std::{format, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 
 impl<'a, S, T, E, R> AssertIteratorContains<'a, Vec<T>, E, R> for Spec<'a, S, R>
