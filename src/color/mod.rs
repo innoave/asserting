@@ -2,7 +2,7 @@
 mod no_color {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::{DiffFormat, Highlight};
-    use alloc::{format, string::String};
+    use crate::std::{format, string::String};
     use core::fmt::Debug;
 
     pub const fn diff_format() -> DiffFormat {
@@ -117,8 +117,7 @@ use with_color::mark;
 
 use crate::spec::{DiffFormat, Highlight};
 use crate::std::fmt::Debug;
-#[cfg(not(feature = "std"))]
-use alloc::string::String;
+use crate::std::string::String;
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 
