@@ -1,8 +1,7 @@
 //! Implementation of assertions for `Vec` values.
 
-use crate::prelude::{IsEmptyProperty, LengthProperty};
-#[cfg(not(feature = "std"))]
-use alloc::vec::Vec;
+use crate::properties::{IsEmptyProperty, LengthProperty};
+use crate::std::vec::Vec;
 
 impl<T> IsEmptyProperty for Vec<T> {
     fn is_empty_property(&self) -> bool {

@@ -1,6 +1,5 @@
 use crate::prelude::*;
-#[cfg(not(feature = "std"))]
-use alloc::string::{String, ToString};
+use crate::std::string::{String, ToString};
 
 #[test]
 fn string_is_equal_to_string() {

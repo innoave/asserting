@@ -1,8 +1,5 @@
 use crate::prelude::*;
-#[cfg(feature = "std")]
-use crate::std::vec;
-#[cfg(not(feature = "std"))]
-use alloc::{vec, vec::Vec};
+use crate::std::{vec, vec::Vec};
 
 #[derive(Debug)]
 struct CustomCollection<T> {
