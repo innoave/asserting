@@ -4,8 +4,7 @@ use crate::assertions::AssertOrder;
 use crate::expectations::{IsAtLeast, IsAtMost, IsGreaterThan, IsLessThan};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl<S, E, R> AssertOrder<E> for Spec<'_, S, R>
 where

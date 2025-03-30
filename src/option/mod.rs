@@ -4,8 +4,7 @@ use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::expectations::{HasValue, IsNone, IsSome};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl<S, R> AssertOption for Spec<'_, Option<S>, R>
 where

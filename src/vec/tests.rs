@@ -1,6 +1,5 @@
 use crate::prelude::*;
-#[cfg(not(feature = "std"))]
-use alloc::{
+use crate::std::{
     string::{String, ToString},
     vec,
     vec::Vec,

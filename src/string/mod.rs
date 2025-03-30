@@ -13,8 +13,7 @@ use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl IsEmptyProperty for &str {
     fn is_empty_property(&self) -> bool {

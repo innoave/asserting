@@ -3,8 +3,7 @@
 #![allow(missing_docs)]
 
 use crate::std::ops::RangeInclusive;
-#[cfg(not(feature = "std"))]
-use alloc::{string::String, vec::Vec};
+use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
 pub struct IsTrue;

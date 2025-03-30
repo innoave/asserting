@@ -1,14 +1,12 @@
 //! Implementations of the emptiness and length assertions.
 
-use crate::assertions::AssertHasLength;
+use crate::assertions::{AssertEmptiness, AssertHasLength};
 use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
-use crate::prelude::{AssertEmptiness, LengthProperty};
-use crate::properties::IsEmptyProperty;
+use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeInclusive;
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String};
+use crate::std::{format, string::String};
 
 impl<S, R> AssertEmptiness for Spec<'_, S, R>
 where
