@@ -11,6 +11,8 @@ use crate::std::{
     vec,
     vec::Vec,
 };
+#[cfg(feature = "panic")]
+use crate::std::{cell::RefCell, rc::Rc};
 
 /// Starts an assertion for the given subject or expression in the
 /// [`PanicOnFail`] mode.
@@ -236,8 +238,17 @@ macro_rules! verify_that_code {
 ///     .is_equal_to(42);
 /// ```
 #[track_caller]
+#[allow(clippy::missing_const_for_fn)]
 pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
-    Spec::new(subject, PanicOnFail)
+    #[cfg(not(feature = "color"))]
+    {
+        Spec::new(subject, PanicOnFail)
+    }
+    #[cfg(feature = "color")]
+    {
+        use crate::color::diff_format;
+        Spec::new(subject, PanicOnFail).with_diff_format(diff_format())
+    }
 }
 
 /// Starts an assertion for the given subject or expression in the
@@ -296,6 +307,7 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// ]);
 /// ```
 #[track_caller]
+#[allow(clippy::missing_const_for_fn)]
 pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
     Spec::new(subject, CollectFailures)
 }
@@ -619,6 +631,24 @@ impl<S, R> Spec<'_, S, R> {
 }
 
 impl<'a, S, R> Spec<'a, S, R> {
+    /// Constructs a new `Spec` for the given subject and with the specified
+    /// failing strategy.
+    ///
+    /// The diff format is set to "no highlighting". Failure messages will not
+    /// highlight differences between the actual and the expected value.
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub const fn new(subject: S, failing_strategy: R) -> Self {
+        Self {
+            subject,
+            expression: None,
+            description: None,
+            location: None,
+            failures: vec![],
+            diff_format: color::DIFF_FORMAT_NO_HIGHLIGHT,
+            failing_strategy,
+        }
+    }
+
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn named(mut self, subject_name: &'a str) -> Self {
@@ -638,6 +668,14 @@ impl<'a, S, R> Spec<'a, S, R> {
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn located_at(mut self, location: Location<'a>) -> Self {
         self.location = Some(location);
+        self
+    }
+
+    /// Sets the diff format that is used to highlight differences between
+    /// the actual value and the expected value.
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
+        self.diff_format = diff_format;
         self
     }
 
@@ -738,21 +776,6 @@ impl<S, R> Spec<'_, S, R>
 where
     R: FailingStrategy,
 {
-    /// Constructs a new `Spec` for the given subject and with the specified
-    /// failing strategy.
-    #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn new(subject: S, failing_strategy: R) -> Self {
-        Self {
-            subject,
-            expression: None,
-            description: None,
-            location: None,
-            failures: vec![],
-            diff_format: failing_strategy.diff_format(),
-            failing_strategy,
-        }
-    }
-
     /// Asserts the given expectation.
     ///
     /// In case the expectation is not meet it does fail according the current
@@ -953,8 +976,6 @@ pub trait FailingStrategy {
     /// Reacts to an assertion that has failed with the [`AssertFailure`]s given
     /// as argument.
     fn do_fail_with(&self, failures: &[AssertFailure]);
-
-    fn diff_format(&self) -> DiffFormat;
 }
 
 /// [`FailingStrategy`] that panics when an assertion fails.
@@ -971,10 +992,6 @@ impl FailingStrategy for PanicOnFail {
             .join("\n");
         panic!("{}", message);
     }
-
-    fn diff_format(&self) -> DiffFormat {
-        color::diff_format()
-    }
 }
 
 /// [`FailingStrategy`] that collects the failures from failing assertions.
@@ -984,10 +1001,6 @@ pub struct CollectFailures;
 impl FailingStrategy for CollectFailures {
     fn do_fail_with(&self, _failures: &[AssertFailure]) {
         // do nothing by design
-    }
-
-    fn diff_format(&self) -> DiffFormat {
-        color::DIFF_FORMAT_NO_HIGHLIGHT
     }
 }
 
@@ -1055,16 +1068,15 @@ impl Display for Unknown {
     }
 }
 
+/// Wrapper type that holds a closure as code snippet.
 #[cfg(feature = "panic")]
-pub use code::Code;
+pub struct Code<F>(Rc<RefCell<Option<F>>>);
 
 #[cfg(feature = "panic")]
 mod code {
+    use super::Code;
     use std::cell::RefCell;
     use std::rc::Rc;
-
-    /// Wrapper type that holds a closure as code snippet.
-    pub struct Code<F>(Rc<RefCell<Option<F>>>);
 
     impl<F> From<F> for Code<F>
     where

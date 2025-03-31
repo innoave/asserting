@@ -1,3 +1,4 @@
+use crate::color::DIFF_FORMAT_NO_HIGHLIGHT;
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
 use crate::std::{
@@ -52,12 +53,14 @@ fn assert_that_macro_with_borrowed_str_subject() {
 
 #[test]
 #[should_panic(
-    expected = "assertion failed: expected ultimate_answer is equal to 42\n   but was: \u{1b}[31m51\u{1b}[0m\n  expected: \u{1b}[32m42\u{1b}[0m\n"
+    expected = "assertion failed: expected ultimate_answer is equal to 42\n   but was: 51\n  expected: 42\n"
 )]
 fn assert_that_macro_is_equal_to_with_integers_fails() {
     let ultimate_answer = 51;
 
-    assert_that!(ultimate_answer).is_equal_to(42);
+    assert_that!(ultimate_answer)
+        .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+        .is_equal_to(42);
 }
 
 #[test]

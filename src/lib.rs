@@ -595,6 +595,7 @@ mod std {
 }
 
 pub mod assertions;
+pub mod color;
 pub mod expectations;
 pub mod prelude;
 pub mod properties;
@@ -602,7 +603,6 @@ pub mod spec;
 
 mod boolean;
 mod collection;
-mod color;
 mod equality;
 mod integer;
 mod iterator;

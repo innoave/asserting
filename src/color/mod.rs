@@ -5,6 +5,7 @@ mod no_color {
     use crate::std::{format, string::String};
     use core::fmt::Debug;
 
+    #[must_use]
     pub const fn diff_format() -> DiffFormat {
         DIFF_FORMAT_NO_HIGHLIGHT
     }
@@ -21,6 +22,23 @@ mod no_color {
 mod with_color {
     use crate::spec::{DiffFormat, Highlight};
     use core::fmt::Debug;
+
+    /// Environment variable to set the highlight mode.
+    pub const ENV_VAR_HIGHLIGHT_DIFFS: &str = "ASSERTING_HIGHLIGHT_DIFFS";
+
+    /// Highlight mode using CVD-friendly colors.
+    pub const HIGHLIGHT_MODE_CVD_COLORED: &str = "cvd-colored";
+    /// Highlight mode using colors.
+    pub const HIGHLIGHT_MODE_COLORED: &str = "colored";
+    /// Highlight mode using bold font.
+    pub const HIGHLIGHT_MODE_BOLD: &str = "bold";
+    /// Highlight mode for no highlight at all.
+    pub const HIGHLIGHT_MODE_OFF: &str = "off";
+
+    /// Default highlight mode.
+    pub const DEFAULT_HIGHLIGHT_MODE: &str = HIGHLIGHT_MODE_CVD_COLORED;
+    /// Default diff format.
+    pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_CVD_COLORED;
 
     const TERM_FONT_BOLD: &str = "\u{1b}[1m";
     const TERM_COLOR_RED: &str = "\u{1b}[31m";
@@ -66,31 +84,37 @@ mod with_color {
         expected: TERM_NO_HIGHLIGHT,
     };
 
+    #[must_use]
+    pub fn diff_format_for_mode(mode: &str) -> Option<DiffFormat> {
+        match mode.to_lowercase().as_str() {
+            HIGHLIGHT_MODE_CVD_COLORED => Some(DIFF_FORMAT_CVD_COLORED),
+            HIGHLIGHT_MODE_COLORED => Some(DIFF_FORMAT_COLORED),
+            HIGHLIGHT_MODE_BOLD => Some(DIFF_FORMAT_BOLD),
+            HIGHLIGHT_MODE_OFF => Some(DIFF_FORMAT_OFF),
+            _ => None,
+        }
+    }
+
     #[allow(clippy::print_stderr)]
+    #[must_use]
     pub fn diff_format() -> DiffFormat {
         use crate::std::env;
 
-        match env::var("ASSERTING_HIGHLIGHT_DIFFS").map(|var| var.to_lowercase()) {
-            Ok(value) => match &value[..] {
-                "cvd-colored" => DIFF_FORMAT_CVD_COLORED,
-                "colored" => DIFF_FORMAT_COLORED,
-                "bold" => DIFF_FORMAT_BOLD,
-                "off" => DIFF_FORMAT_OFF,
-                _ => {
-                    #[cfg(feature = "std")]
-                    eprintln!(
-                        "WARNING: the environment variable `ASSERTING_HIGHLIGHT_DIFFS` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"cvd-colored\" is used.",
-                    );
-                    DIFF_FORMAT_CVD_COLORED
-                },
-            },
-            Err(env::VarError::NotPresent) => DIFF_FORMAT_CVD_COLORED,
+        match env::var(ENV_VAR_HIGHLIGHT_DIFFS) {
+            Ok(value) => diff_format_for_mode(&value).unwrap_or_else(|| {
+                #[cfg(feature = "std")]
+                eprintln!(
+                    "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
+                );
+                DEFAULT_DIFF_FORMAT
+            }),
+            Err(env::VarError::NotPresent) => DEFAULT_DIFF_FORMAT,
             Err(env::VarError::NotUnicode(value)) => {
                 #[cfg(feature = "std")]
                 eprintln!(
-                    "WARNING: the environment variable `ASSERTING_HIGHLIGHT_DIFFS` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"cvd-colored\" is used."
+                    "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
                 );
-                DIFF_FORMAT_CVD_COLORED
+                DEFAULT_DIFF_FORMAT
             },
         }
     }
@@ -107,7 +131,10 @@ mod with_color {
 pub use no_color::diff_format;
 
 #[cfg(feature = "color")]
-pub use with_color::diff_format;
+pub use with_color::{
+    diff_format, diff_format_for_mode, DEFAULT_DIFF_FORMAT, DEFAULT_HIGHLIGHT_MODE,
+    HIGHLIGHT_MODE_BOLD, HIGHLIGHT_MODE_COLORED, HIGHLIGHT_MODE_CVD_COLORED, HIGHLIGHT_MODE_OFF,
+};
 
 #[cfg(not(feature = "color"))]
 use no_color::mark;
@@ -121,6 +148,9 @@ use crate::std::string::String;
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 
+/// Diff format that does not highlight anything.
+///
+/// Setting this format effectively switches off highlighting.
 pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
     actual: NO_HIGHLIGHT,
     expected: NO_HIGHLIGHT,
