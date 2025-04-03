@@ -159,8 +159,17 @@ pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
     expected: NO_HIGHLIGHT,
 };
 
+pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+where
+    S: Debug,
+    E: Debug,
+{
+    mark_diff_impl(actual, expected, format)
+}
+
 #[cfg(not(feature = "color"))]
-pub fn mark_diff<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
+#[inline]
+fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
 where
     S: Debug,
     E: Debug,
@@ -169,7 +178,8 @@ where
 }
 
 #[cfg(feature = "color")]
-pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+#[inline]
+fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
 where
     S: Debug,
     E: Debug,
