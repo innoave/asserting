@@ -19,20 +19,21 @@ all-features = true
 
 [features]
 default = ["std", "color", "float", "panic"]
-color = ["std"]
+color = ["std", "dep:sdiff"]
 float = ["dep:float-cmp"]
 panic = ["std"]
 std = []
 
 [dependencies]
 hashbrown = "0.15"
-sdiff = "0.1"
 
 # optional
 float-cmp = { version = "0.10", optional = true }
+sdiff = { version = "0.1", optional = true }
 
 [dev-dependencies]
 anyhow = "1"
+serial_test = "3"
 version-sync = "0.9"
 
 [lints.rust]
@@ -56,7 +57,7 @@ unused_import_braces = "warn"
 unused_lifetimes = "warn"
 unused_qualifications = "warn"
 dead_code = "warn"
-missing_docs = "warn"  # uncomment when working on docs
+#missing_docs = "warn"  # uncomment when working on docs
 #variant_size_differences = "warn"  # enable when working on performance
 
 [lints.clippy]

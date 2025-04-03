@@ -614,6 +614,11 @@ impl<S, R> Spec<'_, S, R> {
         self.description
     }
 
+    /// Returns the diff format used with this assertion.
+    pub const fn diff_format(&self) -> &DiffFormat {
+        &self.diff_format
+    }
+
     /// Returns the failing strategy that is used in case an assertion fails.
     pub const fn failing_strategy(&self) -> &R {
         &self.failing_strategy
@@ -1044,7 +1049,7 @@ impl FailingStrategy for CollectFailures {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>, _format: DiffFormat) -> String {
+///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
 ///         format!(
 ///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),
