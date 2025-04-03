@@ -8,8 +8,7 @@
 
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
-use crate::prelude::DefinedOrderProperty;
-use crate::properties::{IsEmptyProperty, LengthProperty};
+use crate::properties::{DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;

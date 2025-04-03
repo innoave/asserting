@@ -1,8 +1,9 @@
 //! Implementation of assertions for `Result` values.
 
-use crate::assertions::{AssertHasErrorMessage, AssertResult, AssertResultValue};
+use crate::assertions::{
+    AssertHasError, AssertHasErrorMessage, AssertHasValue, AssertResult, AssertResultValue,
+};
 use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
-use crate::prelude::{AssertHasError, AssertHasValue};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::{Debug, Display};
 use crate::std::{
