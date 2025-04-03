@@ -33,6 +33,7 @@ sdiff = { version = "0.1", optional = true }
 
 [dev-dependencies]
 anyhow = "1"
+proptest = "1"
 serial_test = "3"
 version-sync = "0.9"
 

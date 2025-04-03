@@ -17,24 +17,27 @@ mod with_color {
     /// Environment variable to set the highlight mode.
     pub const ENV_VAR_HIGHLIGHT_DIFFS: &str = "ASSERTING_HIGHLIGHT_DIFFS";
 
-    /// Highlight mode using CVD-friendly colors.
-    const HIGHLIGHT_MODE_CVD_COLORED: &str = "cvd-colored";
-    /// Highlight mode using colors.
-    const HIGHLIGHT_MODE_COLORED: &str = "colored";
+    /// Highlight mode using the CVD-friendly colors red and blue.
+    const HIGHLIGHT_MODE_RED_BLUE: &str = "red-blue";
+    /// Highlight mode using the colors red and green.
+    const HIGHLIGHT_MODE_RED_GREEN: &str = "red-green";
+    /// Highlight mode using the colors red and yellow.
+    const HIGHLIGHT_MODE_RED_YELLOW: &str = "red-yellow";
     /// Highlight mode using bold font.
     const HIGHLIGHT_MODE_BOLD: &str = "bold";
     /// Highlight mode for no highlight at all.
     const HIGHLIGHT_MODE_OFF: &str = "off";
 
     /// Default highlight mode.
-    pub const DEFAULT_HIGHLIGHT_MODE: &str = HIGHLIGHT_MODE_CVD_COLORED;
+    pub const DEFAULT_HIGHLIGHT_MODE: &str = HIGHLIGHT_MODE_RED_GREEN;
     /// Default diff format.
-    pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_CVD_COLORED;
+    pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_RED_GREEN;
 
     const TERM_FONT_BOLD: &str = "\u{1b}[1m";
     const TERM_COLOR_RED: &str = "\u{1b}[31m";
     const TERM_COLOR_GREEN: &str = "\u{1b}[32m";
     const TERM_COLOR_BLUE: &str = "\u{1b}[34m";
+    const TERM_COLOR_YELLOW: &str = "\u{1b}[33m";
     const TERM_RESET: &str = "\u{1b}[0m";
 
     const TERM_HIGHLIGHT_BOLD: Highlight = Highlight {
@@ -53,18 +56,43 @@ mod with_color {
         start: TERM_COLOR_BLUE,
         end: TERM_RESET,
     };
+    const TERM_HIGHLIGHT_YELLOW: Highlight = Highlight {
+        start: TERM_COLOR_YELLOW,
+        end: TERM_RESET,
+    };
     const TERM_NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 
-    pub const DIFF_FORMAT_CVD_COLORED: DiffFormat = DiffFormat {
+    /// A diff format that highlights differences in the colors red and blue.
+    ///
+    /// Differences in the actual value or not expected parts are colored in
+    /// red. Differences in the expected value or parts that are missing in the
+    /// actual value or colored in blue.
+    pub const DIFF_FORMAT_RED_BLUE: DiffFormat = DiffFormat {
         actual: TERM_HIGHLIGHT_RED,
         expected: TERM_HIGHLIGHT_BLUE,
     };
 
-    pub const DIFF_FORMAT_COLORED: DiffFormat = DiffFormat {
+    /// A diff format that highlights differences in the colors red and green.
+    ///
+    /// Differences in the actual value or not expected parts are colored in
+    /// red. Differences in the expected value or parts that are missing in the
+    /// actual value or colored in green.
+    pub const DIFF_FORMAT_RED_GREEN: DiffFormat = DiffFormat {
         actual: TERM_HIGHLIGHT_RED,
         expected: TERM_HIGHLIGHT_GREEN,
     };
 
+    /// A diff format that highlights differences in the colors red and yellow.
+    ///
+    /// Differences in the actual value or not expected parts are colored in
+    /// red. Differences in the expected value or parts that are missing in the
+    /// actual value or colored in yellow.
+    pub const DIFF_FORMAT_RED_YELLOW: DiffFormat = DiffFormat {
+        actual: TERM_HIGHLIGHT_RED,
+        expected: TERM_HIGHLIGHT_YELLOW,
+    };
+
+    /// A diff format that highlights differences in the actual value in bold.
     pub const DIFF_FORMAT_BOLD: DiffFormat = DiffFormat {
         actual: TERM_HIGHLIGHT_BOLD,
         expected: TERM_NO_HIGHLIGHT,
@@ -73,8 +101,9 @@ mod with_color {
     #[must_use]
     pub fn diff_format_for_mode(mode: &str) -> Option<DiffFormat> {
         match mode.to_lowercase().as_str() {
-            HIGHLIGHT_MODE_CVD_COLORED => Some(DIFF_FORMAT_CVD_COLORED),
-            HIGHLIGHT_MODE_COLORED => Some(DIFF_FORMAT_COLORED),
+            HIGHLIGHT_MODE_RED_BLUE => Some(DIFF_FORMAT_RED_BLUE),
+            HIGHLIGHT_MODE_RED_GREEN => Some(DIFF_FORMAT_RED_GREEN),
+            HIGHLIGHT_MODE_RED_YELLOW => Some(DIFF_FORMAT_RED_YELLOW),
             HIGHLIGHT_MODE_BOLD => Some(DIFF_FORMAT_BOLD),
             HIGHLIGHT_MODE_OFF => Some(DIFF_FORMAT_NO_HIGHLIGHT),
             _ => None,
@@ -112,7 +141,7 @@ pub use no_color::diff_format;
 #[cfg(feature = "color")]
 pub use with_color::{
     diff_format, diff_format_for_mode, DEFAULT_DIFF_FORMAT, DEFAULT_HIGHLIGHT_MODE,
-    DIFF_FORMAT_BOLD, DIFF_FORMAT_COLORED, DIFF_FORMAT_CVD_COLORED,
+    DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
 };
 
 use crate::spec::{DiffFormat, Highlight};

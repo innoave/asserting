@@ -9,6 +9,7 @@ mod dummy_extern_uses {
     #[cfg(feature = "float")]
     use float_cmp as _;
     use hashbrown as _;
+    use proptest as _;
     #[cfg(feature = "color")]
     use sdiff as _;
     use serial_test as _;
