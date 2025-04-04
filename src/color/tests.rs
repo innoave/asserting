@@ -186,4 +186,36 @@ mod with_color_feature {
             "]
         );
     }
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_custom_struct() {
+        #[derive(Debug, PartialEq)]
+        struct Foo {
+            lorem: String,
+            ipsum: i32,
+            dolor: Option<String>,
+        }
+
+        let subject = Some(Foo {
+            lorem: "¡Hola, Welt!".to_string(),
+            ipsum: 42,
+            dolor: Some("hey".to_string()),
+        });
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_equal_to(Some(Foo {
+                lorem: "Hello World!".to_string(),
+                ipsum: 42,
+                dolor: Some("hey ho!".to_string()),
+            }))
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject is equal to Some(Foo { lorem: \"Hello World!\", ipsum: 42, dolor: Some(\"hey ho!\") })\n   \
+                 but was: Some(Foo { lorem: \"\u{1b}[31m¡\u{1b}[0mH\u{1b}[31mo\u{1b}[0ml\u{1b}[31ma,\u{1b}[0m W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\") })\n  \
+               expected: Some(Foo { lorem: \"H\u{1b}[32me\u{1b}[0ml\u{1b}[32mlo\u{1b}[0m W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\u{1b}[32m ho!\u{1b}[0m\") })\n\
+            ",
+        ]);
+    }
 }
