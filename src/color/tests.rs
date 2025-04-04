@@ -1,9 +1,14 @@
+use super::*;
 use crate::prelude::*;
 
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::*;
-    use crate::color::DIFF_FORMAT_NO_HIGHLIGHT;
+
+    #[test]
+    fn default_diff_format_is_no_highlight() {
+        assert_that(DEFAULT_DIFF_FORMAT).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
+    }
 
     #[test]
     fn assert_that_sets_the_diff_format_to_no_highlighting() {
@@ -24,14 +29,15 @@ mod without_colored_feature {
 mod with_colored_feature {
     use super::*;
     use crate::color::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
-    use crate::color::{
-        DEFAULT_DIFF_FORMAT, DIFF_FORMAT_BOLD, DIFF_FORMAT_NO_HIGHLIGHT, DIFF_FORMAT_RED_BLUE,
-        DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
-    };
     use crate::std::env;
     #[cfg(feature = "std")]
     use proptest::prelude::*;
     use serial_test::serial;
+
+    #[test]
+    fn default_diff_format_is_red_green() {
+        assert_that(DEFAULT_DIFF_FORMAT).is_equal_to(DIFF_FORMAT_RED_GREEN);
+    }
 
     #[test]
     #[serial]
