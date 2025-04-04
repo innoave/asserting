@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-#[cfg(not(feature = "color"))]
-mod without_color_feature {
+#[cfg(not(feature = "colored"))]
+mod without_colored_feature {
     use super::*;
     use crate::color::DIFF_FORMAT_NO_HIGHLIGHT;
 
@@ -20,10 +20,10 @@ mod without_color_feature {
     }
 }
 
-#[cfg(feature = "color")]
-mod with_color_feature {
+#[cfg(feature = "colored")]
+mod with_colored_feature {
     use super::*;
-    use crate::color::with_color::ENV_VAR_HIGHLIGHT_DIFFS;
+    use crate::color::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
     use crate::color::{
         DEFAULT_DIFF_FORMAT, DIFF_FORMAT_BOLD, DIFF_FORMAT_NO_HIGHLIGHT, DIFF_FORMAT_RED_BLUE,
         DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,

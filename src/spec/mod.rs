@@ -240,11 +240,11 @@ macro_rules! verify_that_code {
 #[track_caller]
 #[allow(clippy::missing_const_for_fn)]
 pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
-    #[cfg(not(feature = "color"))]
+    #[cfg(not(feature = "colored"))]
     {
         Spec::new(subject, PanicOnFail)
     }
-    #[cfg(feature = "color")]
+    #[cfg(feature = "colored")]
     {
         use crate::color::diff_format;
         Spec::new(subject, PanicOnFail).with_diff_format(diff_format())

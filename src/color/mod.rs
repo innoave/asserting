@@ -1,5 +1,5 @@
-#[cfg(not(feature = "color"))]
-mod no_color {
+#[cfg(not(feature = "colored"))]
+mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::DiffFormat;
 
@@ -9,8 +9,8 @@ mod no_color {
     }
 }
 
-#[cfg(feature = "color")]
-mod with_color {
+#[cfg(feature = "colored")]
+mod with_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::{DiffFormat, Highlight};
 
@@ -135,11 +135,11 @@ mod with_color {
     }
 }
 
-#[cfg(not(feature = "color"))]
-pub use no_color::diff_format;
+#[cfg(not(feature = "colored"))]
+pub use without_colored_feature::diff_format;
 
-#[cfg(feature = "color")]
-pub use with_color::{
+#[cfg(feature = "colored")]
+pub use with_colored_feature::{
     diff_format, diff_format_for_mode, DEFAULT_DIFF_FORMAT, DEFAULT_HIGHLIGHT_MODE,
     DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
 };
@@ -167,7 +167,7 @@ where
     mark_diff_impl(actual, expected, format)
 }
 
-#[cfg(not(feature = "color"))]
+#[cfg(not(feature = "colored"))]
 #[inline]
 fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
 where
@@ -177,7 +177,7 @@ where
     (format!("{actual:?}"), format!("{expected:?}"))
 }
 
-#[cfg(feature = "color")]
+#[cfg(feature = "colored")]
 #[inline]
 fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
 where
