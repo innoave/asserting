@@ -2,11 +2,21 @@
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::DiffFormat;
+    use crate::std::{fmt::Debug, format, string::String};
 
     #[must_use]
     #[inline]
     pub const fn configured_diff_format_impl() -> DiffFormat {
         DIFF_FORMAT_NO_HIGHLIGHT
+    }
+
+    #[inline]
+    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
+    where
+        S: Debug,
+        E: Debug,
+    {
+        (format!("{actual:?}"), format!("{expected:?}"))
     }
 }
 
@@ -14,8 +24,10 @@ mod without_colored_feature {
 mod with_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::{DiffFormat, Highlight};
+    use crate::std::{fmt::Debug, format, string::String};
 
     /// Environment variable to set the highlight mode.
+    #[cfg(feature = "std")]
     pub const ENV_VAR_HIGHLIGHT_DIFFS: &str = "ASSERTING_HIGHLIGHT_DIFFS";
 
     /// Highlight mode using the CVD-friendly colors red and blue.
@@ -37,6 +49,7 @@ mod with_colored_feature {
     const TERM_RESET: &str = "\u{1b}[0m";
 
     /// Default highlight mode.
+    #[cfg(feature = "std")]
     const DEFAULT_HIGHLIGHT_MODE: &str = HIGHLIGHT_MODE_RED_GREEN;
 
     /// Default diff format.
@@ -112,6 +125,12 @@ mod with_colored_feature {
         }
     }
 
+    #[cfg(not(feature = "std"))]
+    pub const fn configured_diff_format_impl() -> DiffFormat {
+        DEFAULT_DIFF_FORMAT
+    }
+
+    #[cfg(feature = "std")]
     #[allow(clippy::print_stderr)]
     #[must_use]
     #[inline]
@@ -136,6 +155,48 @@ mod with_colored_feature {
             },
         }
     }
+
+    #[inline]
+    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+    where
+        S: Debug,
+        E: Debug,
+    {
+        use crate::std::vec::Vec;
+        use sdiff::Diff;
+
+        let actual = format!("{actual:?}").chars().collect::<Vec<_>>();
+        let expected = format!("{expected:?}").chars().collect::<Vec<_>>();
+        let mut marked_actual = Vec::with_capacity(actual.len());
+        let mut marked_expected = Vec::with_capacity(expected.len());
+        let diffs = sdiff::diff(&actual, &expected);
+        for diff in diffs {
+            match diff {
+                Diff::Left { index, length } => {
+                    marked_actual.extend(format.actual.start.chars());
+                    marked_actual.extend_from_slice(&actual[index..(index + length)]);
+                    marked_actual.extend(format.actual.end.chars());
+                },
+                Diff::Both {
+                    left_index,
+                    right_index,
+                    length,
+                } => {
+                    marked_actual.extend_from_slice(&actual[left_index..left_index + length]);
+                    marked_expected.extend_from_slice(&expected[right_index..right_index + length]);
+                },
+                Diff::Right { index, length } => {
+                    marked_expected.extend(format.expected.start.chars());
+                    marked_expected.extend_from_slice(&expected[index..(index + length)]);
+                    marked_expected.extend(format.expected.end.chars());
+                },
+            }
+        }
+        (
+            String::from_iter(marked_actual),
+            String::from_iter(marked_expected),
+        )
+    }
 }
 
 #[cfg(feature = "colored")]
@@ -146,12 +207,11 @@ pub use with_colored_feature::{
 
 use crate::spec::{DiffFormat, Highlight};
 use crate::std::fmt::Debug;
-use crate::std::format;
 use crate::std::string::String;
 #[cfg(feature = "colored")]
-use with_colored_feature::configured_diff_format_impl;
+use with_colored_feature::{configured_diff_format_impl, mark_diff_impl};
 #[cfg(not(feature = "colored"))]
-use without_colored_feature::configured_diff_format_impl;
+use without_colored_feature::{configured_diff_format_impl, mark_diff_impl};
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 
@@ -181,59 +241,6 @@ where
     E: Debug,
 {
     mark_diff_impl(actual, expected, format)
-}
-
-#[cfg(not(feature = "colored"))]
-#[inline]
-fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
-where
-    S: Debug,
-    E: Debug,
-{
-    (format!("{actual:?}"), format!("{expected:?}"))
-}
-
-#[cfg(feature = "colored")]
-#[inline]
-fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
-where
-    S: Debug,
-    E: Debug,
-{
-    use crate::std::vec::Vec;
-    use sdiff::Diff;
-
-    let actual = format!("{actual:?}").chars().collect::<Vec<_>>();
-    let expected = format!("{expected:?}").chars().collect::<Vec<_>>();
-    let mut marked_actual = Vec::with_capacity(actual.len());
-    let mut marked_expected = Vec::with_capacity(expected.len());
-    let diffs = sdiff::diff(&actual, &expected);
-    for diff in diffs {
-        match diff {
-            Diff::Left { index, length } => {
-                marked_actual.extend(format.actual.start.chars());
-                marked_actual.extend_from_slice(&actual[index..(index + length)]);
-                marked_actual.extend(format.actual.end.chars());
-            },
-            Diff::Both {
-                left_index,
-                right_index,
-                length,
-            } => {
-                marked_actual.extend_from_slice(&actual[left_index..left_index + length]);
-                marked_expected.extend_from_slice(&expected[right_index..right_index + length]);
-            },
-            Diff::Right { index, length } => {
-                marked_expected.extend(format.expected.start.chars());
-                marked_expected.extend_from_slice(&expected[index..(index + length)]);
-                marked_expected.extend(format.expected.end.chars());
-            },
-        }
-    }
-    (
-        String::from_iter(marked_actual),
-        String::from_iter(marked_expected),
-    )
 }
 
 #[cfg(test)]

@@ -28,16 +28,85 @@ mod without_colored_feature {
 #[cfg(feature = "colored")]
 mod with_colored_feature {
     use super::*;
-    use crate::color::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
-    use crate::std::env;
-    #[cfg(feature = "std")]
-    use proptest::prelude::*;
-    use serial_test::serial;
 
     #[test]
     fn default_diff_format_is_red_green() {
         assert_that(DEFAULT_DIFF_FORMAT).is_equal_to(DIFF_FORMAT_RED_GREEN);
     }
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_integers() {
+        let failures = verify_that(37)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to(42)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is equal to 42\n   \
+               but was: \u{1b}[31m37\u{1b}[0m\n  \
+              expected: \u{1b}[34m42\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_strings() {
+        let failures = verify_that("invidunt wisi facilisis exercitation")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to("invi wisi exercitation anim placerat")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
+                   but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
+                  expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_custom_struct() {
+        #[derive(Debug, PartialEq)]
+        struct Foo {
+            lorem: String,
+            ipsum: i32,
+            dolor: Option<String>,
+        }
+
+        let subject = Some(Foo {
+            lorem: "¡Hola, Welt!".into(),
+            ipsum: 42,
+            dolor: Some("hey".into()),
+        });
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_equal_to(Some(Foo {
+                lorem: "Hello World!".into(),
+                ipsum: 42,
+                dolor: Some("hey ho!".into()),
+            }))
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject is equal to Some(Foo { lorem: \"Hello World!\", ipsum: 42, dolor: Some(\"hey ho!\") })\n   \
+                 but was: Some(Foo { lorem: \"\u{1b}[31m¡\u{1b}[0mH\u{1b}[31mo\u{1b}[0ml\u{1b}[31ma,\u{1b}[0m W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\") })\n  \
+               expected: Some(Foo { lorem: \"H\u{1b}[32me\u{1b}[0ml\u{1b}[32mlo\u{1b}[0m W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\u{1b}[32m ho!\u{1b}[0m\") })\n\
+            ",
+        ]);
+    }
+}
+
+#[cfg(all(feature = "colored", feature = "std"))]
+mod with_colored_and_std_features {
+    use super::*;
+    use crate::color::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
+    use crate::std::env;
+    use proptest::prelude::*;
+    use serial_test::serial;
 
     #[test]
     #[serial]
@@ -99,7 +168,6 @@ mod with_colored_feature {
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
-    #[cfg(feature = "std")]
     proptest! {
         #[test]
         #[serial]
@@ -158,70 +226,5 @@ mod with_colored_feature {
         let assertion = verify_that(42);
 
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
-    }
-
-    #[test]
-    fn highlight_diffs_is_equal_to_for_integers() {
-        let failures = verify_that(37)
-            .with_diff_format(DIFF_FORMAT_RED_BLUE)
-            .is_equal_to(42)
-            .display_failures();
-
-        assert_eq!(
-            failures,
-            &["assertion failed: expected subject is equal to 42\n   \
-               but was: \u{1b}[31m37\u{1b}[0m\n  \
-              expected: \u{1b}[34m42\u{1b}[0m\n\
-            "]
-        );
-    }
-
-    #[test]
-    fn highlight_diffs_is_equal_to_for_strings() {
-        let failures = verify_that("invidunt wisi facilisis exercitation")
-            .with_diff_format(DIFF_FORMAT_RED_BLUE)
-            .is_equal_to("invi wisi exercitation anim placerat")
-            .display_failures();
-
-        assert_eq!(
-            failures,
-            &[
-                "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
-                   but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
-                  expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
-            "]
-        );
-    }
-
-    #[test]
-    fn highlight_diffs_is_equal_to_for_custom_struct() {
-        #[derive(Debug, PartialEq)]
-        struct Foo {
-            lorem: String,
-            ipsum: i32,
-            dolor: Option<String>,
-        }
-
-        let subject = Some(Foo {
-            lorem: "¡Hola, Welt!".to_string(),
-            ipsum: 42,
-            dolor: Some("hey".to_string()),
-        });
-
-        let failures = verify_that(subject)
-            .with_diff_format(DIFF_FORMAT_RED_GREEN)
-            .is_equal_to(Some(Foo {
-                lorem: "Hello World!".to_string(),
-                ipsum: 42,
-                dolor: Some("hey ho!".to_string()),
-            }))
-            .display_failures();
-
-        assert_eq!(failures, &[
-            "assertion failed: expected subject is equal to Some(Foo { lorem: \"Hello World!\", ipsum: 42, dolor: Some(\"hey ho!\") })\n   \
-                 but was: Some(Foo { lorem: \"\u{1b}[31m¡\u{1b}[0mH\u{1b}[31mo\u{1b}[0ml\u{1b}[31ma,\u{1b}[0m W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\") })\n  \
-               expected: Some(Foo { lorem: \"H\u{1b}[32me\u{1b}[0ml\u{1b}[32mlo\u{1b}[0m W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\u{1b}[32m ho!\u{1b}[0m\") })\n\
-            ",
-        ]);
     }
 }
