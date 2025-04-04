@@ -5,7 +5,7 @@ mod without_colored_feature {
 
     #[must_use]
     #[inline]
-    pub const fn diff_format_impl() -> DiffFormat {
+    pub const fn configured_diff_format_impl() -> DiffFormat {
         DIFF_FORMAT_NO_HIGHLIGHT
     }
 }
@@ -115,7 +115,7 @@ mod with_colored_feature {
     #[allow(clippy::print_stderr)]
     #[must_use]
     #[inline]
-    pub fn diff_format_impl() -> DiffFormat {
+    pub fn configured_diff_format_impl() -> DiffFormat {
         use crate::std::env;
 
         match env::var(ENV_VAR_HIGHLIGHT_DIFFS) {
@@ -149,9 +149,9 @@ use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::string::String;
 #[cfg(feature = "colored")]
-use with_colored_feature::diff_format_impl;
+use with_colored_feature::configured_diff_format_impl;
 #[cfg(not(feature = "colored"))]
-use without_colored_feature::diff_format_impl;
+use without_colored_feature::configured_diff_format_impl;
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 
@@ -171,8 +171,8 @@ pub const DEFAULT_DIFF_FORMAT: DiffFormat = with_colored_feature::DEFAULT_DIFF_F
 
 #[allow(clippy::missing_const_for_fn)]
 #[must_use]
-pub fn diff_format() -> DiffFormat {
-    diff_format_impl()
+pub fn configured_diff_format() -> DiffFormat {
+    configured_diff_format_impl()
 }
 
 pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)

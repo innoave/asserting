@@ -246,8 +246,8 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     }
     #[cfg(feature = "colored")]
     {
-        use crate::color::diff_format;
-        Spec::new(subject, PanicOnFail).with_diff_format(diff_format())
+        use crate::color::configured_diff_format;
+        Spec::new(subject, PanicOnFail).with_diff_format(configured_diff_format())
     }
 }
 
