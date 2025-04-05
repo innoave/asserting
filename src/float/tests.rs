@@ -177,3 +177,42 @@ fn verify_f64_is_not_close_to_another_f64_within_given_margin_fails() {
 "]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_f32_is_close_to() {
+        let failures = verify_that(6.28318_f32 / 2.)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_close_to_with_margin(3.15148, (2. * f32::EPSILON, 3))
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is close to 3.15148\n  \
+                within a margin of epsilon=2.3841858e-7 and ulps=3\n   \
+                 but was: 3.1\u{1b}[31m41\u{1b}[0m5\u{1b}[31m9\u{1b}[0m\n  \
+                expected: 3.15\u{1b}[34m148\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_f64_is_close_to() {
+        let failures = verify_that(6.28318_f64 / 2.)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_close_to_with_margin(3.15148, (2. * f64::EPSILON, 3))
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is close to 3.15148\n  \
+                within a margin of epsilon=4.440892098500626e-16 and ulps=3\n   \
+                 but was: 3.1\u{1b}[31m41\u{1b}[0m5\u{1b}[31m9\u{1b}[0m\n  \
+                expected: 3.15\u{1b}[34m148\u{1b}[0m\n\
+            "]
+        );
+    }
+}
