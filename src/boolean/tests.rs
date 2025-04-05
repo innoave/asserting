@@ -69,3 +69,40 @@ fn verify_bool_is_false_fails() {
 "]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_bool_is_true() {
+        let failures = verify_that(37 == 42)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_true()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is true\n   \
+               but was: \u{1b}[31mfalse\u{1b}[0m\n  \
+              expected: \u{1b}[32mtrue\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_bool_is_false() {
+        let failures = verify_that(42 == 42)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_false()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is false\n   \
+               but was: \u{1b}[31mtrue\u{1b}[0m\n  \
+              expected: \u{1b}[33mfalse\u{1b}[0m\n\
+            "]
+        );
+    }
+}
