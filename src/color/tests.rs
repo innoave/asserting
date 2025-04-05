@@ -35,39 +35,6 @@ mod with_colored_feature {
     }
 
     #[test]
-    fn highlight_diffs_is_equal_to_for_integers() {
-        let failures = verify_that(37)
-            .with_diff_format(DIFF_FORMAT_RED_BLUE)
-            .is_equal_to(42)
-            .display_failures();
-
-        assert_eq!(
-            failures,
-            &["assertion failed: expected subject is equal to 42\n   \
-               but was: \u{1b}[31m37\u{1b}[0m\n  \
-              expected: \u{1b}[34m42\u{1b}[0m\n\
-            "]
-        );
-    }
-
-    #[test]
-    fn highlight_diffs_is_equal_to_for_strings() {
-        let failures = verify_that("invidunt wisi facilisis exercitation")
-            .with_diff_format(DIFF_FORMAT_RED_BLUE)
-            .is_equal_to("invi wisi exercitation anim placerat")
-            .display_failures();
-
-        assert_eq!(
-            failures,
-            &[
-                "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
-                   but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
-                  expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
-            "]
-        );
-    }
-
-    #[test]
     fn highlight_diffs_is_equal_to_for_custom_struct() {
         #[derive(Debug, PartialEq)]
         struct Foo {
@@ -97,6 +64,25 @@ mod with_colored_feature {
                expected: Some(Foo { lorem: \"H\u{1b}[32me\u{1b}[0ml\u{1b}[32mlo\u{1b}[0m W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\u{1b}[32m ho!\u{1b}[0m\") })\n\
             ",
         ]);
+    }
+}
+
+#[cfg(all(feature = "colored", not(feature = "std")))]
+mod with_colored_but_not_std_feature {
+    use super::*;
+
+    #[test]
+    fn assert_that_sets_the_diff_format_to_red_green() {
+        let assertion = assert_that(42);
+
+        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_GREEN);
+    }
+
+    #[test]
+    fn verify_that_sets_the_diff_format_to_no_highlighting() {
+        let assertion = verify_that(42);
+
+        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
     }
 }
 
@@ -219,7 +205,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn verify_that_sets_the_diff_format_to_no_highlighting() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 

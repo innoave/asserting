@@ -681,3 +681,25 @@ fn verify_string_ends_with_char_fails() {
 "#]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_strings() {
+        let failures = verify_that("invidunt wisi facilisis exercitation")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to("invi wisi exercitation anim placerat")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
+                   but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
+                  expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
+            "]
+        );
+    }
+}

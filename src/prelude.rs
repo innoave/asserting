@@ -22,6 +22,12 @@ pub use super::{
     verify_that,
 };
 
+#[cfg(feature = "colored")]
+pub use super::color::{
+    DEFAULT_DIFF_FORMAT, DIFF_FORMAT_BOLD, DIFF_FORMAT_NO_HIGHLIGHT, DIFF_FORMAT_RED_BLUE,
+    DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
+};
+
 #[cfg(feature = "panic")]
 pub use super::{
     assert_that_code,
