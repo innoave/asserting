@@ -962,8 +962,8 @@ pub(crate) struct Highlight {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiffFormat {
-    pub(crate) actual: Highlight,
-    pub(crate) expected: Highlight,
+    pub(crate) unexpected: Highlight,
+    pub(crate) missing: Highlight,
 }
 
 /// Defines the behavior when an assertion fails.

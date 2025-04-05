@@ -99,8 +99,8 @@ mod with_colored_feature {
     /// red. Differences in the expected value or parts that are missing in the
     /// actual value or colored in blue.
     pub const DIFF_FORMAT_RED_BLUE: DiffFormat = DiffFormat {
-        actual: TERM_HIGHLIGHT_RED,
-        expected: TERM_HIGHLIGHT_BLUE,
+        unexpected: TERM_HIGHLIGHT_RED,
+        missing: TERM_HIGHLIGHT_BLUE,
     };
 
     /// A diff format that highlights differences in the colors red and green.
@@ -109,8 +109,8 @@ mod with_colored_feature {
     /// red. Differences in the expected value or parts that are missing in the
     /// actual value or colored in green.
     pub const DIFF_FORMAT_RED_GREEN: DiffFormat = DiffFormat {
-        actual: TERM_HIGHLIGHT_RED,
-        expected: TERM_HIGHLIGHT_GREEN,
+        unexpected: TERM_HIGHLIGHT_RED,
+        missing: TERM_HIGHLIGHT_GREEN,
     };
 
     /// A diff format that highlights differences in the colors red and yellow.
@@ -119,14 +119,14 @@ mod with_colored_feature {
     /// red. Differences in the expected value or parts that are missing in the
     /// actual value or colored in yellow.
     pub const DIFF_FORMAT_RED_YELLOW: DiffFormat = DiffFormat {
-        actual: TERM_HIGHLIGHT_RED,
-        expected: TERM_HIGHLIGHT_YELLOW,
+        unexpected: TERM_HIGHLIGHT_RED,
+        missing: TERM_HIGHLIGHT_YELLOW,
     };
 
     /// A diff format that highlights differences in the actual value in bold.
     pub const DIFF_FORMAT_BOLD: DiffFormat = DiffFormat {
-        actual: TERM_HIGHLIGHT_BOLD,
-        expected: TERM_NO_HIGHLIGHT,
+        unexpected: TERM_HIGHLIGHT_BOLD,
+        missing: TERM_NO_HIGHLIGHT,
     };
 
     #[must_use]
@@ -177,7 +177,10 @@ mod with_colored_feature {
     where
         T: Debug,
     {
-        format!("{}{value:?}{}", format.actual.start, format.actual.end)
+        format!(
+            "{}{value:?}{}",
+            format.unexpected.start, format.unexpected.end
+        )
     }
 
     #[inline]
@@ -185,7 +188,7 @@ mod with_colored_feature {
     where
         T: Debug,
     {
-        format!("{}{value:?}{}", format.expected.start, format.expected.end)
+        format!("{}{value:?}{}", format.missing.start, format.missing.end)
     }
 
     #[inline]
@@ -205,9 +208,9 @@ mod with_colored_feature {
         for diff in diffs {
             match diff {
                 Diff::Left { index, length } => {
-                    marked_actual.extend(format.actual.start.chars());
+                    marked_actual.extend(format.unexpected.start.chars());
                     marked_actual.extend_from_slice(&actual[index..(index + length)]);
-                    marked_actual.extend(format.actual.end.chars());
+                    marked_actual.extend(format.unexpected.end.chars());
                 },
                 Diff::Both {
                     left_index,
@@ -218,9 +221,9 @@ mod with_colored_feature {
                     marked_expected.extend_from_slice(&expected[right_index..right_index + length]);
                 },
                 Diff::Right { index, length } => {
-                    marked_expected.extend(format.expected.start.chars());
+                    marked_expected.extend(format.missing.start.chars());
                     marked_expected.extend_from_slice(&expected[index..(index + length)]);
-                    marked_expected.extend(format.expected.end.chars());
+                    marked_expected.extend(format.missing.end.chars());
                 },
             }
         }
@@ -255,8 +258,8 @@ const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
 ///
 /// Setting this format effectively switches off highlighting.
 pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
-    actual: NO_HIGHLIGHT,
-    expected: NO_HIGHLIGHT,
+    unexpected: NO_HIGHLIGHT,
+    missing: NO_HIGHLIGHT,
 };
 
 #[cfg(not(feature = "colored"))]
