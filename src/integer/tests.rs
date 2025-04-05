@@ -63,4 +63,20 @@ mod colored {
             "]
         );
     }
+
+    #[test]
+    fn highlight_diffs_is_not_equal_to_for_integers() {
+        let failures = verify_that(42)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_not_equal_to(42)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is not equal to 42\n   \
+               but was: 42\n  \
+              expected: 42\n\
+            "]
+        );
+    }
 }

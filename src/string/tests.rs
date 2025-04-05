@@ -702,4 +702,20 @@ mod colored {
             "]
         );
     }
+
+    #[test]
+    fn highlight_diffs_is_not_equal_to_for_strings() {
+        let failures = verify_that("aute aliquip culpa blandit")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_not_equal_to("aute aliquip culpa blandit")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is not equal to \"aute aliquip culpa blandit\"\n   \
+               but was: \"aute aliquip culpa blandit\"\n  \
+              expected: \"aute aliquip culpa blandit\"\n\
+            "]
+        );
+    }
 }
