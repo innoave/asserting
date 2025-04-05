@@ -1,7 +1,7 @@
 //! Implementation of the equality assertions.
 
 use crate::assertions::AssertEquality;
-use crate::color::mark_diff;
+use crate::colored::mark_diff;
 use crate::expectations::{IsEqualTo, IsNotEqualTo};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;

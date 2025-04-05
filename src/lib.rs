@@ -595,7 +595,7 @@ mod std {
 }
 
 pub mod assertions;
-pub mod color;
+pub mod colored;
 pub mod expectations;
 pub mod prelude;
 pub mod properties;

@@ -1,6 +1,6 @@
 //! This is the core of the `asserting` crate.
 
-use crate::color;
+use crate::colored;
 use crate::expectations::Predicate;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
@@ -245,7 +245,7 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     }
     #[cfg(feature = "colored")]
     {
-        use crate::color::configured_diff_format;
+        use crate::colored::configured_diff_format;
         Spec::new(subject, PanicOnFail).with_diff_format(configured_diff_format())
     }
 }
@@ -641,7 +641,7 @@ impl<'a, S, R> Spec<'a, S, R> {
             description: None,
             location: None,
             failures: vec![],
-            diff_format: color::DIFF_FORMAT_NO_HIGHLIGHT,
+            diff_format: colored::DIFF_FORMAT_NO_HIGHLIGHT,
             failing_strategy,
         }
     }

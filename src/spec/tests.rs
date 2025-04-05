@@ -1,4 +1,3 @@
-use crate::color::DIFF_FORMAT_NO_HIGHLIGHT;
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
 use crate::std::{

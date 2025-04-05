@@ -89,7 +89,7 @@ mod with_colored_but_not_std_feature {
 #[cfg(all(feature = "colored", feature = "std"))]
 mod with_colored_and_std_features {
     use super::*;
-    use crate::color::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
+    use crate::colored::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
     use crate::std::env;
     use proptest::prelude::*;
     use serial_test::serial;
