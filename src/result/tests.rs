@@ -230,3 +230,89 @@ fn verify_result_error_has_message_for_ok_value() {
         r#"assertion failed: expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+    use crate::std::{
+        string::{String, ToString},
+        vec,
+        vec::Vec,
+    };
+
+    #[test]
+    fn highlight_diffs_result_of_i64_is_ok() {
+        let subject: Result<i64, String> = Err("esse augue id esse".to_string());
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_ok()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is Ok(_)\n   \
+                but was: \u{1b}[31mErr(\"esse augue id esse\")\u{1b}[0m\n  \
+               expected: \u{1b}[34mOk(_)\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_result_of_i64_is_err() {
+        let subject: Result<i64, String> = Ok(3500);
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_err()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is Err(_)\n   \
+                but was: \u{1b}[31mOk(3500)\u{1b}[0m\n  \
+               expected: \u{1b}[32mErr(_)\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_option_of_vec_of_i32_has_value_but_is_err() {
+        let subject: Result<Vec<i32>, String> = Err("minim facer liber kasd".to_string());
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_value(vec![1, 2, 3, 5, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is ok containing [1, 2, 3, 5, 7]\n   \
+                but was: \u{1b}[31mErr(\"minim facer liber kasd\")\u{1b}[0m\n  \
+               expected: \u{1b}[33mOk([1, 2, 3, 5, 7])\u{1b}[0m\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_option_of_vec_of_i32_has_error_but_is_ok() {
+        let subject: Result<Vec<i32>, String> = Ok(vec![1, 2, 3, 5, 7]);
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_error("at feugait nihil qui")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is error containing \"at feugait nihil qui\"\n   \
+                but was: \u{1b}[31mOk([1, 2, 3, 5, 7])\u{1b}[0m\n  \
+               expected: \u{1b}[33mErr(\"at feugait nihil qui\")\u{1b}[0m\n\
+            "
+            ]
+        );
+    }
+}

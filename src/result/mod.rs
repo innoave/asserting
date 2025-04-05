@@ -3,6 +3,7 @@
 use crate::assertions::{
     AssertHasError, AssertHasErrorMessage, AssertHasValue, AssertResult, AssertResultValue,
 };
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::{Debug, Display};
@@ -107,12 +108,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Result<T, E>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = Ok::<_, Unknown>(Unknown);
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            Ok::<_, Unknown>(Unknown),
-            Ok::<_, Unknown>(Unknown),
+            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -130,12 +132,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Result<T, E>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = Err::<Unknown, Unknown>(Unknown);
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            Err::<Unknown, Unknown>(Unknown),
-            Err::<Unknown, Unknown>(Unknown),
+            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -154,12 +157,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Result<T, E>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = &self.expected;
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&Ok::<_, E>(expected), format);
         format!(
-            "expected {expression} is ok containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected,
-            Ok::<_, E>(&self.expected),
+            "expected {expression} is ok containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -178,12 +182,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Result<T, E>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = &self.expected;
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&Err::<T, _>(expected), format);
         format!(
-            "expected {expression} is error containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected,
-            Err::<T, _>(&self.expected),
+            "expected {expression} is error containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
