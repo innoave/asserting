@@ -471,19 +471,16 @@ impl<'a> Location<'a> {
 
 impl Location<'_> {
     /// Returns the file path of this location.
-    #[must_use]
     pub const fn file(&self) -> &str {
         self.file
     }
 
     /// Returns the line number of this location.
-    #[must_use]
     pub const fn line(&self) -> u32 {
         self.line
     }
 
     /// Returns the column number of this location.
-    #[must_use]
     pub const fn column(&self) -> u32 {
         self.column
     }
@@ -540,18 +537,15 @@ impl From<Location<'_>> for OwnedLocation {
 
 impl OwnedLocation {
     /// Returns the file path of this location.
-    #[must_use]
     pub fn file(&self) -> &str {
         &self.file
     }
 
-    #[must_use]
     /// Returns the line number of this location.
     pub const fn line(&self) -> u32 {
         self.line
     }
 
-    #[must_use]
     /// Returns the column number of this location.
     pub const fn column(&self) -> u32 {
         self.column
@@ -688,6 +682,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     ///     .is_equal_to("imperdiet aliqua zzril eiusmod");
     ///
     /// ```
+    #[must_use = "a spec does nothing unless an assertion method is called"]
     pub fn extracting<F, U>(self, extractor: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
@@ -730,6 +725,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// the `Debug` trait, which are both required for an `is_equal_to`
     /// assertion. So we map the subject of the type `Point` to a tuple of its
     /// fields.
+    #[must_use = "a spec does nothing unless an assertion method is called"]
     pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
@@ -822,8 +818,6 @@ where
         })
     }
 
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
     /// Asserts whether the given predicate is meet.
     ///
     /// This method takes a predicate function and calls it as an expectation.
@@ -857,6 +851,8 @@ where
     /// To assert a predicate with a generic failure message instead of
     /// providing one use the method
     /// [`satisfies`](Spec::satisfies).
+    #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
     pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
     where
         P: Fn(&S) -> bool,
