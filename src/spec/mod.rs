@@ -235,7 +235,7 @@ macro_rules! verify_that_code {
 ///     .is_equal_to(42);
 /// ```
 #[track_caller]
-pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
+pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     Spec::new(subject, PanicOnFail)
 }
 
@@ -295,7 +295,7 @@ pub const fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// ]);
 /// ```
 #[track_caller]
-pub const fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
+pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
     Spec::new(subject, CollectFailures)
 }
 
@@ -472,19 +472,19 @@ impl<'a> Location<'a> {
 impl Location<'_> {
     /// Returns the file path of this location.
     #[must_use]
-    pub const fn file(&self) -> &str {
+    pub fn file(&self) -> &str {
         self.file
     }
 
     /// Returns the line number of this location.
     #[must_use]
-    pub const fn line(&self) -> u32 {
+    pub fn line(&self) -> u32 {
         self.line
     }
 
     /// Returns the column number of this location.
     #[must_use]
-    pub const fn column(&self) -> u32 {
+    pub fn column(&self) -> u32 {
         self.column
     }
 }
@@ -540,6 +540,7 @@ impl From<Location<'_>> for OwnedLocation {
 
 impl OwnedLocation {
     /// Returns the file path of this location.
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn file(&self) -> &str {
         &self.file
@@ -547,13 +548,13 @@ impl OwnedLocation {
 
     #[must_use]
     /// Returns the line number of this location.
-    pub const fn line(&self) -> u32 {
+    pub fn line(&self) -> u32 {
         self.line
     }
 
     #[must_use]
     /// Returns the column number of this location.
-    pub const fn column(&self) -> u32 {
+    pub fn column(&self) -> u32 {
         self.column
     }
 }
@@ -595,27 +596,27 @@ impl<S, R> Spec<'_, S, R> {
     }
 
     /// Returns the subject.
-    pub const fn subject(&self) -> &S {
+    pub fn subject(&self) -> &S {
         &self.subject
     }
 
     /// Returns the expression (or subject name) if one has been set.
-    pub const fn expression(&self) -> Option<Expression<'_>> {
+    pub fn expression(&self) -> Option<Expression<'_>> {
         self.expression
     }
 
     /// Returns the location in source code or test code if it has been set.
-    pub const fn location(&self) -> Option<Location<'_>> {
+    pub fn location(&self) -> Option<Location<'_>> {
         self.location
     }
 
     /// Returns the description or the assertion if it has been set.
-    pub const fn description(&self) -> Option<&str> {
+    pub fn description(&self) -> Option<&str> {
         self.description
     }
 
     /// Returns the failing strategy that is used in case an assertion fails.
-    pub const fn failing_strategy(&self) -> &R {
+    pub fn failing_strategy(&self) -> &R {
         &self.failing_strategy
     }
 
@@ -911,18 +912,19 @@ impl StdError for AssertFailure {}
 #[allow(clippy::must_use_candidate)]
 impl AssertFailure {
     /// Returns the description of the assertion that failed.
-    pub const fn description(&self) -> Option<&String> {
+    pub fn description(&self) -> Option<&String> {
         self.description.as_ref()
     }
 
     /// Returns the failure message of the assertion that failed.
+    #[allow(clippy::missing_const_for_fn)]
     pub fn message(&self) -> &str {
         &self.message
     }
 
     /// Returns the location of the assertion in the source code / test code if
     /// it has been set in the [`Spec`].
-    pub const fn location(&self) -> Option<&OwnedLocation> {
+    pub fn location(&self) -> Option<&OwnedLocation> {
         self.location.as_ref()
     }
 }
