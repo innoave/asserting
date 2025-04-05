@@ -70,8 +70,8 @@ impl Expectation<f32> for IsCloseTo<f32, F32Margin> {
     }
 
     fn message(&self, expression: Expression<'_>, actual: &f32, _format: &DiffFormat) -> String {
-        format!("expected {expression} is close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
-            &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
+        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
+            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )
     }
 }
@@ -82,8 +82,8 @@ impl Expectation<f32> for IsNotCloseTo<f32, F32Margin> {
     }
 
     fn message(&self, expression: Expression<'_>, actual: &f32, _format: &DiffFormat) -> String {
-        format!("expected {expression} is not close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
-            &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
+        format!("expected {expression} is not close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
+            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )
     }
 }
@@ -94,8 +94,8 @@ impl Expectation<f64> for IsCloseTo<f64, F64Margin> {
     }
 
     fn message(&self, expression: Expression<'_>, actual: &f64, _format: &DiffFormat) -> String {
-        format!("expected {expression} is close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
-            &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
+        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
+            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )
     }
 }
@@ -106,8 +106,8 @@ impl Expectation<f64> for IsNotCloseTo<f64, F64Margin> {
     }
 
     fn message(&self, expression: Expression<'_>, actual: &f64, _format: &DiffFormat) -> String {
-        format!("expected {expression} is not close to {:?}\n   but was: {actual:?}\n  expected: {:?} within a margin of epsilon={:e} and ulps={}",
-            &self.expected, &self.expected, self.margin.epsilon, self.margin.ulps
+        format!("expected {expression} is not close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
+            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )
     }
 }

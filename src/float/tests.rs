@@ -17,8 +17,9 @@ fn verify_f32_is_close_to_another_f32_within_default_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is close to 3.15
+  within a margin of epsilon=4.7683716e-7 and ulps=4
    but was: 3.14
-  expected: 3.15 within a margin of epsilon=4.7683716e-7 and ulps=4
+  expected: 3.15
 "]
     );
 }
@@ -38,8 +39,9 @@ fn verify_f32_is_not_close_to_another_f32_within_default_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is not close to 3.14
+  within a margin of epsilon=4.7683716e-7 and ulps=4
    but was: 3.14
-  expected: 3.14 within a margin of epsilon=4.7683716e-7 and ulps=4
+  expected: 3.14
 "]
     );
 }
@@ -59,8 +61,9 @@ fn verify_f32_is_close_to_another_f32_within_given_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is close to 3.15
+  within a margin of epsilon=2.3841858e-7 and ulps=3
    but was: 3.14
-  expected: 3.15 within a margin of epsilon=2.3841858e-7 and ulps=3
+  expected: 3.15
 "]
     );
 }
@@ -80,8 +83,9 @@ fn verify_f32_is_not_close_to_another_f32_within_givenh_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is not close to 3.14
+  within a margin of epsilon=2.3841858e-7 and ulps=3
    but was: 3.14
-  expected: 3.14 within a margin of epsilon=2.3841858e-7 and ulps=3
+  expected: 3.14
 "]
     );
 }
@@ -101,8 +105,9 @@ fn verify_f64_is_close_to_another_f64_within_default_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is close to 3.15
+  within a margin of epsilon=8.881784197001252e-16 and ulps=4
    but was: 3.14
-  expected: 3.15 within a margin of epsilon=8.881784197001252e-16 and ulps=4
+  expected: 3.15
 "]
     );
 }
@@ -122,8 +127,9 @@ fn verify_f64_is_not_close_to_another_f64_within_default_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is not close to 3.14
+  within a margin of epsilon=8.881784197001252e-16 and ulps=4
    but was: 3.14
-  expected: 3.14 within a margin of epsilon=8.881784197001252e-16 and ulps=4
+  expected: 3.14
 "]
     );
 }
@@ -143,8 +149,9 @@ fn verify_f64_is_close_to_another_f64_within_given_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is close to 3.15
+  within a margin of epsilon=4.440892098500626e-16 and ulps=3
    but was: 3.14
-  expected: 3.15 within a margin of epsilon=4.440892098500626e-16 and ulps=3
+  expected: 3.15
 "]
     );
 }
@@ -164,8 +171,9 @@ fn verify_f64_is_not_close_to_another_f64_within_givenh_margin_fails() {
     assert_eq!(
         failures,
         &[r"assertion failed: expected tau / 2 is not close to 3.14
+  within a margin of epsilon=4.440892098500626e-16 and ulps=3
    but was: 3.14
-  expected: 3.14 within a margin of epsilon=4.440892098500626e-16 and ulps=3
+  expected: 3.14
 "]
     );
 }
