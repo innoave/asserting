@@ -74,7 +74,7 @@ fn f32_is_not_close_to_another_f32_within_given_margin() {
 }
 
 #[test]
-fn verify_f32_is_not_close_to_another_f32_within_givenh_margin_fails() {
+fn verify_f32_is_not_close_to_another_f32_within_given_margin_fails() {
     let failures = verify_that(6.28_f32 / 2.)
         .named("tau / 2")
         .is_not_close_to_with_margin(3.14, (2. * f32::EPSILON, 3))
@@ -162,7 +162,7 @@ fn f64_is_not_close_to_another_f64_within_given_margin() {
 }
 
 #[test]
-fn verify_f64_is_not_close_to_another_f64_within_givenh_margin_fails() {
+fn verify_f64_is_not_close_to_another_f64_within_given_margin_fails() {
     let failures = verify_that(6.28_f64 / 2.)
         .named("tau / 2")
         .is_not_close_to_with_margin(3.14, (2. * f64::EPSILON, 3))
