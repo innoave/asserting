@@ -1,23 +1,29 @@
 //! Definitions of the expectations that are provided by this crate.
 
 #![allow(missing_docs)]
+#![warn(clippy::return_self_not_must_use)]
 
 use crate::std::ops::RangeInclusive;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
+#[must_use]
 pub struct IsTrue;
 
+#[must_use]
 pub struct IsFalse;
 
+#[must_use]
 pub struct IsEqualTo<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsNotEqualTo<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsCloseTo<E, M> {
     pub expected: E,
     pub margin: M,
@@ -27,7 +33,6 @@ impl<E, M> IsCloseTo<E, M>
 where
     M: Default,
 {
-    #[must_use]
     pub fn new(expected: E) -> Self {
         Self {
             expected,
@@ -37,13 +42,13 @@ where
 }
 
 impl<E, M> IsCloseTo<E, M> {
-    #[must_use]
     pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
         self.margin = margin.into();
         self
     }
 }
 
+#[must_use]
 pub struct IsNotCloseTo<E, M> {
     pub expected: E,
     pub margin: M,
@@ -53,7 +58,6 @@ impl<E, M> IsNotCloseTo<E, M>
 where
     M: Default,
 {
-    #[must_use]
     pub fn new(expected: E) -> Self {
         Self {
             expected,
@@ -63,85 +67,106 @@ where
 }
 
 impl<E, M> IsNotCloseTo<E, M> {
-    #[must_use]
     pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
         self.margin = margin.into();
         self
     }
 }
 
+#[must_use]
 pub struct IsLessThan<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsAtMost<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsGreaterThan<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsAtLeast<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsInRange<E> {
     pub expected_range: RangeInclusive<E>,
 }
 
+#[must_use]
 pub struct IsNotInRange<E> {
     pub expected_range: RangeInclusive<E>,
 }
 
+#[must_use]
 pub struct IsSome;
 
+#[must_use]
 pub struct IsNone;
 
+#[must_use]
 pub struct HasValue<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsOk;
 
+#[must_use]
 pub struct IsErr;
 
+#[must_use]
 pub struct HasError<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IsEmpty;
 
+#[must_use]
 pub struct IsNotEmpty;
 
+#[must_use]
 pub struct HasLength<E> {
     pub expected_length: E,
 }
 
+#[must_use]
 pub struct HasLengthInRange<E> {
     pub expected_range: RangeInclusive<E>,
 }
 
+#[must_use]
 pub struct StringContains<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct StringContainsAnyOf<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct StringStartWith<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct StringEndsWith<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IterContains<E> {
     pub expected: E,
 }
 
+#[must_use]
 pub struct IterContainsExactlyInAnyOrder<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
@@ -149,7 +174,6 @@ pub struct IterContainsExactlyInAnyOrder<E> {
 }
 
 impl<E> IterContainsExactlyInAnyOrder<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -159,17 +183,18 @@ impl<E> IterContainsExactlyInAnyOrder<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsAnyOf<E> {
     pub expected: Vec<E>,
 }
 
+#[must_use]
 pub struct IterContainsAllOf<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
 }
 
 impl<E> IterContainsAllOf<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -178,13 +203,13 @@ impl<E> IterContainsAllOf<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsOnly<E> {
     pub expected: Vec<E>,
     pub extra: HashSet<usize>,
 }
 
 impl<E> IterContainsOnly<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -193,6 +218,7 @@ impl<E> IterContainsOnly<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsOnlyOnce<E> {
     pub expected: Vec<E>,
     pub extra: HashSet<usize>,
@@ -200,7 +226,6 @@ pub struct IterContainsOnlyOnce<E> {
 }
 
 impl<E> IterContainsOnlyOnce<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -210,6 +235,7 @@ impl<E> IterContainsOnlyOnce<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsExactly<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
@@ -218,7 +244,6 @@ pub struct IterContainsExactly<E> {
 }
 
 impl<E> IterContainsExactly<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -229,6 +254,7 @@ impl<E> IterContainsExactly<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsSequence<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
@@ -236,7 +262,6 @@ pub struct IterContainsSequence<E> {
 }
 
 impl<E> IterContainsSequence<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -246,13 +271,13 @@ impl<E> IterContainsSequence<E> {
     }
 }
 
+#[must_use]
 pub struct IterContainsAllInOrder<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
 }
 
 impl<E> IterContainsAllInOrder<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -261,6 +286,7 @@ impl<E> IterContainsAllInOrder<E> {
     }
 }
 
+#[must_use]
 pub struct IterStartsWith<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
@@ -268,7 +294,6 @@ pub struct IterStartsWith<E> {
 }
 
 impl<E> IterStartsWith<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -278,6 +303,7 @@ impl<E> IterStartsWith<E> {
     }
 }
 
+#[must_use]
 pub struct IterEndsWith<E> {
     pub expected: Vec<E>,
     pub missing: HashSet<usize>,
@@ -285,7 +311,6 @@ pub struct IterEndsWith<E> {
 }
 
 impl<E> IterEndsWith<E> {
-    #[must_use]
     pub fn new(expected: Vec<E>) -> Self {
         Self {
             expected,
@@ -295,20 +320,20 @@ impl<E> IterEndsWith<E> {
     }
 }
 
+#[must_use]
 pub struct Predicate<F> {
     pub predicate: F,
     pub message: Option<String>,
 }
 
 #[cfg(feature = "panic")]
-pub use panic::DoesNotPanic;
-#[cfg(feature = "panic")]
-pub use panic::DoesPanic;
+pub use panic::{DoesNotPanic, DoesPanic};
 
 #[cfg(feature = "panic")]
 mod panic {
     use std::any::Any;
 
+    #[must_use]
     #[derive(Default)]
     pub struct DoesPanic {
         pub expected_message: Option<String>,
@@ -316,7 +341,6 @@ mod panic {
     }
 
     impl DoesPanic {
-        #[must_use]
         pub fn with_any_message() -> Self {
             Self::default()
         }
@@ -329,6 +353,7 @@ mod panic {
         }
     }
 
+    #[must_use]
     #[derive(Default)]
     pub struct DoesNotPanic {
         pub actual_message: Option<Box<dyn Any + Send>>,

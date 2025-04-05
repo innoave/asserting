@@ -3,7 +3,7 @@ use crate::prelude::*;
 
 #[test]
 fn code_does_not_panic() {
-    const fn add(a: i32, b: i32) -> i32 {
+    fn add(a: i32, b: i32) -> i32 {
         a + b
     }
 
@@ -32,7 +32,7 @@ fn verify_code_does_not_panic_fails() {
 
 #[test]
 fn code_does_panic() {
-    const fn add(a: i32, b: i32) -> i32 {
+    fn add(a: i32, b: i32) -> i32 {
         a + b
     }
 
@@ -44,7 +44,7 @@ fn code_does_panic() {
 
 #[test]
 fn code_does_panic_with_message_from_assertion() {
-    const fn add(a: i32, b: i32) -> i32 {
+    fn add(a: i32, b: i32) -> i32 {
         a + b
     }
 
