@@ -1,6 +1,7 @@
 //! Implementation of assertions for `Option` values.
 
 use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasValue, IsNone, IsSome};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
 use crate::std::fmt::Debug;
@@ -57,12 +58,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Option<T>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = Some(Unknown);
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            Some(Unknown),
-            Some(Unknown)
+            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -79,11 +81,13 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Option<T>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
+        let expected = None::<Unknown>;
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            None::<Unknown>, None::<Unknown>
+            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -103,12 +107,12 @@ where
         &self,
         expression: Expression<'_>,
         actual: &Option<T>,
-        _format: &DiffFormat,
+        format: &DiffFormat,
     ) -> String {
-        format!("expected {expression} is some containing {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected,
-            Some(&self.expected),
-        )
+        let expected = &self.expected;
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&Some(expected), format);
+        format!("expected {expression} is some containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
 
