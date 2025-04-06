@@ -718,4 +718,40 @@ mod colored {
             "]
         );
     }
+
+    #[test]
+    fn highlight_diffs_string_is_empty() {
+        let subject = "voluptua quod quis dignissim";
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_empty()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is empty\n   \
+               but was: \u{1b}[31m\"voluptua quod quis dignissim\"\u{1b}[0m\n  \
+              expected: <empty>\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_is_not_empty() {
+        let subject = "";
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_not_empty()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is not empty\n   \
+               but was: \u{1b}[31m\"\"\u{1b}[0m\n  \
+              expected: <non-empty>\n\
+            "]
+        );
+    }
 }

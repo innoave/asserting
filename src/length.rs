@@ -1,6 +1,7 @@
 //! Implementations of the emptiness and length assertions.
 
 use crate::assertions::{AssertEmptiness, AssertHasLength};
+use crate::colored::mark_unexpected;
 use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
@@ -30,8 +31,9 @@ where
         subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
-        format!("expected {expression} is empty\n   but was: {actual:?}\n  expected: <empty>")
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        format!("expected {expression} is empty\n   but was: {marked_actual}\n  expected: <empty>")
     }
 }
 
@@ -43,9 +45,10 @@ where
         !subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
         format!(
-            "expected {expression} is not empty\n   but was: {actual:?}\n  expected: <non-empty>",
+            "expected {expression} is not empty\n   but was: {marked_actual}\n  expected: <non-empty>",
         )
     }
 }
