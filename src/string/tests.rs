@@ -754,4 +754,42 @@ mod colored {
             "]
         );
     }
+
+    #[test]
+    fn highlight_diffs_string_has_length() {
+        let subject = "feugiat mazim vero vero";
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .has_length(29)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject has length 29\n   \
+               but was: \u{1b}[31m23\u{1b}[0m\n  \
+              expected: \u{1b}[32m29\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_has_length_in_range() {
+        let subject = "dignissim nisl erat possim";
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .has_length_in_range(8..=20)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject has length in range 8..=20\n   \
+                   but was: \u{1b}[31m26\u{1b}[0m\n  \
+                  expected: \u{1b}[32m8..=20\u{1b}[0m\n\
+            "
+            ]
+        );
+    }
 }

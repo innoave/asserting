@@ -1,7 +1,7 @@
 //! Implementations of the emptiness and length assertions.
 
 use crate::assertions::{AssertEmptiness, AssertHasLength};
-use crate::colored::mark_unexpected;
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
@@ -77,12 +77,12 @@ where
         subject.length_property() == self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_length, format);
         format!(
-            "expected {expression} has length {}\n   but was: {}\n  expected: {}",
+            "expected {expression} has length {}\n   but was: {marked_actual}\n  expected: {marked_expected}",
             self.expected_length,
-            actual.length_property(),
-            self.expected_length
         )
     }
 }
@@ -95,12 +95,12 @@ where
         self.expected_range.contains(&subject.length_property())
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_range, format);
         format!(
-            "expected {expression} has length in range {:?}\n   but was: {}\n  expected: {:?}",
+            "expected {expression} has length in range {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
             self.expected_range,
-            actual.length_property(),
-            self.expected_range
         )
     }
 }
