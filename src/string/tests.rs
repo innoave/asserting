@@ -685,6 +685,7 @@ fn verify_string_ends_with_char_fails() {
 #[cfg(feature = "colored")]
 mod colored {
     use crate::prelude::*;
+    use crate::std::string::ToString;
 
     #[test]
     fn highlight_diffs_is_equal_to_for_strings() {
@@ -697,9 +698,10 @@ mod colored {
             failures,
             &[
                 "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
-                   but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
-                  expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
-            "]
+                    but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
+                   expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
+                "
+            ]
         );
     }
 
@@ -789,6 +791,240 @@ mod colored {
                    but was: \u{1b}[31m26\u{1b}[0m\n  \
                   expected: \u{1b}[32m8..=20\u{1b}[0m\n\
             "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_str() {
+        let subject = "sanctus stet eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .contains("status")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to contain \"status\"\n   \
+                    but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
+                   expected: \"\u{1b}[33mstatus\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_string() {
+        let subject = "sanctus stet eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .contains("status".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to contain \"status\"\n   \
+                    but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
+                   expected: \"\u{1b}[33mstatus\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_char() {
+        let subject = "sanctus stet eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .contains('E')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to contain 'E'\n   \
+                 but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
+                expected: '\u{1b}[33mE\u{1b}[0m'\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_starts_with_str() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .starts_with("una")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to start with \"una\"\n   \
+                   but was: \"\u{1b}[31mnul\u{1b}[0mla feugiat illum culpa\"\n  \
+                  expected: \"\u{1b}[32muna\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_starts_with_string() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .starts_with("una".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to start with \"una\"\n   \
+                    but was: \"\u{1b}[31mnul\u{1b}[0mla feugiat illum culpa\"\n  \
+                   expected: \"\u{1b}[32muna\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_starts_with_char() {
+        let subject = "commodo sadipscing id imperdiet".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .starts_with('o')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to start with 'o'\n   \
+                   but was: \"\u{1b}[31mc\u{1b}[0mommodo sadipscing id imperdiet\"\n  \
+                  expected: '\u{1b}[32mo\u{1b}[0m'\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_ends_with_str() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .ends_with("innocence")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to end with \"innocence\"\n   \
+                   but was: \"nulla feugiat il\u{1b}[31mlum culpa\u{1b}[0m\"\n  \
+                  expected: \"\u{1b}[32minnocence\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_ends_with_string() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .ends_with("innocence".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to end with \"innocence\"\n   \
+                    but was: \"nulla feugiat il\u{1b}[31mlum culpa\u{1b}[0m\"\n  \
+                   expected: \"\u{1b}[32minnocence\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_ends_with_char() {
+        let subject = "commodo sadipscing id imperdiet".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .ends_with('e')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to end with 'e'\n   \
+                   but was: \"commodo sadipscing id imperdie\u{1b}[31mt\u{1b}[0m\"\n  \
+                  expected: '\u{1b}[32me\u{1b}[0m'\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_any_of_a_char_slice() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_any_of(&['a', 'b', 'c'][..])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                   expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_any_of_a_char_array() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_any_of(['a', 'b', 'c'])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                   expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_contains_any_of_a_borrowed_char_array() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_any_of(&['a', 'b', 'c'])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                   expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
+                "
             ]
         );
     }

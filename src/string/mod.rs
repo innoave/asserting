@@ -7,12 +7,18 @@
 //! * `CString` and `CStr`
 
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
+use crate::colored::{
+    mark_missing, mark_missing_char, mark_missing_substr, mark_unexpected, mark_unexpected_substr,
+};
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
 use crate::properties::{DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
-use crate::std::{format, string::String};
+use crate::std::{
+    format,
+    string::{String, ToString},
+};
 
 impl IsEmptyProperty for &str {
     fn is_empty_property(&self) -> bool {
@@ -155,10 +161,12 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
+        let marked_expected = mark_missing_substr(self.expected, format);
         format!(
-            "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain {:?}\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -171,10 +179,12 @@ where
         subject.as_ref().contains(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
+        let marked_expected = mark_missing_substr(self.expected.as_ref(), format);
         format!(
-            "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain {:?}\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -187,10 +197,12 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
+        let marked_expected = mark_missing_char(self.expected, format);
         format!(
-            "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain {:?}\n   but was: \"{marked_actual}\"\n  expected: '{marked_expected}'",
+            self.expected,
         )
     }
 }
@@ -203,10 +215,23 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let expected_char_len = self.expected.chars().count();
+        let actual_start = actual
+            .as_ref()
+            .chars()
+            .take(expected_char_len)
+            .collect::<String>();
+        let actual_rest = actual
+            .as_ref()
+            .chars()
+            .skip(expected_char_len)
+            .collect::<String>();
+        let marked_actual_start = mark_unexpected_substr(&actual_start, format);
+        let marked_expected = mark_missing_substr(self.expected, format);
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -219,10 +244,23 @@ where
         subject.as_ref().starts_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let expected_char_len = self.expected.chars().count();
+        let actual_start = actual
+            .as_ref()
+            .chars()
+            .take(expected_char_len)
+            .collect::<String>();
+        let actual_rest = actual
+            .as_ref()
+            .chars()
+            .skip(expected_char_len)
+            .collect::<String>();
+        let marked_actual_start = mark_unexpected_substr(&actual_start, format);
+        let marked_expected = mark_missing_substr(&self.expected, format);
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -235,10 +273,14 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let actual_first_char = actual.as_ref().chars().take(1).collect::<String>();
+        let actual_rest = actual.as_ref().chars().skip(1).collect::<String>();
+        let marked_actual_start = mark_unexpected_substr(&actual_first_char, format);
+        let marked_expected = mark_missing_char(self.expected, format);
         format!(
-            "expected {expression} to start with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: '{marked_expected}'",
+            self.expected,
         )
     }
 }
@@ -251,10 +293,25 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let actual_char_len = actual.as_ref().chars().count();
+        let expected_char_len = self.expected.chars().count();
+        let split_point = actual_char_len.saturating_sub(expected_char_len);
+        let actual_start = actual
+            .as_ref()
+            .chars()
+            .take(split_point)
+            .collect::<String>();
+        let actual_end = actual
+            .as_ref()
+            .chars()
+            .skip(split_point)
+            .collect::<String>();
+        let marked_actual_end = mark_unexpected_substr(&actual_end, format);
+        let marked_expected = mark_missing_substr(self.expected, format);
         format!(
-            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -267,10 +324,25 @@ where
         subject.as_ref().ends_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let actual_char_len = actual.as_ref().chars().count();
+        let expected_char_len = self.expected.chars().count();
+        let split_point = actual_char_len.saturating_sub(expected_char_len);
+        let actual_start = actual
+            .as_ref()
+            .chars()
+            .take(split_point)
+            .collect::<String>();
+        let actual_end = actual
+            .as_ref()
+            .chars()
+            .skip(split_point)
+            .collect::<String>();
+        let marked_actual_end = mark_unexpected_substr(&actual_end, format);
+        let marked_expected = mark_missing_substr(&self.expected, format);
         format!(
-            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: \"{marked_expected}\"",
+            self.expected,
         )
     }
 }
@@ -283,10 +355,20 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let actual_last_char = actual
+            .as_ref()
+            .chars()
+            .last()
+            .map(|c| c.to_string())
+            .unwrap_or_default();
+        let mut actual_start = actual.as_ref().to_string();
+        actual_start.pop();
+        let marked_actual_end = mark_unexpected_substr(&actual_last_char, format);
+        let marked_expected = mark_missing_char(self.expected, format);
         format!(
-            "expected {expression} to end with {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: '{marked_expected}'",
+            self.expected,
         )
     }
 }
@@ -335,10 +417,12 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain any of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            self.expected,
         )
     }
 }
@@ -351,10 +435,12 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain any of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            self.expected,
         )
     }
 }
@@ -367,10 +453,12 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} to contain any of {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            self.expected, self.expected
+            "expected {expression} to contain any of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            self.expected,
         )
     }
 }

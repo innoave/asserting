@@ -2,12 +2,25 @@
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
     use crate::spec::DiffFormat;
-    use crate::std::{fmt::Debug, format, string::String};
+    use crate::std::{
+        fmt::Debug,
+        format,
+        string::{String, ToString},
+    };
 
     #[must_use]
     #[inline]
     pub const fn configured_diff_format_impl() -> DiffFormat {
         DIFF_FORMAT_NO_HIGHLIGHT
+    }
+
+    #[inline]
+    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
+    where
+        S: Debug,
+        E: Debug,
+    {
+        (format!("{actual:?}"), format!("{expected:?}"))
     }
 
     #[inline]
@@ -27,12 +40,23 @@ mod without_colored_feature {
     }
 
     #[inline]
-    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
-    where
-        S: Debug,
-        E: Debug,
-    {
-        (format!("{actual:?}"), format!("{expected:?}"))
+    pub fn mark_unexpected_substr_impl(substr: &str, _format: &DiffFormat) -> String {
+        substr.to_string()
+    }
+
+    #[inline]
+    pub fn mark_missing_substr_impl(substr: &str, _format: &DiffFormat) -> String {
+        substr.to_string()
+    }
+
+    #[inline]
+    pub fn mark_unexpected_char_impl(character: char, _format: &DiffFormat) -> String {
+        format!("{character}")
+    }
+
+    #[inline]
+    pub fn mark_missing_char_impl(character: char, _format: &DiffFormat) -> String {
+        format!("{character}")
     }
 }
 
@@ -173,25 +197,6 @@ mod with_colored_feature {
     }
 
     #[inline]
-    pub fn mark_unexpected_impl<T>(value: &T, format: &DiffFormat) -> String
-    where
-        T: Debug,
-    {
-        format!(
-            "{}{value:?}{}",
-            format.unexpected.start, format.unexpected.end
-        )
-    }
-
-    #[inline]
-    pub fn mark_missing_impl<T>(value: &T, format: &DiffFormat) -> String
-    where
-        T: Debug,
-    {
-        format!("{}{value:?}{}", format.missing.start, format.missing.end)
-    }
-
-    #[inline]
     pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
     where
         S: Debug,
@@ -232,6 +237,51 @@ mod with_colored_feature {
             String::from_iter(marked_expected),
         )
     }
+
+    #[inline]
+    pub fn mark_unexpected_impl<T>(value: &T, format: &DiffFormat) -> String
+    where
+        T: Debug,
+    {
+        format!(
+            "{}{value:?}{}",
+            format.unexpected.start, format.unexpected.end
+        )
+    }
+
+    #[inline]
+    pub fn mark_missing_impl<T>(value: &T, format: &DiffFormat) -> String
+    where
+        T: Debug,
+    {
+        format!("{}{value:?}{}", format.missing.start, format.missing.end)
+    }
+
+    #[inline]
+    pub fn mark_unexpected_substr_impl(substr: &str, format: &DiffFormat) -> String {
+        format!(
+            "{}{substr}{}",
+            format.unexpected.start, format.unexpected.end
+        )
+    }
+
+    #[inline]
+    pub fn mark_missing_substr_impl(substr: &str, format: &DiffFormat) -> String {
+        format!("{}{substr}{}", format.missing.start, format.missing.end)
+    }
+
+    #[inline]
+    pub fn mark_unexpected_char_impl(character: char, format: &DiffFormat) -> String {
+        format!(
+            "{}{character}{}",
+            format.unexpected.start, format.unexpected.end
+        )
+    }
+
+    #[inline]
+    pub fn mark_missing_char_impl(character: char, format: &DiffFormat) -> String {
+        format!("{}{character}{}", format.missing.start, format.missing.end)
+    }
 }
 
 #[cfg(feature = "colored")]
@@ -245,11 +295,15 @@ use crate::std::fmt::Debug;
 use crate::std::string::String;
 #[cfg(feature = "colored")]
 use with_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,
+    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
+    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
+    mark_unexpected_substr_impl,
 };
 #[cfg(not(feature = "colored"))]
 use without_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,
+    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
+    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
+    mark_unexpected_substr_impl,
 };
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
@@ -274,6 +328,14 @@ pub fn configured_diff_format() -> DiffFormat {
     configured_diff_format_impl()
 }
 
+pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+where
+    S: Debug,
+    E: Debug,
+{
+    mark_diff_impl(actual, expected, format)
+}
+
 pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
 where
     T: Debug,
@@ -288,12 +350,20 @@ where
     mark_missing_impl(value, format)
 }
 
-pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
-where
-    S: Debug,
-    E: Debug,
-{
-    mark_diff_impl(actual, expected, format)
+pub fn mark_unexpected_substr(substr: &str, format: &DiffFormat) -> String {
+    mark_unexpected_substr_impl(substr, format)
+}
+
+pub fn mark_missing_substr(substr: &str, format: &DiffFormat) -> String {
+    mark_missing_substr_impl(substr, format)
+}
+
+pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
+    mark_unexpected_char_impl(character, format)
+}
+
+pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
+    mark_missing_char_impl(character, format)
 }
 
 #[cfg(test)]
