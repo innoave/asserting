@@ -292,7 +292,9 @@ pub use with_colored_feature::{
 
 use crate::spec::{DiffFormat, Highlight};
 use crate::std::fmt::Debug;
+use crate::std::format;
 use crate::std::string::String;
+use hashbrown::HashSet;
 #[cfg(feature = "colored")]
 use with_colored_feature::{
     configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
@@ -364,6 +366,62 @@ pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
 
 pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
     mark_missing_char_impl(character, format)
+}
+
+pub fn mark_selected_items_in_collection<T, F>(
+    collection: &[T],
+    selected_indices: &HashSet<usize>,
+    format: &DiffFormat,
+    mark: F,
+) -> String
+where
+    T: Debug,
+    F: Fn(&T, &DiffFormat) -> String,
+{
+    let mut marked_collection = String::with_capacity(collection.len() + 2);
+    marked_collection.push('[');
+    collection
+        .iter()
+        .enumerate()
+        .map(|(index, item)| {
+            if selected_indices.contains(&index) {
+                mark(item, format)
+            } else {
+                format!("{item:?}")
+            }
+        })
+        .for_each(|item| {
+            marked_collection.push_str(&item);
+            marked_collection.push_str(", ");
+        });
+    if marked_collection.len() >= 3 {
+        marked_collection.pop();
+        marked_collection.pop();
+    }
+    marked_collection.push(']');
+    marked_collection
+}
+
+pub fn mark_all_items_in_collection<T, F>(collection: &[T], format: &DiffFormat, mark: F) -> String
+where
+    T: Debug,
+    F: Fn(&T, &DiffFormat) -> String,
+{
+    let mut marked_collection = String::with_capacity(collection.len() + 2);
+    marked_collection.push('[');
+    collection
+        .iter()
+        .map(|item| mark(item, format))
+        .for_each(|item| {
+            marked_collection.push_str(&item);
+            marked_collection.push_str(", ");
+        });
+    if marked_collection.len() >= 3 {
+        marked_collection.pop();
+        marked_collection.pop();
+    }
+    marked_collection.push(']');
+    marked_collection
 }
 
 #[cfg(test)]

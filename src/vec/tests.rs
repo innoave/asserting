@@ -142,7 +142,7 @@ fn verify_vec_contains_any_of_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64], but contained none of them
+            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [0, 2, 4, 8, 16, 32, 64]
 "
@@ -668,4 +668,27 @@ fn verify_empty_vec_ends_with_expected_sequence_longer_than_vec_fails() {
 "
         ]
     );
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use super::*;
+
+    #[ignore = "TODO: we need some kind of specialized implementation of marked diffs for slices and Vec"]
+    #[test]
+    fn highlight_diffs_vec_is_equal_to_slice() {
+        let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to([1, 3, 5, 7, 11, 13, 19, 23, 29, 31, 37])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject is equal to [1, 3, 5, 7, 11, 13, 19, 23, 29, 31, 37]\n   \
+                but was: [\u{1b}[31m13\u{1b}[0m, 5, 7, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, 11, \u{1b}[31m29\u{1b}[0m, 23, 31, 37]
+               expected: [\u{1b}[34m1\u{1b}[0m, \u{1b}[34m3\u{1b}[0m, 5, 7, 11, \u{1b}[34m13\u{1b}[0m, \u{1b}[34m19\u{1b}[0m, 23, \u{1b}[34m29\u{1b}[0m, 31, 37]
+            "
+        ]);
+    }
 }

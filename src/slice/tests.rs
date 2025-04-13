@@ -174,7 +174,7 @@ fn verify_slice_contains_any_of_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64], but contained none of them
+            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [0, 2, 4, 8, 16, 32, 64]
 "
@@ -247,7 +247,7 @@ fn slice_contains_only_once() {
 
 #[test]
 fn verify_slice_contains_only_once_fails() {
-    let subject: &[i32] = &[5, 11, 1, 3, 19, 17, 11, 43];
+    let subject: &[i32] = &[5, 11, 1, 3, 3, 19, 17, 11, 3, 43];
 
     let failures = verify_that(subject)
         .named("my_thing")
@@ -258,10 +258,10 @@ fn verify_slice_contains_only_once_fails() {
         failures,
         &[
             r"assertion failed: expected my_thing contains only once [1, 3, 7, 11, 19]
-     but was: [5, 11, 1, 3, 19, 17, 11, 43]
+     but was: [5, 11, 1, 3, 3, 19, 17, 11, 3, 43]
     expected: [1, 3, 7, 11, 19]
        extra: [5, 17, 43]
-  duplicates: [11, 11]
+  duplicates: [11, 3, 3, 11, 3]
 "
         ]
     );
@@ -700,4 +700,121 @@ fn verify_empty_vec_ends_with_expected_sequence_longer_than_vec_fails() {
 "
         ]
     );
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use super::*;
+
+    #[test]
+    fn highlight_diffs_slice_contains() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains(&21)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to contain 21\n   \
+                but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
+               expected: \u{1b}[32m21\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_slice_contains_exactly_in_any_order() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_exactly_in_any_order(&[1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject contains exactly in any order [1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31]\n   \
+                but was: [13, \u{1b}[31m5\u{1b}[0m, 7, 19, 1, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, 31, \u{1b}[31m37\u{1b}[0m]\n  \
+               expected: [1, \u{1b}[34m2\u{1b}[0m, 3, 13, \u{1b}[34m8\u{1b}[0m, 7, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, 31, 19, \u{1b}[34m20\u{1b}[0m, 11, \u{1b}[34m31\u{1b}[0m]\n   \
+                missing: [2, 8, 12, 15, 20, 31]\n     \
+                  extra: [5, 29, 23, 37]\n\
+            "
+        ]);
+    }
+
+    #[test]
+    fn highlight_diffs_slice_contains_any_of() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_any_of(&[2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject contains any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
+                but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
+               expected: [\u{1b}[34m2\u{1b}[0m, \u{1b}[34m4\u{1b}[0m, \u{1b}[34m6\u{1b}[0m, \u{1b}[34m8\u{1b}[0m, \u{1b}[34m9\u{1b}[0m, \u{1b}[34m10\u{1b}[0m, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, \u{1b}[34m32\u{1b}[0m, \u{1b}[34m20\u{1b}[0m, \u{1b}[34m18\u{1b}[0m]\n\
+            "
+        ]);
+    }
+
+    #[test]
+    fn highlight_diffs_slice_contains_all_of() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_all_of(&[2, 3, 5, 20, 11, 13, 19, 37, 22])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject contains all of [2, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+                but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
+               expected: [\u{1b}[34m2\u{1b}[0m, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n   \
+                missing: [2, 20, 22]\n\
+            "
+        ]);
+    }
+
+    #[test]
+    fn highlight_diffs_slice_contains_only() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_only(&[13, 3, 5, 20, 11, 13, 19, 37, 22])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject contains only [13, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+                but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
+               expected: [13, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n     \
+                  extra: [7, 1, 29, 23, 31]\n\
+            "
+        ]);
+    }
+
+    #[test]
+    fn highlight_diffs_slice_contains_only_once() {
+        let subject: &[i32] = &[5, 11, 1, 3, 3, 19, 17, 11, 3, 43];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .contains_only_once(&[1, 3, 7, 11, 19])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject contains only once [1, 3, 7, 11, 19]\n     \
+                    but was: [\u{1b}[31m5\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, 1, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, 19, \u{1b}[31m17\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m43\u{1b}[0m]\n    \
+                   expected: [1, \u{1b}[34m3\u{1b}[0m, \u{1b}[34m7\u{1b}[0m, \u{1b}[34m11\u{1b}[0m, 19]\n       \
+                      extra: [5, 17, 43]\n  \
+                 duplicates: [11, 3, 3, 11, 3]\n\
+                "
+            ]
+        );
+    }
 }

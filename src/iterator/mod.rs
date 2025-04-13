@@ -3,6 +3,9 @@
 use crate::assertions::{
     AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
 };
+use crate::colored::{
+    mark_all_items_in_collection, mark_missing, mark_selected_items_in_collection, mark_unexpected,
+};
 use crate::expectations::{
     IterContains, IterContainsAllInOrder, IterContainsAllOf, IterContainsAnyOf,
     IterContainsExactly, IterContainsExactlyInAnyOrder, IterContainsOnly, IterContainsOnlyOnce,
@@ -38,10 +41,12 @@ where
         subject.iter().any(|e| e == &self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} to contain {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected, &self.expected
+            "expected {expression} to contain {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            &self.expected,
         )
     }
 }
@@ -107,17 +112,21 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
 
         format!(
             r"expected {expression} contains exactly in any order {:?}
-   but was: {actual:?}
-  expected: {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected, &self.expected
+            &self.expected
         )
     }
 }
@@ -136,12 +145,14 @@ where
         false
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+        let marked_expected = mark_all_items_in_collection(&self.expected, format, mark_missing);
         format!(
-            r"expected {expression} contains any of {:?}, but contained none of them
-   but was: {actual:?}
-  expected: {:?}",
-            &self.expected, &self.expected
+            r"expected {expression} contains any of {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}",
+            &self.expected,
         )
     }
 }
@@ -163,15 +174,25 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let mut extra = HashSet::new();
+        for (actual_index, actual) in actual.iter().enumerate() {
+            if !self.expected.iter().any(|expected| actual == expected) {
+                extra.insert(actual_index);
+            }
+        }
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?}
-   but was: {actual:?}
-  expected: {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
    missing: {missing:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
@@ -193,15 +214,25 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let mut missing = HashSet::new();
+        for (expected_index, expected) in self.expected.iter().enumerate() {
+            if !actual.iter().any(|value| value == expected) {
+                missing.insert(expected_index);
+            }
+        }
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &missing, format, mark_missing);
         let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains only {:?}
-   but was: {actual:?}
-  expected: {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
      extra: {extra:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
@@ -228,17 +259,42 @@ where
         duplicates.is_empty() && extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
-        let extra = collect_values(&self.extra, actual);
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let actual_duplicates_and_extras = self
+            .duplicates
+            .union(&self.extra)
+            .copied()
+            .collect::<HashSet<_>>();
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &actual_duplicates_and_extras,
+            format,
+            mark_unexpected,
+        );
         let duplicates = collect_values(&self.duplicates, actual);
+        let mut expected_duplicates_and_missing = HashSet::new();
+        for (expected_index, expected) in self.expected.iter().enumerate() {
+            if duplicates.iter().any(|duplicate| *duplicate == expected)
+                || !actual.iter().any(|actual| actual == expected)
+            {
+                expected_duplicates_and_missing.insert(expected_index);
+            }
+        }
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &expected_duplicates_and_missing,
+            format,
+            mark_missing,
+        );
+        let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains only once {:?}
-     but was: {actual:?}
-    expected: {:?}
+     but was: {marked_actual}
+    expected: {marked_expected}
        extra: {extra:?}
   duplicates: {duplicates:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
