@@ -1,3 +1,142 @@
+#[cfg(feature = "colored")]
+pub use with_colored_feature::{
+    diff_format_for_mode, DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN,
+    DIFF_FORMAT_RED_YELLOW,
+};
+
+use crate::spec::{DiffFormat, Highlight};
+use crate::std::fmt::Debug;
+use crate::std::format;
+use crate::std::string::String;
+use hashbrown::HashSet;
+#[cfg(feature = "colored")]
+use with_colored_feature::{
+    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
+    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
+    mark_unexpected_substr_impl,
+};
+#[cfg(not(feature = "colored"))]
+use without_colored_feature::{
+    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
+    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
+    mark_unexpected_substr_impl,
+};
+
+const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
+
+/// Diff format that does not highlight anything.
+///
+/// Setting this format effectively switches off highlighting.
+pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
+    unexpected: NO_HIGHLIGHT,
+    missing: NO_HIGHLIGHT,
+};
+
+#[cfg(not(feature = "colored"))]
+pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_NO_HIGHLIGHT;
+
+#[cfg(feature = "colored")]
+pub const DEFAULT_DIFF_FORMAT: DiffFormat = with_colored_feature::DEFAULT_DIFF_FORMAT;
+
+#[allow(clippy::missing_const_for_fn)]
+#[must_use]
+pub fn configured_diff_format() -> DiffFormat {
+    configured_diff_format_impl()
+}
+
+pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+where
+    S: Debug,
+    E: Debug,
+{
+    mark_diff_impl(actual, expected, format)
+}
+
+pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
+where
+    T: Debug,
+{
+    mark_unexpected_impl(value, format)
+}
+
+pub fn mark_missing<T>(value: &T, format: &DiffFormat) -> String
+where
+    T: Debug,
+{
+    mark_missing_impl(value, format)
+}
+
+pub fn mark_unexpected_substr(substr: &str, format: &DiffFormat) -> String {
+    mark_unexpected_substr_impl(substr, format)
+}
+
+pub fn mark_missing_substr(substr: &str, format: &DiffFormat) -> String {
+    mark_missing_substr_impl(substr, format)
+}
+
+pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
+    mark_unexpected_char_impl(character, format)
+}
+
+pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
+    mark_missing_char_impl(character, format)
+}
+
+pub fn mark_selected_items_in_collection<T, F>(
+    collection: &[T],
+    selected_indices: &HashSet<usize>,
+    format: &DiffFormat,
+    mark: F,
+) -> String
+where
+    T: Debug,
+    F: Fn(&T, &DiffFormat) -> String,
+{
+    let mut marked_collection = String::with_capacity(collection.len() + 2);
+    marked_collection.push('[');
+    collection
+        .iter()
+        .enumerate()
+        .map(|(index, item)| {
+            if selected_indices.contains(&index) {
+                mark(item, format)
+            } else {
+                format!("{item:?}")
+            }
+        })
+        .for_each(|item| {
+            marked_collection.push_str(&item);
+            marked_collection.push_str(", ");
+        });
+    if marked_collection.len() >= 3 {
+        marked_collection.pop();
+        marked_collection.pop();
+    }
+    marked_collection.push(']');
+    marked_collection
+}
+
+pub fn mark_all_items_in_collection<T, F>(collection: &[T], format: &DiffFormat, mark: F) -> String
+where
+    T: Debug,
+    F: Fn(&T, &DiffFormat) -> String,
+{
+    let mut marked_collection = String::with_capacity(collection.len() + 2);
+    marked_collection.push('[');
+    collection
+        .iter()
+        .map(|item| mark(item, format))
+        .for_each(|item| {
+            marked_collection.push_str(&item);
+            marked_collection.push_str(", ");
+        });
+    if marked_collection.len() >= 3 {
+        marked_collection.pop();
+        marked_collection.pop();
+    }
+    marked_collection.push(']');
+    marked_collection
+}
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
@@ -282,146 +421,6 @@ mod with_colored_feature {
     pub fn mark_missing_char_impl(character: char, format: &DiffFormat) -> String {
         format!("{}{character}{}", format.missing.start, format.missing.end)
     }
-}
-
-#[cfg(feature = "colored")]
-pub use with_colored_feature::{
-    diff_format_for_mode, DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN,
-    DIFF_FORMAT_RED_YELLOW,
-};
-
-use crate::spec::{DiffFormat, Highlight};
-use crate::std::fmt::Debug;
-use crate::std::format;
-use crate::std::string::String;
-use hashbrown::HashSet;
-#[cfg(feature = "colored")]
-use with_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
-    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
-    mark_unexpected_substr_impl,
-};
-#[cfg(not(feature = "colored"))]
-use without_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
-    mark_missing_substr_impl, mark_unexpected_char_impl, mark_unexpected_impl,
-    mark_unexpected_substr_impl,
-};
-
-const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
-
-/// Diff format that does not highlight anything.
-///
-/// Setting this format effectively switches off highlighting.
-pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
-    unexpected: NO_HIGHLIGHT,
-    missing: NO_HIGHLIGHT,
-};
-
-#[cfg(not(feature = "colored"))]
-pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_NO_HIGHLIGHT;
-
-#[cfg(feature = "colored")]
-pub const DEFAULT_DIFF_FORMAT: DiffFormat = with_colored_feature::DEFAULT_DIFF_FORMAT;
-
-#[allow(clippy::missing_const_for_fn)]
-#[must_use]
-pub fn configured_diff_format() -> DiffFormat {
-    configured_diff_format_impl()
-}
-
-pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
-where
-    S: Debug,
-    E: Debug,
-{
-    mark_diff_impl(actual, expected, format)
-}
-
-pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
-where
-    T: Debug,
-{
-    mark_unexpected_impl(value, format)
-}
-
-pub fn mark_missing<T>(value: &T, format: &DiffFormat) -> String
-where
-    T: Debug,
-{
-    mark_missing_impl(value, format)
-}
-
-pub fn mark_unexpected_substr(substr: &str, format: &DiffFormat) -> String {
-    mark_unexpected_substr_impl(substr, format)
-}
-
-pub fn mark_missing_substr(substr: &str, format: &DiffFormat) -> String {
-    mark_missing_substr_impl(substr, format)
-}
-
-pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
-    mark_unexpected_char_impl(character, format)
-}
-
-pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
-    mark_missing_char_impl(character, format)
-}
-
-pub fn mark_selected_items_in_collection<T, F>(
-    collection: &[T],
-    selected_indices: &HashSet<usize>,
-    format: &DiffFormat,
-    mark: F,
-) -> String
-where
-    T: Debug,
-    F: Fn(&T, &DiffFormat) -> String,
-{
-    let mut marked_collection = String::with_capacity(collection.len() + 2);
-    marked_collection.push('[');
-    collection
-        .iter()
-        .enumerate()
-        .map(|(index, item)| {
-            if selected_indices.contains(&index) {
-                mark(item, format)
-            } else {
-                format!("{item:?}")
-            }
-        })
-        .for_each(|item| {
-            marked_collection.push_str(&item);
-            marked_collection.push_str(", ");
-        });
-    if marked_collection.len() >= 3 {
-        marked_collection.pop();
-        marked_collection.pop();
-    }
-    marked_collection.push(']');
-    marked_collection
-}
-
-pub fn mark_all_items_in_collection<T, F>(collection: &[T], format: &DiffFormat, mark: F) -> String
-where
-    T: Debug,
-    F: Fn(&T, &DiffFormat) -> String,
-{
-    let mut marked_collection = String::with_capacity(collection.len() + 2);
-    marked_collection.push('[');
-    collection
-        .iter()
-        .map(|item| mark(item, format))
-        .for_each(|item| {
-            marked_collection.push_str(&item);
-            marked_collection.push_str(", ");
-        });
-    if marked_collection.len() >= 3 {
-        marked_collection.pop();
-        marked_collection.pop();
-    }
-    marked_collection.push(']');
-    marked_collection
 }
 
 #[cfg(test)]
