@@ -424,10 +424,10 @@ fn verify_vec_contains_sequence_fails() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains sequence ["two", "three", "four", "five", "six", "six", "four"]
-       but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
-      expected: ["two", "three", "four", "five", "six", "six", "four"]
-       missing: ["six", "four"]
-         extra: ["four", "two"]
+   but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
+  expected: ["two", "three", "four", "five", "six", "six", "four"]
+   missing: ["six", "four"]
+     extra: ["four", "two"]
 "#
         ]
     );
@@ -453,10 +453,10 @@ fn verify_vec_contains_sequence_fails_expected_longer_than_vec() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains sequence ["one", "two", "three", "four", "five", "six", "seven"]
-       but was: ["one", "two", "three", "four", "five", "six"]
-      expected: ["one", "two", "three", "four", "five", "six", "seven"]
-       missing: ["seven"]
-         extra: []
+   but was: ["one", "two", "three", "four", "five", "six"]
+  expected: ["one", "two", "three", "four", "five", "six", "seven"]
+   missing: ["seven"]
+     extra: []
 "#
         ]
     );
@@ -518,9 +518,9 @@ fn verify_vec_contains_all_in_order_fails() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains all of ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"] in order
-       but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
-      expected: ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"]
-       missing: ["six"]
+   but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
+  expected: ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"]
+   missing: ["six"]
 "#
         ]
     );

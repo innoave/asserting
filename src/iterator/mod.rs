@@ -260,11 +260,7 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
-        let actual_duplicates_and_extras = self
-            .duplicates
-            .union(&self.extra)
-            .copied()
-            .collect::<HashSet<_>>();
+        let actual_duplicates_and_extras = self.duplicates.union(&self.extra).copied().collect();
         let marked_actual = mark_selected_items_in_collection(
             actual,
             &actual_duplicates_and_extras,
@@ -382,19 +378,35 @@ where
         out_of_order.is_empty() && extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let out_of_order = collect_values(&self.out_of_order, actual);
+        let mut expected_indices = self.missing.clone();
+        for (expected_index, expected) in self.expected.iter().enumerate() {
+            if out_of_order.iter().any(|actual| *actual == expected) {
+                expected_indices.insert(expected_index);
+            }
+        }
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &expected_indices,
+            format,
+            mark_missing,
+        );
+        let actual_indices = self.extra.union(&self.out_of_order).copied().collect();
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &actual_indices, format, mark_unexpected);
+
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
-        let out_of_order = collect_values(&self.out_of_order, actual);
 
         format!(
             r"expected {expression} contains exactly in order {:?}
-       but was: {actual:?}
-      expected: {:?}
+       but was: {marked_actual}
+      expected: {marked_expected}
        missing: {missing:?}
          extra: {extra:?}
   out-of-order: {out_of_order:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
@@ -465,17 +477,21 @@ where
         false
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains sequence {:?}
-       but was: {actual:?}
-      expected: {:?}
-       missing: {missing:?}
-         extra: {extra:?}",
-            &self.expected, &self.expected
+   but was: {marked_actual}
+  expected: {marked_expected}
+   missing: {missing:?}
+     extra: {extra:?}",
+            &self.expected,
         )
     }
 }
@@ -503,15 +519,17 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?} in order
-       but was: {actual:?}
-      expected: {:?}
-       missing: {missing:?}",
-            &self.expected, &self.expected
+   but was: {actual:?}
+  expected: {marked_expected}
+   missing: {missing:?}",
+            &self.expected,
         )
     }
 }
@@ -544,17 +562,21 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} starts with {:?}
-   but was: {actual:?}
-  expected: {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
@@ -587,17 +609,21 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, _format: &DiffFormat) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
+        let marked_expected =
+            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_values(&self.missing, &self.expected);
         let extra = collect_values(&self.extra, actual);
 
         format!(
             r"expected {expression} ends with {:?}
-   but was: {actual:?}
-  expected: {:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected, &self.expected
+            &self.expected,
         )
     }
 }
