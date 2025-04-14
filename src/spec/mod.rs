@@ -670,6 +670,10 @@ impl<'a, S, R> Spec<'a, S, R> {
 
     /// Sets the diff format that is used to highlight differences between
     /// the actual value and the expected value.
+    ///
+    /// Note: This method must be called before an assertion method is called to
+    /// have an effect on the failure message of the assertion as failure
+    /// messages are formatted immediately when an assertion is executed.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
         self.diff_format = diff_format;
