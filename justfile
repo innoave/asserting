@@ -47,7 +47,7 @@ lint-no-features:
 test:
     just test-all-features
     just test-no-std
-    just test-no-featrues
+    just test-no-features
 
 # run tests for all features
 test-all-features:
