@@ -142,7 +142,7 @@ fn verify_vec_contains_any_of_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64], but contained none of them
+            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [0, 2, 4, 8, 16, 32, 64]
 "
@@ -424,10 +424,10 @@ fn verify_vec_contains_sequence_fails() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains sequence ["two", "three", "four", "five", "six", "six", "four"]
-       but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
-      expected: ["two", "three", "four", "five", "six", "six", "four"]
-       missing: ["six", "four"]
-         extra: ["four", "two"]
+   but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
+  expected: ["two", "three", "four", "five", "six", "six", "four"]
+   missing: ["six", "four"]
+     extra: ["four", "two"]
 "#
         ]
     );
@@ -453,10 +453,10 @@ fn verify_vec_contains_sequence_fails_expected_longer_than_vec() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains sequence ["one", "two", "three", "four", "five", "six", "seven"]
-       but was: ["one", "two", "three", "four", "five", "six"]
-      expected: ["one", "two", "three", "four", "five", "six", "seven"]
-       missing: ["seven"]
-         extra: []
+   but was: ["one", "two", "three", "four", "five", "six"]
+  expected: ["one", "two", "three", "four", "five", "six", "seven"]
+   missing: ["seven"]
+     extra: []
 "#
         ]
     );
@@ -518,9 +518,9 @@ fn verify_vec_contains_all_in_order_fails() {
         failures,
         &[
             r#"assertion failed: expected my_thing contains all of ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"] in order
-       but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
-      expected: ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"]
-       missing: ["six"]
+   but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
+  expected: ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"]
+   missing: ["six"]
 "#
         ]
     );
@@ -668,4 +668,27 @@ fn verify_empty_vec_ends_with_expected_sequence_longer_than_vec_fails() {
 "
         ]
     );
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use super::*;
+
+    #[ignore = "TODO: we need some kind of specialized implementation of marked diffs for slices and Vec"]
+    #[test]
+    fn highlight_diffs_vec_is_equal_to_slice() {
+        let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to([1, 3, 5, 7, 11, 13, 19, 23, 29, 31, 37])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject is equal to [1, 3, 5, 7, 11, 13, 19, 23, 29, 31, 37]\n   \
+                but was: [\u{1b}[31m13\u{1b}[0m, 5, 7, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, 11, \u{1b}[31m29\u{1b}[0m, 23, 31, 37]
+               expected: [\u{1b}[34m1\u{1b}[0m, \u{1b}[34m3\u{1b}[0m, 5, 7, 11, \u{1b}[34m13\u{1b}[0m, \u{1b}[34m19\u{1b}[0m, 23, \u{1b}[34m29\u{1b}[0m, 31, 37]
+            "
+        ]);
+    }
 }

@@ -1,6 +1,6 @@
 //! Implementation of assertions for `slice` values.
 
-use crate::prelude::{IsEmptyProperty, LengthProperty};
+use crate::properties::{IsEmptyProperty, LengthProperty};
 
 impl<T> IsEmptyProperty for &[T] {
     fn is_empty_property(&self) -> bool {

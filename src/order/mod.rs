@@ -1,8 +1,9 @@
 //! Implementation of order assertions.
 
 use crate::assertions::AssertOrder;
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{IsAtLeast, IsAtMost, IsGreaterThan, IsLessThan};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 
@@ -38,10 +39,12 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is less than {:?}\n   but was: {actual:?}\n  expected: < {:?}",
-            self.expected, self.expected,
+            "expected {expression} is less than {:?}\n   but was: {marked_actual}\n  expected: < {marked_expected}",
+            self.expected,
         )
     }
 }
@@ -55,10 +58,12 @@ where
         subject <= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is at most {:?}\n   but was: {actual:?}\n  expected: <= {:?}",
-            self.expected, self.expected,
+            "expected {expression} is at most {:?}\n   but was: {marked_actual}\n  expected: <= {marked_expected}",
+            self.expected,
         )
     }
 }
@@ -72,10 +77,12 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is greater than {:?}\n   but was: {actual:?}\n  expected: > {:?}",
-            self.expected, self.expected,
+            "expected {expression} is greater than {:?}\n   but was: {marked_actual}\n  expected: > {marked_expected}",
+            self.expected,
         )
     }
 }
@@ -89,10 +96,12 @@ where
         subject >= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is at least {:?}\n   but was: {actual:?}\n  expected: >= {:?}",
-            self.expected, self.expected,
+            "expected {expression} is at least {:?}\n   but was: {marked_actual}\n  expected: >= {marked_expected}",
+            self.expected,
         )
     }
 }

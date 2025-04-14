@@ -1,9 +1,10 @@
 //! Implementation of assertions for `Range` and `RangeInclusive` values.
 
 use crate::assertions::AssertInRange;
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{IsInRange, IsNotInRange};
 use crate::properties::IsEmptyProperty;
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::{Range, RangeBounds, RangeInclusive};
 use crate::std::{format, string::String};
@@ -54,12 +55,21 @@ where
         self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected_start = if actual < self.expected_range.start() {
+            mark_missing(self.expected_range.start(), format)
+        } else {
+            format!("{:?}", self.expected_range.start())
+        };
+        let marked_expected_end = if actual > self.expected_range.end() {
+            mark_missing(self.expected_range.end(), format)
+        } else {
+            format!("{:?}", self.expected_range.end())
+        };
         format!(
-            "expected {expression} is within range of {:?}\n   but was: {actual:?}\n  expected: {:?} <= x <= {:?}",
+            "expected {expression} is within range of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected_start} <= x <= {marked_expected_end}",
             self.expected_range,
-            self.expected_range.start(),
-            self.expected_range.end(),
         )
     }
 }
@@ -73,12 +83,13 @@ where
         !self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected_start = mark_missing(self.expected_range.start(), format);
+        let marked_expected_end = mark_missing(self.expected_range.end(), format);
         format!(
-            "expected {expression} is not within range of {:?}\n   but was: {actual:?}\n  expected: x < {:?} || x > {:?}",
+            "expected {expression} is not within range of {:?}\n   but was: {marked_actual}\n  expected: x < {marked_expected_start} || x > {marked_expected_end}",
             self.expected_range,
-            self.expected_range.start(),
-            self.expected_range.end(),
         )
     }
 }

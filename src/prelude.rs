@@ -17,9 +17,15 @@
 pub use super::{
     assert_that,
     assertions::*,
+    colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
     properties::*,
     spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail},
     verify_that,
+};
+
+#[cfg(feature = "colored")]
+pub use super::colored::{
+    DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
 };
 
 #[cfg(feature = "panic")]

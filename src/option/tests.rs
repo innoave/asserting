@@ -152,3 +152,65 @@ fn map_option_with_none_to_its_value() {
     })
     .panics_with_message("assertion failed: expected the subject to be `Some(_)`, but was `None`");
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+    use crate::std::{vec, vec::Vec};
+
+    #[test]
+    fn highlight_diffs_option_of_i64_is_some() {
+        let subject: Option<i64> = None;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_some()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is Some(_)\n   \
+                but was: \u{1b}[31mNone\u{1b}[0m\n  \
+               expected: \u{1b}[33mSome(_)\u{1b}[0m\n\
+        "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_option_of_i64_is_none() {
+        let subject: Option<i64> = Some(3500);
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_none()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is None\n   \
+                but was: \u{1b}[31mSome(3500)\u{1b}[0m\n  \
+               expected: \u{1b}[33mNone\u{1b}[0m\n\
+        "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_option_of_vec_of_i32_has_value_but_is_none() {
+        let subject: Option<Vec<i32>> = None;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_value(vec![1, 2, 3, 5, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is some containing [1, 2, 3, 5, 7]\n   \
+                but was: \u{1b}[31mNone\u{1b}[0m\n  \
+               expected: \u{1b}[33mSome([1, 2, 3, 5, 7])\u{1b}[0m\n\
+        "
+            ]
+        );
+    }
+}

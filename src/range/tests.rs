@@ -148,3 +148,68 @@ fn inclusive_range_is_not_empty() {
     assert_that(range.clone().count()).is_equal_to(1);
     assert_that(range).is_not_empty();
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_i64_is_in_range_above_upper_bound() {
+        let subject = 29_834;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_in_range(-4321..=4321)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is within range of -4321..=4321\n   \
+                     but was: \u{1b}[31m29834\u{1b}[0m\n  \
+                    expected: -4321 <= x <= \u{1b}[34m4321\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_i64_is_in_range_below_lower_bound() {
+        let subject = -29_834;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_in_range(-4321..=4321)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is within range of -4321..=4321\n   \
+                     but was: \u{1b}[31m-29834\u{1b}[0m\n  \
+                    expected: \u{1b}[34m-4321\u{1b}[0m <= x <= 4321\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_char_is_not_in_range() {
+        let subject = 'm';
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_not_in_range('a'..='z')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is not within range of 'a'..='z'\n   \
+                     but was: \u{1b}[31m'm'\u{1b}[0m\n  \
+                    expected: x < \u{1b}[32m'a'\u{1b}[0m || x > \u{1b}[32m'z'\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+}

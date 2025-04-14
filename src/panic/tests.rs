@@ -48,7 +48,9 @@ fn code_does_panic_with_message_from_assertion() {
     }
 
     assert_that_code(|| {
-        assert_that(add(2, 3)).is_equal_to(4);
+        assert_that(add(2, 3))
+            .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+            .is_equal_to(4);
     })
     .panics_with_message(
         "assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n",
@@ -93,8 +95,9 @@ fn verify_code_does_panic_with_message_fails_because_code_does_not_panic() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_closure to panic, but did not panic
-"
+            r#"assertion failed: expected my_closure to panic with message "nam veniam ut et",
+  but did not panic
+"#
         ]
     );
 }
@@ -102,7 +105,9 @@ fn verify_code_does_panic_with_message_fails_because_code_does_not_panic() {
 #[test]
 fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() {
     let failures = verify_that_code(|| {
-        assert_that(2 + 3).is_equal_to(4);
+        assert_that(2 + 3)
+            .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+            .is_equal_to(4);
     })
     .named("my_closure")
     .panics_with_message("lobortis lorem aliquam ex")
@@ -111,10 +116,10 @@ fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() 
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_closure to panic with message "lobortis lorem aliquam ex"
-   but was: "assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n"
-  expected: "lobortis lorem aliquam ex"
-"#
+            "assertion failed: expected my_closure to panic with message \"lobortis lorem aliquam ex\"\n   \
+   but was: \"assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n\"\n  \
+  expected: \"lobortis lorem aliquam ex\"\n\
+"
         ]
     );
 }
@@ -136,4 +141,80 @@ fn verify_can_not_perform_two_assertions_on_same_code_subject() {
 "
         ]
     );
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    fn foo(message: Option<&str>) {
+        if let Some(message) = message {
+            panic!("{message}");
+        }
+    }
+
+    #[test]
+    fn highlight_diffs_code_does_not_panic() {
+        let failures = verify_that_code(|| foo(Some("foo does not work with message")))
+            .named("foo")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_panic()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected foo to not panic, but \u{1b}[31mdid panic\u{1b}[0m\n  \
+                   with message: \"\u{1b}[31mfoo does not work with message\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_code_does_panic() {
+        let failures = verify_that_code(|| foo(None))
+            .named("foo")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .panics()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected foo to panic, but \u{1b}[31mdid not panic\u{1b}[0m\n"]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_code_does_panic_with_message_but_does_not_panic() {
+        let failures = verify_that_code(|| foo(None))
+            .named("foo")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .panics_with_message("hendrerit sint tempor ipsum")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected foo to panic with message \"hendrerit sint tempor ipsum\",\n  \
+                 but \u{1b}[31mdid not panic\u{1b}[0m\n"]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_code_does_panic_with_message() {
+        let failures = verify_that_code(|| foo(Some("foo does not work with message")))
+            .named("foo")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .panics_with_message("hendrerit sint tempor ipsum")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected foo to panic with message \"hendrerit sint tempor ipsum\"\n   \
+                  but was: \"\u{1b}[31mfoo does not work with message\u{1b}[0m\"\n  \
+                 expected: \"\u{1b}[32mhendrerit sint tempor ipsum\u{1b}[0m\"\n\
+              "
+            ]
+        );
+    }
 }

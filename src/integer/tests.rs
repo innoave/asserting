@@ -43,3 +43,40 @@ fn verify_i32_is_equal_to_i32_fails() {
 "]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_is_equal_to_for_integers() {
+        let failures = verify_that(37)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_equal_to(42)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is equal to 42\n   \
+               but was: \u{1b}[31m37\u{1b}[0m\n  \
+              expected: \u{1b}[34m42\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_not_equal_to_for_integers() {
+        let failures = verify_that(42)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_not_equal_to(42)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is not equal to 42\n   \
+               but was: 42\n  \
+              expected: 42\n\
+            "]
+        );
+    }
+}

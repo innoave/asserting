@@ -1,8 +1,9 @@
 //! Implementation of assertions for values of type `bool`.
 
 use crate::assertions::AssertBoolean;
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{IsFalse, IsTrue};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::format;
 use crate::std::string::String;
 
@@ -24,10 +25,12 @@ impl Expectation<bool> for IsTrue {
         *subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&true, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            true, true
+            "expected {expression} is {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            true
         )
     }
 }
@@ -37,10 +40,12 @@ impl Expectation<bool> for IsFalse {
         !*subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(actual, format);
+        let marked_expected = mark_missing(&false, format);
         format!(
-            "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
-            false, false
+            "expected {expression} is {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            false
         )
     }
 }

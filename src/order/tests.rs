@@ -207,3 +207,82 @@ fn verify_char_is_at_least_other_char_fails() {
 "]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_is_less_than() {
+        let subject = 3.781;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .is_less_than(3.779)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is less than 3.779\n   \
+                  but was: \u{1b}[31m3.781\u{1b}[0m\n  \
+                 expected: < \u{1b}[32m3.779\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_at_most() {
+        let subject = 3.781;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_at_most(3.779)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is at most 3.779\n   \
+                  but was: \u{1b}[31m3.781\u{1b}[0m\n  \
+                 expected: <= \u{1b}[34m3.779\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_greater_than() {
+        let subject = 3.781;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_greater_than(3.782)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is greater than 3.782\n   \
+                  but was: \u{1b}[31m3.781\u{1b}[0m\n  \
+                 expected: > \u{1b}[33m3.782\u{1b}[0m\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_at_least() {
+        let subject = 3.781;
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_at_least(3.782)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject is at least 3.782\n   \
+                  but was: \u{1b}[31m3.781\u{1b}[0m\n  \
+                 expected: >= \u{1b}[34m3.782\u{1b}[0m\n\
+            "]
+        );
+    }
+}

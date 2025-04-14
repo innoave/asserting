@@ -57,7 +57,9 @@ fn assert_that_macro_with_borrowed_str_subject() {
 fn assert_that_macro_is_equal_to_with_integers_fails() {
     let ultimate_answer = 51;
 
-    assert_that!(ultimate_answer).is_equal_to(42);
+    assert_that!(ultimate_answer)
+        .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+        .is_equal_to(42);
 }
 
 #[test]

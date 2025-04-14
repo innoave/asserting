@@ -29,27 +29,37 @@ check:
 lint:
     just lint-all-features
     just lint-no-std
+    just lint-no-features
 
-# linting code using Clippy --all-features
+# linting code using Clippy with all features enabled
 lint-all-features:
     cargo clippy --all-targets --all-features
 
-# linting code using Clippy - no-std
+# linting code using Clippy for no-std environment
 lint-no-std:
-    cargo clippy --all-targets --no-default-features --features "float"
+    cargo clippy --all-targets --no-default-features --features "colored, float"
+
+# linting code using Clippy with no features enabled
+lint-no-features:
+    cargo clippy --all-targets --no-default-features
 
 # run all tests
 test:
     just test-all-features
     just test-no-std
+    just test-no-features
 
 # run tests for all features
 test-all-features:
     cargo test --all-features
 
-# run tests for no-std
+# run tests for no-std environment
 test-no-std:
-    cargo test --no-default-features --features "float"
+    cargo test --no-default-features --features "colored, float"
+
+# run tests with no features enabled
+test-no-features:
+    cargo test --no-default-features
 
 # run code coverage (does not include doc-tests)
 code-coverage:

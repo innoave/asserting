@@ -73,6 +73,39 @@ asserting = { version = "0.2", default-features = false, features = "float" }
 
 An allocator is still needed for no-std.
 
+## Highlighted differences
+
+`asserting` can highlight the differences between the expected value(s) and the actual value(s) when
+printing assertion failures to the terminal. It supports different variants of how differences are
+highlighted.
+
+| Mode       | Effect                                                                                                                            |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| bold       | Differences are printed in bold letters, without coloring.                                                                        | 
+| red-green  | Differences are printed in the colors <span style="color: green">green</span> and <span style="color: red">red</span>.            | 
+| red-blue   | Differences are printed in the CVD-friendly colors <span style="color: blue">blue</span> and <span style="color: red">red</span>. | 
+| red-yellow | Differences are printed in the colors <span style="color: yellow">yellow</span> and <span style="color: red">red</span>.          | 
+| off        | Switches off highlighting. The differences are not highlighted at all.                                                            | 
+
+The mode can be configured by setting the environment variable `ASSERTING_HIGHLIGHT_DIFFS` to one
+of the modes in the table above. The value is case-insensitive. E.g. setting the environment
+variable to values like `Red-Blue`, `Bold` or `OFF` works as well.
+
+The intended way for configuring the highlighting mode is to set the environment variable in the
+configuration for `Cargo` by adding it to the `[env]` section in your `~/.cargo/config.toml` file:
+
+```toml,no_sync
+[env]
+ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
+```
+
+By default the mode `red-green` is used. Differences are colored in
+<span style="color: green">green</span> and <span style="color: red">red</span>.
+
+Differences are only highlighted if the crate feature `colored` is enabled. The configuration via
+the environment variable only works when the crate feature `std` is enabled too. In no-std projects
+the default colors red and green are used.
+
 ## Available Assertions
 
 This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list

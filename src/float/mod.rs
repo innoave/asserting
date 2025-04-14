@@ -1,6 +1,7 @@
 use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
+use crate::colored::mark_diff;
 use crate::expectations::{IsCloseTo, IsNotCloseTo};
-use crate::spec::{Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::{format, string::String};
 use float_cmp::{ApproxEq, F32Margin, F64Margin};
 
@@ -69,9 +70,10 @@ impl Expectation<f32> for IsCloseTo<f32, F32Margin> {
         subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f32) -> String {
-        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
+    fn message(&self, expression: Expression<'_>, actual: &f32, format: &DiffFormat) -> String {
+        let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
+        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            &self.expected, self.margin.epsilon, self.margin.ulps
         )
     }
 }
@@ -81,7 +83,7 @@ impl Expectation<f32> for IsNotCloseTo<f32, F32Margin> {
         !subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f32) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f32, _format: &DiffFormat) -> String {
         format!("expected {expression} is not close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )
@@ -93,9 +95,10 @@ impl Expectation<f64> for IsCloseTo<f64, F64Margin> {
         subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f64) -> String {
-        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
-            &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
+    fn message(&self, expression: Expression<'_>, actual: &f64, format: &DiffFormat) -> String {
+        let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
+        format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            &self.expected, self.margin.epsilon, self.margin.ulps
         )
     }
 }
@@ -105,7 +108,7 @@ impl Expectation<f64> for IsNotCloseTo<f64, F64Margin> {
         !subject.approx_eq(self.expected, self.margin)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &f64) -> String {
+    fn message(&self, expression: Expression<'_>, actual: &f64, _format: &DiffFormat) -> String {
         format!("expected {expression} is not close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected, self.margin.epsilon, self.margin.ulps, &self.expected
         )

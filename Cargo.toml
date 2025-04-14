@@ -18,7 +18,8 @@ categories = ["development-tools::testing", "no-std"]
 all-features = true
 
 [features]
-default = ["std", "panic", "float"]
+default = ["std", "colored", "float", "panic"]
+colored = ["dep:sdiff"]
 float = ["dep:float-cmp"]
 panic = ["std"]
 std = []
@@ -28,9 +29,12 @@ hashbrown = "0.15"
 
 # optional
 float-cmp = { version = "0.10", optional = true }
+sdiff = { version = "0.1", optional = true }
 
 [dev-dependencies]
 anyhow = "1"
+proptest = "1"
+serial_test = "3"
 version-sync = "0.9"
 
 [lints.rust]
@@ -55,7 +59,7 @@ unused_lifetimes = "warn"
 unused_qualifications = "warn"
 dead_code = "warn"
 missing_docs = "warn"  # uncomment when working on docs
-#variant_size_differences = "warn"  # enable when working on performance
+variant_size_differences = "warn"  # enable when working on performance
 
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }
@@ -70,5 +74,3 @@ option_if_let_else = "allow"
 print_stderr = "deny"
 print_stdout = "deny"
 unwrap_used = "deny"
-missing_errors_doc = "allow"  # remove when working on docs
-missing_panics_doc = "allow"  # remove when working on docs
