@@ -1,3 +1,42 @@
+//! Functions for highlighting differences between expected and actual values
+//! for failed assertions.
+//!
+//! The highlighting differences functionality of `asserting` is gated behind
+//! the crate feature `colored`.
+//!
+//! Highlighting differences between expected and actual value helps with
+//! spotting the differences between the two values and makes finding the
+//! reason for a failed test much easier. The concept is to compare the expected
+//! and the actual values and highlight missing and unexpected parts when
+//! printing the actual and expected values with the assertion failure.
+//!
+//! When printing the expected value parts or the whole value is highlighted as
+//! "missing" if there is no related part in the actual value. On the other hand
+//! when printing the actual value parts or the whole value is highlighted as
+//! "unexpected" if there is no related part in the expected value. The
+//! "missing" parts and the "unexpected" parts are highlighted in two different
+//! colors (or in bold glyphs).
+//!
+//! Which colors are used or whether bold glyphs should be used instead of
+//! colors can be configured via the environment variable
+//! `ASSERTING_HIGHLIGHT_DIFFS`. See the documentation of the function
+//! [`diff_format_for_mode`] for a list of the supported highlight modes. Using
+//! an environment variable to configure the highlight mode (colors) has the
+//! advantage that each developer working on the same code base can set the
+//! colors to his/her liking.
+//!
+//! The intended way to configure the environment variable is to add the setting
+//! to the Cargo config.toml in the users home directory. For example: to set
+//! the colors to red and blue set the environment variable to `red-blue` within
+//! the `[env]` section of the `~/.cargo/config.toml` file, like so:
+//!
+//! ```toml
+//! [env]
+//! ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
+//! ```
+//!
+//! The functions provided by this module help with highlighting missing and
+//! unexpected parts when composing the failure message for an assertion.
 #[cfg(feature = "colored")]
 pub use with_colored_feature::{
     diff_format_for_mode, DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN,
@@ -32,18 +71,107 @@ pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
     missing: NO_HIGHLIGHT,
 };
 
-#[cfg(not(feature = "colored"))]
-pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_NO_HIGHLIGHT;
+/// Default diff format.
+///
+/// When the crate feature `colored` is enabled the default diff format
+/// highlights unexpected values in <span style="color: red;">red</span> and
+/// missing values in <span style="color: green;">green</span>.
+///
+/// Without the crate feature `colored` enabled the default diff format does not
+/// highlight any differences in the messages for failed assertions.
+pub const DEFAULT_DIFF_FORMAT: DiffFormat = {
+    #[cfg(not(feature = "colored"))]
+    {
+        without_colored_feature::DEFAULT_DIFF_FORMAT
+    }
+    #[cfg(feature = "colored")]
+    {
+        with_colored_feature::DEFAULT_DIFF_FORMAT
+    }
+};
 
-#[cfg(feature = "colored")]
-pub const DEFAULT_DIFF_FORMAT: DiffFormat = with_colored_feature::DEFAULT_DIFF_FORMAT;
-
+/// Reads the configured [`DiffFormat`] and returns it.
+///
+/// The behavior of this function is dependent on whether the crate features
+/// `colored` and `std` are enabled or not.
+///
+/// When both features `colored` and `std` are enabled the highlight mode is
+/// read from the environment variable `ASSERTING_HIGHLIGHT_DIFFS`. If the
+/// environment variable is set to a supported highlight mode the
+/// [`DiffFormat`] related to this mode is returned. Otherwise, the default diff
+/// format [`DEFAULT_DIFF_FORMAT`] is returned. See the documentation of
+/// [`diff_format_for_mode`] for a list of supported highlight modes.
+///
+/// When in a no-std environment with the feature `std` not enabled and the
+/// `colored` feature is enabled. The default diff format
+/// [`DEFAULT_DIFF_FORMAT`] is returned.
+///
+/// When the crate feature `colored` is not enabled the diff format
+/// [`DIFF_FORMAT_NO_HIGHLIGHT`] is returned, which means that highlighting is
+/// switched off.
 #[allow(clippy::missing_const_for_fn)]
 #[must_use]
 pub fn configured_diff_format() -> DiffFormat {
     configured_diff_format_impl()
 }
 
+/// Highlights differences between the expected and the actual value and returns
+/// the debug formatted values with marked differences.
+///
+/// The style for marking differences is determined by the provided
+/// [`DiffFormat`].
+///
+/// It first converts the actual and the expected value into their debug
+/// formatted string representation. Then a diff algorithm is applied to
+/// determine the differences between the expected and the actual value.
+/// Finally, the differences are marked according the provided [`DiffFormat`].
+///
+/// It returns a tuple of two `String`s. The first string contains the actual
+/// value and the second one contains the expected value. Both strings represent
+/// their according value as debug formatted string with differences
+/// highlighted.
+///
+/// # Examples
+///
+/// ```
+/// # #[cfg(not(feature = "colored"))]
+/// # fn main() {}
+/// # #[cfg(feature = "colored")]
+/// # fn main() {
+/// use asserting::colored::{mark_diff, DIFF_FORMAT_RED_GREEN};
+///
+/// let actual = "Hello Welt!";
+/// let expected = "Hello World!";
+///
+/// let (marked_actual, marked_expected) = mark_diff(&actual, &expected, &DIFF_FORMAT_RED_GREEN);
+///
+/// assert_eq!(marked_actual, "\"Hello W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\"");
+/// assert_eq!(marked_expected, "\"Hello W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\"");
+/// # }
+/// ```
+///
+/// ```
+/// # #[cfg(not(feature = "colored"))]
+/// # fn main() {}
+/// # #[cfg(feature = "colored")]
+/// # fn main() {
+/// use asserting::colored::{mark_diff, DIFF_FORMAT_RED_BLUE};
+///
+/// #[derive(Debug)]
+/// struct Pos {
+///     x: i32,
+///     y: i32,
+/// }
+///
+/// let actual = Pos { x: 45, y: -21 };
+/// let expected = Pos { x: -45, y: -33 };
+///
+/// let (marked_actual, marked_expected) = mark_diff(&actual, &expected, &DIFF_FORMAT_RED_BLUE);
+///
+/// assert_eq!(marked_actual, "Pos { x: 45, y: -\u{1b}[31m21\u{1b}[0m }");
+/// assert_eq!(marked_expected, "Pos { x: \u{1b}[34m-\u{1b}[0m45, y: -\u{1b}[34m33\u{1b}[0m }");
+/// # }
+/// ```
 pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
 where
     S: Debug,
@@ -52,6 +180,8 @@ where
     mark_diff_impl(actual, expected, format)
 }
 
+/// Highlight the given value as "unexpected value" using the color for
+/// unexpected values or bold as specified by the given [`DiffFormat`].
 pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
 where
     T: Debug,
@@ -59,6 +189,8 @@ where
     mark_unexpected_impl(value, format)
 }
 
+/// Highlight the given value as "missing value" using the color for
+/// "missing values" as specified by the given [`DiffFormat`].
 pub fn mark_missing<T>(value: &T, format: &DiffFormat) -> String
 where
     T: Debug,
@@ -66,22 +198,78 @@ where
     mark_missing_impl(value, format)
 }
 
+/// Highlight the given string as "unexpected value" using the color for
+/// unexpected values or bold as specified by the given [`DiffFormat`].
+///
+/// When using this function in comparison to [`mark_unexpected`], the returned
+/// string does not contain quotes at the start and end of the string as they
+/// appear in the debug formatted string returned by [`mark_unexpected`].
 pub fn mark_unexpected_substr(substr: &str, format: &DiffFormat) -> String {
     mark_unexpected_substr_impl(substr, format)
 }
 
+/// Highlight the given string as "missing value" using the color for
+/// missing values as specified by the given [`DiffFormat`].
+///
+/// When using this function in comparison to [`mark_missing`], the returned
+/// string does not contain quotes at the start and end of the string as they
+/// appear in the debug formatted string returned by [`mark_missing`].
 pub fn mark_missing_substr(substr: &str, format: &DiffFormat) -> String {
     mark_missing_substr_impl(substr, format)
 }
 
+/// Highlight the given character as "unexpected value" using the color for
+/// unexpected values or bold as specified by the given [`DiffFormat`].
+///
+/// When using this function in comparison to [`mark_unexpected`], the returned
+/// string does not contain single quotes around the character as they
+/// appear in the debug formatted string returned by [`mark_unexpected`].
 pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
     mark_unexpected_char_impl(character, format)
 }
 
+/// Highlight the given character as "missing value" using the color for
+/// missing values as specified by the given [`DiffFormat`].
+///
+/// When using this function in comparison to [`mark_missing`], the returned
+/// string does not contain single quotes around the character as they
+/// appear in the debug formatted string returned by [`mark_missing`].
 pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
     mark_missing_char_impl(character, format)
 }
 
+/// Highlights selected items of a collection using the given [`DiffFormat`].
+///
+/// This function formats the given collection for debug and highlights those
+/// items of the collection where the index is present in the `selected_indices`
+/// parameter.
+///
+/// Whether the items are highlighted as "unexpected" or "missing" depends on
+/// the function specified in the `mark` parameter.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(not(feature = "colored"))]
+/// # fn main() {}
+/// # #[cfg(feature = "colored")]
+/// # fn main() {
+/// use asserting::colored::{mark_missing, mark_selected_items_in_collection, DIFF_FORMAT_RED_BLUE};
+/// use hashbrown::HashSet;
+///
+/// let collection = [1, 2, 3, 4, 5];
+/// let selected_items = HashSet::from_iter([1, 2, 4]);
+///
+/// let marked_collection = mark_selected_items_in_collection(
+///     &collection,
+///     &selected_items,
+///     &DIFF_FORMAT_RED_BLUE,
+///     mark_missing
+/// );
+///
+/// assert_eq!(marked_collection, "[1, \u{1b}[34m2\u{1b}[0m, \u{1b}[34m3\u{1b}[0m, 4, \u{1b}[34m5\u{1b}[0m]");
+/// # }
+/// ```
 pub fn mark_selected_items_in_collection<T, F>(
     collection: &[T],
     selected_indices: &HashSet<usize>,
@@ -116,6 +304,35 @@ where
     marked_collection
 }
 
+/// Highlights all items of a collection using the given [`DiffFormat`].
+///
+/// This function formats the given collection for debug and highlights all
+/// items of the collection individually (instead of the whole debug string).
+///
+/// Whether the items are highlighted as "unexpected" or "missing" depends on
+/// the function specified in the `mark` parameter.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(not(feature = "colored"))]
+/// # fn main() {}
+/// # #[cfg(feature = "colored")]
+/// # fn main() {
+/// use asserting::colored::{mark_all_items_in_collection, mark_unexpected, DIFF_FORMAT_RED_BLUE};
+/// use hashbrown::HashSet;
+///
+/// let collection = [1, 2, 3, 4, 5];
+///
+/// let marked_collection = mark_all_items_in_collection(
+///     &collection,
+///     &DIFF_FORMAT_RED_BLUE,
+///     mark_unexpected
+/// );
+///
+/// assert_eq!(marked_collection, "[\u{1b}[31m1\u{1b}[0m, \u{1b}[31m2\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m4\u{1b}[0m, \u{1b}[31m5\u{1b}[0m]");
+/// # }
+/// ```
 pub fn mark_all_items_in_collection<T, F>(collection: &[T], format: &DiffFormat, mark: F) -> String
 where
     T: Debug,
@@ -137,6 +354,7 @@ where
     marked_collection.push(']');
     marked_collection
 }
+
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
@@ -147,10 +365,13 @@ mod without_colored_feature {
         string::{String, ToString},
     };
 
+    /// Default diff format.
+    pub const DEFAULT_DIFF_FORMAT: DiffFormat = DIFF_FORMAT_NO_HIGHLIGHT;
+
     #[must_use]
     #[inline]
     pub const fn configured_diff_format_impl() -> DiffFormat {
-        DIFF_FORMAT_NO_HIGHLIGHT
+        DEFAULT_DIFF_FORMAT
     }
 
     #[inline]
@@ -292,6 +513,19 @@ mod with_colored_feature {
         missing: TERM_NO_HIGHLIGHT,
     };
 
+    /// Returns a [`DiffFormat`] for the given highlight mode.
+    ///
+    /// Supported highlight modes are:
+    ///
+    /// | mode           | diff format                  |
+    /// |----------------|------------------------------|
+    /// | `"red-green"`  | [`DIFF_FORMAT_RED_GREEN`]    |
+    /// | `"red-blue"`   | [`DIFF_FORMAT_RED_BLUE`]     |
+    /// | `"red-yellow"` | [`DIFF_FORMAT_RED_YELLOW`]   |
+    /// | `"bold"`       | [`DIFF_FORMAT_BOLD`]         |
+    /// | `"off"`        | [`DIFF_FORMAT_NO_HIGHLIGHT`] |
+    ///
+    /// The mode string is case-insensitive.
     #[must_use]
     pub fn diff_format_for_mode(mode: &str) -> Option<DiffFormat> {
         match mode.to_lowercase().as_str() {

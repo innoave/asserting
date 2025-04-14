@@ -954,12 +954,15 @@ impl AssertFailure {
     }
 }
 
+/// Start and end tag that marks a highlighted part of a string.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Highlight {
     pub(crate) start: &'static str,
     pub(crate) end: &'static str,
 }
 
+/// Definition of format properties for highlighting differences between two
+/// values.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiffFormat {
     pub(crate) unexpected: Highlight,

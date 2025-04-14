@@ -7,9 +7,14 @@
 //! * express the intent of an assertion
 //! * an assertion reads more like natural english
 //! * concise and expressive assertions for more complex types like collections
-//! * distinct and more informative error messages for specific assertions
+//! * distinct and more helpful error messages for specific assertions
 //! * easy spotting the difference between the expected and the actual value
 //! * chaining of multiple assertions on the same subject
+//!
+//! An additional benefit of `asserting` is that it highlights differences
+//! between the expected value and the actual value for failed assertions.
+//! See the documentation of the [`colored`] module for more information on
+//! "colored diffs".
 //!
 //! # Usage
 //!
@@ -57,6 +62,10 @@
 //!    but was: 43
 //!   expected: 42
 //! ```
+//!
+//! By default, the differences between the expected value and the actual value
+//! are highlighted using colors. See the [`colored`] module for more
+//! information on "colored diffs".
 //!
 //! # Examples
 //!
@@ -348,7 +357,7 @@
 //! an expectation that verifies that a value of type `Either` is a left value.
 //!
 //! ```no_run
-//! use asserting::spec::{Expectation, Expression, Unknown};
+//! use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! use std::fmt::Debug;
 //!
 //! #[derive(Debug)]
@@ -371,7 +380,7 @@
 //!         }
 //!     }
 //!
-//!     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//!     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //!         format!(
 //!             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //!             Either::Left::<_, Unknown>(Unknown),
@@ -385,7 +394,7 @@
 //! method:
 //!
 //! ```
-//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! # use std::fmt::Debug;
 //! #
 //! # #[derive(Debug)]
@@ -408,7 +417,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -432,7 +441,7 @@
 //! trait.
 //!
 //! ```
-//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! #
 //! # #[derive(Debug)]
 //! # enum Either<L, R> {
@@ -454,7 +463,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -485,7 +494,7 @@
 //! subject of type `Either` is a left value.
 //!
 //! ```
-//! # use asserting::spec::{Expectation, Expression, Unknown};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! # use std::fmt::Debug;
 //! #
 //! # #[derive(Debug)]
@@ -508,7 +517,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>) -> String {
+//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
