@@ -74,3 +74,8 @@ option_if_let_else = "allow"
 print_stderr = "deny"
 print_stdout = "deny"
 unwrap_used = "deny"
+
+[[example]]
+name = "colored_diffs"
+path = "examples/colored_diffs.rs"
+required-features = ["colored"]
