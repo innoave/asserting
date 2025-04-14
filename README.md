@@ -102,11 +102,9 @@ ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
 By default the mode `red-green` is used. Differences are colored in
 <span style="color: green">green</span> and <span style="color: red">red</span>.
 
-The expected value is displayed either in black or green and the actual value is either displayed in
-black or red. Black means the actual value matches the expected value. A green part of the expected
-value means that the actual value is different from the expected value or is missing. Red for the
-actual value means that it is different from the expected value or unexpected at all, e.g. extra
-characters in strings or extra items in collections.
+Differences are only highlighted if the crate feature `colored` is enabled. The configuration via
+the environment variable only works when the crate feature `std` is enabled too. In no-std projects
+the default colors red and green are used.
 
 ## Available Assertions
 
