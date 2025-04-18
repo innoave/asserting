@@ -125,13 +125,33 @@ fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() 
 }
 
 #[test]
-fn verify_can_not_perform_two_assertions_on_same_code_subject() {
+fn verify_can_not_perform_two_does_not_panic_assertions_on_same_code_subject() {
     let failures = verify_that_code(|| {
         assert_that(2 + 3).is_equal_to(5);
     })
     .named("my_closure")
     .does_not_panic()
     .does_not_panic()
+    .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: error in test assertion: only one expectation allowed when asserting closures!
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_can_not_perform_two_panics_assertions_on_same_code_subject() {
+    let failures = verify_that_code(|| {
+        #[allow(unconditional_panic)]
+        assert_that(2 / 0).is_equal_to(0);
+    })
+    .named("my_closure")
+    .panics()
+    .panics()
     .display_failures();
 
     assert_eq!(
