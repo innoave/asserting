@@ -18,6 +18,38 @@ fn location_display_format() {
 }
 
 #[test]
+fn owned_location_display_format() {
+    let location = OwnedLocation::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(format!("{}", location)).is_equal_to("src/my_module/my_test.rs:54:13");
+}
+
+#[test]
+fn construct_owned_location_from_location() {
+    let location = Location::new("src/my_module/my_test.rs", 54, 13);
+    let owned_location = OwnedLocation::from(location);
+
+    assert_that!(owned_location).is_equal_to(OwnedLocation {
+        file: "src/my_module/my_test.rs".to_string(),
+        line: 54,
+        column: 13,
+    });
+}
+
+#[test]
+fn owned_location_can_be_referenced_as_location() {
+    let owned_location = OwnedLocation::new("src/my_module/my_test.rs", 54, 13);
+
+    let location = owned_location.as_location();
+
+    assert_that!(location).is_equal_to(Location {
+        file: "src/my_module/my_test.rs",
+        line: 54,
+        column: 13,
+    });
+}
+
+#[test]
 fn assert_failure_display_format() {
     let failure = AssertFailure {
         description: Some("this thing is the best".to_string()),
