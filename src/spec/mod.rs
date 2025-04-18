@@ -534,6 +534,15 @@ impl OwnedLocation {
             column,
         }
     }
+
+    /// Reference this [`OwnedLocation`] as a [`Location`].
+    pub fn as_location(&self) -> Location<'_> {
+        Location {
+            file: &self.file,
+            line: self.line,
+            column: self.column,
+        }
+    }
 }
 
 impl From<Location<'_>> for OwnedLocation {

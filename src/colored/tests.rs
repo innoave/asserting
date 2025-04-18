@@ -106,6 +106,16 @@ mod with_colored_and_std_features {
 
     #[test]
     #[serial]
+    fn assert_that_sets_default_diff_format_env_var_set_to_unknown_mode() {
+        env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "not-valid");
+
+        let assertion = assert_that(42);
+
+        assert_that(assertion.diff_format()).is_equal_to(&DEFAULT_DIFF_FORMAT);
+    }
+
+    #[test]
+    #[serial]
     fn assert_that_sets_default_diff_format_env_var_set_to_bold_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "bold");
 
