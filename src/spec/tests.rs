@@ -62,6 +62,42 @@ fn assert_failure_display_format() {
 }
 
 #[test]
+fn mapping_subject_in_spec() {
+    struct Point {
+        x: i64,
+        y: i64,
+    }
+
+    let target = Point { x: 12, y: -64 };
+
+    assert_that(target)
+        .mapping(|s| (s.x, s.y))
+        .is_equal_to((12, -64));
+}
+
+#[cfg(feature = "float")]
+#[test]
+fn extracting_from_subject_in_spec() {
+    struct Foo {
+        lorem: String,
+        ipsum: f64,
+    }
+
+    let foo = Foo {
+        lorem: "clita aute consequat dolor".into(),
+        ipsum: 0.4519,
+    };
+
+    assert_that(&foo)
+        .extracting(|s| &s.lorem)
+        .is_equal_to("clita aute consequat dolor");
+
+    assert_that(&foo)
+        .extracting(|s| s.ipsum)
+        .is_close_to(0.4519);
+}
+
+#[test]
 fn assert_that_macro_with_owned_string_subject() {
     let input_string = String::from("erat esse sit aliqua");
 
