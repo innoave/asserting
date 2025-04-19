@@ -373,13 +373,21 @@ pub trait AssertHasLength<E> {
 /// use asserting::prelude::*;
 ///
 /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
-/// assert_that(subject).has_length(28);
-/// assert_that(subject).has_char_count(25);
-/// assert_that(subject).has_char_count_in_range(12..=36);
+/// assert_that!(subject).has_length(28);
+/// assert_that!(subject).has_char_count(25);
 ///
 /// let subject = "imper diet al zzril";
-/// assert_that(subject).has_length(19);
-/// assert_that(subject).has_char_count(19);
+/// assert_that!(subject).has_length(19);
+/// assert_that!(subject).has_char_count(19);
+///
+/// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+/// assert_that!(subject).has_char_count_in_range(12..=36);
+/// assert_that!(subject).has_char_count_less_than(26);
+/// assert_that!(subject).has_char_count_greater_than(24);
+/// assert_that!(subject).has_at_most_char_count(26);
+/// assert_that!(subject).has_at_most_char_count(30);
+/// assert_that!(subject).has_at_least_char_count(25);
+/// assert_that!(subject).has_at_least_char_count(20);
 /// ```
 pub trait AssertHasCharCount<E> {
     /// Verifies that the subject contains the expected number of characters.
@@ -392,6 +400,32 @@ pub trait AssertHasCharCount<E> {
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
     fn has_char_count_in_range(self, range: RangeInclusive<E>) -> Self;
+
+    /// Verifies that the subject contains less than the expected number of
+    /// characters.
+    #[track_caller]
+    fn has_char_count_less_than(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains more than the expected number of
+    /// characters.
+    #[track_caller]
+    fn has_char_count_greater_than(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains at least the expected number of
+    /// characters.
+    ///
+    /// In other words, the number of characters shall be less than or equal
+    /// to the expected number.
+    #[track_caller]
+    fn has_at_most_char_count(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains at least the expected number of
+    /// characters.
+    ///
+    /// In other words, the number of characters shall be greater than or equal
+    /// to the expected number.
+    #[track_caller]
+    fn has_at_least_char_count(self, expected: E) -> Self;
 }
 
 /// Assert whether a subject of the `Option` type holds some value or has none.

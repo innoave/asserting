@@ -437,6 +437,116 @@ fn verify_str_has_char_count_in_range_fails() {
 }
 
 #[test]
+fn string_has_char_count_less_than() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(subject).has_char_count_less_than(8);
+}
+
+#[test]
+fn verify_string_has_char_count_less_than_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_less_than(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count less than 7
+   but was: 7
+  expected: < 7
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_char_count_greater_than() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(subject).has_char_count_greater_than(6);
+}
+
+#[test]
+fn verify_string_has_char_count_greater_than_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_greater_than(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count greater than 7
+   but was: 7
+  expected: > 7
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_most_char_count() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(&subject).has_at_most_char_count(7);
+    assert_that(subject).has_at_most_char_count(8);
+}
+
+#[test]
+fn verify_string_has_at_most_char_count_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_most_char_count(6)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at most a char count of 6
+   but was: 7
+  expected: <= 6
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_least_char_count() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(&subject).has_at_least_char_count(7);
+    assert_that(subject).has_at_least_char_count(6);
+}
+
+#[test]
+fn verify_string_has_at_least_char_count_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_least_char_count(8)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at least a char count of 8
+   but was: 7
+  expected: >= 8
+"
+        ]
+    );
+}
+
+#[test]
 fn string_contains_other_str() {
     let subject: String = "illum kasd nostrud possim".to_string();
 

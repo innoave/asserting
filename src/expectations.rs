@@ -172,6 +172,26 @@ pub struct HasCharCountInRange<E> {
 }
 
 #[must_use]
+pub struct HasCharCountLessThan<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasCharCountGreaterThan<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasAtMostCharCount<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasAtLeastCharCount<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
 pub struct StringContains<E> {
     pub expected: E,
 }
