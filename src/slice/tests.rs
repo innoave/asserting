@@ -69,6 +69,116 @@ fn slice_has_length_in_range() {
 }
 
 #[test]
+fn slice_has_length_less_than() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    assert_that(subject).has_length_less_than(7);
+}
+
+#[test]
+fn verify_slice_has_length_less_than_fails() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_less_than(6)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a length less than 6
+   but was: 6
+  expected: < 6
+"
+        ]
+    );
+}
+
+#[test]
+fn slice_has_length_greater_than() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    assert_that(subject).has_length_greater_than(5);
+}
+
+#[test]
+fn verify_slice_has_length_greater_than_fails() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_greater_than(6)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a length greater than 6
+   but was: 6
+  expected: > 6
+"
+        ]
+    );
+}
+
+#[test]
+fn slice_has_at_most_length() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    assert_that(&subject).has_at_most_length(6);
+    assert_that(subject).has_at_most_length(7);
+}
+
+#[test]
+fn verify_slice_has_at_most_length_fails() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_most_length(5)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at most a length of 5
+   but was: 6
+  expected: <= 5
+"
+        ]
+    );
+}
+
+#[test]
+fn slice_has_at_least_length() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    assert_that(&subject).has_at_least_length(6);
+    assert_that(subject).has_at_least_length(5);
+}
+
+#[test]
+fn verify_slice_has_at_least_length_fails() {
+    let subject: &[i32] = &[5, 1, 3, 18, 11, 9];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_least_length(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at least a length of 7
+   but was: 6
+  expected: >= 7
+"
+        ]
+    );
+}
+
+#[test]
 fn slice_contains() {
     let subject: &[i32] = &[1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
 

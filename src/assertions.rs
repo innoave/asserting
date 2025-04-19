@@ -284,12 +284,23 @@ pub trait AssertEmptiness {
 ///
 /// let some_str = "takimata te iriure nonummy";
 /// assert_that!(some_str).has_length(26);
+/// assert_that!(some_str).has_length_in_range(12..=32);
+/// assert_that!(some_str).has_length_less_than(27);
+/// assert_that!(some_str).has_length_greater_than(25);
+/// assert_that!(some_str).has_at_most_length(26);
+/// assert_that!(some_str).has_at_most_length(30);
+/// assert_that!(some_str).has_at_least_length(26);
+/// assert_that!(some_str).has_at_least_length(20);
 ///
-/// let some_array = [12, 24, 36, 48];
-/// assert_that!(some_array).has_length(4);
-///
-/// let some_slice: &[_] = &['a', 'b', 'c'][..];
-/// assert_that!(some_slice).has_length(3);
+/// let some_vec = vec!['m', 'Q', 'k', 'b'];
+/// assert_that!(&some_vec).has_length(4);
+/// assert_that!(&some_vec).has_length_in_range(2..=6);
+/// assert_that!(&some_vec).has_length_less_than(5);
+/// assert_that!(&some_vec).has_length_greater_than(3);
+/// assert_that!(&some_vec).has_at_most_length(4);
+/// assert_that!(&some_vec).has_at_most_length(10);
+/// assert_that!(&some_vec).has_at_least_length(4);
+/// assert_that!(&some_vec).has_at_least_length(1);
 ///
 /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
 /// assert_that!(some_btree_set).has_length(8);
@@ -319,13 +330,35 @@ pub trait AssertEmptiness {
 pub trait AssertHasLength<E> {
     /// Verifies that the subject has the expected length.
     #[track_caller]
-    fn has_length(self, expected: E) -> Self;
+    fn has_length(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length in the expected range.
     ///
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn has_length_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn has_length_in_range(self, expected_range: RangeInclusive<E>) -> Self;
+
+    /// Verifies that the subject has a length that is less than the expected
+    /// length.
+    fn has_length_less_than(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is greater than the expected
+    /// length.
+    fn has_length_greater_than(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is at most the expected
+    /// length.
+    ///
+    /// In other words, the length shall be less than or equal to the expected
+    /// length.
+    fn has_at_most_length(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is at least the expected
+    /// length.
+    ///
+    /// In other words, the length shall be greater than or equal to the
+    /// expected length.
+    fn has_at_least_length(self, expected_length: E) -> Self;
 }
 
 /// Assert the number of characters contained in a string or similar container.
