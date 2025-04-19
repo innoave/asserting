@@ -2,7 +2,10 @@
 
 use crate::assertions::{AssertEmptiness, AssertHasLength};
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{HasLength, HasLengthInRange, IsEmpty, IsNotEmpty};
+use crate::expectations::{
+    HasAtLeastLength, HasAtMostLength, HasLength, HasLengthGreaterThan, HasLengthInRange,
+    HasLengthLessThan, IsEmpty, IsNotEmpty,
+};
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
@@ -67,6 +70,22 @@ where
             expected_range: range,
         })
     }
+
+    fn has_length_less_than(self, expected_length: usize) -> Self {
+        self.expecting(HasLengthLessThan { expected_length })
+    }
+
+    fn has_length_greater_than(self, expected_length: usize) -> Self {
+        self.expecting(HasLengthGreaterThan { expected_length })
+    }
+
+    fn has_at_most_length(self, expected_length: usize) -> Self {
+        self.expecting(HasAtMostLength { expected_length })
+    }
+
+    fn has_at_least_length(self, expected_length: usize) -> Self {
+        self.expecting(HasAtLeastLength { expected_length })
+    }
 }
 
 impl<S> Expectation<S> for HasLength<usize>
@@ -101,6 +120,78 @@ where
         format!(
             "expected {expression} has length in range {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
             self.expected_range,
+        )
+    }
+}
+
+impl<S> Expectation<S> for HasLengthLessThan<usize>
+where
+    S: LengthProperty + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.length_property() < self.expected_length
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_length, format);
+        format!(
+            "expected {expression} has a length less than {:?}\n   but was: {marked_actual}\n  expected: < {marked_expected}",
+            self.expected_length,
+        )
+    }
+}
+
+impl<S> Expectation<S> for HasLengthGreaterThan<usize>
+where
+    S: LengthProperty + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.length_property() > self.expected_length
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_length, format);
+        format!(
+            "expected {expression} has a length greater than {:?}\n   but was: {marked_actual}\n  expected: > {marked_expected}",
+            self.expected_length,
+        )
+    }
+}
+
+impl<S> Expectation<S> for HasAtMostLength<usize>
+where
+    S: LengthProperty + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.length_property() <= self.expected_length
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_length, format);
+        format!(
+            "expected {expression} has at most a length of {:?}\n   but was: {marked_actual}\n  expected: <= {marked_expected}",
+            self.expected_length,
+        )
+    }
+}
+
+impl<S> Expectation<S> for HasAtLeastLength<usize>
+where
+    S: LengthProperty + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.length_property() >= self.expected_length
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual.length_property(), format);
+        let marked_expected = mark_missing(&self.expected_length, format);
+        format!(
+            "expected {expression} has at least a length of {:?}\n   but was: {marked_actual}\n  expected: >= {marked_expected}",
+            self.expected_length,
         )
     }
 }

@@ -142,6 +142,26 @@ pub struct HasLengthInRange<E> {
 }
 
 #[must_use]
+pub struct HasLengthLessThan<E> {
+    pub expected_length: E,
+}
+
+#[must_use]
+pub struct HasLengthGreaterThan<E> {
+    pub expected_length: E,
+}
+
+#[must_use]
+pub struct HasAtMostLength<E> {
+    pub expected_length: E,
+}
+
+#[must_use]
+pub struct HasAtLeastLength<E> {
+    pub expected_length: E,
+}
+
+#[must_use]
 pub struct HasCharCount<E> {
     pub expected_char_count: E,
 }
@@ -149,6 +169,26 @@ pub struct HasCharCount<E> {
 #[must_use]
 pub struct HasCharCountInRange<E> {
     pub expected_range: RangeInclusive<E>,
+}
+
+#[must_use]
+pub struct HasCharCountLessThan<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasCharCountGreaterThan<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasAtMostCharCount<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasAtLeastCharCount<E> {
+    pub expected_char_count: E,
 }
 
 #[must_use]

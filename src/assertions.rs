@@ -284,12 +284,23 @@ pub trait AssertEmptiness {
 ///
 /// let some_str = "takimata te iriure nonummy";
 /// assert_that!(some_str).has_length(26);
+/// assert_that!(some_str).has_length_in_range(12..=32);
+/// assert_that!(some_str).has_length_less_than(27);
+/// assert_that!(some_str).has_length_greater_than(25);
+/// assert_that!(some_str).has_at_most_length(26);
+/// assert_that!(some_str).has_at_most_length(30);
+/// assert_that!(some_str).has_at_least_length(26);
+/// assert_that!(some_str).has_at_least_length(20);
 ///
-/// let some_array = [12, 24, 36, 48];
-/// assert_that!(some_array).has_length(4);
-///
-/// let some_slice: &[_] = &['a', 'b', 'c'][..];
-/// assert_that!(some_slice).has_length(3);
+/// let some_vec = vec!['m', 'Q', 'k', 'b'];
+/// assert_that!(&some_vec).has_length(4);
+/// assert_that!(&some_vec).has_length_in_range(2..=6);
+/// assert_that!(&some_vec).has_length_less_than(5);
+/// assert_that!(&some_vec).has_length_greater_than(3);
+/// assert_that!(&some_vec).has_at_most_length(4);
+/// assert_that!(&some_vec).has_at_most_length(10);
+/// assert_that!(&some_vec).has_at_least_length(4);
+/// assert_that!(&some_vec).has_at_least_length(1);
 ///
 /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
 /// assert_that!(some_btree_set).has_length(8);
@@ -319,13 +330,35 @@ pub trait AssertEmptiness {
 pub trait AssertHasLength<E> {
     /// Verifies that the subject has the expected length.
     #[track_caller]
-    fn has_length(self, expected: E) -> Self;
+    fn has_length(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length in the expected range.
     ///
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn has_length_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn has_length_in_range(self, expected_range: RangeInclusive<E>) -> Self;
+
+    /// Verifies that the subject has a length that is less than the expected
+    /// length.
+    fn has_length_less_than(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is greater than the expected
+    /// length.
+    fn has_length_greater_than(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is at most the expected
+    /// length.
+    ///
+    /// In other words, the length shall be less than or equal to the expected
+    /// length.
+    fn has_at_most_length(self, expected_length: E) -> Self;
+
+    /// Verifies that the subject has a length that is at least the expected
+    /// length.
+    ///
+    /// In other words, the length shall be greater than or equal to the
+    /// expected length.
+    fn has_at_least_length(self, expected_length: E) -> Self;
 }
 
 /// Assert the number of characters contained in a string or similar container.
@@ -340,13 +373,21 @@ pub trait AssertHasLength<E> {
 /// use asserting::prelude::*;
 ///
 /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
-/// assert_that(subject).has_length(28);
-/// assert_that(subject).has_char_count(25);
-/// assert_that(subject).has_char_count_in_range(12..=36);
+/// assert_that!(subject).has_length(28);
+/// assert_that!(subject).has_char_count(25);
 ///
 /// let subject = "imper diet al zzril";
-/// assert_that(subject).has_length(19);
-/// assert_that(subject).has_char_count(19);
+/// assert_that!(subject).has_length(19);
+/// assert_that!(subject).has_char_count(19);
+///
+/// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+/// assert_that!(subject).has_char_count_in_range(12..=36);
+/// assert_that!(subject).has_char_count_less_than(26);
+/// assert_that!(subject).has_char_count_greater_than(24);
+/// assert_that!(subject).has_at_most_char_count(26);
+/// assert_that!(subject).has_at_most_char_count(30);
+/// assert_that!(subject).has_at_least_char_count(25);
+/// assert_that!(subject).has_at_least_char_count(20);
 /// ```
 pub trait AssertHasCharCount<E> {
     /// Verifies that the subject contains the expected number of characters.
@@ -359,6 +400,32 @@ pub trait AssertHasCharCount<E> {
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
     fn has_char_count_in_range(self, range: RangeInclusive<E>) -> Self;
+
+    /// Verifies that the subject contains less than the expected number of
+    /// characters.
+    #[track_caller]
+    fn has_char_count_less_than(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains more than the expected number of
+    /// characters.
+    #[track_caller]
+    fn has_char_count_greater_than(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains at least the expected number of
+    /// characters.
+    ///
+    /// In other words, the number of characters shall be less than or equal
+    /// to the expected number.
+    #[track_caller]
+    fn has_at_most_char_count(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains at least the expected number of
+    /// characters.
+    ///
+    /// In other words, the number of characters shall be greater than or equal
+    /// to the expected number.
+    #[track_caller]
+    fn has_at_least_char_count(self, expected: E) -> Self;
 }
 
 /// Assert whether a subject of the `Option` type holds some value or has none.

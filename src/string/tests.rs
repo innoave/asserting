@@ -236,6 +236,116 @@ fn verify_has_length_in_range_fails() {
 }
 
 #[test]
+fn string_has_length_less_than() {
+    let subject: String = "congue veniam et proident".to_string();
+
+    assert_that(subject).has_length_less_than(26);
+}
+
+#[test]
+fn verify_string_has_length_less_than_fails() {
+    let subject: String = "congue veniam et proident".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_less_than(25)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a length less than 25
+   but was: 25
+  expected: < 25
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_length_greater_than() {
+    let subject: String = "deserunt elit aliquip eirmod".to_string();
+
+    assert_that(subject).has_length_greater_than(27);
+}
+
+#[test]
+fn verify_string_has_length_greater_than_fails() {
+    let subject: String = "deserunt elit aliquip eirmod".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_greater_than(28)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a length greater than 28
+   but was: 28
+  expected: > 28
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_most_length() {
+    let subject: String = "facilisi euismod veniam labore".to_string();
+
+    assert_that(&subject).has_at_most_length(30);
+    assert_that(subject).has_at_most_length(31);
+}
+
+#[test]
+fn verify_string_has_at_most_length_fails() {
+    let subject: String = "facilisi euismod veniam labore".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_most_length(29)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at most a length of 29
+   but was: 30
+  expected: <= 29
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_least_length() {
+    let subject: String = "autem in option zzril".to_string();
+
+    assert_that(&subject).has_at_least_length(21);
+    assert_that(subject).has_at_least_length(20);
+}
+
+#[test]
+fn verify_string_has_at_least_length_fails() {
+    let subject: String = "autem in option zzril".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_least_length(22)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at least a length of 22
+   but was: 21
+  expected: >= 22
+"
+        ]
+    );
+}
+
+#[test]
 fn string_has_char_count() {
     let subject: String = "option\u{0074}\u{02B0} sadipscing accusam augue".to_string();
 
@@ -321,6 +431,116 @@ fn verify_str_has_char_count_in_range_fails() {
             r"assertion failed: expected my_thing has a char count of 6..=12
    but was: 5
   expected: 6..=12
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_char_count_less_than() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(subject).has_char_count_less_than(8);
+}
+
+#[test]
+fn verify_string_has_char_count_less_than_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_less_than(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count less than 7
+   but was: 7
+  expected: < 7
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_char_count_greater_than() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(subject).has_char_count_greater_than(6);
+}
+
+#[test]
+fn verify_string_has_char_count_greater_than_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_greater_than(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count greater than 7
+   but was: 7
+  expected: > 7
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_most_char_count() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(&subject).has_at_most_char_count(7);
+    assert_that(subject).has_at_most_char_count(8);
+}
+
+#[test]
+fn verify_string_has_at_most_char_count_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_most_char_count(6)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at most a char count of 6
+   but was: 7
+  expected: <= 6
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_at_least_char_count() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    assert_that(&subject).has_at_least_char_count(7);
+    assert_that(subject).has_at_least_char_count(6);
+}
+
+#[test]
+fn verify_string_has_at_least_char_count_fails() {
+    let subject: String = "\u{0112} \u{0034} \u{0200} \u{01BE}".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_at_least_char_count(8)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has at least a char count of 8
+   but was: 7
+  expected: >= 8
 "
         ]
     );
