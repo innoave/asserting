@@ -80,3 +80,27 @@ pub trait DefinedOrderProperty {}
 
 impl<C> DefinedOrderProperty for &C where C: DefinedOrderProperty + ?Sized {}
 impl<C> DefinedOrderProperty for &mut C where C: DefinedOrderProperty + ?Sized {}
+
+/// Property for types that contain characters.
+pub trait CharCountProperty {
+    /// Returns the number of characters contained in this type.
+    fn char_count_property(&self) -> usize;
+}
+
+impl<T> CharCountProperty for &T
+where
+    T: CharCountProperty + ?Sized,
+{
+    fn char_count_property(&self) -> usize {
+        <T as CharCountProperty>::char_count_property(self)
+    }
+}
+
+impl<T> CharCountProperty for &mut T
+where
+    T: CharCountProperty + ?Sized,
+{
+    fn char_count_property(&self) -> usize {
+        <T as CharCountProperty>::char_count_property(self)
+    }
+}

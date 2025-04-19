@@ -618,6 +618,7 @@ pub mod spec;
 
 mod boolean;
 mod c_string;
+mod char_count;
 mod collection;
 mod equality;
 mod integer;
