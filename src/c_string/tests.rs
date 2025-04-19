@@ -32,3 +32,19 @@ fn c_string_is_not_empty() {
 
     assert_that(subject).is_not_empty();
 }
+
+#[test]
+fn c_str_has_length() {
+    let subject: &CStr = CStr::from_bytes_until_nul(b"exerci euismod enim stet\0")
+        .unwrap_or_else(|err| panic!("could not create CStr: {err}"));
+
+    assert_that(subject).has_length(24);
+}
+
+#[test]
+fn c_string_has_length() {
+    let subject: CString = CString::new(b"enim lobortis aliquyam sunt")
+        .unwrap_or_else(|err| panic!("could not create a CString: {err}"));
+
+    assert_that(subject).has_length(27);
+}
