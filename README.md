@@ -173,36 +173,48 @@ for `bool`.
 
 for strings of type `String` and `str`:
 
-| assertion               | description                                                                |
-|-------------------------|----------------------------------------------------------------------------|
-| is_empty                | verify that a string is empty                                              |                                                 
-| is_not_empty            | verify that a string is not empty                                          |
-| has_length              | verify that a string has exactly the expected length                       |                                                 
-| has_length_in_range     | verify that a string has a length that is in the expected range            |
-| has_char_count          | verify that a string contains exactly the expected number of characters    |                                                 
-| has_char_count_in_range | verify that a string contains a number of characters in the expected range |
-| contains                | verify that a string contains the expected substring or character          |
-| starts_with             | verify that a string starts with the expected substring or character       |
-| ends_with               | verify that a string ends with the expected substring or character         |
-| contains_any_of         | verify that a string contains any character from a collection of `char`s   |
+| assertion               | description                                                                    |
+|-------------------------|--------------------------------------------------------------------------------|
+| is_empty                | verify that a string is empty                                                  |                                                 
+| is_not_empty            | verify that a string is not empty                                              |
+| has_length              | verify that a string has exactly the expected length                           |                                                 
+| has_length_in_range     | verify that a string has a length that is in the expected range                |
+| has_length_less_than    | verify that a string has a length less than the expected length                |
+| has_length_greater_than | verify that a string has a length greater than the expected length             |
+| has_at_most_length      | verify that a string has a length less than or equal to the expected length    |
+| has_at_least_length     | verify that a string has a length greater than or equal to the expected length |
+| has_char_count          | verify that a string contains exactly the expected number of characters        |                                                 
+| has_char_count_in_range | verify that a string contains a number of characters in the expected range     |
+| contains                | verify that a string contains the expected substring or character              |
+| starts_with             | verify that a string starts with the expected substring or character           |
+| ends_with               | verify that a string ends with the expected substring or character             |
+| contains_any_of         | verify that a string contains any character from a collection of `char`s       |
 
 for strings of type `CString` and `CStr`:
 
-| assertion           | description                                                     |
-|---------------------|-----------------------------------------------------------------|
-| is_empty            | verify that a string is empty                                   |                                                 
-| is_not_empty        | verify that a string is not empty                               |
-| has_length          | verify that a string has exactly the expected length            |                                                 
-| has_length_in_range | verify that a string has a length that is in the expected range |
+| assertion               | description                                                                    |
+|-------------------------|--------------------------------------------------------------------------------|
+| is_empty                | verify that a string is empty                                                  |                                                 
+| is_not_empty            | verify that a string is not empty                                              |
+| has_length              | verify that a string has exactly the expected length                           |                                                 
+| has_length_in_range     | verify that a string has a length that is in the expected range                |
+| has_length_less_than    | verify that a string has a length less than the expected length                |
+| has_length_greater_than | verify that a string has a length greater than the expected length             |
+| has_at_most_length      | verify that a string has a length less than or equal to the expected length    |
+| has_at_least_length     | verify that a string has a length greater than or equal to the expected length |
 
 for strings of type `OsString` and `OsStr` (requires crate feature `std`):
 
-| assertion           | description                                                     |
-|---------------------|-----------------------------------------------------------------|
-| is_empty            | verify that a string is empty                                   |                                                 
-| is_not_empty        | verify that a string is not empty                               |
-| has_length          | verify that a string has exactly the expected length            |                                                 
-| has_length_in_range | verify that a string has a length that is in the expected range |
+| assertion               | description                                                                    |
+|-------------------------|--------------------------------------------------------------------------------|
+| is_empty                | verify that a string is empty                                                  |                                                 
+| is_not_empty            | verify that a string is not empty                                              |
+| has_length              | verify that a string has exactly the expected length                           |                                                 
+| has_length_in_range     | verify that a string has a length that is in the expected range                |
+| has_length_less_than    | verify that a string has a length less than the expected length                |
+| has_length_greater_than | verify that a string has a length greater than the expected length             |
+| has_at_most_length      | verify that a string has a length less than or equal to the expected length    |
+| has_at_least_length     | verify that a string has a length greater than or equal to the expected length |
 
 ### Option
 
@@ -245,10 +257,14 @@ Implementing this property for any type enables these assertions for that type.
 
 for collections and strings.
 
-| assertion           | description                                                        |
-|---------------------|--------------------------------------------------------------------|
-| has_length          | verify that the subject has exactly the expected length            |                                                 
-| has_length_in_range | verify that the subject has a length that is in the expected range |
+| assertion               | description                                                                       |
+|-------------------------|-----------------------------------------------------------------------------------|
+| has_length              | verify that the subject has exactly the expected length                           |                                                 
+| has_length_in_range     | verify that the subject has a length that is in the expected range                |
+| has_length_less_than    | verify that the subject has a length less than the expected length                |
+| has_length_greater_than | verify that the subject has a length greater than the expected length             |
+| has_at_most_length      | verify that the subject has a length less than or equal to the expected length    |
+| has_at_least_length     | verify that the subject has a length greater than or equal to the expected length |
 
 The implementation of these assertions is based on the property trait [`LengthProperty`].
 Implementing this property for any type enables these assertions for that type.
