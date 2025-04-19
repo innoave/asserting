@@ -328,6 +328,39 @@ pub trait AssertHasLength<E> {
     fn has_length_in_range(self, range: RangeInclusive<E>) -> Self;
 }
 
+/// Assert the number of characters contained in a string or similar container.
+///
+/// These assertions are implemented for all types `T` that implement the trait
+/// [`CharCountProperty`](crate::properties::CharCountProperty). This property
+/// is implemented for `String` and `&str`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+/// assert_that(subject).has_length(28);
+/// assert_that(subject).has_char_count(25);
+/// assert_that(subject).has_char_count_in_range(12..=36);
+///
+/// let subject = "imper diet al zzril";
+/// assert_that(subject).has_length(19);
+/// assert_that(subject).has_char_count(19);
+/// ```
+pub trait AssertHasCharCount<E> {
+    /// Verifies that the subject contains the expected number of characters.
+    #[track_caller]
+    fn has_char_count(self, expected: E) -> Self;
+
+    /// Verifies that the subject contains a number of characters that is in the
+    /// expected range.
+    ///
+    /// The expected range must be a closed range with both ends inclusive.
+    #[track_caller]
+    fn has_char_count_in_range(self, range: RangeInclusive<E>) -> Self;
+}
+
 /// Assert whether a subject of the `Option` type holds some value or has none.
 ///
 /// # Examples

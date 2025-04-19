@@ -5,7 +5,7 @@ use crate::colored::{
     mark_missing, mark_missing_char, mark_missing_substr, mark_unexpected, mark_unexpected_substr,
 };
 use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
-use crate::properties::{DefinedOrderProperty, IsEmptyProperty, LengthProperty};
+use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
@@ -20,21 +20,33 @@ impl IsEmptyProperty for &str {
     }
 }
 
-impl LengthProperty for &str {
-    fn length_property(&self) -> usize {
-        self.len()
-    }
-}
-
 impl IsEmptyProperty for String {
     fn is_empty_property(&self) -> bool {
         self.is_empty()
     }
 }
 
+impl LengthProperty for &str {
+    fn length_property(&self) -> usize {
+        self.len()
+    }
+}
+
 impl LengthProperty for String {
     fn length_property(&self) -> usize {
         self.len()
+    }
+}
+
+impl CharCountProperty for &str {
+    fn char_count_property(&self) -> usize {
+        self.chars().count()
+    }
+}
+
+impl CharCountProperty for String {
+    fn char_count_property(&self) -> usize {
+        self.chars().count()
     }
 }
 

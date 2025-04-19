@@ -142,6 +142,16 @@ pub struct HasLengthInRange<E> {
 }
 
 #[must_use]
+pub struct HasCharCount<E> {
+    pub expected_char_count: E,
+}
+
+#[must_use]
+pub struct HasCharCountInRange<E> {
+    pub expected_range: RangeInclusive<E>,
+}
+
+#[must_use]
 pub struct StringContains<E> {
     pub expected: E,
 }

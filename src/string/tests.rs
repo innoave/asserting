@@ -106,6 +106,20 @@ fn string_is_not_empty() {
 }
 
 #[test]
+fn borrowed_string_is_empty() {
+    let subject: &String = &String::new();
+
+    assert_that(subject).is_empty();
+}
+
+#[test]
+fn mutable_borrowed_string_is_empty() {
+    let subject: &mut String = &mut String::new();
+
+    assert_that(subject).is_empty();
+}
+
+#[test]
 fn str_is_empty() {
     let subject: &str = "";
 
@@ -163,6 +177,13 @@ fn string_has_length() {
 }
 
 #[test]
+fn mutable_borrowed_string_has_length() {
+    let subject: &mut String = &mut "aute lobortis voluptua pariatur".to_string();
+
+    assert_that(subject).has_length(31);
+}
+
+#[test]
 fn str_has_length() {
     let subject: &str = "ad fugiat duo erat";
 
@@ -209,6 +230,97 @@ fn verify_has_length_in_range_fails() {
             r"assertion failed: expected my_thing has length in range 1..=24
    but was: 25
   expected: 1..=24
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_char_count() {
+    let subject: String = "option\u{0074}\u{02B0} sadipscing accusam augue".to_string();
+
+    assert_that(&subject).has_length(34);
+    assert_that(subject).has_char_count(33);
+}
+
+#[test]
+fn borrowed_string_has_char_count() {
+    let subject: &String = &"option\u{0074}\u{02B0} sadipscing accusam augue".to_string();
+
+    assert_that(subject).has_length(34);
+    assert_that(subject).has_char_count(33);
+}
+
+#[test]
+fn mutable_borrowed_string_has_char_count() {
+    let subject: &mut String = &mut "option\u{0074}\u{02B0} sadipscing accusam augue".to_string();
+
+    assert_that(&subject).has_length(34);
+    assert_that(subject).has_char_count(33);
+}
+
+#[test]
+fn str_has_char_count() {
+    let subject: &str = "imper\u{0180}diet al\u{02AA}iquyam \u{01AF} zzril aliquip";
+
+    assert_that(subject).has_length(39);
+    assert_that(subject).has_char_count(36);
+}
+
+#[test]
+fn verify_str_has_char_count_fails() {
+    let subject: &str = "\u{0112} \u{0034} \u{0200}";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count(7)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing has a char count of 7
+   but was: 5
+  expected: 7
+"]
+    );
+}
+
+#[test]
+fn string_has_char_count_in_range() {
+    let subject: String = "\u{0112} \u{0034} \u{0200}".to_string();
+
+    assert_that(subject).has_char_count_in_range(5..=5);
+}
+
+#[test]
+fn borrowed_string_has_char_count_in_range() {
+    let subject: &String = &"\u{0112} \u{0034} \u{0200}".to_string();
+
+    assert_that(subject).has_char_count_in_range(5..=5);
+}
+
+#[test]
+fn str_has_char_count_in_range() {
+    let subject: &str = "\u{0112} \u{0034} \u{0200}";
+
+    assert_that(subject).has_char_count_in_range(5..=5);
+}
+
+#[test]
+fn verify_str_has_char_count_in_range_fails() {
+    let subject: &str = "\u{0112} \u{0034} \u{0200}";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_in_range(6..=12)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count of 6..=12
+   but was: 5
+  expected: 6..=12
 "
         ]
     );

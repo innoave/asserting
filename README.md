@@ -171,18 +171,38 @@ for `bool`.
 
 ### String
 
-for all string types of Rust: `String`, `str`, `OsString`, `OsStr`, `CString` and `CStr`.
+for strings of type `String` and `str`:
 
-| assertion           | description                                                              |
-|---------------------|--------------------------------------------------------------------------|
-| is_empty            | verify that a string is empty                                            |                                                 
-| is_not_empty        | verify that a string is not empty                                        |
-| has_length          | verify that a string has exactly the expected length                     |                                                 
-| has_length_in_range | verify that a string has a length that is in the expected range          |
-| contains            | verify that a string contains the expected substring or character        |
-| starts_with         | verify that a string starts with the expected substring or character     |
-| ends_with           | verify that a string ends with the expected substring or character       |
-| contains_any_of     | verify that a string contains any character from a collection of `char`s |
+| assertion               | description                                                                |
+|-------------------------|----------------------------------------------------------------------------|
+| is_empty                | verify that a string is empty                                              |                                                 
+| is_not_empty            | verify that a string is not empty                                          |
+| has_length              | verify that a string has exactly the expected length                       |                                                 
+| has_length_in_range     | verify that a string has a length that is in the expected range            |
+| has_char_count          | verify that a string contains exactly the expected number of characters    |                                                 
+| has_char_count_in_range | verify that a string contains a number of characters in the expected range |
+| contains                | verify that a string contains the expected substring or character          |
+| starts_with             | verify that a string starts with the expected substring or character       |
+| ends_with               | verify that a string ends with the expected substring or character         |
+| contains_any_of         | verify that a string contains any character from a collection of `char`s   |
+
+for strings of type `CString` and `CStr`:
+
+| assertion           | description                                                     |
+|---------------------|-----------------------------------------------------------------|
+| is_empty            | verify that a string is empty                                   |                                                 
+| is_not_empty        | verify that a string is not empty                               |
+| has_length          | verify that a string has exactly the expected length            |                                                 
+| has_length_in_range | verify that a string has a length that is in the expected range |
+
+for strings of type `OsString` and `OsStr` (requires crate feature `std`):
+
+| assertion           | description                                                     |
+|---------------------|-----------------------------------------------------------------|
+| is_empty            | verify that a string is empty                                   |                                                 
+| is_not_empty        | verify that a string is not empty                               |
+| has_length          | verify that a string has exactly the expected length            |                                                 
+| has_length_in_range | verify that a string has a length that is in the expected range |
 
 ### Option
 
