@@ -119,82 +119,6 @@ fn str_is_not_empty() {
     assert_that(subject).is_not_empty();
 }
 
-#[cfg(feature = "std")]
-#[test]
-fn os_str_is_empty() {
-    use crate::std::ffi::OsStr;
-    let subject: &OsStr = OsStr::new("");
-
-    assert_that(subject).is_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn os_str_is_not_empty() {
-    use crate::std::ffi::OsStr;
-    let subject: &OsStr = OsStr::new("officia praesent minim feugait");
-
-    assert_that(subject).is_not_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn os_string_is_empty() {
-    use crate::std::ffi::OsString;
-    let subject: OsString = OsString::new();
-
-    assert_that(subject).is_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn os_string_is_not_empty() {
-    use crate::std::ffi::OsString;
-    let subject: OsString = OsString::from("anim ea aute aliqua");
-
-    assert_that(subject).is_not_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn c_str_is_empty() {
-    use crate::std::ffi::CStr;
-    let subject: &CStr = CStr::from_bytes_until_nul(b"\0")
-        .unwrap_or_else(|err| panic!("could not create CStr: {err}"));
-
-    assert_that(subject).is_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn c_str_is_not_empty() {
-    use crate::std::ffi::CStr;
-    let subject: &CStr = CStr::from_bytes_until_nul(b"facilisi dolores nostrud aliquyam\0")
-        .unwrap_or_else(|err| panic!("could not create CStr: {err}"));
-
-    assert_that(subject).is_not_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn c_string_is_empty() {
-    use crate::std::ffi::CString;
-    let subject: CString =
-        CString::new(b"").unwrap_or_else(|err| panic!("could not create a CString: {err}"));
-
-    assert_that(subject).is_empty();
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn c_string_is_not_empty() {
-    use crate::std::ffi::CString;
-    let subject: CString = CString::new(b"anim ea aute aliqua")
-        .unwrap_or_else(|err| panic!("could not create a CString: {err}"));
-
-    assert_that(subject).is_not_empty();
-}
-
 #[test]
 fn verify_str_is_empty_fails() {
     let subject: &str = "ABC";
@@ -243,24 +167,6 @@ fn str_has_length() {
     let subject: &str = "ad fugiat duo erat";
 
     assert_that(subject).has_length(18);
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn os_str_has_length() {
-    use crate::std::ffi::OsStr;
-    let subject: &OsStr = OsStr::new("A");
-
-    assert_that(subject).has_length(1);
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn os_string_has_length() {
-    use crate::std::ffi::OsString;
-    let subject: OsString = OsString::from("ABC");
-
-    assert_that(subject).has_length(3);
 }
 
 #[test]

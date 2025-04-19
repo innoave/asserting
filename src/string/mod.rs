@@ -1,10 +1,4 @@
-//! Implementation of assertions for string values.
-//!
-//! String assertions are implemented for all string types of Rust:
-//!
-//! * `String` and `str`
-//! * `OsString` and `OsStr`
-//! * `CString` and `CStr`
+//! Implementation of assertions for `String` and `str` values.
 
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::colored::{
@@ -41,54 +35,6 @@ impl IsEmptyProperty for String {
 impl LengthProperty for String {
     fn length_property(&self) -> usize {
         self.len()
-    }
-}
-
-#[cfg(feature = "std")]
-mod os_string {
-    use crate::properties::{IsEmptyProperty, LengthProperty};
-    use crate::std::ffi::{OsStr, OsString};
-
-    impl IsEmptyProperty for OsString {
-        fn is_empty_property(&self) -> bool {
-            self.is_empty()
-        }
-    }
-
-    impl LengthProperty for OsString {
-        fn length_property(&self) -> usize {
-            self.len()
-        }
-    }
-
-    impl IsEmptyProperty for &OsStr {
-        fn is_empty_property(&self) -> bool {
-            self.is_empty()
-        }
-    }
-
-    impl LengthProperty for &OsStr {
-        fn length_property(&self) -> usize {
-            self.len()
-        }
-    }
-}
-
-#[cfg(feature = "std")]
-mod c_string {
-    use crate::properties::IsEmptyProperty;
-    use crate::std::ffi::{CStr, CString};
-
-    impl IsEmptyProperty for CString {
-        fn is_empty_property(&self) -> bool {
-            self.is_empty()
-        }
-    }
-
-    impl IsEmptyProperty for &CStr {
-        fn is_empty_property(&self) -> bool {
-            self.is_empty()
-        }
     }
 }
 
