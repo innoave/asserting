@@ -596,6 +596,12 @@ mod std {
         pub use alloc::str::*;
         pub use core::str::*;
     }
+
+    pub mod ffi {
+        extern crate alloc;
+        pub use alloc::ffi::*;
+        pub use core::ffi::*;
+    }
 }
 
 #[cfg(feature = "std")]
@@ -611,6 +617,7 @@ pub mod properties;
 pub mod spec;
 
 mod boolean;
+mod c_string;
 mod collection;
 mod equality;
 mod integer;
@@ -618,6 +625,8 @@ mod iterator;
 mod length;
 mod option;
 mod order;
+#[cfg(feature = "std")]
+mod os_sting;
 mod predicate;
 mod range;
 mod result;
