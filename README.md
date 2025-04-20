@@ -150,7 +150,37 @@ being the type of the expected value.
 | is_in_range     | verify that the subject is in the expected range (closed range)      |                                                 
 | is_not_in_range | verify that the subject is not in the specified range (closed range) |
 
-### Float
+### Integer and Float
+
+for integer numbers of type `i8`, `i16`, `i32`, `i64`, `i128` and `isize` as well as <br/>
+floating point numbers of type `f32` and `f64`:
+
+| assertion       | description                                          |
+|-----------------|------------------------------------------------------|
+| is_negative     | verify that the subject is a negative number         |
+| is_not_negative | verify that the subject is a positive number or zero |
+| is_positive     | verify that the subject is a positive number         |
+| is_not_positive | verify that the subject is a finite number           |                                                 
+
+for integer numbers of type `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, `u8`, `u16`, `u32`, `u64`,
+`u128` and `usize` as well as <br/>
+floating point numbers of type `f32` and `f64`:
+
+| assertion | description                                                  |
+|-----------|--------------------------------------------------------------|
+| is_zero   | verify that the subject is the additive identity (zero)      |                                                 
+| is_one    | verify that the subject is the multiplicative identity (one) |                                                 
+
+for floating point numbers of type `f32` and `f64`:
+
+| assertion       | description                                   |
+|-----------------|-----------------------------------------------|
+| is_infinite     | verify that the subject is an infinite number |
+| is_finite       | verify that the subject is a finite number    |                                                 
+| is_not_a_number | verify that the subject is not a number       |
+| is_a_number     | verify that the subject is a number           |
+
+### Float comparison
 
 for floating point numbers of type `f32` and `f64`.
 
