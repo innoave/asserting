@@ -79,7 +79,7 @@ An allocator is still needed for no-std.
 `asserting` can highlight the differences between the expected value(s) and the actual value(s) when
 printing assertion failures to the terminal. The colored diffs in assertion failures look like this:
 
-![colored diffs in terminal](examples/colored_diffs.png)
+<img src="examples/colored_diffs.png" alt="colored diffs in terminal" height="90"/>
 
 It supports different variants of how differences are highlighted.
 
