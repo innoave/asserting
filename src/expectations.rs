@@ -120,6 +120,36 @@ pub struct IsNotInRange<E> {
 }
 
 #[must_use]
+pub struct IsNegative;
+
+#[must_use]
+pub struct IsNotNegative;
+
+#[must_use]
+pub struct IsPositive;
+
+#[must_use]
+pub struct IsNotPositive;
+
+#[must_use]
+pub struct IsZero;
+
+#[must_use]
+pub struct IsOne;
+
+#[must_use]
+pub struct IsFinite;
+
+#[must_use]
+pub struct IsInfinite;
+
+#[must_use]
+pub struct IsNotANumber;
+
+#[must_use]
+pub struct IsANumber;
+
+#[must_use]
 pub struct IsSome;
 
 #[must_use]

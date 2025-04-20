@@ -621,9 +621,11 @@ mod c_string;
 mod char_count;
 mod collection;
 mod equality;
+mod float;
 mod integer;
 mod iterator;
 mod length;
+mod number;
 mod option;
 mod order;
 #[cfg(feature = "std")]
@@ -634,9 +636,6 @@ mod result;
 mod slice;
 mod string;
 mod vec;
-
-#[cfg(feature = "float")]
-mod float;
 
 #[cfg(feature = "panic")]
 mod panic;
