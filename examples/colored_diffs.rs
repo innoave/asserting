@@ -12,17 +12,17 @@ struct Foo {
 }
 
 fn test() {
-    let subject = Some(Foo {
+    let subject = Foo {
         lorem: "¡Hola, Welt!".into(),
         ipsum: 42,
         dolor: Some("hey".into()),
-    });
+    };
 
-    assert_that!(subject).is_equal_to(Some(Foo {
+    assert_that!(subject).is_equal_to(Foo {
         lorem: "Hello World!".into(),
         ipsum: 42,
         dolor: Some("hey ho!".into()),
-    }));
+    });
 }
 
 fn main() {
