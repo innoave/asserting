@@ -130,12 +130,15 @@ for all types that implement `PartialEq<E>` with `E` being the type of the expec
 
 for all types that implement `PartialOrd<E>` with `E` being the type of the expected value.
 
-| assertion       | description                                                            |
-|-----------------|------------------------------------------------------------------------|
-| is_greater_than | verify that the subject is greater than the expected value             |                                                 
-| is_less_than    | verify that the subject is less than the expected value                |
-| is_at_least     | verify that the subject is greater than or equal to the expected value |                                                 
-| is_at_most      | verify that the subject is less than or equal to the expected value    |
+| assertion       | description                                                                            |
+|-----------------|----------------------------------------------------------------------------------------|
+| is_greater_than | verify that the subject is greater than the expected value                             |                                                 
+| is_less_than    | verify that the subject is less than the expected value                                |
+| is_at_least     | verify that the subject is greater than or equal to the expected value                 |                                                 
+| is_at_most      | verify that the subject is less than or equal to the expected value                    |
+| is_before       | verify that the subject is less than (before) the expected value                       |
+| is_after        | verify that the subject is greater than (after) the expected value                     |
+| is_between      | verify that the subject is between a min value (inclusive) and a max value (inclusive) |
 
 ### Range
 
