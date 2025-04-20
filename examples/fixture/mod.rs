@@ -9,5 +9,6 @@ mod dummy_extern_uses {
     #[cfg(feature = "colored")]
     use sdiff as _;
     use serial_test as _;
+    use time as _;
     use version_sync as _;
 }

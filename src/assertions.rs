@@ -112,6 +112,7 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// # Examples
 ///
 /// ```
+/// use time::macros::date;
 /// use asserting::prelude::*;
 ///
 /// let some_result: u16 = 42;
@@ -128,6 +129,12 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// assert_that!(some_letter).is_before('P');
 /// assert_that!(some_letter).is_after('K');
 /// assert_that!(some_letter).is_between('A', 'Z');
+///
+/// let some_date = date!(2025-04-20);
+///
+/// assert_that!(some_date).is_before(date!(2025-04-21));
+/// assert_that!(some_date).is_after(date!(2025-04-19));
+/// assert_that!(some_date).is_between(date!(2025-04-19), date!(2025-04-21));
 ///```
 pub trait AssertOrder<E> {
     /// Verifies that the subject is less than some expected value.

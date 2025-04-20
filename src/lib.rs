@@ -653,5 +653,6 @@ type TestCodeSnippetsInReadme = ();
 mod dummy_extern_uses {
     use proptest as _;
     use serial_test as _;
+    use time as _;
     use version_sync as _;
 }
