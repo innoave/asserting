@@ -75,7 +75,7 @@ fn mapping_subject_in_spec() {
         .is_equal_to((12, -64));
 }
 
-#[cfg(feature = "float")]
+#[cfg(feature = "float_cmp")]
 #[test]
 fn extracting_from_subject_in_spec() {
     struct Foo {

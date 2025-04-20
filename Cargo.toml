@@ -18,9 +18,9 @@ categories = ["development-tools::testing", "no-std"]
 all-features = true
 
 [features]
-default = ["std", "colored", "float", "panic"]
+default = ["std", "colored", "float_cmp", "panic"]
 colored = ["dep:sdiff"]
-float = ["dep:float-cmp"]
+float_cmp = ["dep:float-cmp"]
 panic = ["std"]
 std = []
 
