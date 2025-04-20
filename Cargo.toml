@@ -35,6 +35,7 @@ sdiff = { version = "0.1", optional = true }
 anyhow = "1"
 proptest = "1"
 serial_test = "3"
+time = { version = "0.3", default-features = false, features = ["macros"] }
 version-sync = "0.9"
 
 [lints.rust]

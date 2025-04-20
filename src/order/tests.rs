@@ -208,6 +208,83 @@ fn verify_char_is_at_least_other_char_fails() {
     );
 }
 
+#[test]
+fn char_is_before_other_char() {
+    let subject = 'L';
+
+    assert_that(subject).is_before('M');
+}
+
+#[test]
+fn verify_char_is_before_other_char_fails() {
+    let subject = 'L';
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_before('L')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing is before 'L'
+   but was: 'L'
+  expected: < 'L'
+"]
+    );
+}
+
+#[test]
+fn char_is_after_other_char() {
+    let subject = 'L';
+
+    assert_that(subject).is_after('K');
+}
+
+#[test]
+fn verify_char_is_after_other_char_fails() {
+    let subject = 'L';
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_after('L')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing is after 'L'
+   but was: 'L'
+  expected: > 'L'
+"]
+    );
+}
+
+#[test]
+fn char_is_between_a_min_char_and_a_max_char() {
+    let subject = 'L';
+
+    assert_that(subject).is_between('K', 'M');
+    assert_that(subject).is_between('L', 'P');
+    assert_that(subject).is_between('H', 'L');
+}
+
+#[test]
+fn verify_char_is_between_a_min_char_and_a_max_char_fails() {
+    let subject = 'L';
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .is_between('M', 'P')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing is between 'M' and 'P'
+   but was: 'L'
+  expected: 'M' <= x <= 'P'
+"]
+    );
+}
+
 #[cfg(feature = "colored")]
 mod colored {
     use crate::prelude::*;
@@ -283,6 +360,46 @@ mod colored {
                   but was: \u{1b}[31m3.781\u{1b}[0m\n  \
                  expected: >= \u{1b}[34m3.782\u{1b}[0m\n\
             "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_between_but_is_below_min() {
+        let subject = 'L';
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_between('M', 'P')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is between 'M' and 'P'\n   \
+                    but was: \u{1b}[31m'L'\u{1b}[0m\n  \
+                   expected: \u{1b}[33m'M'\u{1b}[0m <= x <= 'P'\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_between_but_is_above_max() {
+        let subject = 'L';
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .is_between('H', 'K')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject is between 'H' and 'K'\n   \
+                    but was: \u{1b}[31m'L'\u{1b}[0m\n  \
+                   expected: 'H' <= x <= \u{1b}[33m'K'\u{1b}[0m\n\
+                "
+            ]
         );
     }
 }

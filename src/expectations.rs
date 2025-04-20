@@ -94,6 +94,22 @@ pub struct IsAtLeast<E> {
 }
 
 #[must_use]
+pub struct IsBefore<E> {
+    pub expected: E,
+}
+
+#[must_use]
+pub struct IsAfter<E> {
+    pub expected: E,
+}
+
+#[must_use]
+pub struct IsBetween<E> {
+    pub min: E,
+    pub max: E,
+}
+
+#[must_use]
 pub struct IsInRange<E> {
     pub expected_range: RangeInclusive<E>,
 }
