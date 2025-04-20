@@ -122,6 +122,12 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// assert_that!(some_result).is_at_least(41);
 /// assert_that!(some_result).is_greater_than(41);
 /// assert_that!(some_result).is_less_than(43);
+///
+/// let some_letter: char = 'M';
+///
+/// assert_that!(some_letter).is_before('P');
+/// assert_that!(some_letter).is_after('K');
+/// assert_that!(some_letter).is_between('A', 'Z');
 ///```
 pub trait AssertOrder<E> {
     /// Verifies that the subject is less than some expected value.
@@ -140,6 +146,28 @@ pub trait AssertOrder<E> {
     /// value.
     #[track_caller]
     fn is_at_least(self, expected: E) -> Self;
+
+    /// Verifies that the subject is before some expected value.
+    ///
+    /// This is equivalent to asserting a subject to be less than the expected
+    /// value.
+    #[track_caller]
+    fn is_before(self, expected: E) -> Self;
+
+    /// Verifies that the subject is after some expected value.
+    ///
+    /// This is equivalent to asserting a subject to be greater than the
+    /// expected value.
+    #[track_caller]
+    fn is_after(self, expected: E) -> Self;
+
+    /// Verifies that the subject is between a min value and a max value.
+    ///
+    /// Min and max values are included. This is equivalent to asserting a
+    /// subject to be greater than or equal to the min value and to be less than
+    /// or equal to the max value.
+    #[track_caller]
+    fn is_between(self, min: E, max: E) -> Self;
 }
 
 /// Assert whether a value is within an expected range.
