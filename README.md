@@ -50,13 +50,13 @@ converting every expected `&str` to `String` results in lots of noise.
 
 ### Easy to extend
 
-Easy to extend means that we can write assertions for custom types with minimal effort.
+Easy-to-extend means that we can write assertions for custom types with minimal effort.
 
 `asserting` provides three kinds of custom assertions:
 
 1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
-2. property based assertions can be used with any type that implements the related property (
-   see "[property based assertions]")
+2. property-based assertions can be used with any type that implements the related property
+   (see "[property-based assertions]")
 3. write custom assertions by implementing two simple traits (see "[custom assertions]")
 
 The mentioned references link to a chapter in the crate's documentation that describes the
@@ -92,7 +92,7 @@ It supports different variants of how differences are highlighted.
 | off        | Switches off highlighting. The differences are not highlighted at all.                                                            | 
 
 The mode can be configured by setting the environment variable `ASSERTING_HIGHLIGHT_DIFFS` to one
-of the modes in the table above. The value is case-insensitive. E.g. setting the environment
+of the modes in the table above. The value is case-insensitive. E.g., setting the environment
 variable to values like `Red-Blue`, `Bold` or `OFF` works as well.
 
 The intended way for configuring the highlighting mode is to set the environment variable in the
@@ -103,18 +103,18 @@ configuration for `Cargo` by adding it to the `[env]` section in your `~/.cargo/
 ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
 ```
 
-By default the mode `red-green` is used. Differences are colored in
+By default, the mode `red-green` is used. Differences are colored in
 <span style="color: green">green</span> and <span style="color: red">red</span>.
 
 Differences are only highlighted if the crate feature `colored` is enabled. The configuration via
-the environment variable only works when the crate feature `std` is enabled too. In no-std projects
+the environment variable only works when the crate feature `std` is enabled too. In no-std projects,
 the default colors red and green are used.
 
 ## Available Assertions
 
 This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list
 of available assertions including examples browse the documentation of the [`assertions`] module.
-The documentation of the assertion traits contain examples on how to use each assertion. The
+The documentation of the assertion traits contains examples on how to use each assertion. The
 [crate level documentation][docs-url] contains lots of examples as a quick introduction.
 
 ### Equality
@@ -367,7 +367,7 @@ To start assertions on code use the `assert_that_code!()` macro.
 
 [predicate as custom assertion]: https://docs.rs/asserting/#predicate-as-custom-assertion
 
-[property based assertions]: https://docs.rs/asserting/#property-based-assertions
+[property-based assertions]: https://docs.rs/asserting/#property-based-assertions
 
 [`assertions`]: https://docs.rs/asserting/latest/asserting/assertions/
 
