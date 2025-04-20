@@ -418,7 +418,7 @@ fn verify_f64_is_not_a_number_fails() {
     );
 }
 
-#[cfg(feature = "float")]
+#[cfg(feature = "float_cmp")]
 mod cmp {
     use crate::prelude::*;
 
