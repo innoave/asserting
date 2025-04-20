@@ -209,6 +209,132 @@ pub trait AssertInRange<E> {
     fn is_not_in_range(self, range: RangeInclusive<E>) -> Self;
 }
 
+/// Assert whether a numeric value is negative or positive.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!(-42).is_negative();
+/// assert_that!(42).is_positive();
+/// assert_that!(0).is_not_negative();
+/// assert_that!(1).is_not_negative();
+/// assert_that!(0).is_not_positive();
+/// assert_that!(-1).is_not_positive();
+///
+/// assert_that!(-0.1).is_negative();
+/// assert_that!(0.1).is_positive();
+/// assert_that!(0.0).is_not_negative();
+/// assert_that!(0.1).is_not_negative();
+/// assert_that!(0.0).is_not_positive();
+/// assert_that!(-0.1).is_not_positive();
+/// ```
+pub trait AssertSignum {
+    /// Verifies that the subject is a negative number.
+    ///
+    /// This is equivalent to asserting that a number is less than 0.
+    #[track_caller]
+    fn is_negative(self) -> Self;
+
+    /// Verifies that the subject is a non-negative number.
+    ///
+    /// This is equivalent to asserting that a number is greater than or equal
+    /// to 0.
+    #[track_caller]
+    fn is_not_negative(self) -> Self;
+
+    /// Verifies that the subject is a positive number.
+    ///
+    /// This is equivalent to asserting that a number is greater than 0.
+    #[track_caller]
+    fn is_positive(self) -> Self;
+
+    /// Verifies that the subject is a non-positive number.
+    ///
+    /// This is equivalent to asserting that a number is less than or equal to
+    /// 0.
+    #[track_caller]
+    fn is_not_positive(self) -> Self;
+}
+
+/// Assert the additive and multiplicative identity of a number.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!(0).is_zero();
+/// assert_that!(1).is_one();
+/// assert_that!(0.0).is_zero();
+/// assert_that!(1.0).is_one();
+/// ```
+pub trait AssertNumericIdentity {
+    /// Verifies whether the subject is the additive identity (zero).
+    #[track_caller]
+    fn is_zero(self) -> Self;
+
+    /// Verifies whether the subject is the multiplicative identity (one).
+    #[track_caller]
+    fn is_one(self) -> Self;
+}
+
+/// Assert whether a numeric value is infinite or finite.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!(0.1).is_finite();
+/// assert_that!(0.0).is_finite();
+/// assert_that!(f32::INFINITY).is_infinite();
+/// assert_that!(f32::NEG_INFINITY).is_infinite();
+/// assert_that!(f64::INFINITY).is_infinite();
+/// assert_that!(f64::NEG_INFINITY).is_infinite();
+/// ```
+///
+/// Assert negative and positive infinity:
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!(f64::INFINITY).is_positive().is_infinite();
+/// assert_that!(f64::NEG_INFINITY).is_negative().is_infinite();
+/// ```
+pub trait AssertInfinity {
+    /// Verifies that the subject is an infinite number.    
+    #[track_caller]
+    fn is_infinite(self) -> Self;
+
+    /// Verifies that the subject is a finite number.
+    #[track_caller]
+    fn is_finite(self) -> Self;
+}
+
+/// Assert whether a numeric value is not a number.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!(0.1).is_a_number();
+/// assert_that!(0.0).is_a_number();
+/// assert_that!(f32::NAN).is_not_a_number();
+/// assert_that!(f64::NAN).is_not_a_number();
+/// ```
+pub trait AssertNotANumber {
+    /// Verifies that the subject is not a number.
+    #[track_caller]
+    fn is_not_a_number(self) -> Self;
+
+    /// Verifies that the subject is a number.
+    #[track_caller]
+    fn is_a_number(self) -> Self;
+}
+
 /// Assert whether some value or expression is true or false.
 ///
 /// # Examples

@@ -22,11 +22,12 @@
 //! specifies that a collection's iterator yields the items in a well-defined
 //! order.
 
-/// Any type that implements this trait provides access to its `is_empty` method
-/// to be used by the implementation of the
+/// The "empty" property of a collection-like type.
+///
+/// This property is used by the implementation of the
 /// [`AsssertEmptiness`](crate::assertions::AssertEmptiness) assertions.
 pub trait IsEmptyProperty {
-    /// Provides access to the `is_empty` property.
+    /// Returns whether the collection-like value is empty.
     fn is_empty_property(&self) -> bool;
 }
 
@@ -48,11 +49,15 @@ where
     }
 }
 
-/// Any type that implements this trait provides access to its `len` method
-/// to be used by the implementation of the
+/// The length property of a collection-like type.
+///
+/// Collection-like types are, for example, `Vec`, slice, array, `HashSet`,
+/// `HashMap` and strings.
+///
+/// This property is used by the implementation of the
 /// [`AssertHasLength`](crate::assertions::AssertHasLength) assertion.
 pub trait LengthProperty {
-    /// Provides access to the `len` property.
+    /// Returns the length of a collection-like value.
     fn length_property(&self) -> usize;
 }
 
@@ -102,5 +107,112 @@ where
 {
     fn char_count_property(&self) -> usize {
         <T as CharCountProperty>::char_count_property(self)
+    }
+}
+
+/// The additive identity property of a numeric type.
+pub trait AdditiveIdentityProperty {
+    /// The additive identity (zero).
+    const ADDITIVE_IDENTITY: Self;
+}
+
+/// The multiplicative identity property of a numeric type.
+pub trait MultiplicativeIdentityProperty {
+    /// The multiplicative identity (one).
+    const MULTIPLICATIVE_IDENTITY: Self;
+}
+
+/// A property of numeric types that can have negative and positive values.
+pub trait SignumProperty {
+    /// Returns whether this value is negative.
+    fn is_negative_property(&self) -> bool;
+
+    /// Returns whether this value is positive.
+    fn is_positive_property(&self) -> bool;
+}
+
+impl<T> SignumProperty for &T
+where
+    T: SignumProperty + ?Sized,
+{
+    fn is_negative_property(&self) -> bool {
+        <T as SignumProperty>::is_negative_property(self)
+    }
+
+    fn is_positive_property(&self) -> bool {
+        <T as SignumProperty>::is_positive_property(self)
+    }
+}
+
+impl<T> SignumProperty for &mut T
+where
+    T: SignumProperty + ?Sized,
+{
+    fn is_negative_property(&self) -> bool {
+        <T as SignumProperty>::is_negative_property(self)
+    }
+
+    fn is_positive_property(&self) -> bool {
+        <T as SignumProperty>::is_positive_property(self)
+    }
+}
+
+/// A property of floating point numbers that may have infinite or finite
+/// values.
+pub trait InfinityProperty {
+    /// Returns whether this value is infinite.
+    fn is_infinite_property(&self) -> bool;
+
+    /// Returns whether this value is finite.
+    fn is_finite_property(&self) -> bool;
+}
+
+impl<T> InfinityProperty for &T
+where
+    T: InfinityProperty + ?Sized,
+{
+    fn is_infinite_property(&self) -> bool {
+        <T as InfinityProperty>::is_infinite_property(self)
+    }
+
+    fn is_finite_property(&self) -> bool {
+        <T as InfinityProperty>::is_finite_property(self)
+    }
+}
+
+impl<T> InfinityProperty for &mut T
+where
+    T: InfinityProperty + ?Sized,
+{
+    fn is_infinite_property(&self) -> bool {
+        <T as InfinityProperty>::is_infinite_property(self)
+    }
+
+    fn is_finite_property(&self) -> bool {
+        <T as InfinityProperty>::is_finite_property(self)
+    }
+}
+
+/// The not-a-number property of floating point numbers.
+pub trait IsNanProperty {
+    /// Returns whether this value is not a number.
+    fn is_nan_property(&self) -> bool;
+}
+
+impl<T> IsNanProperty for &T
+where
+    T: IsNanProperty + ?Sized,
+{
+    fn is_nan_property(&self) -> bool {
+        <T as IsNanProperty>::is_nan_property(self)
+    }
+}
+
+impl<T> IsNanProperty for &mut T
+where
+    T: IsNanProperty + ?Sized,
+{
+    fn is_nan_property(&self) -> bool {
+        <T as IsNanProperty>::is_nan_property(self)
     }
 }
