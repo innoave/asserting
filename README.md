@@ -12,8 +12,8 @@ The goals for `asserting` are:
 1. assertions are convenient to write and easy to read
 2. helpful error messages in case of failing assertions
 3. colored diffs between expected and actual values
-4. provide a sensible amount of assertions out of the box
-5. do not require from asserted types to implement traits if it is not absolutely necessary
+4. provide a sensible number of assertions out of the box
+5. do not require that asserted types have to implement traits if it is not absolutely necessary
 6. support for asserting custom types with provided assertions
 7. writing custom assertions requires minimal effort
 8. support no-std environments
