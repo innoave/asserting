@@ -563,7 +563,7 @@
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at
 
-#![doc(html_root_url = "https://docs.rs/asserting/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/asserting/0.4.0")]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]

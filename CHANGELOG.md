@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.0 - 2025-04-20
+
+### Breaking Changes
+
+* Rename crate feature `float` to `float_cmp`
+  [(PR #18)](https://github.com/innoave/asserting/pull/18)<br/>
+  The functionality of the crate feature remains the same.<br/>
+  Replace any occurrence of the crate feature `float` with `float_cmp`.
+
+### Added
+
+* Provide assertions for the length of `CString` and `CStr`
+  [(PR #13)](https://github.com/innoave/asserting/pull/13)
+* Provide assertions for the number of characters in strings
+  [(PR #14)](https://github.com/innoave/asserting/pull/14)
+* Provide more assertions for the length of strings and collections
+  [(PR #15)](https://github.com/innoave/asserting/pull/15)
+* Provide additional assertions for the order of values
+  [(PR #16)](https://github.com/innoave/asserting/pull/16)
+* Provide additional assertions for integers and floats
+  [(PR #17)](https://github.com/innoave/asserting/pull/17)
+
 ## 0.3.0 - 2025-04-14
 
 ### Added
