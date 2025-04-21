@@ -110,6 +110,9 @@ Differences are only highlighted if the crate feature `colored` is enabled. The 
 the environment variable only works when the crate feature `std` is enabled too. In no-std projects,
 the default colors red and green are used.
 
+*Asserting* respects the [`NO_COLOR`] environment variable. If the `NO_COLOR` environment variable
+is set no colors are used regardless of the configured highlight mode.
+
 ## Available Assertions
 
 This chapter gives an overview for the assertions provided by `asserting`. For a comprehensive list
@@ -376,3 +379,5 @@ To start assertions on code use the `assert_that_code!()` macro.
 [`IsEmptyProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.IsEmptyProperty.html
 
 [`LengthProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.LengthProperty.html
+
+[`NO_COLOR`]: https://no-color.org/
