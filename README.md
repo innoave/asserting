@@ -145,10 +145,10 @@ for all types that implement `PartialOrd<E>` with `E` being the type of the expe
 for all types `T` that implement `PartialOrd<E>` and `E` implementing `PartialOrd<T>` with `E`
 being the type of the expected value.
 
-| assertion       | description                                                          |
-|-----------------|----------------------------------------------------------------------|
-| is_in_range     | verify that the subject is in the expected range (closed range)      |                                                 
-| is_not_in_range | verify that the subject is not in the specified range (closed range) |
+| assertion       | description                                           |
+|-----------------|-------------------------------------------------------|
+| is_in_range     | verify that the subject is in the expected range      |                                                 
+| is_not_in_range | verify that the subject is not in the specified range |
 
 ### Integer and Float
 

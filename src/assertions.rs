@@ -11,7 +11,8 @@
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
 use crate::spec::Spec;
-use crate::std::ops::RangeInclusive;
+use crate::std::fmt::Debug;
+use crate::std::ops::RangeBounds;
 use crate::std::string::String;
 
 /// Assert whether two values are equal or not.
@@ -177,9 +178,18 @@ pub trait AssertOrder<E> {
     fn is_between(self, min: E, max: E) -> Self;
 }
 
+/// Common interface for supported range-like types.
+pub trait RangeLike<T> {
+    /// Returns true if this range contains the given value.
+    fn contains_value<E>(&self, value: &E) -> bool
+    where
+        T: PartialOrd<E>,
+        E: PartialOrd<T>;
+}
+
 /// Assert whether a value is within an expected range.
 ///
-/// The expected range must be a closed range with both ends inclusive.
+/// The expected range can be any of range.
 ///
 /// These assertions are implemented for all types `T` that implement
 /// `PartialOrd<E>` with `E` being the type of the expected value. And `E` must
@@ -190,23 +200,30 @@ pub trait AssertOrder<E> {
 /// ```
 /// use asserting::prelude::*;
 ///
-/// let some_char = 'M';
+/// assert_that!(7).is_in_range(6..8);
+/// assert_that!(8).is_not_in_range(6..8);
+/// assert_that!(1234).is_in_range(6..);
+/// assert_that!(5).is_not_in_range(6..);
+/// assert_that!(-33).is_in_range(..-1);
 ///
-/// assert_that!(some_char).is_in_range('A'..='Z');
-/// assert_that!(some_char).is_not_in_range('a'..='z');
+/// assert_that!('M').is_in_range('A'..='Z');
+/// assert_that!('M').is_not_in_range('a'..='z');
+/// assert_that!('k').is_in_range('h'..'n');
+/// assert_that!('r').is_in_range('H'..);
+/// assert_that!('N').is_in_range(..'n');
 /// ```
 pub trait AssertInRange<E> {
     /// Verifies that the subject is within the expected range.
-    ///
-    /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn is_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn is_in_range<R>(self, range: R) -> Self
+    where
+        R: RangeBounds<E> + Debug;
 
     /// Verifies that the subject is not within the expected range.
-    ///
-    /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn is_not_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn is_not_in_range<R>(self, range: R) -> Self
+    where
+        R: RangeBounds<E> + Debug;
 }
 
 /// Assert whether a numeric value is negative or positive.
@@ -304,7 +321,7 @@ pub trait AssertNumericIdentity {
 /// assert_that!(f64::NEG_INFINITY).is_negative().is_infinite();
 /// ```
 pub trait AssertInfinity {
-    /// Verifies that the subject is an infinite number.    
+    /// Verifies that the subject is an infinite number.
     #[track_caller]
     fn is_infinite(self) -> Self;
 
@@ -445,7 +462,11 @@ pub trait AssertEmptiness {
 ///
 /// let some_str = "takimata te iriure nonummy";
 /// assert_that!(some_str).has_length(26);
+/// assert_that!(some_str).has_length_in_range(12..32);
 /// assert_that!(some_str).has_length_in_range(12..=32);
+/// assert_that!(some_str).has_length_in_range(12..);
+/// assert_that!(some_str).has_length_in_range(..32);
+/// assert_that!(some_str).has_length_in_range(..=32);
 /// assert_that!(some_str).has_length_less_than(27);
 /// assert_that!(some_str).has_length_greater_than(25);
 /// assert_that!(some_str).has_at_most_length(26);
@@ -455,7 +476,11 @@ pub trait AssertEmptiness {
 ///
 /// let some_vec = vec!['m', 'Q', 'k', 'b'];
 /// assert_that!(&some_vec).has_length(4);
+/// assert_that!(&some_vec).has_length_in_range(2..6);
 /// assert_that!(&some_vec).has_length_in_range(2..=6);
+/// assert_that!(&some_vec).has_length_in_range(2..);
+/// assert_that!(&some_vec).has_length_in_range(..6);
+/// assert_that!(&some_vec).has_length_in_range(..=6);
 /// assert_that!(&some_vec).has_length_less_than(5);
 /// assert_that!(&some_vec).has_length_greater_than(3);
 /// assert_that!(&some_vec).has_at_most_length(4);
@@ -495,9 +520,11 @@ pub trait AssertHasLength<E> {
 
     /// Verifies that the subject has a length in the expected range.
     ///
-    /// The expected range must be a closed range with both ends inclusive.
+    /// The expected range can be any type of range.
     #[track_caller]
-    fn has_length_in_range(self, expected_range: RangeInclusive<E>) -> Self;
+    fn has_length_in_range<U>(self, expected_range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug;
 
     /// Verifies that the subject has a length that is less than the expected
     /// length.
@@ -560,7 +587,9 @@ pub trait AssertHasCharCount<E> {
     ///
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn has_char_count_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn has_char_count_in_range<U>(self, range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug;
 
     /// Verifies that the subject contains less than the expected number of
     /// characters.
