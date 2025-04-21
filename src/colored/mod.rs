@@ -11,9 +11,9 @@
 //! printing the actual and expected values with the assertion failure.
 //!
 //! When printing the expected value parts or the whole value is highlighted as
-//! "missing" if there is no related part in the actual value. On the other hand
-//! when printing the actual value parts or the whole value is highlighted as
-//! "unexpected" if there is no related part in the expected value. The
+//! "missing" if there is no related part in the actual value. On the other
+//! hand, when printing the actual value parts or the whole value is highlighted
+//! as "unexpected" if there is no related part in the expected value. The
 //! "missing" parts and the "unexpected" parts are highlighted in two different
 //! colors (or in bold glyphs).
 //!
@@ -26,7 +26,7 @@
 //! colors to his/her liking.
 //!
 //! The intended way to configure the environment variable is to add the setting
-//! to the Cargo config.toml in the users home directory. For example: to set
+//! to the Cargo config.toml in the users home directory. For example, to set
 //! the colors to red and blue set the environment variable to `red-blue` within
 //! the `[env]` section of the `~/.cargo/config.toml` file, like so:
 //!
@@ -35,8 +35,14 @@
 //! ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
 //! ```
 //!
+//! This feature respects the [`NO_COLOR`] environment variable. If `NO_COLOR` is
+//! set to a non-empty string, no colors are used, regardless of the mode set
+//! with the `ASSERTING_HIGHLIGHT_DIFFS` environment variable.
+//!
 //! The functions provided by this module help with highlighting missing and
 //! unexpected parts when composing the failure message for an assertion.
+//!
+//! [`NO_COLOR`]: https://no-color.org/
 #[cfg(feature = "colored")]
 #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
 pub use with_colored_feature::{
@@ -74,11 +80,11 @@ pub const DIFF_FORMAT_NO_HIGHLIGHT: DiffFormat = DiffFormat {
 
 /// Default diff format.
 ///
-/// When the crate feature `colored` is enabled the default diff format
+/// When the crate feature `colored` is enabled, the default diff format
 /// highlights unexpected values in <span style="color: red;">red</span> and
 /// missing values in <span style="color: green;">green</span>.
 ///
-/// Without the crate feature `colored` enabled the default diff format does not
+/// Without the crate feature `colored` enabled, the default diff format does not
 /// highlight any differences in the messages for failed assertions.
 pub const DEFAULT_DIFF_FORMAT: DiffFormat = {
     #[cfg(not(feature = "colored"))]
@@ -96,20 +102,26 @@ pub const DEFAULT_DIFF_FORMAT: DiffFormat = {
 /// The behavior of this function is dependent on whether the crate features
 /// `colored` and `std` are enabled or not.
 ///
-/// When both features `colored` and `std` are enabled the highlight mode is
+/// When both features `colored` and `std` are enabled, the highlight mode is
 /// read from the environment variable `ASSERTING_HIGHLIGHT_DIFFS`. If the
-/// environment variable is set to a supported highlight mode the
+/// environment variable is set to a supported highlight mode, the
 /// [`DiffFormat`] related to this mode is returned. Otherwise, the default diff
 /// format [`DEFAULT_DIFF_FORMAT`] is returned. See the documentation of
 /// [`diff_format_for_mode`] for a list of supported highlight modes.
+///
+/// If the environment variable [`NO_COLOR`] is set to a non-empty string, no
+/// and `ASSERTING_HIGHLIGHT_DIFFS` is set to a color-mode, then
+/// [`DIFF_FORMAT_NO_HIGHLIGHT`] is returned, which switches off colors.
 ///
 /// When in a no-std environment with the feature `std` not enabled and the
 /// `colored` feature is enabled. The default diff format
 /// [`DEFAULT_DIFF_FORMAT`] is returned.
 ///
-/// When the crate feature `colored` is not enabled the diff format
+/// When the crate feature `colored` is not enabled, the diff format
 /// [`DIFF_FORMAT_NO_HIGHLIGHT`] is returned, which means that highlighting is
 /// switched off.
+///
+/// [`NO_COLOR`]: https://no-color.org/
 #[allow(clippy::missing_const_for_fn)]
 #[must_use]
 pub fn configured_diff_format() -> DiffFormat {
@@ -125,11 +137,12 @@ pub fn configured_diff_format() -> DiffFormat {
 /// It first converts the actual and the expected value into their debug
 /// formatted string representation. Then a diff algorithm is applied to
 /// determine the differences between the expected and the actual value.
-/// Finally, the differences are marked according the provided [`DiffFormat`].
+/// Finally, the differences are marked according to the provided
+/// [`DiffFormat`].
 ///
 /// It returns a tuple of two `String`s. The first string contains the actual
-/// value and the second one contains the expected value. Both strings represent
-/// their according value as debug formatted string with differences
+/// value, and the second one contains the expected value. Both strings
+/// represent their according value as debug formatted string with differences
 /// highlighted.
 ///
 /// # Examples
@@ -427,8 +440,13 @@ mod with_colored_feature {
     use crate::spec::{DiffFormat, Highlight};
     use crate::std::{fmt::Debug, format, string::String};
 
+    #[cfg(feature = "std")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+    const ENV_VAR_NO_COLOR: &str = "NO_COLOR";
+
     /// Environment variable to set the highlight mode.
     #[cfg(feature = "std")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     pub const ENV_VAR_HIGHLIGHT_DIFFS: &str = "ASSERTING_HIGHLIGHT_DIFFS";
 
     /// Highlight mode using the CVD-friendly colors red and blue.
@@ -539,6 +557,27 @@ mod with_colored_feature {
         }
     }
 
+    /// Returns true if the mode is a color mode and not "bold" or "off".
+    #[cfg(feature = "std")]
+    fn is_color_mode(mode: &str) -> bool {
+        !matches!(
+            mode.to_lowercase().as_str(),
+            HIGHLIGHT_MODE_BOLD | HIGHLIGHT_MODE_OFF
+        )
+    }
+
+    /// Returns true if the environment variable `NO_COLOR` is set.
+    #[cfg(feature = "std")]
+    fn is_no_color_env_var_set() -> bool {
+        use crate::std::env;
+
+        match env::var(ENV_VAR_NO_COLOR) {
+            Ok(value) => !value.is_empty(),
+            Err(env::VarError::NotPresent) => false,
+            Err(env::VarError::NotUnicode(value)) => !value.is_empty(),
+        }
+    }
+
     #[cfg(not(feature = "std"))]
     pub const fn configured_diff_format_impl() -> DiffFormat {
         DEFAULT_DIFF_FORMAT
@@ -552,14 +591,26 @@ mod with_colored_feature {
         use crate::std::env;
 
         match env::var(ENV_VAR_HIGHLIGHT_DIFFS) {
-            Ok(value) => diff_format_for_mode(&value).unwrap_or_else(|| {
-                #[cfg(feature = "std")]
-                eprintln!(
-                    "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
-                );
-                DEFAULT_DIFF_FORMAT
-            }),
-            Err(env::VarError::NotPresent) => DEFAULT_DIFF_FORMAT,
+            Ok(value) => {
+                if is_color_mode(&value) && is_no_color_env_var_set() {
+                    DIFF_FORMAT_NO_HIGHLIGHT
+                } else {
+                    diff_format_for_mode(&value).unwrap_or_else(|| {
+                        #[cfg(feature = "std")]
+                        eprintln!(
+                            "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
+                        );
+                        DEFAULT_DIFF_FORMAT
+                    })
+                }
+            },
+            Err(env::VarError::NotPresent) => {
+                if is_no_color_env_var_set() {
+                    DIFF_FORMAT_NO_HIGHLIGHT
+                } else {
+                    DEFAULT_DIFF_FORMAT
+                }
+            },
             Err(env::VarError::NotUnicode(value)) => {
                 #[cfg(feature = "std")]
                 eprintln!(
