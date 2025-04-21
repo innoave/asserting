@@ -130,6 +130,7 @@ macro_rules! verify_that {
 /// ```
 #[cfg(feature = "panic")]
 #[cfg_attr(feature = "panic", macro_export)]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 macro_rules! assert_that_code {
     ($subject:expr) => {
         $crate::prelude::assert_that_code($subject)
@@ -190,6 +191,7 @@ macro_rules! assert_that_code {
 /// ```
 #[cfg(feature = "panic")]
 #[cfg_attr(feature = "panic", macro_export)]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 macro_rules! verify_that_code {
     ($subject:expr) => {
         $crate::prelude::verify_that_code($subject)
@@ -339,6 +341,7 @@ pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
 /// assert_that_code(|| { divide(7, 3); }).does_not_panic();
 /// ```
 #[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub fn assert_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, PanicOnFail>
 where
     S: FnOnce(),
@@ -399,6 +402,7 @@ where
 /// ]);
 /// ```
 #[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub fn verify_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, CollectFailures>
 where
     S: FnOnce(),
@@ -1086,6 +1090,7 @@ impl Display for Unknown {
 
 /// Wrapper type that holds a closure as code snippet.
 #[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub struct Code<F>(Rc<RefCell<Option<F>>>);
 
 #[cfg(feature = "panic")]

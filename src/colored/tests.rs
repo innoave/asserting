@@ -174,7 +174,7 @@ mod with_colored_and_std_features {
 
             let assertion = assert_that(42);
 
-            assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_BOLD);
+            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_BOLD);
         }
 
         #[test]
@@ -186,7 +186,7 @@ mod with_colored_and_std_features {
 
             let assertion = assert_that(42);
 
-            assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_BLUE);
+            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_RED_BLUE);
         }
 
         #[test]
@@ -198,7 +198,7 @@ mod with_colored_and_std_features {
 
             let assertion = assert_that(42);
 
-            assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_YELLOW);
+            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_RED_YELLOW);
         }
 
         #[test]
@@ -210,7 +210,7 @@ mod with_colored_and_std_features {
 
             let assertion = assert_that(42);
 
-            assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_NO_HIGHLIGHT);
         }
     }
 

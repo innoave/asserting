@@ -18,7 +18,7 @@
 //!
 //! # Usage
 //!
-//! To write fluent assertions in tests import this crate's `prelude`
+//! To write fluent assertions in tests, import this crate's `prelude`
 //! module in your test module, like so:
 //!
 //! ```
@@ -140,7 +140,7 @@
 //! ```
 //!
 //! Or we can map a custom type that does not implement a required trait to some
-//! supported type, e.g. a tuple in this example:
+//! supported type, e.g., a tuple in this example:
 //!
 //! ```
 //! # use asserting::prelude::*;
@@ -169,10 +169,12 @@
 //!
 //! ## Assert that some code panics or does not panic
 //!
+//! Requires crate feature `panic`.
+//!
 //! ```
-//! # #[cfg(not(feature = "std"))]
+//! # #[cfg(not(feature = "panic"))]
 //! # fn main() {}
-//! # #[cfg(feature = "std")]
+//! # #[cfg(feature = "panic")]
 //! # fn main() {
 //! use asserting::prelude::*;
 //!
@@ -214,7 +216,7 @@
 //! an optional description of what we are going to assert. These attributes are
 //! all optional and must be set explicitly by the user.
 //!
-//! For convenience a set of macros with the same names as the functions above
+//! For convenience, a set of macros with the same names as the functions above
 //! is provided which set the expression and the code location for the user.
 //!
 //! * [`assert_that!`] - calls the [`assert_that`] function and sets the
@@ -565,6 +567,8 @@
 
 #![doc(html_root_url = "https://docs.rs/asserting/0.4.0")]
 #![cfg_attr(not(feature = "std"), no_std)]
+// Render feature requirements in docs.rs
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(not(feature = "std"))]
 #[allow(unused_imports)]

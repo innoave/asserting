@@ -76,5 +76,5 @@ clean:
     cargo clean
 
 # generate and open docs locally
-doc:
+doc $RUSTDOCFLAGS="--cfg docsrs":
     cargo +nightly doc --all-features --no-deps --open
