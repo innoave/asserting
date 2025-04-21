@@ -42,6 +42,8 @@ pub trait AssertEquality<E> {
 }
 
 /// Assert approximate equality for floating point numbers.
+#[cfg(feature = "float_cmp")]
+#[cfg_attr(docsrs, doc(cfg(feature = "float_cmp")))]
 pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
@@ -73,6 +75,8 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
 }
 
 /// Assert approximate equality for floating point numbers.
+#[cfg(feature = "float_cmp")]
+#[cfg_attr(docsrs, doc(cfg(feature = "float_cmp")))]
 pub trait AssertIsCloseToWithDefaultMargin<E> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
@@ -1007,6 +1011,8 @@ pub trait AssertIsSorted {
 
 /// Assert that the code under test panics, panics with a certain message or
 /// does not panic.
+#[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub trait AssertCodePanics {
     /// Verifies that the actual code under test does not panic.
     #[track_caller]

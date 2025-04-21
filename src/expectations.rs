@@ -463,6 +463,7 @@ pub struct Predicate<F> {
 }
 
 #[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub use panic::{DoesNotPanic, DoesPanic};
 
 #[cfg(feature = "panic")]

@@ -38,6 +38,7 @@
 //! The functions provided by this module help with highlighting missing and
 //! unexpected parts when composing the failure message for an assertion.
 #[cfg(feature = "colored")]
+#[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
 pub use with_colored_feature::{
     diff_format_for_mode, DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN,
     DIFF_FORMAT_RED_YELLOW,

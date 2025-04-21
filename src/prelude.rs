@@ -24,11 +24,13 @@ pub use super::{
 };
 
 #[cfg(feature = "colored")]
+#[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
 pub use super::colored::{
     DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
 };
 
 #[cfg(feature = "panic")]
+#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub use super::{
     assert_that_code,
     spec::{assert_that_code, verify_that_code},
