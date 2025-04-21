@@ -12,7 +12,7 @@
 
 use crate::spec::Spec;
 use crate::std::fmt::Debug;
-use crate::std::ops::{RangeBounds, RangeInclusive};
+use crate::std::ops::RangeBounds;
 use crate::std::string::String;
 
 /// Assert whether two values are equal or not.
@@ -462,7 +462,11 @@ pub trait AssertEmptiness {
 ///
 /// let some_str = "takimata te iriure nonummy";
 /// assert_that!(some_str).has_length(26);
+/// assert_that!(some_str).has_length_in_range(12..32);
 /// assert_that!(some_str).has_length_in_range(12..=32);
+/// assert_that!(some_str).has_length_in_range(12..);
+/// assert_that!(some_str).has_length_in_range(..32);
+/// assert_that!(some_str).has_length_in_range(..=32);
 /// assert_that!(some_str).has_length_less_than(27);
 /// assert_that!(some_str).has_length_greater_than(25);
 /// assert_that!(some_str).has_at_most_length(26);
@@ -472,7 +476,11 @@ pub trait AssertEmptiness {
 ///
 /// let some_vec = vec!['m', 'Q', 'k', 'b'];
 /// assert_that!(&some_vec).has_length(4);
+/// assert_that!(&some_vec).has_length_in_range(2..6);
 /// assert_that!(&some_vec).has_length_in_range(2..=6);
+/// assert_that!(&some_vec).has_length_in_range(2..);
+/// assert_that!(&some_vec).has_length_in_range(..6);
+/// assert_that!(&some_vec).has_length_in_range(..=6);
 /// assert_that!(&some_vec).has_length_less_than(5);
 /// assert_that!(&some_vec).has_length_greater_than(3);
 /// assert_that!(&some_vec).has_at_most_length(4);
@@ -512,9 +520,11 @@ pub trait AssertHasLength<E> {
 
     /// Verifies that the subject has a length in the expected range.
     ///
-    /// The expected range must be a closed range with both ends inclusive.
+    /// The expected range can be any type of range.
     #[track_caller]
-    fn has_length_in_range(self, expected_range: RangeInclusive<E>) -> Self;
+    fn has_length_in_range<U>(self, expected_range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug;
 
     /// Verifies that the subject has a length that is less than the expected
     /// length.
@@ -577,7 +587,9 @@ pub trait AssertHasCharCount<E> {
     ///
     /// The expected range must be a closed range with both ends inclusive.
     #[track_caller]
-    fn has_char_count_in_range(self, range: RangeInclusive<E>) -> Self;
+    fn has_char_count_in_range<U>(self, range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug;
 
     /// Verifies that the subject contains less than the expected number of
     /// characters.

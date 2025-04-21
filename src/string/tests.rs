@@ -212,11 +212,38 @@ fn verify_str_has_length_fails() {
 fn string_has_length_in_range() {
     let subject: String = "fugiat vero cillum dolore".to_string();
 
-    assert_that(subject).has_length_in_range(1..=25);
+    assert_that(subject).has_length_in_range(1..26);
 }
 
 #[test]
 fn verify_has_length_in_range_fails() {
+    let subject: String = "fugiat vero cillum dolore".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_length_in_range(1..25)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has length in range 1..25
+   but was: 25
+  expected: 1..25
+"
+        ]
+    );
+}
+
+#[test]
+fn string_has_length_in_inclusive_range() {
+    let subject: String = "fugiat vero cillum dolore".to_string();
+
+    assert_that(subject).has_length_in_range(1..=25);
+}
+
+#[test]
+fn verify_has_length_in_inclusive_range_fails() {
     let subject: String = "fugiat vero cillum dolore".to_string();
 
     let failures = verify_that(subject)
@@ -399,6 +426,13 @@ fn verify_str_has_char_count_fails() {
 fn string_has_char_count_in_range() {
     let subject: String = "\u{0112} \u{0034} \u{0200}".to_string();
 
+    assert_that(subject).has_char_count_in_range(5..6);
+}
+
+#[test]
+fn string_has_char_count_in_inclusive_range() {
+    let subject: String = "\u{0112} \u{0034} \u{0200}".to_string();
+
     assert_that(subject).has_char_count_in_range(5..=5);
 }
 
@@ -413,11 +447,38 @@ fn borrowed_string_has_char_count_in_range() {
 fn str_has_char_count_in_range() {
     let subject: &str = "\u{0112} \u{0034} \u{0200}";
 
-    assert_that(subject).has_char_count_in_range(5..=5);
+    assert_that(subject).has_char_count_in_range(5..6);
 }
 
 #[test]
 fn verify_str_has_char_count_in_range_fails() {
+    let subject: &str = "\u{0112} \u{0034} \u{0200}";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .has_char_count_in_range(6..12)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing has a char count of 6..12
+   but was: 5
+  expected: 6..12
+"
+        ]
+    );
+}
+
+#[test]
+fn str_has_char_count_in_inclusive_range() {
+    let subject: &str = "\u{0112} \u{0034} \u{0200}";
+
+    assert_that(subject).has_char_count_in_range(5..=5);
+}
+
+#[test]
+fn verify_str_has_char_count_in_inclusive_range_fails() {
     let subject: &str = "\u{0112} \u{0034} \u{0200}";
 
     let failures = verify_that(subject)

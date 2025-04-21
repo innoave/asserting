@@ -65,6 +65,13 @@ fn slice_has_length() {
 fn slice_has_length_in_range() {
     let subject: &[i32] = &[1, 3, 5, 7, 11];
 
+    assert_that(subject).has_length_in_range(4..6);
+}
+
+#[test]
+fn slice_has_length_in_inclusive_range() {
+    let subject: &[i32] = &[1, 3, 5, 7, 11];
+
     assert_that(subject).has_length_in_range(4..=6);
 }
 

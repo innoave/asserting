@@ -4,7 +4,6 @@
 #![warn(clippy::return_self_not_must_use)]
 
 use crate::std::marker::PhantomData;
-use crate::std::ops::RangeInclusive;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
@@ -204,8 +203,18 @@ pub struct HasLength<E> {
 }
 
 #[must_use]
-pub struct HasLengthInRange<E> {
-    pub expected_range: RangeInclusive<E>,
+pub struct HasLengthInRange<R, E> {
+    pub expected_range: R,
+    _element_type: PhantomData<E>,
+}
+
+impl<R, E> HasLengthInRange<R, E> {
+    pub fn new(expected_range: R) -> Self {
+        Self {
+            expected_range,
+            _element_type: PhantomData,
+        }
+    }
 }
 
 #[must_use]
@@ -234,8 +243,18 @@ pub struct HasCharCount<E> {
 }
 
 #[must_use]
-pub struct HasCharCountInRange<E> {
-    pub expected_range: RangeInclusive<E>,
+pub struct HasCharCountInRange<R, E> {
+    pub expected_range: R,
+    _element_type: PhantomData<E>,
+}
+
+impl<R, E> HasCharCountInRange<R, E> {
+    pub fn new(expected_range: R) -> Self {
+        Self {
+            expected_range,
+            _element_type: PhantomData,
+        }
+    }
 }
 
 #[must_use]

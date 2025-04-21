@@ -10,7 +10,7 @@ use crate::properties::CharCountProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::format;
-use crate::std::ops::RangeInclusive;
+use crate::std::ops::RangeBounds;
 use crate::std::string::String;
 
 impl<S, R> AssertHasCharCount<usize> for Spec<'_, S, R>
@@ -24,10 +24,11 @@ where
         })
     }
 
-    fn has_char_count_in_range(self, range: RangeInclusive<usize>) -> Self {
-        self.expecting(HasCharCountInRange {
-            expected_range: range,
-        })
+    fn has_char_count_in_range<U>(self, expected_range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug,
+    {
+        self.expecting(HasCharCountInRange::new(expected_range))
     }
 
     fn has_char_count_less_than(self, expected_char_count: usize) -> Self {
@@ -73,9 +74,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for HasCharCountInRange<usize>
+impl<S, R> Expectation<S> for HasCharCountInRange<R, usize>
 where
     S: CharCountProperty + Debug,
+    R: RangeBounds<usize> + Debug,
 {
     fn test(&mut self, subject: &S) -> bool {
         self.expected_range.contains(&subject.char_count_property())

@@ -9,7 +9,7 @@ use crate::expectations::{
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
-use crate::std::ops::RangeInclusive;
+use crate::std::ops::RangeBounds;
 use crate::std::{format, string::String};
 
 impl<S, R> AssertEmptiness for Spec<'_, S, R>
@@ -65,10 +65,11 @@ where
         self.expecting(HasLength { expected_length })
     }
 
-    fn has_length_in_range(self, range: RangeInclusive<usize>) -> Self {
-        self.expecting(HasLengthInRange {
-            expected_range: range,
-        })
+    fn has_length_in_range<U>(self, expected_range: U) -> Self
+    where
+        U: RangeBounds<usize> + Debug,
+    {
+        self.expecting(HasLengthInRange::new(expected_range))
     }
 
     fn has_length_less_than(self, expected_length: usize) -> Self {
@@ -106,9 +107,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for HasLengthInRange<usize>
+impl<S, R> Expectation<S> for HasLengthInRange<R, usize>
 where
     S: LengthProperty + Debug,
+    R: RangeBounds<usize> + Debug,
 {
     fn test(&mut self, subject: &S) -> bool {
         self.expected_range.contains(&subject.length_property())
