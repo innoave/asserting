@@ -29,7 +29,7 @@
 //! prelude re-exports all types, traits and functions and macros that are
 //! needed to write assertions in tests.
 //!
-//! Start writing assertion by applying the [`assert_that`] macro to the subject
+//! Start writing assertion by applying the [`assert_that!`] macro to the subject
 //! to be asserted. Then call an assertion
 //! function like `is_equal_to`, like so:
 //!
@@ -46,7 +46,7 @@
 //! assert_that!(6 * 8 - 6).is_equal_to(42);
 //! ```
 //!
-//! The variable or expression inside the call of the [`assert_that`] macro is
+//! The variable or expression inside the call of the [`assert_that!`] macro is
 //! repeated in the error message when an assertion fails. For example, the
 //! assertion:
 //!
