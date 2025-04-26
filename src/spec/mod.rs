@@ -245,10 +245,18 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     {
         Spec::new(subject, PanicOnFail)
     }
-    #[cfg(feature = "colored")]
+    #[cfg(all(feature = "colored", not(feature = "std")))]
     {
         use crate::colored::configured_diff_format;
         Spec::new(subject, PanicOnFail).with_diff_format(configured_diff_format())
+    }
+    #[cfg(all(feature = "colored", feature = "std"))]
+    {
+        use crate::colored::configured_diff_format;
+        use crate::std::sync::OnceLock;
+        static DIFF_FORMAT: OnceLock<DiffFormat> = OnceLock::new();
+        let diff_format = DIFF_FORMAT.get_or_init(configured_diff_format);
+        Spec::new(subject, PanicOnFail).with_diff_format(diff_format.clone())
     }
 }
 
