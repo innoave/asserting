@@ -5,14 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.5.0 - 2025-04-26
+
+_Soft assertions_
+
+### Added
+
+* Support for soft assertions
+  [(PR #28)](https://github.com/innoave/asserting/pull/28)
+* Respect `NO_COLOR` environment variable `colored` feature
+  [(PR #23)](https://github.com/innoave/asserting/pull/23)
+* Provide `matches` regex assertion for strings
+  [(PR #24)](https://github.com/innoave/asserting/pull/24)
+* Accept any type of range in range assertions
+  [(PR #21)](https://github.com/innoave/asserting/pull/21)
+* Doc: mark api elements gated behind a feature flag in rust doc
+  [(PR #22)](https://github.com/innoave/asserting/pull/22)
+
+### Changed
+
+* **Breaking:** Rename crate feature `float_cmp` to `float-cmp`
+  [(PR #26)](https://github.com/innoave/asserting/pull/26)<br/>
+  The functionality of the crate feature remains the same.<br/>
+  Replace any occurrence of the crate feature `float_cmp` with `float-cmp`.
+* Read diff format configuration only once per test run
+  [(PR #27)](https://github.com/innoave/asserting/pull/27)
+
+### Fixed
+
+* `assert_that_code` does not highlight diffs in failure messages
+  [(PR #30)](https://github.com/innoave/asserting/pull/30)
+
 ## 0.4.0 - 2025-04-20
 
-### Breaking Changes
-
-* Rename crate feature `float` to `float_cmp`
-  [(PR #18)](https://github.com/innoave/asserting/pull/18)<br/>
-  The functionality of the crate feature remains the same.<br/>
-  Replace any occurrence of the crate feature `float` with `float_cmp`.
+_More assertions provided_
 
 ### Added
 
@@ -27,7 +53,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Provide additional assertions for integers and floats
   [(PR #17)](https://github.com/innoave/asserting/pull/17)
 
+### Changed
+
+* **Breaking:** Rename crate feature `float` to `float_cmp`
+  [(PR #18)](https://github.com/innoave/asserting/pull/18)<br/>
+  The functionality of the crate feature remains the same.<br/>
+  Replace any occurrence of the crate feature `float` with `float_cmp`.
+
 ## 0.3.0 - 2025-04-14
+
+_Color-highlighted diffs in assertion failures_
 
 ### Added
 
