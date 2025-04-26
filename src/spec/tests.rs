@@ -205,6 +205,16 @@ expected answer is equal to 42
 }
 
 #[test]
+fn soft_assertions_with_chained_assertion_methods() {
+    let subject = "the answer to all important questions is 42".to_string();
+
+    verify_that(subject)
+        .contains("important")
+        .has_at_most_length(43)
+        .soft_panic();
+}
+
+#[test]
 #[should_panic = "assertion failed: expected subject to contain \"unimportant\"\n   \
        but was: \"the answer to all important questions is 42\"\n  \
       expected: \"unimportant\"\n\
@@ -214,7 +224,7 @@ expected answer is equal to 42
       expected: <= 41\n\
 "]
 fn soft_assertions_panic_once_with_multiple_failure_messages() {
-    let subject = "the answer to all important questions is 42";
+    let subject = "the answer to all important questions is 42".to_string();
 
     verify_that(subject)
         .contains("unimportant")
