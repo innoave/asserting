@@ -7,18 +7,21 @@
 
 Fluent assertions for tests in Rust that are convenient to write and easy to extend.
 
-The goals for `asserting` are:
+Features of `asserting`:
 
 1. assertions are convenient to write and easy to read
 2. helpful error messages in case of failing assertions
 3. colored diffs between expected and actual values
-4. provide a sensible number of assertions out of the box
+4. provide a reasonable number of assertions out of the box
 5. do not require that asserted types have to implement traits if it is not absolutely necessary
 6. support for asserting custom types with provided assertions
 7. writing custom assertions requires minimal effort
 8. support no-std environments
 
 ### Convenient to write
+
+Code editors and IDEs help with autocomplete to find the right method for the kind of assertion we
+want to write. The API docs of the assertions contain examples to help with writing assertions.
 
 The expected value does not need to be exactly of the same type as the subject. For example, instead
 of writing:
