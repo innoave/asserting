@@ -72,7 +72,7 @@ require std can still be added.
 
 ```toml
 [dev-dependencies]
-asserting = { version = "0.4", default-features = false, features = ["colored", "float_cmp"] }
+asserting = { version = "0.4", default-features = false, features = ["colored", "float-cmp"] }
 ```
 
 An allocator is still needed for no-std.
@@ -190,7 +190,7 @@ for floating point numbers of type `f32` and `f64`:
 
 for floating point numbers of type `f32` and `f64`.
 
-requires crate feature `float_cmp` which is enabled by default.
+requires crate feature `float-cmp` which is enabled by default.
 
 | assertion                   | description                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------------------|

@@ -42,8 +42,8 @@ pub trait AssertEquality<E> {
 }
 
 /// Assert approximate equality for floating point numbers.
-#[cfg(feature = "float_cmp")]
-#[cfg_attr(docsrs, doc(cfg(feature = "float_cmp")))]
+#[cfg(feature = "float-cmp")]
+#[cfg_attr(docsrs, doc(cfg(feature = "float-cmp")))]
 pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
@@ -75,8 +75,8 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
 }
 
 /// Assert approximate equality for floating point numbers.
-#[cfg(feature = "float_cmp")]
-#[cfg_attr(docsrs, doc(cfg(feature = "float_cmp")))]
+#[cfg(feature = "float-cmp")]
+#[cfg_attr(docsrs, doc(cfg(feature = "float-cmp")))]
 pub trait AssertIsCloseToWithDefaultMargin<E> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.

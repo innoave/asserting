@@ -71,7 +71,7 @@ impl IsNanProperty for f64 {
     }
 }
 
-#[cfg(feature = "float_cmp")]
+#[cfg(feature = "float-cmp")]
 mod cmp {
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::colored::mark_diff;

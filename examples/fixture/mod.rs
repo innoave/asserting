@@ -2,7 +2,7 @@
 // Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
 mod dummy_extern_uses {
     use anyhow as _;
-    #[cfg(feature = "float_cmp")]
+    #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
     use proptest as _;
