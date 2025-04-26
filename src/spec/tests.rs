@@ -163,9 +163,9 @@ fn verify_that_option_is_some_chained_with_has_value_fails_as_none() {
 
 #[test]
 fn verify_that_a_subject_with_custom_description_is_equal_to_fails() {
-    let an_anwser = 51;
+    let an_answer = 51;
 
-    let failures = verify_that(an_anwser)
+    let failures = verify_that(an_answer)
         .described_as("the answer to all important questions is 42")
         .is_equal_to(42)
         .display_failures();
@@ -202,4 +202,46 @@ expected answer is equal to 42
 "
         ]
     );
+}
+
+#[test]
+#[should_panic = "assertion failed: expected subject to contain \"unimportant\"\n   \
+       but was: \"the answer to all important questions is 42\"\n  \
+      expected: \"unimportant\"\n\
+    \n\
+    assertion failed: expected subject has at most a length of 41\n   \
+       but was: 43\n  \
+      expected: <= 41\n\
+"]
+fn soft_assertions_panic_once_with_multiple_failure_messages() {
+    let subject = "the answer to all important questions is 42";
+
+    verify_that(subject)
+        .contains("unimportant")
+        .has_at_most_length(41)
+        .soft_panic();
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+
+    #[test]
+    #[should_panic = "assertion failed: expected subject to contain \"unimportant\"\n   \
+       but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
+      expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
+    \n\
+    assertion failed: expected subject has at most a length of 41\n   \
+       but was: \u{1b}[31m43\u{1b}[0m\n  \
+      expected: <= \u{1b}[32m41\u{1b}[0m\n\
+"]
+    fn soft_assertions_panic_message_contains_highlighted_diffs() {
+        let subject = "the answer to all important questions is 42";
+
+        verify_that(subject)
+            .with_configured_diff_format()
+            .contains("unimportant")
+            .has_at_most_length(41)
+            .soft_panic();
+    }
 }

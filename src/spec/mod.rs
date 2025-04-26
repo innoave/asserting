@@ -245,18 +245,9 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
     {
         Spec::new(subject, PanicOnFail)
     }
-    #[cfg(all(feature = "colored", not(feature = "std")))]
+    #[cfg(feature = "colored")]
     {
-        use crate::colored::configured_diff_format;
-        Spec::new(subject, PanicOnFail).with_diff_format(configured_diff_format())
-    }
-    #[cfg(all(feature = "colored", feature = "std"))]
-    {
-        use crate::colored::configured_diff_format;
-        use crate::std::sync::OnceLock;
-        static DIFF_FORMAT: OnceLock<DiffFormat> = OnceLock::new();
-        let diff_format = DIFF_FORMAT.get_or_init(configured_diff_format);
-        Spec::new(subject, PanicOnFail).with_diff_format(diff_format.clone())
+        Spec::new(subject, PanicOnFail).with_configured_diff_format()
     }
 }
 
@@ -701,6 +692,29 @@ impl<'a, S, R> Spec<'a, S, R> {
         self
     }
 
+    /// Sets the diff format used to highlight differences between the actual
+    /// value and the expected value according the configured mode.
+    ///
+    /// The mode is configured via environment variables like described in the
+    /// module [colored].
+    #[cfg(feature = "colored")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
+    #[must_use = "a spec does nothing unless an assertion method is called"]
+    pub fn with_configured_diff_format(self) -> Self {
+        use crate::colored::configured_diff_format;
+        #[cfg(not(feature = "std"))]
+        {
+            self.with_diff_format(configured_diff_format())
+        }
+        #[cfg(feature = "std")]
+        {
+            use crate::std::sync::OnceLock;
+            static DIFF_FORMAT: OnceLock<DiffFormat> = OnceLock::new();
+            let diff_format = DIFF_FORMAT.get_or_init(configured_diff_format);
+            self.with_diff_format(diff_format.clone())
+        }
+    }
+
     /// Maps the current subject to some other value.
     ///
     /// It takes a closure that maps the current subject to a new subject and
@@ -930,6 +944,72 @@ where
         };
         self.failures.push(failure);
         self.failing_strategy.do_fail_with(&self.failures);
+    }
+}
+
+impl<S> Spec<'_, S, CollectFailures> {
+    /// Turns assertions into "soft assertions".
+    ///
+    /// It executes all specified assertions on a `Spec` and if at least one
+    /// assertion fails, it panics. The panic message contains the messages of
+    /// all assertions that have failed.
+    ///
+    /// This method is only available on `Spec`s with the
+    /// [`CollectFailures`]-[`FailingStrategy`]. That is any `Spec` contructed
+    /// by the macros [`verify_that!`] and [`verify_that_code!`] or by the
+    /// functions [`verify_that()`] and [`verify_that_code()`].
+    ///
+    /// On a `Spec` with the [`PanicOnFail`]-[`FailingStrategy`] it would not
+    /// work as the very first failing assertion panics immediately, and later
+    /// assertions never get executed.
+    ///
+    /// # Examples
+    ///
+    /// Running the following two assertions in "soft" mode:
+    ///
+    /// ```should_panic
+    /// use asserting::prelude::*;
+    ///
+    /// verify_that!("the answer to all important questions is 42")
+    ///     .contains("unimportant")
+    ///     .has_at_most_length(41)
+    ///     .soft_panic();
+    /// ```
+    ///
+    /// executes both assertions and prints the messages of both failing
+    /// assertions in the panic message:
+    ///
+    /// ```console
+    /// assertion failed: expected subject to contain "unimportant"
+    ///    but was: "the answer to all important questions is 42"
+    ///   expected: "unimportant"
+    ///
+    /// assertion failed: expected subject has at most a length of 41
+    ///    but was: 43
+    ///   expected: <= 41
+    /// ```
+    ///
+    /// To highlight differences in failure messages of soft assertions use
+    /// the `with_configured_diff_format()` method, like so:
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "colored"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "colored")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    ///
+    /// verify_that!("the answer to all important questions is 42")
+    ///     .with_configured_diff_format()
+    ///     .contains("important")
+    ///     .has_at_most_length(43)
+    ///     .soft_panic();
+    /// # }
+    /// ```
+    pub fn soft_panic(&self) {
+        if !self.failures.is_empty() {
+            PanicOnFail.do_fail_with(&self.failures);
+        }
     }
 }
 

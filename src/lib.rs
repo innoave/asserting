@@ -10,6 +10,7 @@
 //! * distinct and more helpful error messages for specific assertions
 //! * easy spotting the difference between the expected and the actual value
 //! * chaining of multiple assertions on the same subject
+//! * soft assertions
 //!
 //! An additional benefit of `asserting` is that it highlights differences
 //! between the expected value and the actual value for failed assertions.
@@ -117,6 +118,32 @@
 //!     .contains_all_of([1, 11, 13, 17, 19])
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
+//!
+//! ## Soft assertions
+//!
+//! ```should_panic
+//! use asserting::prelude::*;
+//!
+//! verify_that!("the answer to all important questions is 42")
+//!     .contains("unimportant")
+//!     .has_at_most_length(41)
+//!     .soft_panic();
+//! ```
+//!
+//! executes both assertions and prints the messages of both failing
+//! assertions in the panic message:
+//!
+//! ```console
+//! assertion failed: expected subject to contain "unimportant"
+//!    but was: "the answer to all important questions is 42"
+//!   expected: "unimportant"
+//!
+//! assertion failed: expected subject has at most a length of 41
+//!    but was: 43
+//!   expected: <= 41
+//! ```
+//!
+//! For more details see [`Spec::soft_panic()`].
 //!
 //! ## Asserting custom types
 //!
@@ -556,6 +583,7 @@
 //! [`Spec`]: spec::Spec
 //! [`Spec::expecting()`]: spec::Spec::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies
+//! [`Spec::soft_panic()`]: spec::Spec::soft_panic
 //! [`assert_that`]: spec::assert_that
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
