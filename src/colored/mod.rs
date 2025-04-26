@@ -43,6 +43,7 @@
 //! unexpected parts when composing the failure message for an assertion.
 //!
 //! [`NO_COLOR`]: https://no-color.org/
+
 #[cfg(feature = "colored")]
 #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
 pub use with_colored_feature::{

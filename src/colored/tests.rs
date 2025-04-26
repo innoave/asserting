@@ -96,137 +96,137 @@ mod with_colored_and_std_features {
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_not_set() {
+    fn get_configured_diff_format_when_env_var_not_set() {
         env::remove_var(ENV_VAR_HIGHLIGHT_DIFFS);
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DEFAULT_DIFF_FORMAT);
+        assert_that(diff_format).is_equal_to(DEFAULT_DIFF_FORMAT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_not_set_no_color_env_var_set() {
+    fn get_configured_diff_format_when_env_var_not_set_and_no_color_env_var_set() {
         env::remove_var(ENV_VAR_HIGHLIGHT_DIFFS);
         env::set_var("NO_COLOR", "1");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
         env::remove_var("NO_COLOR");
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_unknown_mode() {
+    fn get_configured_diff_format_when_env_var_set_to_unknown_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "not-valid");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DEFAULT_DIFF_FORMAT);
+        assert_that(diff_format).is_equal_to(DEFAULT_DIFF_FORMAT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_bold_mode() {
+    fn get_configured_diff_format_when_env_var_set_to_bold_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "bold");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_BOLD);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_BOLD);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_bold_mode_no_color_env_var_set() {
+    fn get_configured_diff_format_when_env_var_set_to_bold_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "bold");
         env::set_var("NO_COLOR", "1");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
         env::remove_var("NO_COLOR");
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_BOLD);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_BOLD);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_green_mode() {
+    fn get_configured_diff_format_when_env_var_set_to_red_green_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_GREEN);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_RED_GREEN);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_green_mode_no_color_env_var_set() {
+    fn get_configured_diff_format_when_env_var_set_to_red_green_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
         env::set_var("NO_COLOR", "1");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
         env::remove_var("NO_COLOR");
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_blue_mode() {
+    fn get_configured_diff_format_when_env_var_set_to_red_blue_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-blue");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_BLUE);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_RED_BLUE);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_blue_mode_no_color_env_var_set() {
+    fn get_configured_diff_format_when_env_var_set_to_red_blue_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-blue");
         env::set_var("NO_COLOR", "1");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
         env::remove_var("NO_COLOR");
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_yellow_mode() {
+    fn get_configured_diff_format_when_env_var_set_to_red_yellow_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-yellow");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_YELLOW);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_RED_YELLOW);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_red_yellow_mode_no_color_env_var_set() {
+    fn get_configured_diff_format_when_env_var_set_to_red_yellow_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-yellow");
         env::set_var("NO_COLOR", "1");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
         env::remove_var("NO_COLOR");
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
     #[test]
     #[serial]
-    fn assert_that_sets_default_diff_format_env_var_set_to_off() {
+    fn get_configured_diff_format_when_env_var_set_to_off() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "off");
 
-        let assertion = assert_that(42);
+        let diff_format = configured_diff_format();
 
-        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+        assert_that(diff_format).is_equal_to(DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
     proptest! {
@@ -237,9 +237,9 @@ mod with_colored_and_std_features {
         ) {
             env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
 
-            let assertion = assert_that(42);
+            let diff_format = configured_diff_format();
 
-            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_BOLD);
+            prop_assert_eq!(diff_format, DIFF_FORMAT_BOLD);
         }
 
         #[test]
@@ -249,9 +249,9 @@ mod with_colored_and_std_features {
         ) {
             env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
 
-            let assertion = assert_that(42);
+            let diff_format = configured_diff_format();
 
-            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_RED_BLUE);
+            prop_assert_eq!(diff_format, DIFF_FORMAT_RED_BLUE);
         }
 
         #[test]
@@ -261,9 +261,9 @@ mod with_colored_and_std_features {
         ) {
             env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
 
-            let assertion = assert_that(42);
+            let diff_format = configured_diff_format();
 
-            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_RED_YELLOW);
+            prop_assert_eq!(diff_format, DIFF_FORMAT_RED_YELLOW);
         }
 
         #[test]
@@ -273,9 +273,9 @@ mod with_colored_and_std_features {
         ) {
             env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
 
-            let assertion = assert_that(42);
+            let diff_format = configured_diff_format();
 
-            prop_assert_eq!(assertion.diff_format(), &DIFF_FORMAT_NO_HIGHLIGHT);
+            prop_assert_eq!(diff_format, DIFF_FORMAT_NO_HIGHLIGHT);
         }
     }
 
