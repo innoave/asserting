@@ -421,5 +421,61 @@ where
     }
 }
 
+#[cfg(feature = "regex")]
+mod regex {
+    use crate::assertions::AssertStringMatches;
+    use crate::colored::{mark_missing_substr, mark_unexpected_substr};
+    use crate::expectations::StringMatches;
+    use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+    use crate::std::fmt::Debug;
+
+    impl<S, R> AssertStringMatches for Spec<'_, S, R>
+    where
+        S: AsRef<str> + Debug,
+        R: FailingStrategy,
+    {
+        fn matches(self, regex_pattern: &str) -> Self {
+            self.expecting(StringMatches::new(regex_pattern))
+        }
+    }
+
+    impl<S> Expectation<S> for StringMatches<'_>
+    where
+        S: AsRef<str> + Debug,
+    {
+        fn test(&mut self, subject: &S) -> bool {
+            self.regex
+                .as_ref()
+                .is_ok_and(|regex| regex.is_match(subject.as_ref()))
+        }
+
+        fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+            let pattern = self.pattern;
+            match self.regex.as_ref() {
+                Ok(regex) => {
+                    let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
+                    let marked_expected = mark_missing_substr(regex.as_str(), format);
+                    format!("expected {expression} matches regex {pattern}\n               but was: {marked_actual}\n  does not match regex: {marked_expected}")
+                },
+                Err(regex::Error::Syntax(error)) => {
+                    let marked_error = mark_unexpected_substr(error, format);
+                    format!("expected {expression} matches regex {pattern}\n  but the regex can not be compiled: {marked_error}")
+                },
+                Err(regex::Error::CompiledTooBig(limit)) => {
+                    let marked_error = mark_unexpected_substr(
+                        &format!("the compiled regex exceeds the size limit of {limit} bytes"),
+                        format,
+                    );
+                    format!("expected {expression} matches regex {pattern}\n  but {marked_error}")
+                },
+                Err(err) => {
+                    let marked_error = mark_unexpected_substr(&err.to_string(), format);
+                    format!("expected {expression} matches regex {pattern}\n  but {marked_error}")
+                },
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests;

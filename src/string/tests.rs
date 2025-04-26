@@ -981,6 +981,79 @@ fn verify_string_ends_with_char_fails() {
     );
 }
 
+#[cfg(feature = "regex")]
+mod regex {
+    use crate::prelude::*;
+
+    #[test]
+    fn string_matches_regex() {
+        let subject: String = "tincidunt laoreet molestie eros".to_string();
+
+        assert_that(subject).matches(r"\b\w{8}\b");
+    }
+
+    #[test]
+    fn verify_string_matches_regex_fails() {
+        let subject: String = "volutpat lobortis aliquam diam".to_string();
+
+        let failures = verify_that(subject)
+            .named("my_thing")
+            .matches(r"\b\w{12}\b")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"assertion failed: expected my_thing matches regex \b\w{12}\b
+               but was: volutpat lobortis aliquam diam
+  does not match regex: \b\w{12}\b
+"
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_string_matches_regex_given_an_invalid_regex_fails() {
+        let subject: String = "s3cr3tPass".to_string();
+
+        let failures = verify_that(subject)
+            .named("password")
+            .matches(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"assertion failed: expected password matches regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
+  but the regex can not be compiled: regex parse error:
+    ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
+     ^^^
+error: look-around, including look-ahead and look-behind, is not supported
+"
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_string_matcher_regex_given_regex_exceeds_default_size_limit_failes() {
+        let subject: String = "s3cr3tPass".to_string();
+
+        let failures = verify_that(subject)
+            .named("my_thing")
+            .matches(r"^(\/[\w-]{1,255}){1,64}\/?$")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"assertion failed: expected my_thing matches regex ^(\/[\w-]{1,255}){1,64}\/?$
+  but the compiled regex exceeds the size limit of 10485760 bytes
+"
+            ]
+        );
+    }
+}
+
 #[cfg(feature = "colored")]
 mod colored {
     use crate::prelude::*;
@@ -1323,6 +1396,76 @@ mod colored {
                 "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
                     but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+}
+
+#[cfg(all(feature = "colored", feature = "regex"))]
+mod colored_regex {
+    use crate::prelude::*;
+    use crate::std::string::ToString;
+
+    #[test]
+    fn verify_string_matches_regex_fails() {
+        let subject: String = "volutpat lobortis aliquam diam".to_string();
+
+        let failures = verify_that(subject)
+            .named("my_thing")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .matches(r"\b\w{12}\b")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected my_thing matches regex \\b\\w{12}\\b\n               \
+                                but was: \u{1b}[31mvolutpat lobortis aliquam diam\u{1b}[0m\n  \
+                   does not match regex: \u{1b}[32m\\b\\w{12}\\b\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_string_matches_regex_given_an_invalid_regex_fails() {
+        let subject: String = "s3cr3tPass".to_string();
+
+        let failures = verify_that(subject)
+            .named("password")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .matches(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected password matches regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n  \
+                   but the regex can not be compiled: \u{1b}[31mregex parse error:\n    \
+                     ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n     \
+                      ^^^\n\
+                 error: look-around, including look-ahead and look-behind, is not supported\u{1b}[0m\n\
+"
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_string_matcher_regex_given_regex_exceeds_default_size_limit_failes() {
+        let subject: String = "s3cr3tPass".to_string();
+
+        let failures = verify_that(subject)
+            .named("my_thing")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .matches(r"^(\/[\w-]{1,255}){1,64}\/?$")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected my_thing matches regex ^(\\/[\\w-]{1,255}){1,64}\\/?$\n  \
+                   but \u{1b}[31mthe compiled regex exceeds the size limit of 10485760 bytes\u{1b}[0m\n\
                 "
             ]
         );

@@ -297,6 +297,30 @@ pub struct StringEndsWith<E> {
     pub expected: E,
 }
 
+#[cfg(feature = "regex")]
+#[cfg_attr(docsrs, doc(cfg(feature = "regex")))]
+pub use regex::StringMatches;
+
+#[cfg(feature = "regex")]
+mod regex {
+    use regex::Regex;
+
+    #[must_use]
+    pub struct StringMatches<'a> {
+        pub pattern: &'a str,
+        pub regex: Result<Regex, regex::Error>,
+    }
+
+    impl<'a> StringMatches<'a> {
+        pub fn new(regex_pattern: &'a str) -> Self {
+            Self {
+                pattern: regex_pattern,
+                regex: Regex::new(regex_pattern),
+            }
+        }
+    }
+}
+
 #[must_use]
 pub struct IterContains<E> {
     pub expected: E,

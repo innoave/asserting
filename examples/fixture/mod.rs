@@ -6,6 +6,8 @@ mod dummy_extern_uses {
     use float_cmp as _;
     use hashbrown as _;
     use proptest as _;
+    #[cfg(feature = "regex")]
+    use regex as _;
     #[cfg(feature = "colored")]
     use sdiff as _;
     use serial_test as _;

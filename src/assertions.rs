@@ -906,6 +906,41 @@ pub trait AssertStringContainsAnyOf<E> {
     fn contains_any_of(self, pattern: E) -> Self;
 }
 
+/// Assert that a string matches a regex pattern.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(not(feature = "regex"))]
+/// # fn main() {}
+/// # #[cfg(feature = "regex")]
+/// # fn main() {
+/// use asserting::prelude::*;
+///
+/// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
+/// # }
+/// ```
+#[cfg(feature = "regex")]
+#[cfg_attr(docsrs, doc(cfg(feature = "regex")))]
+pub trait AssertStringMatches {
+    /// Verifies that a string matches the given regex pattern.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "regex"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "regex")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
+    /// # }
+    /// ```
+    #[track_caller]
+    fn matches(self, regex_pattern: &str) -> Self;
+}
+
 /// Assert that an iterator or collection contains the expected value.
 ///
 /// This assertion is implemented for any collection or iterator of items that

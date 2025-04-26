@@ -226,6 +226,7 @@ for strings of type `String` and `str`:
 | starts_with                 | verify that a string starts with the expected substring or character           |
 | ends_with                   | verify that a string ends with the expected substring or character             |
 | contains_any_of             | verify that a string contains any character from a collection of `char`s       |
+| matches                     | verify that a string matches the given regex (requires `regex` feature)        |                                                 
 
 for strings of type `CString` and `CStr`:
 
