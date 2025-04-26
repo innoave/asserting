@@ -374,7 +374,7 @@ To start assertions on code use the `assert_that_code!()` macro.
 
 <!-- External Links -->
 
-[soft assertions]: https://docs.rs/asserting/#soft-assertions
+["soft assertions"]: https://docs.rs/asserting/#soft-assertions
 
 [custom assertions]: https://docs.rs/asserting/#custom-assertions
 
