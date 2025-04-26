@@ -19,10 +19,11 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-default = ["std", "colored", "float_cmp", "panic"]
+default = ["std", "colored", "float_cmp", "panic", "regex"]
 colored = ["dep:sdiff"]
 float_cmp = ["dep:float-cmp"]
 panic = ["std"]
+regex = ["dep:regex"]
 std = []
 
 [dependencies]
@@ -30,6 +31,7 @@ hashbrown = "0.15"
 
 # optional
 float-cmp = { version = "0.10", optional = true }
+regex = { version = "1", optional = true }
 sdiff = { version = "0.1", optional = true }
 
 [dev-dependencies]
