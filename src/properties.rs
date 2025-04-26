@@ -9,11 +9,12 @@
 //! Property traits that define access to a specific kind of information of a
 //! type's value define an accessor method to query this information.
 //!
-//! For example the trait [`LengthProperty`] defines that all implementing types
-//! have a length. The trait defines the accessor method `length_property` to
-//! query the length of a value of this type. For all types that implement the
-//! [`LengthProperty`] trait the assertions around a types length defined by
-//! [`AssertHasLength`](crate::assertions::AssertHasLength) trait can be used.
+//! For example, the trait [`LengthProperty`] defines that all implementing
+//! types have a length. The trait defines the accessor method `length_property`
+//! to query the length of a value of this type. For all types that implement
+//! the [`LengthProperty`] trait, the assertions around a type's length defined
+//! by [`AssertHasLength`](crate::assertions::AssertHasLength) trait can be
+//! used.
 //!
 //! Property traits that define a certain behavior of a type are often marker
 //! traits.

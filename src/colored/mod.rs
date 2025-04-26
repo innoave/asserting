@@ -35,8 +35,8 @@
 //! ASSERTING_HIGHLIGHT_DIFFS = "red-blue"
 //! ```
 //!
-//! This feature respects the [`NO_COLOR`] environment variable. If `NO_COLOR` is
-//! set to a non-empty string, no colors are used, regardless of the mode set
+//! This feature respects the [`NO_COLOR`] environment variable. If `NO_COLOR`
+//! is set to a non-empty string, no colors are used, regardless of the mode set
 //! with the `ASSERTING_HIGHLIGHT_DIFFS` environment variable.
 //!
 //! The functions provided by this module help with highlighting missing and

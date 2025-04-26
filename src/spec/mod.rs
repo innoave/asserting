@@ -215,8 +215,8 @@ macro_rules! verify_that_code {
 ///
 /// In comparison to using the macro [`assert_that!`](crate::assert_that)
 /// calling this function does not set a name for the expression and does not
-/// set the code location of the assertion. In failure messages the generic word
-/// "subject" is used. To set a specific text for the expression the method
+/// set the code location of the assertion. In failure messages, the generic word
+/// "subject" is used. To set a specific text for the expression, the method
 /// [`named`](Spec::named) must be called explicitly.
 ///
 /// Note: It is not necessary to set the code location explicitly as this
@@ -264,8 +264,8 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 ///
 /// In comparison to using the macro [`verify_that!`](crate::verify_that) calling
 /// this function does not set a name for the expression and does not set the
-/// code location of the assertion. In failure messages the generic word
-/// "subject" is used. To set a specific text for the expression the method
+/// code location of the assertion. In failure messages, the generic word
+/// "subject" is used. To set a specific text for the expression, the method
 /// [`named`](Spec::named) must be called explicitly.
 ///
 /// # Examples
@@ -321,9 +321,9 @@ pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
 ///
 /// In comparison to using the macro [`assert_that_code!`](crate::assert_that_code)
 /// calling this function does not set a name for the expression and does not
-/// set the code location of the assertion. In failure messages the generic word
-/// "the closure" is used. To set a specific text for the expression the method
-/// [`named`](Spec::named) must be called explicitly.
+/// set the code location of the assertion. In failure messages, the generic
+/// word "the closure" is used. To set a specific text for the expression, the
+/// method [`named`](Spec::named) must be called explicitly.
 ///
 /// # Examples
 ///
@@ -360,9 +360,9 @@ where
 ///
 /// In comparison to using the macro [`verify_that_code!`](crate::verify_that_code)
 /// calling this function does not set a name for the expression and does not
-/// set the code location of the assertion. In failure messages the generic word
-/// "the closure" is used. To set a specific text for the expression the method
-/// [`named`](Spec::named) must be called explicitly.
+/// set the code location of the assertion. In failure messages, the generic
+/// word "the closure" is used. To set a specific text for the expression, the
+/// method [`named`](Spec::named) must be called explicitly.
 ///
 /// # Examples
 ///
@@ -413,8 +413,9 @@ where
 ///
 /// It requires two methods: a `test()` method and a `message()` method.
 /// The `test()` method is called to verify whether an actual subject meets the
-/// expected property. In case the test of the expectation fails the `message()`
-/// method is called to form an expectation specific failure message.
+/// expected property. In case the test of the expectation fails, the
+/// `message()` method is called to form an expectation-specific failure
+/// message.
 pub trait Expectation<S: ?Sized> {
     /// Verifies whether the actual subject fulfills the expected property.
     fn test(&mut self, subject: &S) -> bool;
@@ -585,7 +586,7 @@ impl OwnedLocation {
 /// It also holds the concrete [`FailingStrategy`] on how to behave in case
 /// an assertion fails.
 ///
-/// In case of the [`CollectFailures`] failing strategy the [`AssertFailure`]s
+/// In case of the [`CollectFailures`] failing strategy, the [`AssertFailure`]s
 /// are collected in this struct.
 pub struct Spec<'a, S, R> {
     subject: S,
@@ -816,7 +817,7 @@ where
 {
     /// Asserts the given expectation.
     ///
-    /// In case the expectation is not meet it does fail according the current
+    /// In case the expectation is not meet, it does fail according the current
     /// failing strategy of this `Spec`.
     ///
     /// This method is called from the implementations of the assertion traits
@@ -873,7 +874,7 @@ where
     /// ```
     ///
     /// To assert a predicate with a custom failure message instead of the
-    /// generic one use the method
+    /// generic one, use the method
     /// [`satisfies_with_message`](Spec::satisfies_with_message).
     #[allow(clippy::return_self_not_must_use)]
     #[track_caller]

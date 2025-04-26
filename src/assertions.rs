@@ -48,7 +48,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
     ///
-    /// For the comparison the epsilon and ULPS values of the given margin are
+    /// For comparison, the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// The following articles describe the challenges with comparing floating
@@ -59,10 +59,10 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     #[track_caller]
     fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 
-    /// Verifies that the actual value not approximately equal to the expected
+    /// Verifies that the actual value not approximately equals to the expected
     /// value.
     ///
-    /// For the comparison the epsilon and ULPS values of the given margin are
+    /// For comparison, the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// The following articles describe the challenges with comparing floating
@@ -81,7 +81,7 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
     ///
-    /// For the approximation a default margin with 4 * epsilon and 4 * ULPS is
+    /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
     /// used.
     ///
     /// The following articles describe the challenges with comparing floating
@@ -95,7 +95,7 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
     /// Verifies that the actual value is not approximately equal to the expected
     /// value.
     ///
-    /// For the approximation a default margin with 4 * epsilon and 4 * ULPS is
+    /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
     /// used.
     ///
     /// The following articles describe the challenges with comparing floating
@@ -709,13 +709,13 @@ pub trait AssertResult {
 pub trait AssertResultValue<'a, T, E, R> {
     /// Maps the subject to the result's ok value.
     ///
-    /// If the result is an error this method panics.
+    /// If the result is an error, this method panics.
     #[track_caller]
     fn ok(self) -> Spec<'a, T, R>;
 
     /// Maps the subject to the result's err value.
     ///
-    /// If the result is an ok value this method panics.
+    /// If the result is an ok value, this method panics.
     fn err(self) -> Spec<'a, E, R>;
 }
 
@@ -749,7 +749,7 @@ pub trait AssertHasValue<E> {
     ///
     /// For `Option` it compares the value in `Some(value)` and for `Result`
     /// it compares the value in `Ok(value)`. If an `Option` is `None` or a
-    /// `Result` is `Err(error)` than the assertion fails.
+    /// `Result` is `Err(error)` then the assertion fails.
     #[track_caller]
     fn has_value(self, expected: E) -> Self;
 }
@@ -776,7 +776,7 @@ pub trait AssertHasError<E> {
     /// expected one.
     ///
     /// For `Result` it compares the value in `Err(value)`. If the `Result`
-    /// holds an `Ok(value)` the assertion fails.
+    /// holds an `Ok(value)`, the assertion fails.
     #[track_caller]
     fn has_error(self, expected: E) -> Self;
 }
@@ -784,7 +784,7 @@ pub trait AssertHasError<E> {
 /// Assert that a subject of some container type holds an error value that has
 /// a message equal to the expected message.
 ///
-/// This is useful for opaque error types, that do not implement
+/// This is useful for opaque error types that do not implement
 /// `PartialEq`. Since the `std::error::Error` trait requires that error
 /// types implement `Display`, the string representation of the error value
 /// is compared to an expected message string.
@@ -806,7 +806,7 @@ pub trait AssertHasError<E> {
 pub trait AssertHasErrorMessage<'a, E, R> {
     /// Verifies that the subject is an error value with the expected message.
     ///
-    /// This is useful for opaque error types, that do not implement
+    /// This is useful for opaque error types that do not implement
     /// `PartialEq`. Since the `std::error::Error` trait requires that error
     /// types implement `Display`, the string representation of the error value
     /// is compared to an expected message string.
@@ -948,7 +948,7 @@ pub trait AssertStringMatches {
 /// Assert that an iterator or collection contains the expected value.
 ///
 /// This assertion is implemented for any collection or iterator of items that
-/// that implement `PartialEq<E>` with `E` being the type of the expected value.
+/// implement `PartialEq<E>` with `E` being the type of the expected value.
 pub trait AssertIteratorContains<'a, U, E, R> {
     /// Verifies that the actual collection/iterator contains the expected
     /// value.

@@ -224,7 +224,7 @@
 //! an assertion fails or the alternative way that collects failures from
 //! failed assertions which can be read later.
 //!
-//! To call assertion functions on a subject it is wrapped into the [`Spec`]
+//! To call assertion functions on a subject, it is wrapped into the [`Spec`]
 //! struct. This can be done by calling one of the functions:
 //!
 //! * [`assert_that`] - wraps the subject into a [`Spec`] that panics if an
@@ -284,7 +284,7 @@
 //! ```
 //!
 //! When using the `verfiy_*` variants of the macros or functions for each
-//! failing assertion a failure of type [`AssertFailure`] is added to the
+//! failing assertion, a failure of type [`AssertFailure`] is added to the
 //! [`Spec`]. We can read the failures collected by calling the [`failures()`]
 //! method, like so:
 //!
@@ -324,16 +324,16 @@
 //! [`Spec::satisfies()`] method and in the [Examples](#predicate-as-custom-assertion)
 //! chapter above. The other 3 ways are described in the following subchapters.
 //!
-//! ## Property based assertions
+//! ## Property-based assertions
 //!
-//! Some assertions provided by `asserting` are so-called property based
+//! Some assertions provided by `asserting` are so-called property-based
 //! assertions. They are implemented for all types that implement a related
 //! property trait.
 //!
-//! For example the `has_length()` assertion is implemented for all types that
+//! For example, the `has_length()` assertion is implemented for all types that
 //! implement the [`LengthProperty`].
 //!
-//! If we want to provide the `has_length()` assertion for a custom type we
+//! If we want to provide the `has_length()` assertion for a custom type, we
 //! simply need to implement the [`LengthProperty`] trait for this type.
 //!
 //! Let's assume we have a custom struct `PathWay` and we implement the
@@ -382,7 +382,7 @@
 //! ## Writing custom expectations
 //!
 //! A custom expectation is any type that implements the [`Expectation`] trait.
-//! For example, lets assume we have a custom type `Either` and want to write
+//! For example, let's assume we have a custom type `Either` and want to write
 //! an expectation that verifies that a value of type `Either` is a left value.
 //!
 //! ```no_run
@@ -463,8 +463,9 @@
 //!
 //! ## Providing a custom assertion method
 //!
-//! In the previous chapter we implement a custom expectation which can be used
-//! with the [`Spec::expecting()`] method. But this way is not very expressive.
+//! In the previous chapter, we implemented a custom expectation which can be
+//! used with the [`Spec::expecting()`] method. But this way is not very
+//! expressive.
 //!
 //! Additionally, we can implement a custom assertion method via an extension
 //! trait.
