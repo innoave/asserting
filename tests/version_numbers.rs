@@ -6,7 +6,7 @@
 mod dummy_extern_uses {
     use anyhow as _;
     use asserting as _;
-    #[cfg(feature = "float_cmp")]
+    #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
     use proptest as _;
