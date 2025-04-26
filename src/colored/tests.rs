@@ -280,10 +280,38 @@ mod with_colored_and_std_features {
     }
 
     #[test]
+    #[serial]
+    fn assert_that_sets_the_diff_format_to_red_green() {
+        env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
+
+        let assertion = assert_that(42);
+
+        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_GREEN);
+    }
+
+    #[test]
+    #[serial]
     fn verify_that_sets_the_diff_format_to_no_highlighting() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 
         let assertion = verify_that(42);
+
+        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+    }
+
+    #[test]
+    #[serial]
+    fn assert_that_code_sets_the_diff_format_to_red_green() {
+        env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
+
+        let assertion = assert_that_code(|| {});
+
+        assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_GREEN);
+    }
+
+    #[test]
+    fn verify_that_code_sets_the_diff_format_to_no_highlighting() {
+        let assertion = verify_that_code(|| {});
 
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
     }
