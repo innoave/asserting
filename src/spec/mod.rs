@@ -345,7 +345,16 @@ pub fn assert_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, PanicOnFail>
 where
     S: FnOnce(),
 {
-    Spec::new(Code::from(code), PanicOnFail).named("the closure")
+    #[cfg(not(feature = "colored"))]
+    {
+        Spec::new(Code::from(code), PanicOnFail).named("the closure")
+    }
+    #[cfg(feature = "colored")]
+    {
+        Spec::new(Code::from(code), PanicOnFail)
+            .named("the closure")
+            .with_configured_diff_format()
+    }
 }
 
 /// Starts an assertion for some piece of code in the [`CollectFailures`] mode.
