@@ -480,12 +480,47 @@ impl<E> IterEndsWith<E> {
     }
 }
 
+pub struct Not<E>(pub E);
+
+impl<E, S> Expectation<S> for Not<E>
+where
+    E: Negatable<S> + Expectation<S>,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        !self.0.test(subject)
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        self.0.negated_message(expression, actual, format)
+    }
+}
+
+pub trait Negatable<S> {
+    fn negated_message(
+        &self,
+        expression: Expression<'_>,
+        actual: &S,
+        format: &DiffFormat,
+    ) -> String;
+}
+
+#[must_use]
+pub struct MapContainsKey<E> {
+    pub expected_key: E,
+}
+
+#[must_use]
+pub struct MapContainsValue<E> {
+    pub expected_value: E,
+}
+
 #[must_use]
 pub struct Predicate<F> {
     pub predicate: F,
     pub message: Option<String>,
 }
 
+use crate::spec::{DiffFormat, Expectation, Expression};
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub use panic::{DoesNotPanic, DoesPanic};
