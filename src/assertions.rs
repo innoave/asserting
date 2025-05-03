@@ -1254,6 +1254,58 @@ pub trait AssertMapContainsKey<E> {
     /// ```
     #[track_caller]
     fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
+
+    /// Verify that the actual map does not contain any mapping for one of the
+    /// given keys.
+    ///
+    /// The order of the keys is not relevant and duplicates are ignored.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "std"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "std")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use std::collections::HashMap;
+    ///
+    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_keys([2, 3]);
+    /// assert_that!(&subject).does_not_contain_keys([6, 3, 7]);
+    /// assert_that!(&subject).does_not_contain_keys([3, 6, 3]);
+    /// # }
+    /// ```
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use hashbrown::HashMap;
+    ///
+    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_keys([6, 7]);
+    /// assert_that!(&subject).does_not_contain_keys([3, 2, 6]);
+    /// assert_that!(&subject).does_not_contain_keys([7, 2, 7]);
+    /// ```
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "std"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "std")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use std::collections::BTreeMap;
+    ///
+    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_keys([2, 3, 6, 7]);
+    /// assert_that!(&subject).does_not_contain_keys([7, 3, 6]);
+    /// assert_that!(&subject).does_not_contain_keys([2, 2, 9]);
+    /// # }
+    /// ```
+    #[track_caller]
+    fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
 }
 
 /// Assertions for the values of a map.
@@ -1448,4 +1500,56 @@ pub trait AssertMapContainsValue<E> {
     /// ```
     #[track_caller]
     fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
+
+    /// Verify that the actual map does not contain any mapping where the value
+    /// is one of the given values.
+    ///
+    /// The order of the values is not relevant and duplicates are ignored.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "std"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "std")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use std::collections::HashMap;
+    ///
+    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_values(["two", "three"]);
+    /// assert_that!(&subject).does_not_contain_values(["six", "three", "seven"]);
+    /// assert_that!(&subject).does_not_contain_values(["three", "six", "three"]);
+    /// # }
+    /// ```
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use hashbrown::HashMap;
+    ///
+    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_values(["six", "seven"]);
+    /// assert_that!(&subject).does_not_contain_values(["three", "two", "six"]);
+    /// assert_that!(&subject).does_not_contain_values(["seven", "two", "seven"]);
+    /// ```
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "std"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "std")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use std::collections::BTreeMap;
+    ///
+    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+    ///
+    /// assert_that!(&subject).does_not_contain_values(["two", "three", "six", "seven"]);
+    /// assert_that!(&subject).does_not_contain_values(["seven", "three", "six"]);
+    /// assert_that!(&subject).does_not_contain_values(["two", "two", "nine"]);
+    /// # }
+    /// ```
+    #[track_caller]
+    fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
 }

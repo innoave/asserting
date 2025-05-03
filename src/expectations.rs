@@ -3,34 +3,9 @@
 #![allow(missing_docs)]
 #![warn(clippy::return_self_not_must_use)]
 
-use crate::spec::{DiffFormat, Expectation, Expression};
 use crate::std::marker::PhantomData;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
-
-pub struct Not<E>(pub E);
-
-impl<E, S> Expectation<S> for Not<E>
-where
-    E: Negatable<S> + Expectation<S>,
-{
-    fn test(&mut self, subject: &S) -> bool {
-        !self.0.test(subject)
-    }
-
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
-        self.0.negated_message(expression, actual, format)
-    }
-}
-
-pub trait Negatable<S> {
-    fn negated_message(
-        &self,
-        expression: Expression<'_>,
-        actual: &S,
-        format: &DiffFormat,
-    ) -> String;
-}
 
 #[must_use]
 pub struct Predicate<F> {
@@ -517,21 +492,46 @@ pub struct MapContainsKey<E> {
 }
 
 #[must_use]
+pub struct MapDoesNotContainKey<E> {
+    pub expected_key: E,
+}
+
+#[must_use]
 pub struct MapContainsValue<E> {
+    pub expected_value: E,
+}
+
+#[must_use]
+pub struct MapDoesNotContainValue<E> {
     pub expected_value: E,
 }
 
 #[must_use]
 pub struct MapContainsKeys<E> {
     pub expected_keys: Vec<E>,
-    pub missing_keys: HashSet<usize>,
+    pub missing: HashSet<usize>,
 }
 
 impl<E> MapContainsKeys<E> {
     pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
         Self {
             expected_keys: Vec::from_iter(expected_keys),
-            missing_keys: HashSet::new(),
+            missing: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapDoesNotContainKeys<E> {
+    pub expected_keys: Vec<E>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapDoesNotContainKeys<E> {
+    pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_keys: Vec::from_iter(expected_keys),
+            extra: HashSet::new(),
         }
     }
 }
@@ -539,14 +539,29 @@ impl<E> MapContainsKeys<E> {
 #[must_use]
 pub struct MapContainsValues<E> {
     pub expected_values: Vec<E>,
-    pub missing_values: HashSet<usize>,
+    pub missing: HashSet<usize>,
 }
 
 impl<E> MapContainsValues<E> {
     pub fn new(expected_values: impl IntoIterator<Item = E>) -> Self {
         Self {
             expected_values: Vec::from_iter(expected_values),
-            missing_values: HashSet::new(),
+            missing: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapDoesNotContainValues<E> {
+    pub expected_values: Vec<E>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapDoesNotContainValues<E> {
+    pub fn new(expected_values: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_values: Vec::from_iter(expected_values),
+            extra: HashSet::new(),
         }
     }
 }

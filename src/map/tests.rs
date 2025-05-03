@@ -1,6 +1,7 @@
 mod hashbrown {
     use crate::prelude::*;
     use crate::std::format;
+    use crate::std::vec::Vec;
     use hashbrown::HashMap;
 
     #[test]
@@ -290,6 +291,71 @@ mod hashbrown {
    but was: {formatted_actual}
   expected: ["one", "two", "three"]
    missing: ["two", "three"]
+"#
+            )]
+        );
+    }
+
+    #[test]
+    fn hashmap_does_not_contain_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).does_not_contain_keys([7, 3]);
+    }
+
+    #[test]
+    fn verify_hashmap_does_not_contain_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .keys()
+                .filter(|k| **k == 5 || **k == 4)
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .does_not_contain_keys([5, 3, 4])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map does not contain keys [5, 3, 4]
+   but was: {formatted_actual}
+  expected: [5, 3, 4]
+     extra: {formatted_extra}
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn hashmap_does_not_contain_values() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).does_not_contain_values(["three", "seven"]);
+    }
+
+    #[test]
+    fn verify_hashmap_does_not_contain_values_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .does_not_contain_values(["one", "two", "three"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r#"assertion failed: expected foo_map does not contain values ["one", "two", "three"]
+   but was: {formatted_actual}
+  expected: ["one", "two", "three"]
+     extra: ["one"]
 "#
             )]
         );
@@ -887,6 +953,7 @@ mod btree_map {
 mod colored {
     use crate::prelude::*;
     use crate::std::format;
+    use crate::std::vec::Vec;
     use hashbrown::HashMap;
 
     #[test]
@@ -1013,6 +1080,38 @@ mod colored {
     }
 
     #[test]
+    fn highlight_diffs_hashmap_does_not_contain_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
+            .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .keys()
+                .filter(|k| **k == 5 || **k == 4)
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_contain_keys([5, 2, 4, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map does not contain keys [5, 2, 4, 7]\n   \
+                but was: {formatted_actual}\n  \
+               expected: [\u{1b}[32m5\u{1b}[0m, 2, \u{1b}[32m4\u{1b}[0m, 7]\n     \
+                  extra: {formatted_extra}\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
     fn highlight_diffs_hashmap_contains_values() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
         let formatted_actual = format!("{:?}", &subject)
@@ -1032,6 +1131,38 @@ mod colored {
                     but was: {formatted_actual}\n  \
                    expected: [\"five\", \u{1b}[32m\"two\"\u{1b}[0m, \"four\", \u{1b}[32m\"seven\"\u{1b}[0m]\n   \
                     missing: [\"two\", \"seven\"]\n\
+                "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_does_not_contain_values() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
+            .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .values()
+                .filter(|v| **v == "five" || **v == "four")
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_contain_values(["five", "two", "four", "seven"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map does not contain values [\"five\", \"two\", \"four\", \"seven\"]\n   \
+                    but was: {formatted_actual}\n  \
+                   expected: [\u{1b}[32m\"five\"\u{1b}[0m, \"two\", \u{1b}[32m\"four\"\u{1b}[0m, \"seven\"]\n     \
+                      extra: {formatted_extra}\n\
                 "
             )]
         );
