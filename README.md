@@ -13,11 +13,12 @@ Features of `asserting`:
 2. helpful error messages in case of failing assertions
 3. colored diffs between expected and actual values
 4. provide a reasonable number of assertions out of the box
-5. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
-6. do not require that asserted types have to implement traits if it is not absolutely necessary
-7. support for asserting custom types with provided assertions
-8. writing custom assertions requires minimal effort
-9. support no-std environments
+5. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
+6. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
+7. do not require that asserted types have to implement traits if it is not absolutely necessary
+8. support for asserting custom types with provided assertions
+9. writing custom assertions requires minimal effort
+10. support no-std environments
 
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
@@ -390,6 +391,8 @@ To start assertions on code use the `assert_that_code!()` macro.
 [code-coverage-url]: https://codecov.io/github/innoave/asserting
 
 <!-- External Links -->
+
+["Chaining assertions"]: https://docs.rs/asserting/latest/asserting/#chaining-assertions-on-the-same-subject
 
 ["soft assertions"]: https://docs.rs/asserting/#soft-assertions
 
