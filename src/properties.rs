@@ -23,6 +23,8 @@
 //! specifies that a collection's iterator yields the items in a well-defined
 //! order.
 
+use crate::std::iter::Iterator;
+
 /// The "empty" property of a collection-like type.
 ///
 /// This property is used by the implementation of the
@@ -216,4 +218,22 @@ where
     fn is_nan_property(&self) -> bool {
         <T as IsNanProperty>::is_nan_property(self)
     }
+}
+
+/// The properties of a map-like type.
+pub trait MapProperties {
+    /// The type of the keys in this map.
+    type Key;
+
+    /// The type of the values in this map.
+    type Value;
+
+    /// Returns an iterator over the keys in this map.
+    fn keys_property(&self) -> impl Iterator<Item = &Self::Key>;
+
+    /// Returns an iterator over the values in this map.
+    fn values_property(&self) -> impl Iterator<Item = &Self::Value>;
+
+    /// Returns an iterator over the key/value-pairs in this map.
+    fn entries_property(&self) -> impl Iterator<Item = (&Self::Key, &Self::Value)>;
 }

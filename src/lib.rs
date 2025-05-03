@@ -658,6 +658,7 @@ mod float;
 mod integer;
 mod iterator;
 mod length;
+mod map;
 mod number;
 mod option;
 mod order;

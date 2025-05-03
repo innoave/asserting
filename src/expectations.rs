@@ -8,6 +8,12 @@ use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
 #[must_use]
+pub struct Predicate<F> {
+    pub predicate: F,
+    pub message: Option<String>,
+}
+
+#[must_use]
 pub struct IsTrue;
 
 #[must_use]
@@ -481,9 +487,100 @@ impl<E> IterEndsWith<E> {
 }
 
 #[must_use]
-pub struct Predicate<F> {
-    pub predicate: F,
-    pub message: Option<String>,
+pub struct MapContainsKey<E> {
+    pub expected_key: E,
+}
+
+#[must_use]
+pub struct MapDoesNotContainKey<E> {
+    pub expected_key: E,
+}
+
+#[must_use]
+pub struct MapContainsValue<E> {
+    pub expected_value: E,
+}
+
+#[must_use]
+pub struct MapDoesNotContainValue<E> {
+    pub expected_value: E,
+}
+
+#[must_use]
+pub struct MapContainsKeys<E> {
+    pub expected_keys: Vec<E>,
+    pub missing: HashSet<usize>,
+}
+
+impl<E> MapContainsKeys<E> {
+    pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_keys: Vec::from_iter(expected_keys),
+            missing: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapDoesNotContainKeys<E> {
+    pub expected_keys: Vec<E>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapDoesNotContainKeys<E> {
+    pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_keys: Vec::from_iter(expected_keys),
+            extra: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapContainsValues<E> {
+    pub expected_values: Vec<E>,
+    pub missing: HashSet<usize>,
+}
+
+impl<E> MapContainsValues<E> {
+    pub fn new(expected_values: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_values: Vec::from_iter(expected_values),
+            missing: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapDoesNotContainValues<E> {
+    pub expected_values: Vec<E>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapDoesNotContainValues<E> {
+    pub fn new(expected_values: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_values: Vec::from_iter(expected_values),
+            extra: HashSet::new(),
+        }
+    }
+}
+
+#[must_use]
+pub struct MapContainsExactlyKeys<E> {
+    pub expected_keys: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapContainsExactlyKeys<E> {
+    pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_keys: Vec::from_iter(expected_keys),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
+        }
+    }
 }
 
 #[cfg(feature = "panic")]
