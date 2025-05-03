@@ -360,6 +360,43 @@ mod hashbrown {
             )]
         );
     }
+
+    #[test]
+    fn hashmap_contains_exactly_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_exactly_keys([5, 6, 1, 4]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_exactly_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .keys()
+                .filter(|k| **k == 1 || **k == 4)
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_exactly_keys([5, 2, 6, 3])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]
+   but was: {formatted_actual}
+  expected: [5, 2, 6, 3]
+   missing: [2, 3]
+     extra: {formatted_extra}
+"
+            )]
+        );
+    }
 }
 
 #[cfg(feature = "std")]
@@ -659,12 +696,43 @@ mod std_hash_map {
             )]
         );
     }
+
+    #[test]
+    fn hashmap_contains_exactly_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_exactly_keys([5, 6, 1, 4]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_exactly_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_exactly_keys([4, 5, 6, 3])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains exactly the keys [4, 5, 6, 3]
+   but was: {formatted_actual}
+  expected: [4, 5, 6, 3]
+   missing: [3]
+     extra: [1]
+"
+            )]
+        );
+    }
 }
 
 mod btree_map {
     use crate::prelude::*;
     use crate::std::collections::BTreeMap;
     use crate::std::format;
+    use crate::std::vec::Vec;
 
     #[test]
     fn btree_map_is_empty() {
@@ -947,6 +1015,43 @@ mod btree_map {
             )]
         );
     }
+
+    #[test]
+    fn btree_map_contains_exactly_keys() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_exactly_keys([5, 6, 1, 4]);
+    }
+
+    #[test]
+    fn verify_btree_map_contains_exactly_keys_fails() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .keys()
+                .filter(|k| **k == 1 || **k == 4)
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_exactly_keys([5, 2, 6, 3])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]
+   but was: {formatted_actual}
+  expected: [5, 2, 6, 3]
+   missing: [2, 3]
+     extra: {formatted_extra}
+"
+            )]
+        );
+    }
 }
 
 #[cfg(feature = "colored")]
@@ -1162,6 +1267,39 @@ mod colored {
                 "assertion failed: expected foo_map does not contain values [\"five\", \"two\", \"four\", \"seven\"]\n   \
                     but was: {formatted_actual}\n  \
                    expected: [\u{1b}[32m\"five\"\u{1b}[0m, \"two\", \u{1b}[32m\"four\"\u{1b}[0m, \"seven\"]\n     \
+                      extra: {formatted_extra}\n\
+                "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_contains_exactly_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
+            .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
+        let formatted_extra = format!(
+            "{:?}",
+            subject
+                .keys()
+                .filter(|k| **k == 1 || **k == 4)
+                .collect::<Vec<_>>()
+        );
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains_exactly_keys([5, 2, 6, 3])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]\n   \
+                    but was: {formatted_actual}\n  \
+                   expected: [5, \u{1b}[32m2\u{1b}[0m, 6, \u{1b}[32m3\u{1b}[0m]\n   \
+                    missing: [2, 3]\n     \
                       extra: {formatted_extra}\n\
                 "
             )]

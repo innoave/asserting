@@ -4,8 +4,8 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected_substr,
 };
 use crate::expectations::{
-    MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues, MapDoesNotContainKey,
-    MapDoesNotContainKeys, MapDoesNotContainValue, MapDoesNotContainValues,
+    MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
+    MapDoesNotContainKey, MapDoesNotContainKeys, MapDoesNotContainValue, MapDoesNotContainValues,
 };
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
@@ -38,6 +38,10 @@ where
 
     fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
         self.expecting(MapDoesNotContainKeys::new(expected_keys))
+    }
+
+    fn contains_exactly_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(MapContainsExactlyKeys::new(expected_keys))
     }
 }
 
@@ -186,6 +190,53 @@ where
             r"expected {expression} does not contain keys {expected_keys:?}
    but was: {marked_actual}
   expected: {marked_expected}
+     extra: {extra_keys:?}"
+        )
+    }
+}
+
+impl<M, E> Expectation<M> for MapContainsExactlyKeys<E>
+where
+    M: MapProperties,
+    <M as MapProperties>::Key: PartialEq<E> + Debug,
+    <M as MapProperties>::Value: Debug,
+    E: Debug,
+{
+    fn test(&mut self, subject: &M) -> bool {
+        let actual_keys = subject.keys_property().collect::<Vec<_>>();
+        let expected_keys = &self.expected_keys;
+        let missing = &mut self.missing;
+        let extra = &mut self.extra;
+        *extra = (0..actual_keys.len()).collect();
+        for (expected_index, expected_key) in expected_keys.iter().enumerate() {
+            if let Some(actual_index) = actual_keys.iter().position(|k| *k == expected_key) {
+                extra.remove(&actual_index);
+            } else {
+                missing.insert(expected_index);
+            }
+        }
+        missing.is_empty() && extra.is_empty()
+    }
+
+    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+        let expected_keys = &self.expected_keys;
+        let missing = &self.missing;
+        let extra = &self.extra;
+        let actual_entries: Vec<_> = actual.entries_property().collect();
+        let actual_keys: Vec<_> = actual.keys_property().collect();
+
+        let marked_actual =
+            mark_selected_entries_in_map(&actual_entries, extra, format, mark_unexpected_substr);
+        let marked_expected =
+            mark_selected_items_in_collection(expected_keys, missing, format, mark_missing);
+        let missing_keys = collect_selected_values(missing, expected_keys);
+        let extra_keys = collect_selected_values(extra, &actual_keys);
+
+        format!(
+            r"expected {expression} contains exactly the keys {expected_keys:?}
+   but was: {marked_actual}
+  expected: {marked_expected}
+   missing: {missing_keys:?}
      extra: {extra_keys:?}"
         )
     }

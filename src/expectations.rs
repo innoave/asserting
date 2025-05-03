@@ -566,6 +566,23 @@ impl<E> MapDoesNotContainValues<E> {
     }
 }
 
+#[must_use]
+pub struct MapContainsExactlyKeys<E> {
+    pub expected_keys: Vec<E>,
+    pub missing: HashSet<usize>,
+    pub extra: HashSet<usize>,
+}
+
+impl<E> MapContainsExactlyKeys<E> {
+    pub fn new(expected_keys: impl IntoIterator<Item = E>) -> Self {
+        Self {
+            expected_keys: Vec::from_iter(expected_keys),
+            missing: HashSet::new(),
+            extra: HashSet::new(),
+        }
+    }
+}
+
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
 pub use panic::{DoesNotPanic, DoesPanic};
