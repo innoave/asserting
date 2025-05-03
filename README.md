@@ -342,6 +342,23 @@ All the above assertions provided for any kind of iterator plus the following:
 | starts_with           | verify that an iterator/collection contains the given values as the first elements in order                                                      |
 | ends_with             | verify that an iterator/collection contains the given values as the last elements in order                                                       |
 
+### Maps
+
+For all types that implement the [`MapProperties`] trait. Currently, it is implemented for
+`std::collections::HashMap`, `std::collections::BTreeMap` and `hashbrown::HashMap`.
+
+| assertion               | description                                                                                                                      |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| contains_key            | verify that a map contains a mapping for the expected key                                                                        |
+| contains_keys           | verify that a map contains a mapping for each of the expected keys, ignoring order and duplicates                                |
+| contains_exactly_keys   | verify that a map contains exactly one mapping for each of the expected keys and no other mapping, ignoring order and duplicates |
+| does_not_contain_key    | verify that a map does not contain any mapping for the given key                                                                 |
+| does_not_contain_keys   | verify that a map does not contain any mapping for the given keys                                                                |
+| contains_value          | verify that a map contains at least one mapping where the value is equal to the expected one                                     |
+| contains_values         | verify that a map contains for each expected value at least one mapping where the value is equal, ignoring order and duplicates  |
+| does_not_contain_value  | verify that a map does not contain any mapping where the value is equal to the given one                                         |
+| does_not_contain_values | verify that a map does not contain any mapping where the value is equal to one of the given values                               |
+
 ### Panic
 
 for code inside a closure.
@@ -389,5 +406,7 @@ To start assertions on code use the `assert_that_code!()` macro.
 [`IsEmptyProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.IsEmptyProperty.html
 
 [`LengthProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.LengthProperty.html
+
+[`MapProperties`]: https://docs.rs/asserting/latest/asserting/properties/trait.MapProperties.html
 
 [`NO_COLOR`]: https://no-color.org/
