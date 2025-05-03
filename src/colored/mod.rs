@@ -199,7 +199,7 @@ where
 /// unexpected values or bold as specified by the given [`DiffFormat`].
 pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
 where
-    T: Debug,
+    T: Debug + ?Sized,
 {
     mark_unexpected_impl(value, format)
 }
@@ -208,7 +208,7 @@ where
 /// "missing values" as specified by the given [`DiffFormat`].
 pub fn mark_missing<T>(value: &T, format: &DiffFormat) -> String
 where
-    T: Debug,
+    T: Debug + ?Sized,
 {
     mark_missing_impl(value, format)
 }
@@ -273,7 +273,7 @@ pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
 /// use hashbrown::HashSet;
 ///
 /// let collection = [1, 2, 3, 4, 5];
-/// let selected_items = HashSet::from_iter([1, 2, 4]);
+/// let selected_items: HashSet<_> = [1, 2, 4].into();
 ///
 /// let marked_collection = mark_selected_items_in_collection(
 ///     &collection,
@@ -370,6 +370,135 @@ where
     marked_collection
 }
 
+/// Highlights selected entries in a map using the given [`DiffFormat`].
+///
+/// This function formats the given map for debug and highlights those entries
+/// in the map where the index is present in the `selected_indices` parameter.
+///
+/// Whether the entries are highlighted as "unexpected" or "missing" depends on
+/// the function specified in the `mark` parameter.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(not(all(feature = "colored", feature = "std")))]
+/// # fn main() {}
+/// # #[cfg(all(feature = "colored", feature = "std"))]
+/// # fn main() {
+/// use asserting::colored::{mark_missing_substr, mark_selected_entries_in_map, DIFF_FORMAT_RED_BLUE};
+/// use hashbrown::HashSet;
+/// use std::collections::BTreeMap;
+///
+/// let map: BTreeMap<_, _> = [(1, "one"), (2, "two"), (3, "three"), (4, "four")].into();
+/// let selected_entries: HashSet<_> = [0, 2].into();
+///
+/// let map_entries: Vec<_> = map.iter().collect();
+/// let marked_map = mark_selected_entries_in_map(
+///     &map_entries,
+///     &selected_entries,
+///     &DIFF_FORMAT_RED_BLUE,
+///     mark_missing_substr
+/// );
+///
+/// assert_eq!(marked_map, "{\u{1b}[34m1: \"one\"\u{1b}[0m, 2: \"two\", \u{1b}[34m3: \"three\"\u{1b}[0m, 4: \"four\"}");
+/// # }
+/// ```
+pub fn mark_selected_entries_in_map<K, V, F>(
+    map_entries: &[(K, V)],
+    selected_indices: &HashSet<usize>,
+    format: &DiffFormat,
+    mark: F,
+) -> String
+where
+    K: Debug,
+    V: Debug,
+    F: Fn(&str, &DiffFormat) -> String,
+{
+    let mut marked_map_entries = String::with_capacity(map_entries.len() + 2);
+    marked_map_entries.push('{');
+    map_entries
+        .iter()
+        .enumerate()
+        .map(|(index, entry)| {
+            let key_value_pair = format!("{:?}: {:?}", entry.0, entry.1);
+            if selected_indices.contains(&index) {
+                mark(&key_value_pair, format)
+            } else {
+                key_value_pair
+            }
+        })
+        .for_each(|entry| {
+            marked_map_entries.push_str(&entry);
+            marked_map_entries.push_str(", ");
+        });
+    if marked_map_entries.len() >= 3 {
+        marked_map_entries.pop();
+        marked_map_entries.pop();
+    }
+    marked_map_entries.push('}');
+    marked_map_entries
+}
+
+/// Highlights all entries in a map using the given [`DiffFormat`].
+///
+/// This function formats the given map for debug and highlights all entries in
+/// the map individually (instead of the whole debug string).
+///
+/// Whether the entries are highlighted as "unexpected" or "missing" depends on
+/// the function specified in the `mark` parameter.
+///
+/// # Example
+///
+/// ```
+/// # #[cfg(not(all(feature = "colored", feature = "std")))]
+/// # fn main() {}
+/// # #[cfg(all(feature = "colored", feature = "std"))]
+/// # fn main() {
+/// use asserting::colored::{mark_all_entries_in_map, mark_unexpected_substr, DIFF_FORMAT_RED_BLUE};
+/// use std::collections::BTreeMap;
+///
+/// let map: BTreeMap<_, _> = [(1, "one"), (2, "two"), (3, "three"), (4, "four")].into();
+///
+/// let map_entries: Vec<_> = map.iter().collect();
+/// let marked_map = mark_all_entries_in_map(
+///     &map_entries,
+///     &DIFF_FORMAT_RED_BLUE,
+///     mark_unexpected_substr
+/// );
+///
+/// assert_eq!(marked_map, "{\u{1b}[31m1: \"one\"\u{1b}[0m, \u{1b}[31m2: \"two\"\u{1b}[0m, \u{1b}[31m3: \"three\"\u{1b}[0m, \u{1b}[31m4: \"four\"\u{1b}[0m}");
+/// # }
+/// ```
+pub fn mark_all_entries_in_map<K, V, F>(
+    map_entries: &[(K, V)],
+    format: &DiffFormat,
+    mark: F,
+) -> String
+where
+    K: Debug,
+    V: Debug,
+    F: Fn(&str, &DiffFormat) -> String,
+{
+    let mut marked_map_entries = String::with_capacity(map_entries.len() + 2);
+    marked_map_entries.push('{');
+    map_entries
+        .iter()
+        .map(|entry| {
+            let key_value_pair = format!("{:?}: {:?}", entry.0, entry.1);
+            mark(&key_value_pair, format)
+        })
+        .for_each(|entry| {
+            marked_map_entries.push_str(&entry);
+            marked_map_entries.push_str(", ");
+        });
+    if marked_map_entries.len() >= 3 {
+        marked_map_entries.pop();
+        marked_map_entries.pop();
+    }
+    marked_map_entries.push('}');
+    marked_map_entries
+}
+
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
@@ -401,7 +530,7 @@ mod without_colored_feature {
     #[inline]
     pub fn mark_unexpected_impl<T>(value: &T, _format: &DiffFormat) -> String
     where
-        T: Debug,
+        T: Debug + ?Sized,
     {
         format!("{value:?}")
     }
@@ -409,7 +538,7 @@ mod without_colored_feature {
     #[inline]
     pub fn mark_missing_impl<T>(value: &T, _format: &DiffFormat) -> String
     where
-        T: Debug,
+        T: Debug + ?Sized,
     {
         format!("{value:?}")
     }
@@ -667,7 +796,7 @@ mod with_colored_feature {
     #[inline]
     pub fn mark_unexpected_impl<T>(value: &T, format: &DiffFormat) -> String
     where
-        T: Debug,
+        T: Debug + ?Sized,
     {
         format!(
             "{}{value:?}{}",
@@ -678,7 +807,7 @@ mod with_colored_feature {
     #[inline]
     pub fn mark_missing_impl<T>(value: &T, format: &DiffFormat) -> String
     where
-        T: Debug,
+        T: Debug + ?Sized,
     {
         format!("{}{value:?}{}", format.missing.start, format.missing.end)
     }

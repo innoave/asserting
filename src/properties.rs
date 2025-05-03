@@ -220,21 +220,20 @@ where
     }
 }
 
-/// The keys property for map-like types provides access to the keys in a map.
-pub trait KeysProperty {
+/// The properties of a map-like type.
+pub trait MapProperties {
     /// The type of the keys in this map.
     type Key;
 
-    /// Returns an iterator over the keys in this map.
-    fn keys_property(&self) -> impl Iterator<Item = &Self::Key>;
-}
-
-/// The values property for map-like types provides access to the values in a
-/// map.
-pub trait ValuesProperty {
     /// The type of the values in this map.
     type Value;
 
+    /// Returns an iterator over the keys in this map.
+    fn keys_property(&self) -> impl Iterator<Item = &Self::Key>;
+
     /// Returns an iterator over the values in this map.
     fn values_property(&self) -> impl Iterator<Item = &Self::Value>;
+
+    /// Returns an iterator over the key/value-pairs in this map.
+    fn entries_property(&self) -> impl Iterator<Item = (&Self::Key, &Self::Value)>;
 }

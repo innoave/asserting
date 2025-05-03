@@ -192,12 +192,115 @@ mod hashbrown {
             )]
         );
     }
+
+    #[test]
+    fn hashmap_contains_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_keys([5, 4]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 4])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+   but was: {formatted_actual}
+  expected: [5, 3, 4]
+   missing: [3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_borrowed_hashmap_contains_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 4])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+   but was: {formatted_actual}
+  expected: [5, 3, 4]
+   missing: [3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_mutable_borrowed_hashmap_contains_keys_fails() {
+        let mut subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&mut subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 4])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+   but was: {formatted_actual}
+  expected: [5, 3, 4]
+   missing: [3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn hashmap_contains_values() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_values(["five", "four"]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_values_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_values(["one", "two", "three"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+   but was: {formatted_actual}
+  expected: ["one", "two", "three"]
+   missing: ["two", "three"]
+"#
+            )]
+        );
+    }
 }
 
 #[cfg(feature = "std")]
 mod std_hash_map {
     use crate::prelude::*;
     use crate::std::collections::HashMap;
+    use crate::std::format;
 
     #[test]
     fn hashmap_is_empty() {
@@ -388,11 +491,114 @@ mod std_hash_map {
             )]
         );
     }
+
+    #[test]
+    fn hashmap_contains_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_keys([1, 6]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_keys([2, 3, 5])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+   but was: {formatted_actual}
+  expected: [2, 3, 5]
+   missing: [2, 3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_borrowed_hashmap_contains_keys_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&subject)
+            .named("foo_map")
+            .contains_keys([2, 3, 5])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+   but was: {formatted_actual}
+  expected: [2, 3, 5]
+   missing: [2, 3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_mutable_borrowed_hashmap_contains_keys_fails() {
+        let mut subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&mut subject)
+            .named("foo_map")
+            .contains_keys([2, 3, 5])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+   but was: {formatted_actual}
+  expected: [2, 3, 5]
+   missing: [2, 3]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn hashmap_contains_values() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_values(["five", "four"]);
+    }
+
+    #[test]
+    fn verify_hashmap_contains_values_fails() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_values(["one", "two", "three"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+   but was: {formatted_actual}
+  expected: ["one", "two", "three"]
+   missing: ["two", "three"]
+"#
+            )]
+        );
+    }
 }
 
 mod btree_map {
     use crate::prelude::*;
     use crate::std::collections::BTreeMap;
+    use crate::std::format;
 
     #[test]
     fn btree_map_is_empty() {
@@ -571,6 +777,263 @@ mod btree_map {
   expected: "one"
 "#
             ]
+        );
+    }
+
+    #[test]
+    fn btree_map_contains_keys() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_keys([5, 1, 6]);
+    }
+
+    #[test]
+    fn verify_btree_map_contains_keys_fails() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+   but was: {formatted_actual}
+  expected: [5, 3, 7]
+   missing: [3, 7]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_borrowed_btree_map_contains_keys_fails() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+   but was: {formatted_actual}
+  expected: [5, 3, 7]
+   missing: [3, 7]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn verify_mutable_borrowed_btree_map_contains_keys_fails() {
+        let mut subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(&mut subject)
+            .named("foo_map")
+            .contains_keys([5, 3, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+   but was: {formatted_actual}
+  expected: [5, 3, 7]
+   missing: [3, 7]
+"
+            )]
+        );
+    }
+
+    #[test]
+    fn btree_map_contains_values() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+
+        assert_that(subject).contains_values(["five", "four"]);
+    }
+
+    #[test]
+    fn verify_btree_map_contains_values_fails() {
+        let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject);
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .contains_values(["one", "two", "three"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+   but was: {formatted_actual}
+  expected: ["one", "two", "three"]
+   missing: ["two", "three"]
+"#
+            )]
+        );
+    }
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::prelude::*;
+    use crate::std::format;
+    use hashbrown::HashMap;
+
+    #[test]
+    fn highlight_diffs_hashmap_contains_key() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
+            .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
+            .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m")
+            .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains_key(2)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map contains key 2\n   \
+                but was: {formatted_actual}\n  \
+               expected: \u{1b}[32m2\u{1b}[0m\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_does_not_contain_key() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual =
+            format!("{:?}", &subject).replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_contain_key(1)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map does not contain key 1\n   \
+                but was: {formatted_actual}\n  \
+               expected: \u{1b}[32m1\u{1b}[0m\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_contains_value() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
+            .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
+            .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m")
+            .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains_value("three")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map contains value \"three\"\n   \
+                but was: {formatted_actual}\n  \
+               expected: \u{1b}[32m\"three\"\u{1b}[0m\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_does_not_contain_value() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual =
+            format!("{:?}", &subject).replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_contain_value("four")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map does not contain value \"four\"\n   \
+                but was: {formatted_actual}\n  \
+               expected: \u{1b}[32m\"four\"\u{1b}[0m\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_contains_keys() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
+            .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains_keys([5, 2, 4, 7])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map contains keys [5, 2, 4, 7]\n   \
+                but was: {formatted_actual}\n  \
+               expected: [5, \u{1b}[32m2\u{1b}[0m, 4, \u{1b}[32m7\u{1b}[0m]\n   \
+                missing: [2, 7]\n\
+            "
+            )]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_hashmap_contains_values() {
+        let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
+        let formatted_actual = format!("{:?}", &subject)
+            .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
+            .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
+
+        let failures = verify_that(subject)
+            .named("foo_map")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .contains_values(["five", "two", "four", "seven"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[format!(
+                "assertion failed: expected foo_map contains values [\"five\", \"two\", \"four\", \"seven\"]\n   \
+                    but was: {formatted_actual}\n  \
+                   expected: [\"five\", \u{1b}[32m\"two\"\u{1b}[0m, \"four\", \u{1b}[32m\"seven\"\u{1b}[0m]\n   \
+                    missing: [\"two\", \"seven\"]\n\
+                "
+            )]
         );
     }
 }

@@ -113,8 +113,8 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
-        let missing = collect_values(&self.missing, &self.expected);
-        let extra = collect_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected);
+        let extra = collect_selected_values(&self.extra, actual);
         let marked_actual =
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
@@ -185,7 +185,7 @@ where
             mark_selected_items_in_collection(actual, &extra, format, mark_unexpected);
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_values(&self.missing, &self.expected);
+        let missing = collect_selected_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?}
@@ -225,7 +225,7 @@ where
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &missing, format, mark_missing);
-        let extra = collect_values(&self.extra, actual);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains only {:?}
@@ -267,7 +267,7 @@ where
             format,
             mark_unexpected,
         );
-        let duplicates = collect_values(&self.duplicates, actual);
+        let duplicates = collect_selected_values(&self.duplicates, actual);
         let mut expected_duplicates_and_missing = HashSet::new();
         for (expected_index, expected) in self.expected.iter().enumerate() {
             if duplicates.iter().any(|duplicate| *duplicate == expected)
@@ -282,7 +282,7 @@ where
             format,
             mark_missing,
         );
-        let extra = collect_values(&self.extra, actual);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains only once {:?}
@@ -379,7 +379,7 @@ where
     }
 
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
-        let out_of_order = collect_values(&self.out_of_order, actual);
+        let out_of_order = collect_selected_values(&self.out_of_order, actual);
         let mut expected_indices = self.missing.clone();
         for (expected_index, expected) in self.expected.iter().enumerate() {
             if out_of_order.iter().any(|actual| *actual == expected) {
@@ -396,8 +396,8 @@ where
         let marked_actual =
             mark_selected_items_in_collection(actual, &actual_indices, format, mark_unexpected);
 
-        let missing = collect_values(&self.missing, &self.expected);
-        let extra = collect_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains exactly in order {:?}
@@ -482,8 +482,8 @@ where
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_values(&self.missing, &self.expected);
-        let extra = collect_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} contains sequence {:?}
@@ -522,7 +522,7 @@ where
     fn message(&self, expression: Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_values(&self.missing, &self.expected);
+        let missing = collect_selected_values(&self.missing, &self.expected);
 
         format!(
             r"expected {expression} contains all of {:?} in order
@@ -567,8 +567,8 @@ where
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_values(&self.missing, &self.expected);
-        let extra = collect_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} starts with {:?}
@@ -614,8 +614,8 @@ where
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_values(&self.missing, &self.expected);
-        let extra = collect_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected);
+        let extra = collect_selected_values(&self.extra, actual);
 
         format!(
             r"expected {expression} ends with {:?}
@@ -628,7 +628,7 @@ where
     }
 }
 
-fn collect_values<'a, T>(indices: &HashSet<usize>, collection: &'a [T]) -> Vec<&'a T> {
+pub fn collect_selected_values<'a, T>(indices: &HashSet<usize>, collection: &'a [T]) -> Vec<&'a T> {
     collection
         .iter()
         .enumerate()
