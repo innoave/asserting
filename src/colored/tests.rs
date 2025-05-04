@@ -91,6 +91,7 @@ mod with_colored_and_std_features {
     use super::*;
     use crate::colored::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
     use crate::std::env;
+    use hashbrown::HashMap;
     use proptest::prelude::*;
     use serial_test::serial;
 
@@ -314,5 +315,85 @@ mod with_colored_and_std_features {
         let assertion = verify_that_code(|| {});
 
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
+    }
+
+    #[test]
+    fn mark_unexpected_highlights_a_char_with_single_quotes() {
+        let marked_char = mark_unexpected(&'R', &DIFF_FORMAT_RED_GREEN);
+
+        assert_that(marked_char).is_equal_to("\u{1b}[31m'R'\u{1b}[0m");
+    }
+
+    #[test]
+    fn mark_missing_highlights_a_char_with_single_quotes() {
+        let marked_char = mark_missing(&'R', &DIFF_FORMAT_RED_GREEN);
+
+        assert_that(marked_char).is_equal_to("\u{1b}[32m'R'\u{1b}[0m");
+    }
+
+    #[test]
+    fn mark_unexpected_char_highlights_char_without_single_quotes() {
+        let marked_char = mark_unexpected_char('R', &DIFF_FORMAT_RED_GREEN);
+
+        assert_that(marked_char).is_equal_to("\u{1b}[31mR\u{1b}[0m");
+    }
+
+    #[test]
+    fn mark_missing_char_highlights_char_without_single_quotes() {
+        let marked_char = mark_missing_char('R', &DIFF_FORMAT_RED_GREEN);
+
+        assert_that(marked_char).is_equal_to("\u{1b}[32mR\u{1b}[0m");
+    }
+
+    #[test]
+    fn mark_selected_items_in_collection_for_empty_collection() {
+        let collection: &[usize] = &[];
+        let selected: HashSet<usize> = [1, 4].into();
+
+        let marked_collection = mark_selected_items_in_collection(
+            collection,
+            &selected,
+            &DIFF_FORMAT_RED_GREEN,
+            mark_missing,
+        );
+
+        assert_that(marked_collection).is_equal_to("[]");
+    }
+
+    #[test]
+    fn mark_all_items_in_collection_for_empty_collection() {
+        let collection: &[usize] = &[];
+
+        let marked_collection =
+            mark_all_items_in_collection(collection, &DIFF_FORMAT_RED_GREEN, mark_missing);
+
+        assert_that(marked_collection).is_equal_to("[]");
+    }
+
+    #[test]
+    fn mark_selected_entries_in_map_for_empty_map() {
+        let map: HashMap<String, usize> = HashMap::new();
+        let map_entries: Vec<_> = map.iter().collect();
+        let selected: HashSet<usize> = [1, 4].into();
+
+        let marked_map = mark_selected_entries_in_map(
+            &map_entries,
+            &selected,
+            &DIFF_FORMAT_RED_GREEN,
+            mark_missing,
+        );
+
+        assert_that(marked_map).is_equal_to("{}");
+    }
+
+    #[test]
+    fn mark_all_entries_in_map_for_empty_map() {
+        let map: HashMap<String, usize> = HashMap::new();
+        let map_entries: Vec<_> = map.iter().collect();
+
+        let marked_map =
+            mark_all_entries_in_map(&map_entries, &DIFF_FORMAT_RED_GREEN, mark_missing);
+
+        assert_that(marked_map).is_equal_to("{}");
     }
 }
