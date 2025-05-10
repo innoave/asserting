@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.0 - 2025-05-10
+
+_Assertions for map-like types (`HashMap`, `BTreeMap`) and assert items of collections/iterators_
+
+### Added
+
+* Provide assertions for map-like types
+  [(PR #31)](https://github.com/innoave/asserting/pull/31)
+* Assert each item in a collection or iterator
+  [(PR #35)](https://github.com/innoave/asserting/pull/35)
+* Support dynamically composed expression in `Spec`
+  [(PR #33)](https://github.com/innoave/asserting/pull/33)
+* Support dynamically composed description in `Spec`
+  [(PR #34)](https://github.com/innoave/asserting/pull/34)
+
+### Changed
+
+* Compile time error when assertions for closures are chained
+  [(PR #36)](https://github.com/innoave/asserting/pull/36)
+* Remove implementation of `Default` for `DoesPanic`
+  [(PR #37)](https://github.com/innoave/asserting/pull/37)
+
+### Fixed
+
+* `assert_that_code` does not highlight diffs in failure
+  [(PR #30)](https://github.com/innoave/asserting/pull/30)
+
 ## 0.5.0 - 2025-04-26
 
 _Soft assertions_
