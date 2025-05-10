@@ -64,7 +64,7 @@ where
         subject.char_count_property() == self.expected_char_count
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
@@ -83,7 +83,7 @@ where
         self.expected_range.contains(&subject.char_count_property())
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_range, format);
         format!(
@@ -101,7 +101,7 @@ where
         subject.char_count_property() < self.expected_char_count
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
@@ -119,7 +119,7 @@ where
         subject.char_count_property() > self.expected_char_count
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
@@ -137,7 +137,7 @@ where
         subject.char_count_property() <= self.expected_char_count
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
@@ -155,7 +155,7 @@ where
         subject.char_count_property() >= self.expected_char_count
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(

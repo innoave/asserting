@@ -119,7 +119,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
         let marked_expected = mark_missing_substr(self.expected, format);
         format!(
@@ -137,7 +137,7 @@ where
         subject.as_ref().contains(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
         let marked_expected = mark_missing_substr(self.expected.as_ref(), format);
         format!(
@@ -155,7 +155,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
         let marked_expected = mark_missing_char(self.expected, format);
         format!(
@@ -173,7 +173,7 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let expected_char_len = self.expected.chars().count();
         let actual_start = actual
             .as_ref()
@@ -202,7 +202,7 @@ where
         subject.as_ref().starts_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let expected_char_len = self.expected.chars().count();
         let actual_start = actual
             .as_ref()
@@ -231,7 +231,7 @@ where
         subject.as_ref().starts_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let actual_first_char = actual.as_ref().chars().take(1).collect::<String>();
         let actual_rest = actual.as_ref().chars().skip(1).collect::<String>();
         let marked_actual_start = mark_unexpected_substr(&actual_first_char, format);
@@ -251,7 +251,7 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let actual_char_len = actual.as_ref().chars().count();
         let expected_char_len = self.expected.chars().count();
         let split_point = actual_char_len.saturating_sub(expected_char_len);
@@ -282,7 +282,7 @@ where
         subject.as_ref().ends_with(&self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let actual_char_len = actual.as_ref().chars().count();
         let expected_char_len = self.expected.chars().count();
         let split_point = actual_char_len.saturating_sub(expected_char_len);
@@ -313,7 +313,7 @@ where
         subject.as_ref().ends_with(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let actual_last_char = actual
             .as_ref()
             .chars()
@@ -375,7 +375,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -393,7 +393,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -411,7 +411,7 @@ where
         subject.as_ref().contains(self.expected)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -449,7 +449,7 @@ mod regex {
                 .is_ok_and(|regex| regex.is_match(subject.as_ref()))
         }
 
-        fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
             let pattern = self.pattern;
             match self.regex.as_ref() {
                 Ok(regex) => {

@@ -2,7 +2,7 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
-use crate::std::borrow::ToOwned;
+use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
@@ -428,17 +428,17 @@ pub trait Expectation<S: ?Sized> {
     fn test(&mut self, subject: &S) -> bool;
 
     /// Forms a failure message for this expectation.
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String;
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String;
 }
 
 /// A textual representation of the expression or subject that is being
 /// asserted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Expression<'a>(pub &'a str);
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct Expression<'a>(pub Cow<'a, str>);
 
 impl Default for Expression<'_> {
     fn default() -> Self {
-        Self("subject")
+        Self("subject".into())
     }
 }
 
@@ -452,7 +452,7 @@ impl Deref for Expression<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        self.0
+        &self.0
     }
 }
 
@@ -598,7 +598,7 @@ impl OwnedLocation {
 pub struct Spec<'a, S, R> {
     subject: S,
     expression: Option<Expression<'a>>,
-    description: Option<&'a str>,
+    description: Option<Cow<'a, str>>,
     location: Option<Location<'a>>,
     failures: Vec<AssertFailure>,
     diff_format: DiffFormat,
@@ -612,8 +612,8 @@ impl<S, R> Spec<'_, S, R> {
     }
 
     /// Returns the expression (or subject name) if one has been set.
-    pub fn expression(&self) -> Option<Expression<'_>> {
-        self.expression
+    pub fn expression(&self) -> Option<&Expression<'_>> {
+        self.expression.as_ref()
     }
 
     /// Returns the location in source code or test code if it has been set.
@@ -623,7 +623,7 @@ impl<S, R> Spec<'_, S, R> {
 
     /// Returns the description or the assertion if it has been set.
     pub fn description(&self) -> Option<&str> {
-        self.description
+        self.description.as_deref()
     }
 
     /// Returns the diff format used with this assertion.
@@ -668,15 +668,15 @@ impl<'a, S, R> Spec<'a, S, R> {
 
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn named(mut self, subject_name: &'a str) -> Self {
-        self.expression = Some(Expression(subject_name));
+    pub fn named(mut self, subject_name: impl Into<Cow<'a, str>>) -> Self {
+        self.expression = Some(Expression(subject_name.into()));
         self
     }
 
     /// Sets a custom description about what is being asserted.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn described_as(mut self, description: &'a str) -> Self {
-        self.description = Some(description);
+    pub fn described_as(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
         self
     }
 
@@ -845,7 +845,8 @@ where
     #[track_caller]
     pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
-            let expression = self.expression.unwrap_or_default();
+            let default_expression = Expression::default();
+            let expression = self.expression.as_ref().unwrap_or(&default_expression);
             let message = expectation.message(expression, &self.subject, &self.diff_format);
             self.do_fail_with_message(message);
         }
@@ -946,7 +947,7 @@ where
     fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
-            description: self.description.map(ToOwned::to_owned),
+            description: self.description.clone().map(String::from),
             message,
             location: self.location.map(OwnedLocation::from),
         };
@@ -1192,7 +1193,7 @@ impl FailingStrategy for CollectFailures {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
+///     fn message(&self, expression: &Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
 ///         format!(
 ///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),

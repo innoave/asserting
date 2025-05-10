@@ -34,7 +34,7 @@ where
         subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         format!("expected {expression} is empty\n   but was: {marked_actual}\n  expected: <empty>")
     }
@@ -48,7 +48,7 @@ where
         !subject.is_empty_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         format!(
             "expected {expression} is not empty\n   but was: {marked_actual}\n  expected: <non-empty>",
@@ -97,7 +97,7 @@ where
         subject.length_property() == self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_length, format);
         format!(
@@ -116,7 +116,7 @@ where
         self.expected_range.contains(&subject.length_property())
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_range, format);
         format!(
@@ -134,7 +134,7 @@ where
         subject.length_property() < self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_length, format);
         format!(
@@ -152,7 +152,7 @@ where
         subject.length_property() > self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_length, format);
         format!(
@@ -170,7 +170,7 @@ where
         subject.length_property() <= self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_length, format);
         format!(
@@ -188,7 +188,7 @@ where
         subject.length_property() >= self.expected_length
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(&actual.length_property(), format);
         let marked_expected = mark_missing(&self.expected_length, format);
         format!(

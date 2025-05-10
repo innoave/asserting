@@ -56,7 +56,7 @@ where
         subject.keys_property().any(|k| k == &self.expected_key)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_key = &self.expected_key;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let marked_actual =
@@ -78,7 +78,7 @@ where
         subject.keys_property().all(|k| k != &self.expected_key)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_key = &self.expected_key;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let found: HashSet<usize> = actual_entries
@@ -119,7 +119,7 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_keys = &self.expected_keys;
         let missing = &self.missing;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -169,7 +169,7 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_keys = &self.expected_keys;
         let extra = &self.extra;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -218,7 +218,7 @@ where
         missing.is_empty() && extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_keys = &self.expected_keys;
         let missing = &self.missing;
         let extra = &self.extra;
@@ -278,7 +278,7 @@ where
         subject.values_property().any(|v| v == &self.expected_value)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_value = &self.expected_value;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let marked_actual =
@@ -300,7 +300,7 @@ where
         subject.values_property().all(|v| v != &self.expected_value)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_value = &self.expected_value;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let found: HashSet<usize> = actual_entries
@@ -341,7 +341,7 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_values = &self.expected_values;
         let missing = &self.missing;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -391,7 +391,7 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
         let expected_values = &self.expected_values;
         let extra = &self.extra;
         let actual_entries: Vec<_> = actual.entries_property().collect();
