@@ -2,15 +2,13 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
+use crate::std::borrow::ToOwned;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
-use crate::std::{
-    borrow::ToOwned,
-    string::{String, ToString},
-    vec,
-    vec::Vec,
-};
+use crate::std::string::{String, ToString};
+use crate::std::vec;
+use crate::std::vec::Vec;
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
 
@@ -1019,6 +1017,38 @@ impl<S> Spec<'_, S, CollectFailures> {
     pub fn soft_panic(&self) {
         if !self.failures.is_empty() {
             PanicOnFail.do_fail_with(&self.failures);
+        }
+    }
+}
+
+impl<'a, I, R> Spec<'a, I, R> {
+    #[allow(clippy::return_self_not_must_use)]
+    pub fn each_item<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    where
+        I: IntoIterator<Item = T>,
+        for<'c> A: Fn(Spec<'c, T, CollectFailures>) -> Spec<'c, B, CollectFailures>,
+    {
+        for item in self.subject {
+            let element_spec = Spec {
+                subject: item,
+                expression: Some(Expression("iterator-item")),
+                description: None,
+                location: self.location,
+                failures: vec![],
+                diff_format: self.diff_format.clone(),
+                failing_strategy: CollectFailures,
+            };
+            let failures = assert(element_spec).failures;
+            self.failures.extend(failures);
+        }
+        Spec {
+            subject: (),
+            expression: self.expression,
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
         }
     }
 }
