@@ -251,6 +251,17 @@ fn assert_each_item_of_a_borrowed_iterator() {
 }
 
 #[test]
+#[should_panic = "assertion failed: expected numbers 2. item is not equal to 4\n   but was: 4\n  expected: not 4\n"]
+fn assert_each_item_of_an_iterator_panics_if_one_assertion_fails() {
+    let subject = [2, 4, 6, 8, 10];
+
+    assert_that(subject)
+        .named("numbers")
+        .is_not_empty()
+        .each_item(|e| e.is_not_equal_to(4));
+}
+
+#[test]
 fn verify_assert_each_item_of_an_iterator_fails() {
     let subject = [2, 4, 6, 8, 10];
 

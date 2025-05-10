@@ -1060,6 +1060,11 @@ impl<'a, I, R> Spec<'a, I, R> {
             let failures = assert(element_spec).failures;
             self.failures.extend(failures);
         }
+        if !self.failures.is_empty()
+            && any::type_name_of_val(&self.failing_strategy) == any::type_name::<PanicOnFail>()
+        {
+            PanicOnFail.do_fail_with(&self.failures);
+        }
         Spec {
             subject: (),
             expression: self.expression,
