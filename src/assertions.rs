@@ -1048,19 +1048,19 @@ pub trait AssertIsSorted {
 /// does not panic.
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
-pub trait AssertCodePanics {
+pub trait AssertCodePanics<'a, R> {
     /// Verifies that the actual code under test does not panic.
     #[track_caller]
-    fn does_not_panic(self) -> Self;
+    fn does_not_panic(self) -> Spec<'a, (), R>;
 
     /// Verifies that the actual code under test panics with any message.
     #[track_caller]
-    fn panics(self) -> Self;
+    fn panics(self) -> Spec<'a, (), R>;
 
     /// Verifies that the actual code under test panics with the given
     /// message.
     #[track_caller]
-    fn panics_with_message(self, message: impl Into<String>) -> Self;
+    fn panics_with_message(self, message: impl Into<String>) -> Spec<'a, (), R>;
 }
 
 /// Assertions for the keys of a map.
