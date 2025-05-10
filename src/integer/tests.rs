@@ -499,7 +499,7 @@ mod colored {
             failures,
             &["assertion failed: expected subject is not equal to 42\n   \
                but was: 42\n  \
-              expected: 42\n\
+              expected: not 42\n\
             "]
         );
     }

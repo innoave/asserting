@@ -262,15 +262,15 @@ fn verify_assert_each_item_of_an_iterator_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected iterator-item is greater than 2
+            r"assertion failed: expected numbers 1. item is greater than 2
    but was: 2
   expected: > 2
 ",
-            r"assertion failed: expected iterator-item is at most 7
+            r"assertion failed: expected numbers 4. item is at most 7
    but was: 8
   expected: <= 7
 ",
-            r"assertion failed: expected iterator-item is at most 7
+            r"assertion failed: expected numbers 5. item is at most 7
    but was: 10
   expected: <= 7
 ",

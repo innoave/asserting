@@ -2,9 +2,11 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
+use crate::std::any;
 use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
+use crate::std::format;
 use crate::std::ops::Deref;
 use crate::std::string::{String, ToString};
 use crate::std::vec;
@@ -453,6 +455,18 @@ impl Deref for Expression<'_> {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl<'a> From<&'a str> for Expression<'a> {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
+impl From<String> for Expression<'_> {
+    fn from(s: String) -> Self {
+        Self(s.into())
     }
 }
 
@@ -1029,10 +1043,14 @@ impl<'a, I, R> Spec<'a, I, R> {
         I: IntoIterator<Item = T>,
         for<'c> A: Fn(Spec<'c, T, CollectFailures>) -> Spec<'c, B, CollectFailures>,
     {
+        let default_expression = &Expression::default();
+        let root_expression = self.expression.as_ref().unwrap_or(default_expression);
+        let mut position = 0;
         for item in self.subject {
+            position += 1;
             let element_spec = Spec {
                 subject: item,
-                expression: Some(Expression("iterator-item".into())),
+                expression: Some(format!("{root_expression} {position}. item").into()),
                 description: None,
                 location: self.location,
                 failures: vec![],

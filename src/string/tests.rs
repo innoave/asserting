@@ -1088,7 +1088,7 @@ mod colored {
             failures,
             &["assertion failed: expected subject is not equal to \"aute aliquip culpa blandit\"\n   \
                but was: \"aute aliquip culpa blandit\"\n  \
-              expected: \"aute aliquip culpa blandit\"\n\
+              expected: not \"aute aliquip culpa blandit\"\n\
             "]
         );
     }
