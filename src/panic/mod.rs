@@ -20,7 +20,8 @@ where
     }
 
     fn panics(self) -> Spec<'a, (), R> {
-        self.expecting(DoesPanic::default()).mapping(|_| ())
+        self.expecting(DoesPanic::with_any_message())
+            .mapping(|_| ())
     }
 
     fn panics_with_message(self, message: impl Into<String>) -> Spec<'a, (), R> {
