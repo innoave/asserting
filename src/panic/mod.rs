@@ -20,7 +20,7 @@ where
     }
 
     fn panics(self) -> Self {
-        self.expecting(DoesPanic::default())
+        self.expecting(DoesPanic::with_any_message())
     }
 
     fn panics_with_message(self, message: impl Into<String>) -> Self {

@@ -592,7 +592,6 @@ mod panic {
     use std::any::Any;
 
     #[must_use]
-    #[derive(Default)]
     pub struct DoesPanic {
         pub expected_message: Option<String>,
         pub actual_message: Option<String>,
@@ -600,7 +599,10 @@ mod panic {
 
     impl DoesPanic {
         pub fn with_any_message() -> Self {
-            Self::default()
+            Self {
+                expected_message: None,
+                actual_message: None,
+            }
         }
 
         pub fn with_message(message: impl Into<String>) -> Self {
