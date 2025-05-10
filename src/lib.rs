@@ -119,6 +119,21 @@
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
 //!
+//! ## Asserting each item of a collection or iterator
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let numbers = [2, 4, 6, 8, 10];
+//!
+//! assert_that!(numbers).each_item(|e|
+//!     e.is_greater_than(1)
+//!         .is_at_most(10)
+//! );
+//! ```
+//!
+//! For more details see [`Spec::each_item()`].
+//!
 //! ## Soft assertions
 //!
 //! ```should_panic
@@ -582,6 +597,7 @@
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
 //! [`Spec`]: spec::Spec
+//! [`Spec::each_item()`]: spec::Spec::each_item
 //! [`Spec::expecting()`]: spec::Spec::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies
 //! [`Spec::soft_panic()`]: spec::Spec::soft_panic
