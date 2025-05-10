@@ -2,7 +2,7 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
-use crate::std::borrow::{Cow, ToOwned};
+use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
@@ -598,7 +598,7 @@ impl OwnedLocation {
 pub struct Spec<'a, S, R> {
     subject: S,
     expression: Option<Expression<'a>>,
-    description: Option<&'a str>,
+    description: Option<Cow<'a, str>>,
     location: Option<Location<'a>>,
     failures: Vec<AssertFailure>,
     diff_format: DiffFormat,
@@ -623,7 +623,7 @@ impl<S, R> Spec<'_, S, R> {
 
     /// Returns the description or the assertion if it has been set.
     pub fn description(&self) -> Option<&str> {
-        self.description
+        self.description.as_deref()
     }
 
     /// Returns the diff format used with this assertion.
@@ -675,8 +675,8 @@ impl<'a, S, R> Spec<'a, S, R> {
 
     /// Sets a custom description about what is being asserted.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn described_as(mut self, description: &'a str) -> Self {
-        self.description = Some(description);
+    pub fn described_as(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
         self
     }
 
@@ -947,7 +947,7 @@ where
     fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
-            description: self.description.map(ToOwned::to_owned),
+            description: self.description.clone().map(String::from),
             message,
             location: self.location.map(OwnedLocation::from),
         };
