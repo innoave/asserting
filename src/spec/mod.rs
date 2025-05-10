@@ -1037,6 +1037,47 @@ impl<S> Spec<'_, S, CollectFailures> {
 }
 
 impl<'a, I, R> Spec<'a, I, R> {
+    /// Iterates over the items of a collection or iterator and executes the
+    /// given assertions for each of those items.
+    ///
+    /// It iterates over all items of the collection or iterator and collects
+    /// the failure messages for those items where the assertion fails. In other
+    /// words, it does not stop iterating when the assertion for one item fails.
+    ///
+    /// The failure messages contain the position of the item within the
+    /// collection or iterator. The position is 1 based. So a failure message
+    /// for the first item contains "1. item", the second "2. item", etc.
+    ///
+    /// # Example
+    ///
+    /// The following assertion:
+    ///
+    /// ```should_panic
+    /// use asserting::prelude::*;
+    ///
+    /// let numbers = [2, 4, 6, 8, 10];
+    ///
+    /// assert_that!(numbers).each_item(|e|
+    ///     e.is_greater_than(2)
+    ///         .is_at_most(7)
+    /// );
+    /// ```
+    ///
+    /// will print:
+    ///
+    /// ```console
+    /// assertion failed: expected numbers 1. item is greater than 2
+    ///    but was: 2
+    ///   expected: > 2
+    ///
+    /// assertion failed: expected numbers 4. item is at most 7
+    ///    but was: 8
+    ///   expected: <= 7
+    ///
+    /// assertion failed: expected numbers 5. item is at most 7
+    ///    but was: 10
+    ///   expected: <= 7
+    /// ```
     #[allow(clippy::return_self_not_must_use)]
     pub fn each_item<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
