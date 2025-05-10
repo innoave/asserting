@@ -53,7 +53,7 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -72,7 +72,7 @@ where
         subject <= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -91,7 +91,7 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -110,7 +110,7 @@ where
         subject >= &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -129,7 +129,7 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -148,7 +148,7 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
@@ -167,7 +167,7 @@ where
         subject >= &self.min && subject <= &self.max
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_start = if actual < &self.min {
             mark_missing(&self.min, format)

@@ -145,7 +145,12 @@ mod cmp {
             subject.approx_eq(self.expected, self.margin)
         }
 
-        fn message(&self, expression: Expression<'_>, actual: &f32, format: &DiffFormat) -> String {
+        fn message(
+            &self,
+            expression: &Expression<'_>,
+            actual: &f32,
+            format: &DiffFormat,
+        ) -> String {
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
             format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 &self.expected, self.margin.epsilon, self.margin.ulps
@@ -160,7 +165,7 @@ mod cmp {
 
         fn message(
             &self,
-            expression: Expression<'_>,
+            expression: &Expression<'_>,
             actual: &f32,
             _format: &DiffFormat,
         ) -> String {
@@ -175,7 +180,12 @@ mod cmp {
             subject.approx_eq(self.expected, self.margin)
         }
 
-        fn message(&self, expression: Expression<'_>, actual: &f64, format: &DiffFormat) -> String {
+        fn message(
+            &self,
+            expression: &Expression<'_>,
+            actual: &f64,
+            format: &DiffFormat,
+        ) -> String {
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
             format!("expected {expression} is close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 &self.expected, self.margin.epsilon, self.margin.ulps
@@ -190,7 +200,7 @@ mod cmp {
 
         fn message(
             &self,
-            expression: Expression<'_>,
+            expression: &Expression<'_>,
             actual: &f64,
             _format: &DiffFormat,
         ) -> String {

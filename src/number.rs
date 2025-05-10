@@ -45,7 +45,7 @@ where
         subject.is_negative_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("< 0", format);
         format!("expected {expression} is negative\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -60,7 +60,7 @@ where
         !subject.is_negative_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr(">= 0", format);
         format!("expected {expression} is not negative\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -75,7 +75,7 @@ where
         subject.is_positive_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("> 0", format);
         format!("expected {expression} is positive\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -90,7 +90,7 @@ where
         !subject.is_positive_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("<= 0", format);
         format!("expected {expression} is not positive\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -119,7 +119,7 @@ where
         *subject == <S as AdditiveIdentityProperty>::ADDITIVE_IDENTITY
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&S::ADDITIVE_IDENTITY, format);
         format!("expected {expression} is zero\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -134,7 +134,7 @@ where
         *subject == <S as MultiplicativeIdentityProperty>::MULTIPLICATIVE_IDENTITY
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&S::MULTIPLICATIVE_IDENTITY, format);
         format!("expected {expression} is one\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -163,7 +163,7 @@ where
         subject.is_finite_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("a finite number", format);
         format!("expected {expression} is finite\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -178,7 +178,7 @@ where
         subject.is_infinite_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("an infinite number", format);
         format!("expected {expression} is infinite\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -207,7 +207,7 @@ where
         !subject.is_nan_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("a number", format);
         format!("expected {expression} is a number\n   but was: {marked_actual}\n  expected: {marked_expected}")
@@ -222,7 +222,7 @@ where
         subject.is_nan_property()
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("NaN", format);
         format!("expected {expression} is not a number (NaN)\n   but was: {marked_actual}\n  expected: {marked_expected}")

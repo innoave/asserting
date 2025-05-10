@@ -12,7 +12,7 @@ where
         (self.predicate)(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, _actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, _actual: &S, _format: &DiffFormat) -> String {
         self.message.clone().unwrap_or_else(|| {
             format!("expected {expression} to satisfy the given predicate, but returned false")
         })

@@ -59,7 +59,7 @@ where
         self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected_start = match self.expected_range.start_bound() {
             Bound::Included(start) => {
@@ -112,7 +112,7 @@ where
         !self.expected_range.contains(subject)
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected_start = match self.expected_range.start_bound() {
             Bound::Included(start) => format!("< {}", mark_missing(start, format)),

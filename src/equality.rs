@@ -31,7 +31,7 @@ where
         subject == &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let expected = &self.expected;
         let (marked_actual, marked_expected) = mark_diff(actual, expected, format);
         format!(
@@ -49,7 +49,7 @@ where
         subject != &self.expected
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
             "expected {expression} is not equal to {:?}\n   but was: {actual:?}\n  expected: {:?}",
             &self.expected, &self.expected
