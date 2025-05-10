@@ -25,7 +25,7 @@ impl Expectation<bool> for IsTrue {
         *subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&true, format);
         format!(
@@ -40,7 +40,7 @@ impl Expectation<bool> for IsFalse {
         !*subject
     }
 
-    fn message(&self, expression: Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
+    fn message(&self, expression: &Expression<'_>, actual: &bool, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&false, format);
         format!(

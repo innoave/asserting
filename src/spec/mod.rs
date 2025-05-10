@@ -2,15 +2,13 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
+use crate::std::borrow::{Cow, ToOwned};
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::ops::Deref;
-use crate::std::{
-    borrow::ToOwned,
-    string::{String, ToString},
-    vec,
-    vec::Vec,
-};
+use crate::std::string::{String, ToString};
+use crate::std::vec;
+use crate::std::vec::Vec;
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
 
@@ -430,17 +428,17 @@ pub trait Expectation<S: ?Sized> {
     fn test(&mut self, subject: &S) -> bool;
 
     /// Forms a failure message for this expectation.
-    fn message(&self, expression: Expression<'_>, actual: &S, format: &DiffFormat) -> String;
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String;
 }
 
 /// A textual representation of the expression or subject that is being
 /// asserted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Expression<'a>(pub &'a str);
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct Expression<'a>(pub Cow<'a, str>);
 
 impl Default for Expression<'_> {
     fn default() -> Self {
-        Self("subject")
+        Self("subject".into())
     }
 }
 
@@ -454,7 +452,7 @@ impl Deref for Expression<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        self.0
+        &self.0
     }
 }
 
@@ -614,8 +612,8 @@ impl<S, R> Spec<'_, S, R> {
     }
 
     /// Returns the expression (or subject name) if one has been set.
-    pub fn expression(&self) -> Option<Expression<'_>> {
-        self.expression
+    pub fn expression(&self) -> Option<&Expression<'_>> {
+        self.expression.as_ref()
     }
 
     /// Returns the location in source code or test code if it has been set.
@@ -670,8 +668,8 @@ impl<'a, S, R> Spec<'a, S, R> {
 
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn named(mut self, subject_name: &'a str) -> Self {
-        self.expression = Some(Expression(subject_name));
+    pub fn named(mut self, subject_name: impl Into<Cow<'a, str>>) -> Self {
+        self.expression = Some(Expression(subject_name.into()));
         self
     }
 
@@ -847,7 +845,8 @@ where
     #[track_caller]
     pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
-            let expression = self.expression.unwrap_or_default();
+            let default_expression = Expression::default();
+            let expression = self.expression.as_ref().unwrap_or(&default_expression);
             let message = expectation.message(expression, &self.subject, &self.diff_format);
             self.do_fail_with_message(message);
         }
@@ -1162,7 +1161,7 @@ impl FailingStrategy for CollectFailures {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
+///     fn message(&self, expression: &Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
 ///         format!(
 ///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),

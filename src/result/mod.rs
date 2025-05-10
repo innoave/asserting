@@ -106,7 +106,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         actual: &Result<T, E>,
         format: &DiffFormat,
     ) -> String {
@@ -130,7 +130,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         actual: &Result<T, E>,
         format: &DiffFormat,
     ) -> String {
@@ -155,7 +155,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         actual: &Result<T, E>,
         format: &DiffFormat,
     ) -> String {
@@ -180,7 +180,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         actual: &Result<T, E>,
         format: &DiffFormat,
     ) -> String {

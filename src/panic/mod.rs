@@ -50,7 +50,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         _actual: &Code<S>,
         format: &DiffFormat,
     ) -> String {
@@ -99,7 +99,7 @@ where
 
     fn message(
         &self,
-        expression: Expression<'_>,
+        expression: &Expression<'_>,
         _actual: &Code<S>,
         format: &DiffFormat,
     ) -> String {

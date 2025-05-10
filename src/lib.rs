@@ -409,7 +409,7 @@
 //!         }
 //!     }
 //!
-//!     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//!     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //!         format!(
 //!             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //!             Either::Left::<_, Unknown>(Unknown),
@@ -446,7 +446,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -493,7 +493,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -547,7 +547,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
