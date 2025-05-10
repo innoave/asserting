@@ -1032,7 +1032,7 @@ impl<'a, I, R> Spec<'a, I, R> {
         for item in self.subject {
             let element_spec = Spec {
                 subject: item,
-                expression: Some(Expression("iterator-item")),
+                expression: Some(Expression("iterator-item".into())),
                 description: None,
                 location: self.location,
                 failures: vec![],
