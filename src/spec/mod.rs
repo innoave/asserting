@@ -2,9 +2,11 @@
 
 use crate::colored;
 use crate::expectations::Predicate;
+use crate::std::any;
 use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
+use crate::std::format;
 use crate::std::ops::Deref;
 use crate::std::string::{String, ToString};
 use crate::std::vec;
@@ -453,6 +455,18 @@ impl Deref for Expression<'_> {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl<'a> From<&'a str> for Expression<'a> {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
+    }
+}
+
+impl From<String> for Expression<'_> {
+    fn from(s: String) -> Self {
+        Self(s.into())
     }
 }
 
@@ -1018,6 +1032,88 @@ impl<S> Spec<'_, S, CollectFailures> {
     pub fn soft_panic(&self) {
         if !self.failures.is_empty() {
             PanicOnFail.do_fail_with(&self.failures);
+        }
+    }
+}
+
+impl<'a, I, R> Spec<'a, I, R> {
+    /// Iterates over the items of a collection or iterator and executes the
+    /// given assertions for each of those items.
+    ///
+    /// It iterates over all items of the collection or iterator and collects
+    /// the failure messages for those items where the assertion fails. In other
+    /// words, it does not stop iterating when the assertion for one item fails.
+    ///
+    /// The failure messages contain the position of the item within the
+    /// collection or iterator. The position is 1 based. So a failure message
+    /// for the first item contains "1. item", the second "2. item", etc.
+    ///
+    /// # Example
+    ///
+    /// The following assertion:
+    ///
+    /// ```should_panic
+    /// use asserting::prelude::*;
+    ///
+    /// let numbers = [2, 4, 6, 8, 10];
+    ///
+    /// assert_that!(numbers).each_item(|e|
+    ///     e.is_greater_than(2)
+    ///         .is_at_most(7)
+    /// );
+    /// ```
+    ///
+    /// will print:
+    ///
+    /// ```console
+    /// assertion failed: expected numbers 1. item is greater than 2
+    ///    but was: 2
+    ///   expected: > 2
+    ///
+    /// assertion failed: expected numbers 4. item is at most 7
+    ///    but was: 8
+    ///   expected: <= 7
+    ///
+    /// assertion failed: expected numbers 5. item is at most 7
+    ///    but was: 10
+    ///   expected: <= 7
+    /// ```
+    #[allow(clippy::return_self_not_must_use)]
+    pub fn each_item<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    where
+        I: IntoIterator<Item = T>,
+        for<'c> A: Fn(Spec<'c, T, CollectFailures>) -> Spec<'c, B, CollectFailures>,
+    {
+        let default_expression = &Expression::default();
+        let root_expression = self.expression.as_ref().unwrap_or(default_expression);
+        let mut position = 0;
+        for item in self.subject {
+            position += 1;
+            let element_spec = Spec {
+                subject: item,
+                expression: Some(format!("{root_expression} {position}. item").into()),
+                description: None,
+                location: self.location,
+                failures: vec![],
+                diff_format: self.diff_format.clone(),
+                failing_strategy: CollectFailures,
+            };
+            let failures = assert(element_spec).failures;
+            self.failures.extend(failures);
+        }
+        if !self.failures.is_empty()
+            && any::type_name_of_val(&self.failing_strategy) == any::type_name::<PanicOnFail>()
+        {
+            PanicOnFail.do_fail_with(&self.failures);
+        }
+        Spec {
+            subject: (),
+            expression: self.expression,
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
         }
     }
 }

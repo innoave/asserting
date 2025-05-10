@@ -25,7 +25,7 @@ fn verify_bool_is_not_equal_to_false_fails() {
         failures,
         &[r"assertion failed: expected my_thing is not equal to false
    but was: false
-  expected: false
+  expected: not false
 "]
     );
 }

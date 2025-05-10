@@ -232,6 +232,63 @@ fn soft_assertions_panic_once_with_multiple_failure_messages() {
         .soft_panic();
 }
 
+#[test]
+fn assert_each_item_of_an_iterator() {
+    let subject = [2, 4, 6, 8, 10];
+
+    assert_that(subject)
+        .is_not_empty()
+        .each_item(|e| e.is_positive().is_at_most(20));
+}
+
+#[test]
+fn assert_each_item_of_a_borrowed_iterator() {
+    let subject = [2, 4, 6, 8, 10];
+
+    assert_that(&subject)
+        .is_not_empty()
+        .each_item(|e| e.is_positive().is_at_most(&20));
+}
+
+#[test]
+#[should_panic = "assertion failed: expected numbers 2. item is not equal to 4\n   but was: 4\n  expected: not 4\n"]
+fn assert_each_item_of_an_iterator_panics_if_one_assertion_fails() {
+    let subject = [2, 4, 6, 8, 10];
+
+    assert_that(subject)
+        .named("numbers")
+        .is_not_empty()
+        .each_item(|e| e.is_not_equal_to(4));
+}
+
+#[test]
+fn verify_assert_each_item_of_an_iterator_fails() {
+    let subject = [2, 4, 6, 8, 10];
+
+    let failures = verify_that(&subject)
+        .named("numbers")
+        .each_item(|e| e.is_greater_than(&2).is_at_most(&7))
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected numbers 1. item is greater than 2
+   but was: 2
+  expected: > 2
+",
+            r"assertion failed: expected numbers 4. item is at most 7
+   but was: 8
+  expected: <= 7
+",
+            r"assertion failed: expected numbers 5. item is at most 7
+   but was: 10
+  expected: <= 7
+",
+        ]
+    );
+}
+
 #[cfg(feature = "colored")]
 mod colored {
     use crate::prelude::*;

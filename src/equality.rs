@@ -51,7 +51,7 @@ where
 
     fn message(&self, expression: &Expression<'_>, actual: &S, _format: &DiffFormat) -> String {
         format!(
-            "expected {expression} is not equal to {:?}\n   but was: {actual:?}\n  expected: {:?}",
+            "expected {expression} is not equal to {:?}\n   but was: {actual:?}\n  expected: not {:?}",
             &self.expected, &self.expected
         )
     }
