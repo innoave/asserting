@@ -816,6 +816,20 @@ pub trait AssertHasErrorMessage<'a, E, R> {
     fn has_error_message(self, expected_message: E) -> Spec<'a, String, R>;
 }
 
+pub trait AssertErrorHasSource<'a, R> {
+    #[track_caller]
+    fn has_no_source(self) -> Self;
+
+    #[track_caller]
+    fn has_source(self) -> Self;
+
+    #[track_caller]
+    fn has_source_message(
+        self,
+        expected_source_message: impl Into<String>,
+    ) -> Spec<'a, Option<String>, R>;
+}
+
 /// Assert that a string contains a substring or character.
 ///
 /// # Examples

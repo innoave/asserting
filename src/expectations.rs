@@ -198,6 +198,17 @@ pub struct HasError<E> {
 }
 
 #[must_use]
+pub struct ErrorHasNoSource;
+
+#[must_use]
+pub struct ErrorHasSource;
+
+#[must_use]
+pub struct ErrorHasSourceMessage {
+    pub expected_source_message: String,
+}
+
+#[must_use]
 pub struct IsEmpty;
 
 #[must_use]

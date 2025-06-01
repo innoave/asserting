@@ -1,0 +1,228 @@
+use crate::prelude::*;
+use crate::std::error::Error;
+use crate::std::fmt::{self, Display};
+
+#[derive(Debug)]
+struct SuperError {
+    source: SourceError,
+}
+
+impl Display for SuperError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "super-error caused by {}", self.source)
+    }
+}
+
+impl Error for SuperError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.source)
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum SourceError {
+    Foo,
+    Bar,
+}
+
+impl Display for SourceError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Foo => f.write_str("foo error"),
+            Self::Bar => f.write_str("bar error"),
+        }
+    }
+}
+
+impl Error for SourceError {}
+
+#[test]
+fn source_error_has_no_source() {
+    let error = SourceError::Foo;
+
+    assert_that(error).has_no_source();
+}
+
+#[test]
+fn verify_error_has_no_source_fails() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    let failures = verify_that(error)
+        .named("my error")
+        .has_no_source()
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my error has no source
+   but was: SuperError { source: Foo }
+  expected: <error with no source>
+"]
+    );
+}
+
+#[test]
+fn super_error_has_source() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    assert_that(error).has_source();
+}
+
+#[test]
+fn verify_error_has_source_fails() {
+    let error = SourceError::Bar;
+
+    let failures = verify_that(error)
+        .named("my error")
+        .has_source()
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my error has a source
+   but was: Bar
+  expected: <error with some source>
+"]
+    );
+}
+
+#[test]
+fn super_error_has_source_message() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    assert_that(error).has_source_message("foo error");
+}
+
+#[test]
+fn verify_error_has_source_message_fails_wrong_source() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    let failures = verify_that(error)
+        .named("my error")
+        .has_source_message("foo error")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my error has source message "foo error"
+   but was: "bar error"
+  expected: "foo error"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_error_has_source_message_fails_error_without_source() {
+    let error = SourceError::Foo;
+
+    let failures = verify_that(error)
+        .named("my error")
+        .has_source_message("foo error")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my error has source message "foo error"
+   but was: Foo - which has no source
+  expected: "foo error"
+"#
+        ]
+    );
+}
+
+#[cfg(feature = "colored")]
+mod colored {
+    use crate::error::tests::{SourceError, SuperError};
+    use crate::prelude::*;
+
+    #[test]
+    fn highlight_diffs_error_has_no_source() {
+        let error = SuperError {
+            source: SourceError::Foo,
+        };
+
+        let failures = verify_that(error)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_no_source()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject has no source\n   \
+                but was: \u{1b}[31mSuperError { source: Foo }\u{1b}[0m\n  \
+               expected: \u{1b}[33m<error with no source>\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_error_has_source() {
+        let error = SourceError::Foo;
+
+        let failures = verify_that(error)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_source()
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject has a source\n   \
+                but was: \u{1b}[31mFoo\u{1b}[0m\n  \
+               expected: \u{1b}[33m<error with some source>\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_error_has_source_message_fails_wrong_source() {
+        let error = SuperError {
+            source: SourceError::Bar,
+        };
+
+        let failures = verify_that(error)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_source_message("foo error")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject has source message \"foo error\"\n   \
+                    but was: \"\u{1b}[31mbar error\u{1b}[0m\"\n  \
+                   expected: \"\u{1b}[33mfoo error\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_error_has_source_message_fails_error_without_source() {
+        let error = SourceError::Foo;
+
+        let failures = verify_that(error)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .has_source_message("foo error")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject has source message \"foo error\"\n   \
+                    but was: \u{1b}[31mFoo\u{1b}[0m - which has no source\n  \
+                   expected: \u{1b}[33m\"foo error\"\u{1b}[0m\n\
+            "
+            ]
+        );
+    }
+}
