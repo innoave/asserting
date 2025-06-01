@@ -290,6 +290,16 @@ for the `Result` type.
 | ok                | verify that a result has an ok value and map the subject to this ok value                                |
 | err               | verify that a result has an err value and map the subject to this err value                              |
 
+### Error
+
+for types that implement `std::error::Error`.
+
+| assertion          | description                                                                                        |
+|--------------------|----------------------------------------------------------------------------------------------------|
+| has_no_source      | verify that an error has no source                                                                 |                                                 
+| has_source         | verify that an error has some source                                                               |
+| has_source_message | verify that an error has a source which converts to a string that is equal to the expected message |
+
 ### Emptiness
 
 for collections and strings.
