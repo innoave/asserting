@@ -816,13 +816,196 @@ pub trait AssertHasErrorMessage<'a, E, R> {
     fn has_error_message(self, expected_message: E) -> Spec<'a, String, R>;
 }
 
+/// Assert the source of any type that implements `std::error::Error`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+/// use std::error::Error;
+/// use std::fmt::{self, Display};
+///
+/// #[derive(Debug)]
+/// struct SuperError {
+///     source: SourceError,
+/// }
+///
+/// impl Display for SuperError {
+///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+///         write!(f, "super-error caused by {}", self.source)
+///     }
+/// }
+///
+/// impl Error for SuperError {
+///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+///         Some(&self.source)
+///     }
+/// }
+///
+/// #[derive(Debug, PartialEq)]
+/// enum SourceError {
+///     Foo,
+///     Bar,
+/// }
+///
+/// impl Display for SourceError {
+///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+///         match self {
+///             Self::Foo => f.write_str("foo error"),
+///             Self::Bar => f.write_str("bar error"),
+///         }
+///     }
+/// }
+///
+/// impl Error for SourceError {}
+///
+///
+/// let error = SuperError {
+///     source: SourceError::Foo,
+/// };
+///
+/// assert_that!(&error).has_source();
+/// assert_that!(&error).has_source_message("foo error");
+/// ```
 pub trait AssertErrorHasSource<'a, R> {
+    /// Verifies that an error has no source.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use std::error::Error;
+    /// use std::fmt::{self, Display};
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// enum SimpleError {
+    ///     Foo,
+    ///     Bar,
+    /// }
+    ///
+    /// impl Display for SimpleError {
+    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         match self {
+    ///             Self::Foo => f.write_str("foo error"),
+    ///             Self::Bar => f.write_str("bar error"),
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// impl Error for SimpleError {}
+    ///
+    ///
+    /// let error = SimpleError::Bar;
+    ///
+    /// assert_that!(&error).has_no_source();
+    /// ```
     #[track_caller]
     fn has_no_source(self) -> Self;
 
+    /// Verifies that an error has some source.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use std::error::Error;
+    /// use std::fmt::{self, Display};
+    ///
+    /// #[derive(Debug)]
+    /// struct SuperError {
+    ///     source: SourceError,
+    /// }
+    ///
+    /// impl Display for SuperError {
+    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         write!(f, "super-error caused by {}", self.source)
+    ///     }
+    /// }
+    ///
+    /// impl Error for SuperError {
+    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+    ///         Some(&self.source)
+    ///     }
+    /// }
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// enum SourceError {
+    ///     Foo,
+    ///     Bar,
+    /// }
+    ///
+    /// impl Display for SourceError {
+    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         match self {
+    ///             Self::Foo => f.write_str("foo error"),
+    ///             Self::Bar => f.write_str("bar error"),
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// impl Error for SourceError {}
+    ///
+    ///
+    /// let error = SuperError {
+    ///     source: SourceError::Foo,
+    /// };
+    ///
+    /// assert_that!(&error).has_source();
+    /// ```
     #[track_caller]
     fn has_source(self) -> Self;
 
+    /// Verifies that an error has some source which converted to a string
+    /// equals the expected message.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use std::error::Error;
+    /// use std::fmt::{self, Display};
+    ///
+    /// #[derive(Debug)]
+    /// struct SuperError {
+    ///     source: SourceError,
+    /// }
+    ///
+    /// impl Display for SuperError {
+    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         write!(f, "super-error caused by {}", self.source)
+    ///     }
+    /// }
+    ///
+    /// impl Error for SuperError {
+    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+    ///         Some(&self.source)
+    ///     }
+    /// }
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// enum SourceError {
+    ///     Foo,
+    ///     Bar,
+    /// }
+    ///
+    /// impl Display for SourceError {
+    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         match self {
+    ///             Self::Foo => f.write_str("foo error"),
+    ///             Self::Bar => f.write_str("bar error"),
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// impl Error for SourceError {}
+    ///
+    ///
+    /// let error = SuperError {
+    ///     source: SourceError::Bar,
+    /// };
+    ///
+    /// assert_that!(&error).has_source_message("bar error");
+    /// ```
     #[track_caller]
     fn has_source_message(
         self,
