@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.7.0 - 2025-06-02
+
+_Assertions for `Error` types_
+
+### Added
+
+* Provide assertions for types that implement `std::error::Error`
+  [(PR #38)](https://github.com/innoave/asserting/pull/38)
+* Add examples to the rustdoc of every assertion method
+  [(PR #39)](https://github.com/innoave/asserting/pull/39)
+
+### Fixed
+
+* Missing #[track_caller] annotations on some assertion methods
+  [(PR #40)](https://github.com/innoave/asserting/pull/40)
+* Delete the trait `RangeLike` as it is unused
+  [(PR #41)](https://github.com/innoave/asserting/pull/41)
+
 ## 0.6.0 - 2025-05-10
 
 _Assertions for map-like types (`HashMap`, `BTreeMap`) and assert items of collections/iterators_
