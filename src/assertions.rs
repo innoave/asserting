@@ -532,10 +532,12 @@ pub trait AssertHasLength<E> {
 
     /// Verifies that the subject has a length that is less than the expected
     /// length.
+    #[track_caller]
     fn has_length_less_than(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is greater than the expected
     /// length.
+    #[track_caller]
     fn has_length_greater_than(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is at most the expected
@@ -543,6 +545,7 @@ pub trait AssertHasLength<E> {
     ///
     /// In other words, the length shall be less than or equal to the expected
     /// length.
+    #[track_caller]
     fn has_at_most_length(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is at least the expected
@@ -550,6 +553,7 @@ pub trait AssertHasLength<E> {
     ///
     /// In other words, the length shall be greater than or equal to the
     /// expected length.
+    #[track_caller]
     fn has_at_least_length(self, expected_length: E) -> Self;
 }
 
@@ -716,6 +720,7 @@ pub trait AssertResultValue<'a, T, E, R> {
     /// Maps the subject to the result's err value.
     ///
     /// If the result is an ok value, this method panics.
+    #[track_caller]
     fn err(self) -> Spec<'a, E, R>;
 }
 
