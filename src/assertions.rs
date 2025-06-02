@@ -355,15 +355,6 @@ pub trait AssertOrder<E> {
     fn is_between(self, min: E, max: E) -> Self;
 }
 
-/// Common interface for supported range-like types.
-pub trait RangeLike<T> {
-    /// Returns true if this range contains the given value.
-    fn contains_value<E>(&self, value: &E) -> bool
-    where
-        T: PartialOrd<E>,
-        E: PartialOrd<T>;
-}
-
 /// Assert whether a value is within an expected range.
 ///
 /// The expected range can be any of range.
