@@ -1055,6 +1055,7 @@ pub trait AssertHasLength<E> {
     /// assert_that!(&some_map).has_length_less_than(5);
     /// # }
     /// ```
+    #[track_caller]
     fn has_length_less_than(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is greater than the expected
@@ -1103,6 +1104,7 @@ pub trait AssertHasLength<E> {
     /// assert_that!(&some_map).has_length_greater_than(3);
     /// # }
     /// ```
+    #[track_caller]
     fn has_length_greater_than(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is at most the expected
@@ -1154,6 +1156,7 @@ pub trait AssertHasLength<E> {
     /// assert_that!(&some_map).has_at_most_length(4);
     /// # }
     /// ```
+    #[track_caller]
     fn has_at_most_length(self, expected_length: E) -> Self;
 
     /// Verifies that the subject has a length that is at least the expected
@@ -1205,6 +1208,7 @@ pub trait AssertHasLength<E> {
     /// assert_that!(&some_map).has_at_least_length(4);
     /// # }
     /// ```
+    #[track_caller]
     fn has_at_least_length(self, expected_length: E) -> Self;
 }
 
@@ -1511,6 +1515,7 @@ pub trait AssertResultValue<'a, T, E, R> {
     /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
     /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
     /// ```
+    #[track_caller]
     fn err(self) -> Spec<'a, E, R>;
 }
 
