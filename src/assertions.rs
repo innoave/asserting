@@ -1399,7 +1399,7 @@ pub trait AssertOption {
     fn is_none(self) -> Self;
 }
 
-/// Assert the option value by mapping the subject.
+/// Assert the value of an option by mapping the subject.
 ///
 /// If the option is none, the assertion fails.
 ///
@@ -1433,7 +1433,7 @@ pub trait AssertOptionValue<'a, T, R> {
     fn some(self) -> Spec<'a, T, R>;
 }
 
-/// Assert the borrowed option value by mapping the subject.
+/// Assert the value of a borrowed option by mapping the subject.
 ///
 /// If the option is none, the assertion fails.
 ///
@@ -1508,7 +1508,7 @@ pub trait AssertResult {
     fn is_err(self) -> Self;
 }
 
-/// Assert the result value or error by mapping the subject.
+/// Assert the ok-value or error of a result by mapping the subject.
 ///
 /// # Examples
 ///
@@ -1551,6 +1551,51 @@ pub trait AssertResultValue<'a, T, E, R> {
     /// ```
     #[track_caller]
     fn err(self) -> Spec<'a, E, R>;
+}
+
+/// Assert the ok-value or error of a borrowed result by mapping the subject.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
+/// assert_that!(&subject).ok().is_not_empty();
+///
+/// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
+/// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
+/// ```
+pub trait AssertBorrowedResultValue<'a, T, E, R> {
+    /// Maps the subject to the result's ok value.
+    ///
+    /// If the result is an error, this method panics.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
+    /// assert_that!(&subject).ok().contains_exactly(&[1, 2, 3]);
+    /// ```
+    #[track_caller]
+    fn ok(self) -> Spec<'a, &'a T, R>;
+
+    /// Maps the subject to the result's err value.
+    ///
+    /// If the result is an ok value, this method panics.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
+    /// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
+    /// ```
+    #[track_caller]
+    fn err(self) -> Spec<'a, &'a E, R>;
 }
 
 /// Assert that a subject of some container type holds a value that is equal to
