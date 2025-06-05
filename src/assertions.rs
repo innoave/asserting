@@ -1433,6 +1433,40 @@ pub trait AssertOptionValue<'a, T, R> {
     fn some(self) -> Spec<'a, T, R>;
 }
 
+/// Assert the borrowed option value by mapping the subject.
+///
+/// If the option is none, the assertion fails.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
+/// assert_that!(&subject).some().contains_exactly(&[1, 2, 3]);
+///
+/// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
+/// assert_that!(&subject).some().is_not_empty();
+/// ```
+pub trait AssertBorrowedOptionValue<'a, T, R> {
+    /// Maps the subject to the option's value if it has some. Otherwise, this
+    /// assertion fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
+    /// assert_that!(&subject).some().contains_exactly(&[1, 2, 3]);
+    ///
+    /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
+    /// assert_that!(&subject).some().is_not_empty();
+    /// ```
+    #[track_caller]
+    fn some(self) -> Spec<'a, &'a T, R>;
+}
+
 /// Assert whether a subject of the `Result` type holds some value or an error.
 ///
 /// # Examples
