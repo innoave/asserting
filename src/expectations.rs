@@ -176,6 +176,35 @@ pub struct IsNotANumber;
 pub struct IsANumber;
 
 #[must_use]
+pub struct IsLowerCase;
+
+#[must_use]
+pub struct IsUpperCase;
+
+#[must_use]
+pub struct IsAscii;
+
+#[must_use]
+pub struct IsNonAscii;
+
+#[must_use]
+pub struct IsAlphabetic;
+
+#[must_use]
+pub struct IsAlphanumeric;
+
+#[must_use]
+pub struct IsControlChar;
+
+#[must_use]
+pub struct IsDigit {
+    pub radix: u32,
+}
+
+#[must_use]
+pub struct IsWhitespace;
+
+#[must_use]
 pub struct IsSome;
 
 #[must_use]
