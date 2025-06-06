@@ -715,6 +715,146 @@ pub trait AssertBoolean {
     fn is_false(self) -> Self;
 }
 
+/// Assert properties or classifications of a character.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!('b').is_lowercase();
+/// assert_that!('G').is_uppercase();
+/// assert_that!('H').is_alphabetic();
+/// assert_that!('z').is_alphanumeric();
+/// assert_that!('9').is_alphanumeric();
+/// assert_that!('7').is_digit(8);
+/// assert_that!('9').is_digit(10);
+/// assert_that!('F').is_digit(16);
+/// assert_that!('\t').is_whitespace();
+/// assert_that!('\u{1b}').is_control_char();
+/// assert_that!('@').is_ascii();
+/// ```
+///
+/// To assert ASCII uppercase or lowercase, we combine the assertions `is_ascii`
+/// and `is_uppercase` or `is_lowercase` in chained assertions.
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that('c').is_ascii().is_lowercase();
+/// assert_that('M').is_ascii().is_uppercase();
+/// assert_that('a').is_ascii().is_alphabetic();
+/// assert_that('\t').is_ascii().is_control_char();
+/// ```
+pub trait AssertChar {
+    /// Verify that a character is lowercase.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('b').is_lowercase();
+    /// assert_that!('n').is_lowercase();
+    /// ```
+    #[track_caller]
+    fn is_lowercase(self) -> Self;
+
+    /// Verify that a character is uppercase.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('G').is_uppercase();
+    /// assert_that!('N').is_uppercase();
+    /// ```
+    #[track_caller]
+    fn is_uppercase(self) -> Self;
+
+    /// Verify that a character is an ASCII character.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('a').is_ascii();
+    /// assert_that!('5').is_ascii();
+    /// assert_that!('#').is_ascii();
+    /// assert_that!('@').is_ascii();
+    /// ```
+    #[track_caller]
+    fn is_ascii(self) -> Self;
+
+    /// Verify that a character is an alphabetic character.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('b').is_alphabetic();
+    /// assert_that!('Z').is_alphabetic();
+    /// ```
+    #[track_caller]
+    fn is_alphabetic(self) -> Self;
+
+    /// Verify that a character is an alphabetic character or a digit.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('z').is_alphanumeric();
+    /// assert_that!('9').is_alphanumeric();
+    /// ```
+    #[track_caller]
+    fn is_alphanumeric(self) -> Self;
+
+    /// Verify that a character is a control character.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('\t').is_control_char();
+    /// assert_that!('\u{1b}').is_control_char();
+    /// ```
+    #[track_caller]
+    fn is_control_char(self) -> Self;
+
+    /// Verify that a character is a digit within the given radix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!('7').is_digit(8);
+    /// assert_that!('9').is_digit(10);
+    /// assert_that!('F').is_digit(16);
+    /// ```
+    #[track_caller]
+    fn is_digit(self, radix: u32) -> Self;
+
+    /// Verify that a character is whitespace.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!(' ').is_whitespace();
+    /// assert_that!('\t').is_whitespace();
+    /// ```
+    #[track_caller]
+    fn is_whitespace(self) -> Self;
+}
+
 /// Assert whether a string, collection or iterator is empty or not.
 ///
 /// These assertions are implemented for all types `T` that implement the

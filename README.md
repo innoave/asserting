@@ -204,6 +204,21 @@ requires crate feature `float-cmp` which is enabled by default.
 | is_close_to_with_margin     | verify that the subject is approximately equal to the expected value within the given margin     |
 | is_not_close_to_with_margin | verify that the subject is not approximately equal to the expected value within the given margin |
 
+### Character
+
+for `char`.
+
+| assertion       | description                                                     |
+|-----------------|-----------------------------------------------------------------|
+| is_lowercase    | verify that the character is lowercase                          |
+| is_uppercase    | verify that the character is uppercase                          |                                                 
+| is_ascii        | verify that the character is an ASCII character                 |                                                 
+| is_alphabetic   | verify that the character is an alphabetic character            |
+| is_alphanumeric | verify that the character is an alphabetic character or a digit |
+| is_control_char | verify that the character is a control character                |
+| is_digit        | verify that the character is a digit in the given radix         |
+| is_whitespace   | verify that the character is whitespace                         |
+
 ### Boolean
 
 for `bool`.
