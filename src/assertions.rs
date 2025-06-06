@@ -1769,6 +1769,7 @@ pub trait AssertHasErrorMessage<'a, E, R> {
 ///
 /// impl Error for SourceError {}
 ///
+/// assert_that!(&SourceError::Foo).has_no_source();
 ///
 /// let error = SuperError {
 ///     source: SourceError::Foo,
@@ -1808,6 +1809,11 @@ pub trait AssertErrorHasSource<'a, R> {
     /// let error = SimpleError::Bar;
     ///
     /// assert_that!(&error).has_no_source();
+    ///
+    /// // error in result
+    /// let result: Result<Vec<i32>, SimpleError> = Err(SimpleError::Foo);
+    ///
+    /// assert_that!(&result).err().has_no_source();
     /// ```
     #[track_caller]
     fn has_no_source(self) -> Self;
@@ -1861,6 +1867,13 @@ pub trait AssertErrorHasSource<'a, R> {
     /// };
     ///
     /// assert_that!(&error).has_source();
+    ///
+    /// // error in result
+    /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
+    ///     source: SourceError::Bar,
+    /// });
+    ///
+    /// assert_that!(result).err().has_source();
     /// ```
     #[track_caller]
     fn has_source(self) -> Self;
@@ -1915,6 +1928,13 @@ pub trait AssertErrorHasSource<'a, R> {
     /// };
     ///
     /// assert_that!(&error).has_source_message("bar error");
+    ///
+    /// // error in result
+    /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
+    ///     source: SourceError::Foo,
+    /// });
+    ///
+    /// assert_that!(result).err().has_source_message("foo error");
     /// ```
     #[track_caller]
     fn has_source_message(
