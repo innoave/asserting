@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use crate::std::error::Error;
 use crate::std::fmt::{self, Display};
+use crate::std::vec::Vec;
 
 #[derive(Debug)]
 struct SuperError {
@@ -139,6 +140,18 @@ fn verify_error_has_source_message_fails_error_without_source() {
 "#
         ]
     );
+}
+
+#[test]
+fn result_is_error_which_has_source() {
+    let result: Result<Vec<i32>, SuperError> = Err(SuperError {
+        source: SourceError::Bar,
+    });
+
+    assert_that(&result)
+        .err()
+        .has_source()
+        .has_source_message("bar error");
 }
 
 #[cfg(feature = "colored")]
