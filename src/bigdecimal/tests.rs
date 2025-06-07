@@ -1,6 +1,6 @@
 use crate::prelude::*;
+use bigdecimal::num_bigint::BigInt;
 use bigdecimal::BigDecimal;
-use num_bigint::BigInt;
 
 #[test]
 fn bigdecimal_is_equal_to_other() {

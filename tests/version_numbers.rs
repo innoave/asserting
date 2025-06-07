@@ -13,7 +13,7 @@ mod dummy_extern_uses {
     use hashbrown as _;
     #[cfg(feature = "num-bigint")]
     use lazy_static as _;
-    #[cfg(any(feature = "num-bigint", test))]
+    #[cfg(feature = "num-bigint")]
     use num_bigint as _;
     use proptest as _;
     #[cfg(feature = "regex")]
