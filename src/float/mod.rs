@@ -23,21 +23,43 @@ impl SignumProperty for f64 {
     }
 }
 
-impl AdditiveIdentityProperty for f32 {
-    const ADDITIVE_IDENTITY: Self = 0.;
+macro_rules! impl_additive_identity_property {
+    ($type:ty) => {
+        impl AdditiveIdentityProperty for $type {
+            fn additive_identity() -> Self {
+                0.
+            }
+        }
+
+        impl AdditiveIdentityProperty for &$type {
+            fn additive_identity() -> Self {
+                &0.
+            }
+        }
+    };
 }
 
-impl AdditiveIdentityProperty for f64 {
-    const ADDITIVE_IDENTITY: Self = 0.;
+impl_additive_identity_property!(f32);
+impl_additive_identity_property!(f64);
+
+macro_rules! impl_multiplicative_identity_property {
+    ($type:ty) => {
+        impl MultiplicativeIdentityProperty for $type {
+            fn multiplicative_identity() -> Self {
+                1.
+            }
+        }
+
+        impl MultiplicativeIdentityProperty for &$type {
+            fn multiplicative_identity() -> Self {
+                &1.
+            }
+        }
+    };
 }
 
-impl MultiplicativeIdentityProperty for f32 {
-    const MULTIPLICATIVE_IDENTITY: Self = 1.;
-}
-
-impl MultiplicativeIdentityProperty for f64 {
-    const MULTIPLICATIVE_IDENTITY: Self = 1.;
-}
+impl_multiplicative_identity_property!(f32);
+impl_multiplicative_identity_property!(f64);
 
 impl InfinityProperty for f32 {
     fn is_infinite_property(&self) -> bool {

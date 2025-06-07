@@ -116,13 +116,13 @@ where
 /// The additive identity property of a numeric type.
 pub trait AdditiveIdentityProperty {
     /// The additive identity (zero).
-    const ADDITIVE_IDENTITY: Self;
+    fn additive_identity() -> Self;
 }
 
 /// The multiplicative identity property of a numeric type.
 pub trait MultiplicativeIdentityProperty {
     /// The multiplicative identity (one).
-    const MULTIPLICATIVE_IDENTITY: Self;
+    fn multiplicative_identity() -> Self;
 }
 
 /// A property of numeric types that can have negative and positive values.

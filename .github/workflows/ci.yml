@@ -34,6 +34,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clippy
+          args: --all-features
 
   fmt:
     name: Rustfmt check
@@ -93,7 +94,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --no-default-features --features "colored, float-cmp"
+          args: --no-default-features --features "colored, float-cmp, num-bigint"
 
   msrv:
     name: Build with MSRV

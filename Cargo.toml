@@ -22,6 +22,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 default = ["std", "colored", "float-cmp", "panic", "regex"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
+num-bigint = ["dep:num-bigint", "dep:lazy_static"]
 panic = ["std"]
 regex = ["dep:regex"]
 std = []
@@ -31,6 +32,8 @@ hashbrown = "0.15"
 
 # optional
 float-cmp = { version = "0.10", optional = true }
+lazy_static = { version = "1", optional = true }
+num-bigint = { version = "0.4", default-features = false, optional = true }
 regex = { version = "1", optional = true }
 sdiff = { version = "0.1", optional = true }
 

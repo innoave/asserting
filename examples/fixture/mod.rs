@@ -5,6 +5,10 @@ mod dummy_extern_uses {
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
+    #[cfg(feature = "num-bigint")]
+    use lazy_static as _;
+    #[cfg(feature = "num-bigint")]
+    use num_bigint as _;
     use proptest as _;
     #[cfg(feature = "regex")]
     use regex as _;

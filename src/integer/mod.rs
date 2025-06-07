@@ -26,7 +26,15 @@ impl_signum_property!(isize);
 macro_rules! impl_additive_identity_property {
     ($type:ty) => {
         impl AdditiveIdentityProperty for $type {
-            const ADDITIVE_IDENTITY: Self = 0;
+            fn additive_identity() -> Self {
+                0
+            }
+        }
+
+        impl AdditiveIdentityProperty for &$type {
+            fn additive_identity() -> Self {
+                &0
+            }
         }
     };
 }
@@ -48,7 +56,15 @@ impl_additive_identity_property!(usize);
 macro_rules! impl_multiplicative_identity_property {
     ($type:ty) => {
         impl MultiplicativeIdentityProperty for $type {
-            const MULTIPLICATIVE_IDENTITY: Self = 1;
+            fn multiplicative_identity() -> Self {
+                1
+            }
+        }
+
+        impl MultiplicativeIdentityProperty for &$type {
+            fn multiplicative_identity() -> Self {
+                &1
+            }
         }
     };
 }
