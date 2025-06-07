@@ -163,8 +163,11 @@ being the type of the expected value.
 
 ### Integer and Float
 
-for integer numbers of type `i8`, `i16`, `i32`, `i64`, `i128` and `isize` as well as <br/>
-floating point numbers of type `f32` and `f64`:
+for numbers of types
+
+* integer primitives: `i8`, `i16`, `i32`, `i64`, `i128` and `isize`
+* floating point numbers: `f32` and `f64`
+* `num_bigint::BigInt` (requires crate feature `num-bigint`)
 
 | assertion       | description                                          |
 |-----------------|------------------------------------------------------|
@@ -173,9 +176,12 @@ floating point numbers of type `f32` and `f64`:
 | is_positive     | verify that the subject is a positive number         |
 | is_not_positive | verify that the subject is a finite number           |                                                 
 
-for integer numbers of type `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, `u8`, `u16`, `u32`, `u64`,
-`u128` and `usize` as well as <br/>
-floating point numbers of type `f32` and `f64`:
+for numbers of types
+
+* integer primitives: `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, `u8`, `u16`, `u32`, `u64`, `u128`
+  and `usize`
+* floating point numbers: `f32` and `f64`
+* `num_bigint::BigInt` and `num_bigint::BigUint` (requires crate feature `num-bigint`)
 
 | assertion | description                                                  |
 |-----------|--------------------------------------------------------------|
