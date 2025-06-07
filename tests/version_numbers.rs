@@ -6,6 +6,8 @@
 mod dummy_extern_uses {
     use anyhow as _;
     use asserting as _;
+    #[cfg(feature = "bigdecimal")]
+    use bigdecimal as _;
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;

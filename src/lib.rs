@@ -671,6 +671,8 @@ pub mod prelude;
 pub mod properties;
 pub mod spec;
 
+#[cfg(feature = "bigdecimal")]
+mod bigdecimal;
 mod boolean;
 mod c_string;
 mod char;

@@ -168,6 +168,8 @@ for numbers of types
 * integer primitives: `i8`, `i16`, `i32`, `i64`, `i128` and `isize`
 * floating point numbers: `f32` and `f64`
 * `num_bigint::BigInt` (requires crate feature `num-bigint`)
+* `bigdecimal:BigDecimal` and `bigdecimal:BigDecimalRef` (requires crate feature `bigdecimal`)
+* `rust_decimal::Decimal` (requires crate feature `rust-decimal`)
 
 | assertion       | description                                          |
 |-----------------|------------------------------------------------------|
@@ -182,6 +184,7 @@ for numbers of types
   and `usize`
 * floating point numbers: `f32` and `f64`
 * `num_bigint::BigInt` and `num_bigint::BigUint` (requires crate feature `num-bigint`)
+* `bigdecimal:BigDecimal` and `bigdecimal:BigDecimalRef` (requires crate feature `bigdecimal`)
 * `rust_decimal::Decimal` (requires crate feature `rust-decimal`)
 
 | assertion | description                                                  |
