@@ -1,3 +1,4 @@
+use crate::prelude::DecimalProperties;
 use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
 use rust_decimal::Decimal;
 
@@ -32,6 +33,20 @@ impl MultiplicativeIdentityProperty for Decimal {
 impl MultiplicativeIdentityProperty for &Decimal {
     fn multiplicative_identity() -> Self {
         &Decimal::ONE
+    }
+}
+
+impl DecimalProperties for Decimal {
+    fn precision_property(&self) -> u64 {
+        29
+    }
+
+    fn scale_property(&self) -> i64 {
+        i64::from(self.scale())
+    }
+
+    fn is_integer_property(&self) -> bool {
+        self.is_integer()
     }
 }
 

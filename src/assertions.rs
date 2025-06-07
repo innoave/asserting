@@ -665,6 +665,142 @@ pub trait AssertNotANumber {
     fn is_a_number(self) -> Self;
 }
 
+/// Assert decimal number specific properties.
+pub trait AssertDecimalNumber {
+    /// Verifies the scale of a decimal number.
+    ///
+    /// It compares the scale, the total number of digits to the right of the
+    /// decimal point (including insignificant leading zeros), to the expected
+    /// scale.
+    ///
+    /// # Examples
+    ///
+    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "bigdecimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "bigdecimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use bigdecimal::BigDecimal;
+    ///
+    /// let subject: BigDecimal = "42.0839".parse().unwrap();
+    /// assert_that!(subject).has_scale_of(4);
+    ///
+    /// let subject: BigDecimal = "1.053700".parse().unwrap();
+    /// assert_that!(&subject).has_scale_of(6);
+    /// assert_that!(subject.normalized()).has_scale_of(4);
+    /// # }
+    /// ```
+    ///
+    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "rust-decimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "rust-decimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use rust_decimal::Decimal;
+    ///
+    /// let subject: Decimal = "42.0839".parse().unwrap();
+    /// assert_that!(subject).has_scale_of(4);
+    ///
+    /// let subject: Decimal = "1.053700".parse().unwrap();
+    /// assert_that!(subject).has_scale_of(6);
+    /// assert_that!(subject.normalize()).has_scale_of(4);
+    /// # }
+    /// ```
+    #[track_caller]
+    fn has_scale_of(self, expected_scale: i64) -> Self;
+
+    /// Verifies the precision of a decimal number.
+    ///
+    /// It compares the precision, the total number of digits in the non-scaled
+    /// integer representation, to the expected precision.
+    ///
+    /// # Examples
+    ///
+    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "bigdecimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "bigdecimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use bigdecimal::BigDecimal;
+    ///
+    /// let subject: BigDecimal = "42.0839".parse().unwrap();
+    ///
+    /// assert_that!(subject).has_precision_of(6);
+    /// # }
+    /// ```
+    ///
+    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "rust-decimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "rust-decimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use rust_decimal::Decimal;
+    ///
+    /// let subject: Decimal = "42.083916".parse().unwrap();
+    /// assert_that!(subject).has_precision_of(29);
+    ///
+    /// let subject: Decimal = "1.05".parse().unwrap();
+    /// assert_that!(subject).has_precision_of(29);
+    /// # }
+    /// ```
+    ///
+    /// Note: `rust_decimal::Decimal` is fixed precision decimal number. The
+    /// actual precision is always 29.
+    #[track_caller]
+    fn has_precision_of(self, expected_precision: u64) -> Self;
+
+    /// Verifies that a decimal number has zero fractional digits (is equivalent
+    /// to an integer).
+    ///
+    /// # Examples
+    ///
+    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "bigdecimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "bigdecimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use bigdecimal::BigDecimal;
+    ///
+    /// let subject: BigDecimal = "14_752.0".parse().unwrap();
+    ///
+    /// assert_that!(subject).is_integer();
+    /// # }
+    /// ```
+    ///
+    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "rust-decimal"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "rust-decimal")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    /// use rust_decimal::Decimal;
+    ///
+    /// let subject: Decimal = "14_752.0".parse().unwrap();
+    ///
+    /// assert_that!(subject).is_integer();
+    /// # }
+    /// ```
+    #[track_caller]
+    fn is_integer(self) -> Self;
+}
+
 /// Assert whether some value or expression is true or false.
 ///
 /// # Examples

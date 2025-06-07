@@ -1,14 +1,16 @@
 //! Implementations of assertions specific for numbers.
 
-use crate::assertions::{AssertInfinity, AssertNotANumber, AssertNumericIdentity, AssertSignum};
+use crate::assertions::{
+    AssertDecimalNumber, AssertInfinity, AssertNotANumber, AssertNumericIdentity, AssertSignum,
+};
 use crate::colored::{mark_missing, mark_missing_substr, mark_unexpected};
 use crate::expectations::{
-    IsANumber, IsFinite, IsInfinite, IsNegative, IsNotANumber, IsNotNegative, IsNotPositive, IsOne,
-    IsPositive, IsZero,
+    HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite, IsInteger, IsNegative,
+    IsNotANumber, IsNotNegative, IsNotPositive, IsOne, IsPositive, IsZero,
 };
 use crate::properties::{
-    AdditiveIdentityProperty, InfinityProperty, IsNanProperty, MultiplicativeIdentityProperty,
-    SignumProperty,
+    AdditiveIdentityProperty, DecimalProperties, InfinityProperty, IsNanProperty,
+    MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
@@ -226,5 +228,70 @@ where
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_substr("NaN", format);
         format!("expected {expression} is not a number (NaN)\n   but was: {marked_actual}\n  expected: {marked_expected}")
+    }
+}
+
+impl<S, R> AssertDecimalNumber for Spec<'_, S, R>
+where
+    S: DecimalProperties + Debug,
+    R: FailingStrategy,
+{
+    fn has_scale_of(self, expected_scale: i64) -> Self {
+        self.expecting(HasScaleOf { expected_scale })
+    }
+
+    fn has_precision_of(self, expected_precision: u64) -> Self {
+        self.expecting(HasPrecisionOf { expected_precision })
+    }
+
+    fn is_integer(self) -> Self {
+        self.expecting(IsInteger)
+    }
+}
+
+impl<S> Expectation<S> for HasScaleOf
+where
+    S: DecimalProperties + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.scale_property() == self.expected_scale
+    }
+
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let expected_scale = self.expected_scale;
+        let marked_actual = mark_unexpected(&actual.scale_property(), format);
+        let marked_expected = mark_missing(&expected_scale, format);
+        format!("expected {expression} to have a scale of {expected_scale}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+    }
+}
+
+impl<S> Expectation<S> for HasPrecisionOf
+where
+    S: DecimalProperties + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.precision_property() == self.expected_precision
+    }
+
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let expected_precision = self.expected_precision;
+        let marked_actual = mark_unexpected(&actual.precision_property(), format);
+        let marked_expected = mark_missing(&expected_precision, format);
+        format!("expected {expression} to have a precision of {expected_precision}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+    }
+}
+
+impl<S> Expectation<S> for IsInteger
+where
+    S: DecimalProperties + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject.is_integer_property()
+    }
+
+    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+        let marked_actual = mark_unexpected(&actual, format);
+        let marked_expected = mark_missing_substr("an integer value", format);
+        format!("expected {expression} to be an integer value\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }

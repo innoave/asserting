@@ -176,6 +176,19 @@ pub struct IsNotANumber;
 pub struct IsANumber;
 
 #[must_use]
+pub struct HasPrecisionOf {
+    pub expected_precision: u64,
+}
+
+#[must_use]
+pub struct HasScaleOf {
+    pub expected_scale: i64,
+}
+
+#[must_use]
+pub struct IsInteger;
+
+#[must_use]
 pub struct IsLowerCase;
 
 #[must_use]
