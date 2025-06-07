@@ -695,6 +695,8 @@ mod panic;
 mod predicate;
 mod range;
 mod result;
+#[cfg(feature = "rust-decimal")]
+mod rust_decimal;
 mod slice;
 mod string;
 mod vec;

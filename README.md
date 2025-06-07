@@ -182,6 +182,7 @@ for numbers of types
   and `usize`
 * floating point numbers: `f32` and `f64`
 * `num_bigint::BigInt` and `num_bigint::BigUint` (requires crate feature `num-bigint`)
+* `rust_decimal::Decimal` (requires crate feature `rust-decimal`)
 
 | assertion | description                                                  |
 |-----------|--------------------------------------------------------------|

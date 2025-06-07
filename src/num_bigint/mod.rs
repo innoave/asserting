@@ -1,5 +1,4 @@
-use crate::prelude::{AdditiveIdentityProperty, MultiplicativeIdentityProperty};
-use crate::properties::SignumProperty;
+use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
 use crate::std::vec;
 use lazy_static::lazy_static;
 use num_bigint::{BigInt, BigUint, Sign};
