@@ -220,6 +220,56 @@ where
     }
 }
 
+/// Properties of a decimal number.
+pub trait DecimalProperties {
+    /// Returns the precision of this decimal number.
+    ///
+    /// The precision is the total number of digits in the non-scaled integer
+    /// representation of a decimal number.
+    fn precision_property(&self) -> u64;
+
+    /// Returns the scale of this decimal number.
+    fn scale_property(&self) -> i64;
+
+    /// Returns whether this decimal number has no fractional digits
+    /// (is equivalent to an integer).
+    fn is_integer_property(&self) -> bool;
+}
+
+impl<T> DecimalProperties for &T
+where
+    T: DecimalProperties + ?Sized,
+{
+    fn precision_property(&self) -> u64 {
+        <T as DecimalProperties>::precision_property(self)
+    }
+
+    fn scale_property(&self) -> i64 {
+        <T as DecimalProperties>::scale_property(self)
+    }
+
+    fn is_integer_property(&self) -> bool {
+        <T as DecimalProperties>::is_integer_property(self)
+    }
+}
+
+impl<T> DecimalProperties for &mut T
+where
+    T: DecimalProperties + ?Sized,
+{
+    fn precision_property(&self) -> u64 {
+        <T as DecimalProperties>::precision_property(self)
+    }
+
+    fn scale_property(&self) -> i64 {
+        <T as DecimalProperties>::scale_property(self)
+    }
+
+    fn is_integer_property(&self) -> bool {
+        <T as DecimalProperties>::is_integer_property(self)
+    }
+}
+
 /// The properties of a map-like type.
 pub trait MapProperties {
     /// The type of the keys in this map.

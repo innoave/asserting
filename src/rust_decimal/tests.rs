@@ -152,3 +152,96 @@ fn borrowed_decimal_is_zero() {
 fn borrowed_decimal_is_one() {
     assert_that(&Decimal::new(1, 0)).is_one();
 }
+
+#[test]
+fn decimal_has_precision_of() {
+    let subject = Decimal::new(420_831, 4);
+
+    assert_that(subject).has_precision_of(29);
+}
+
+#[test]
+fn verify_decimal_has_precision_of_fails() {
+    let subject = Decimal::new(420_831_000, 7);
+
+    let failures = verify_that(subject).has_precision_of(7).display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected subject to have a precision of 7
+   but was: 29
+  expected: 7
+"
+        ]
+    );
+}
+
+#[test]
+fn decimal_has_scale_of() {
+    let subject = Decimal::new(420_831, 4);
+
+    assert_that(subject).has_scale_of(4);
+}
+
+#[test]
+fn decimal_has_scale_of_with_zero_in_fraction() {
+    let subject = Decimal::new(420_830, 1);
+
+    assert_that(subject).has_scale_of(1);
+
+    assert_that(subject.normalize()).has_scale_of(0);
+}
+
+#[test]
+fn decimal_has_scale_of_trailing_zeros() {
+    let subject = Decimal::new(420_831_000, 4);
+
+    assert_that(subject).has_scale_of(4);
+}
+
+#[test]
+fn verify_decimal_has_scale_of_fails() {
+    let subject = Decimal::new(420_831_000, 5);
+
+    let failures = verify_that(subject.normalize())
+        .has_scale_of(5)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected subject to have a scale of 5
+   but was: 2
+  expected: 5
+"]
+    );
+}
+
+#[test]
+fn decimal_is_integer() {
+    let subject = Decimal::new(420_830, 0);
+
+    assert_that(subject).is_integer();
+}
+
+#[test]
+fn decimal_is_integer_zero_in_fraction() {
+    let subject = Decimal::new(420_830, 1);
+
+    assert_that(subject).is_integer();
+}
+
+#[test]
+fn verify_decimal_is_integer_fails() {
+    let subject = Decimal::new(420_810, 2);
+
+    let failures = verify_that(subject).is_integer().display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected subject to be an integer value
+   but was: 4208.10
+  expected: an integer value
+"]
+    );
+}

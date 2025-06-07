@@ -201,6 +201,19 @@ for floating point numbers of type `f32` and `f64`:
 | is_not_a_number | verify that the subject is not a number       |
 | is_a_number     | verify that the subject is a number           |
 
+### Decimal number
+
+for decimal numbers of types
+
+* `bigdecimal:BigDecimal` and `bigdecimal:BigDecimalRef` (requires crate feature `bigdecimal`)
+* `rust_decimal::Decimal` (requires crate feature `rust-decimal`)
+
+| assertion        | description                                        |
+|------------------|----------------------------------------------------|
+| has_scale_of     | verify that the subject has the expected scale     |                                                 
+| has_precision_of | verify that the subject has the expected precision |                                                 
+| is_integer       | verify that the subject has zero fractional digits |                                                 
+
 ### Float comparison
 
 for floating point numbers of type `f32` and `f64`.

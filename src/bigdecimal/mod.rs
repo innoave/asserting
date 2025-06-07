@@ -1,4 +1,6 @@
-use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
+use crate::properties::{
+    AdditiveIdentityProperty, DecimalProperties, MultiplicativeIdentityProperty, SignumProperty,
+};
 use bigdecimal::num_bigint::Sign;
 use bigdecimal::{BigDecimal, BigDecimalRef, One, Zero};
 use lazy_static::lazy_static;
@@ -49,6 +51,20 @@ impl MultiplicativeIdentityProperty for BigDecimal {
 impl MultiplicativeIdentityProperty for &BigDecimal {
     fn multiplicative_identity() -> Self {
         &BIGDECIMAL_ONE
+    }
+}
+
+impl DecimalProperties for BigDecimal {
+    fn precision_property(&self) -> u64 {
+        self.digits()
+    }
+
+    fn scale_property(&self) -> i64 {
+        self.fractional_digit_count()
+    }
+
+    fn is_integer_property(&self) -> bool {
+        self.is_integer()
     }
 }
 
