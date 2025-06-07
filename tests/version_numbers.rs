@@ -6,12 +6,14 @@
 mod dummy_extern_uses {
     use anyhow as _;
     use asserting as _;
+    #[cfg(feature = "bigdecimal")]
+    use bigdecimal as _;
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
     #[cfg(feature = "num-bigint")]
     use lazy_static as _;
-    #[cfg(feature = "num-bigint")]
+    #[cfg(any(feature = "num-bigint", test))]
     use num_bigint as _;
     use proptest as _;
     #[cfg(feature = "regex")]

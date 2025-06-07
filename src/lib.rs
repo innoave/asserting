@@ -671,6 +671,8 @@ pub mod prelude;
 pub mod properties;
 pub mod spec;
 
+#[cfg(feature = "bigdecimal")]
+mod bigdecimal;
 mod boolean;
 mod c_string;
 mod char;
@@ -711,6 +713,7 @@ type TestCodeSnippetsInReadme = ();
 // Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
 #[cfg(test)]
 mod dummy_extern_uses {
+    use num_bigint as _;
     use proptest as _;
     use serial_test as _;
     use time as _;

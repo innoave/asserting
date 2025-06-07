@@ -2,6 +2,8 @@
 // Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
 mod dummy_extern_uses {
     use anyhow as _;
+    #[cfg(feature = "bigdecimal")]
+    use bigdecimal as _;
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
