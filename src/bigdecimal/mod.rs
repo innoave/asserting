@@ -1,5 +1,6 @@
 use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
-use bigdecimal::{BigDecimal, One, Signed, Zero};
+use bigdecimal::num_bigint::Sign;
+use bigdecimal::{BigDecimal, BigDecimalRef, One, Zero};
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -19,11 +20,11 @@ fn bigdecimal_one() -> BigDecimal {
 
 impl SignumProperty for BigDecimal {
     fn is_negative_property(&self) -> bool {
-        self.is_negative()
+        self.sign() == Sign::Minus
     }
 
     fn is_positive_property(&self) -> bool {
-        self.is_positive()
+        self.sign() == Sign::Plus
     }
 }
 
@@ -48,6 +49,28 @@ impl MultiplicativeIdentityProperty for BigDecimal {
 impl MultiplicativeIdentityProperty for &BigDecimal {
     fn multiplicative_identity() -> Self {
         &BIGDECIMAL_ONE
+    }
+}
+
+impl SignumProperty for BigDecimalRef<'_> {
+    fn is_negative_property(&self) -> bool {
+        self.sign() == Sign::Minus
+    }
+
+    fn is_positive_property(&self) -> bool {
+        self.sign() == Sign::Plus
+    }
+}
+
+impl AdditiveIdentityProperty for BigDecimalRef<'_> {
+    fn additive_identity() -> Self {
+        BIGDECIMAL_ZERO.to_ref()
+    }
+}
+
+impl MultiplicativeIdentityProperty for BigDecimalRef<'_> {
+    fn multiplicative_identity() -> Self {
+        BIGDECIMAL_ONE.to_ref()
     }
 }
 
