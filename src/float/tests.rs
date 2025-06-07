@@ -176,8 +176,18 @@ fn f32_is_zero() {
 }
 
 #[test]
+fn borrowed_f32_is_zero() {
+    assert_that(&0.0_f32).is_zero();
+}
+
+#[test]
 fn f64_is_zero() {
     assert_that(0.0_f64).is_zero();
+}
+
+#[test]
+fn borrowed_f64_is_zero() {
+    assert_that(&0.0_f64).is_zero();
 }
 
 #[test]
@@ -202,8 +212,18 @@ fn f32_is_one() {
 }
 
 #[test]
+fn borrowed_f32_is_one() {
+    assert_that(&1.0_f32).is_one();
+}
+
+#[test]
 fn f64_is_one() {
     assert_that(1.0_f64).is_one();
+}
+
+#[test]
+fn borrowed_f64_is_one() {
+    assert_that(&1.0_f64).is_one();
 }
 
 #[test]

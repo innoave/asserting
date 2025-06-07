@@ -37,7 +37,7 @@ lint-all-features:
 
 # linting code using Clippy for no-std environment
 lint-no-std:
-    cargo clippy --all-targets --no-default-features --features "colored, float-cmp"
+    cargo clippy --all-targets --no-default-features --features "colored, float-cmp, num-bigint"
 
 # linting code using Clippy with no features enabled
 lint-no-features:
@@ -55,7 +55,7 @@ test-all-features:
 
 # run tests for no-std environment
 test-no-std:
-    cargo test --no-default-features --features "colored, float-cmp"
+    cargo test --no-default-features --features "colored, float-cmp, num-bigint"
 
 # run tests with no features enabled
 test-no-features:

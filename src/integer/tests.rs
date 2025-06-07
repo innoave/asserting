@@ -377,6 +377,11 @@ fn usize_is_zero() {
 }
 
 #[test]
+fn borrowed_usize_is_zero() {
+    assert_that(&0_usize).is_zero();
+}
+
+#[test]
 fn verify_u64_is_zero_fails() {
     let failures = verify_that(1_u64)
         .named("some_number")
@@ -450,6 +455,11 @@ fn u128_is_one() {
 #[test]
 fn usize_is_one() {
     assert_that(1_usize).is_one();
+}
+
+#[test]
+fn borrowed_usize_is_one() {
+    assert_that(&1_usize).is_one();
 }
 
 #[test]

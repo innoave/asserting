@@ -646,6 +646,12 @@ mod std {
         pub use core::str::*;
     }
 
+    pub mod sync {
+        extern crate alloc;
+        pub use alloc::sync::*;
+        pub use core::sync::*;
+    }
+
     pub mod ffi {
         extern crate alloc;
         pub use alloc::ffi::*;
@@ -677,20 +683,21 @@ mod integer;
 mod iterator;
 mod length;
 mod map;
+#[cfg(feature = "num-bigint")]
+mod num_bigint;
 mod number;
 mod option;
 mod order;
 #[cfg(feature = "std")]
 mod os_sting;
+#[cfg(feature = "panic")]
+mod panic;
 mod predicate;
 mod range;
 mod result;
 mod slice;
 mod string;
 mod vec;
-
-#[cfg(feature = "panic")]
-mod panic;
 
 // test code snippets in the README.md
 #[cfg(doctest)]

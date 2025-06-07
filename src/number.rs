@@ -116,12 +116,12 @@ where
     S: AdditiveIdentityProperty + PartialEq + Debug,
 {
     fn test(&mut self, subject: &S) -> bool {
-        *subject == <S as AdditiveIdentityProperty>::ADDITIVE_IDENTITY
+        *subject == <S as AdditiveIdentityProperty>::additive_identity()
     }
 
     fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&S::ADDITIVE_IDENTITY, format);
+        let marked_actual = mark_unexpected(&actual, format);
+        let marked_expected = mark_missing(&S::additive_identity(), format);
         format!("expected {expression} is zero\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -131,12 +131,12 @@ where
     S: MultiplicativeIdentityProperty + PartialEq + Debug,
 {
     fn test(&mut self, subject: &S) -> bool {
-        *subject == <S as MultiplicativeIdentityProperty>::MULTIPLICATIVE_IDENTITY
+        *subject == <S as MultiplicativeIdentityProperty>::multiplicative_identity()
     }
 
     fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&S::MULTIPLICATIVE_IDENTITY, format);
+        let marked_expected = mark_missing(&S::multiplicative_identity(), format);
         format!("expected {expression} is one\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
