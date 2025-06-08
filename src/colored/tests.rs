@@ -90,13 +90,11 @@ mod with_colored_but_not_std_feature {
 mod with_colored_and_std_features {
     use super::*;
     use crate::colored::with_colored_feature::ENV_VAR_HIGHLIGHT_DIFFS;
-    use crate::std::env;
+    use crate::env;
     use hashbrown::HashMap;
     use proptest::prelude::*;
-    use serial_test::serial;
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_not_set() {
         env::remove_var(ENV_VAR_HIGHLIGHT_DIFFS);
 
@@ -106,7 +104,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_not_set_and_no_color_env_var_set() {
         env::remove_var(ENV_VAR_HIGHLIGHT_DIFFS);
         env::set_var("NO_COLOR", "1");
@@ -119,7 +116,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_unknown_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "not-valid");
 
@@ -129,7 +125,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_bold_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "bold");
 
@@ -139,7 +134,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_bold_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "bold");
         env::set_var("NO_COLOR", "1");
@@ -152,7 +146,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_green_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 
@@ -162,7 +155,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_green_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
         env::set_var("NO_COLOR", "1");
@@ -175,7 +167,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_blue_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-blue");
 
@@ -185,7 +176,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_blue_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-blue");
         env::set_var("NO_COLOR", "1");
@@ -198,7 +188,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_yellow_mode() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-yellow");
 
@@ -208,7 +197,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_red_yellow_mode_and_no_color_env_var_set() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-yellow");
         env::set_var("NO_COLOR", "1");
@@ -221,7 +209,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn get_configured_diff_format_when_env_var_set_to_off() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "off");
 
@@ -232,11 +219,10 @@ mod with_colored_and_std_features {
 
     proptest! {
         #[test]
-        #[serial]
         fn setting_env_var_to_bold_is_case_insensitive(
             mode in "[bB][oO][lL][dD]"
         ) {
-            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
+            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, &mode);
 
             let diff_format = configured_diff_format();
 
@@ -244,11 +230,10 @@ mod with_colored_and_std_features {
         }
 
         #[test]
-        #[serial]
         fn setting_env_var_to_red_blue_is_case_insensitive(
             mode in "[rR][eE][dD]-[bB][lL][uU][eE]"
         ) {
-            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
+            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, &mode);
 
             let diff_format = configured_diff_format();
 
@@ -256,11 +241,10 @@ mod with_colored_and_std_features {
         }
 
         #[test]
-        #[serial]
         fn setting_env_var_to_red_yellow_is_case_insensitive(
             mode in "[rR][eE][dD]-[yY][eE][lL][lL][oO][wW]"
         ) {
-            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
+            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, &mode);
 
             let diff_format = configured_diff_format();
 
@@ -268,11 +252,10 @@ mod with_colored_and_std_features {
         }
 
         #[test]
-        #[serial]
         fn setting_env_var_to_off_is_case_insensitive(
             mode in "[oO][fF][fF]"
         ) {
-            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, mode);
+            env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, &mode);
 
             let diff_format = configured_diff_format();
 
@@ -281,7 +264,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn assert_that_sets_the_diff_format_to_red_green() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 
@@ -291,7 +273,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn verify_that_sets_the_diff_format_to_no_highlighting() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 
@@ -301,7 +282,6 @@ mod with_colored_and_std_features {
     }
 
     #[test]
-    #[serial]
     fn assert_that_code_sets_the_diff_format_to_red_green() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
 

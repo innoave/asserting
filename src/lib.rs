@@ -678,6 +678,8 @@ mod c_string;
 mod char;
 mod char_count;
 mod collection;
+#[cfg(feature = "std")]
+mod env;
 mod equality;
 mod error;
 mod float;
@@ -713,8 +715,8 @@ type TestCodeSnippetsInReadme = ();
 // Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
 #[cfg(test)]
 mod dummy_extern_uses {
+    use fakeenv as _;
     use proptest as _;
-    use serial_test as _;
     use time as _;
     use version_sync as _;
 }

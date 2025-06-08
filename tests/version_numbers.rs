@@ -8,6 +8,7 @@ mod dummy_extern_uses {
     use asserting as _;
     #[cfg(feature = "bigdecimal")]
     use bigdecimal as _;
+    use fakeenv as _;
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
@@ -22,7 +23,6 @@ mod dummy_extern_uses {
     use rust_decimal as _;
     #[cfg(feature = "colored")]
     use sdiff as _;
-    use serial_test as _;
     use time as _;
 }
 
