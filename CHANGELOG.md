@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.8.0 - 2025-06-08
+
+_Asserting big and accurate numbers_
+
+### Added
+
+* Number assertions for `num_bigint::BigInt` and `num_bigint::BigUint`
+  [(PR #46)](https://github.com/innoave/asserting/pull/46)
+* Number assertions for `bigdecimal::BigDecimal` and `bigdecimal::BigDecimalRef`
+  [(PR #48)](https://github.com/innoave/asserting/pull/48)
+* Number assertions for `rust_decimal::Decimal`
+  [(PR #47)](https://github.com/innoave/asserting/pull/47)
+* Decimal number specific assertions `has_scale_of`, `has_precision_of` and `is_integer`
+  [(PR #49)](https://github.com/innoave/asserting/pull/49)
+* Assertions for properties and classification of characters (`char`)
+  [(PR #45)](https://github.com/innoave/asserting/pull/45)
+
+### Fixed
+
+* Assertions for `Result` are not available for borrowed `&Result`
+  [(PR #43)](https://github.com/innoave/asserting/pull/43)
+* Assertions for `Option` are not available for borrowed `&Option`
+  [(PR #42)](https://github.com/innoave/asserting/pull/42)
+
+### Development
+
+* Use a fake environment for testing functionality that depends on environment variables
+  [(PR #50)](https://github.com/innoave/asserting/pull/50)
+
 ## 0.7.0 - 2025-06-02
 
 _Assertions for `Error` types_

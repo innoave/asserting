@@ -23,6 +23,8 @@ Features of `asserting`:
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
 
+To see what is changed with each release, see the [changelog](CHANGELOG.md).
+
 ### Convenient to write
 
 Code editors and IDEs help with autocomplete to find the right method for the kind of assertion we
@@ -77,7 +79,7 @@ require std can still be added.
 
 ```toml
 [dev-dependencies]
-asserting = { version = "0.7", default-features = false, features = ["colored", "float-cmp"] }
+asserting = { version = "0.8", default-features = false, features = ["colored", "float-cmp", "regex"] }
 ```
 
 An allocator is still needed for no-std.
@@ -88,6 +90,9 @@ An allocator is still needed for no-std.
 printing assertion failures to the terminal. The colored diffs in assertion failures look like this:
 
 ![colored diffs in terminal](examples/colored_diffs.png)
+
+Highlighted differences in the failure message help with spotting the difference between actual and
+expected values and make finding the reason for a failing test much easier.
 
 It supports different variants of how differences are highlighted.
 

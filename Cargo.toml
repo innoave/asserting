@@ -1,6 +1,6 @@
 [package]
 name = "asserting"
-version = "0.7.0"
+version = "0.8.0"
 authors = ["haraldmaida"]
 license = "MIT OR Apache-2.0"
 edition = "2021"
@@ -20,14 +20,14 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 default = ["std", "colored", "float-cmp", "panic", "regex"]
-bigdecimal = ["dep:bigdecimal"]
+bigdecimal = ["dep:bigdecimal", "dep:lazy_static"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
 num-bigint = ["dep:num-bigint", "dep:lazy_static"]
 rust-decimal = ["dep:rust_decimal"]
 panic = ["std"]
 regex = ["dep:regex"]
-std = ["bigdecimal/std", "rust_decimal/std"]
+std = []
 
 [dependencies]
 hashbrown = "0.15"
