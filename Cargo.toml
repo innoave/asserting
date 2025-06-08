@@ -43,8 +43,8 @@ sdiff = { version = "0.1", optional = true }
 
 [dev-dependencies]
 anyhow = "1"
+fakeenv = { version = "0.1", default-features = false, features = ["fake"] }
 proptest = "1"
-serial_test = "3"
 time = { version = "0.3", default-features = false, features = ["macros"] }
 version-sync = "0.9"
 

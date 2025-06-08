@@ -699,7 +699,7 @@ mod with_colored_feature {
     /// Returns true if the environment variable `NO_COLOR` is set.
     #[cfg(feature = "std")]
     fn is_no_color_env_var_set() -> bool {
-        use crate::std::env;
+        use crate::env;
 
         match env::var(ENV_VAR_NO_COLOR) {
             Ok(value) => !value.is_empty(),
@@ -718,7 +718,7 @@ mod with_colored_feature {
     #[must_use]
     #[inline]
     pub fn configured_diff_format_impl() -> DiffFormat {
-        use crate::std::env;
+        use crate::env;
 
         match env::var(ENV_VAR_HIGHLIGHT_DIFFS) {
             Ok(value) => {
