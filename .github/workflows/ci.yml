@@ -55,12 +55,12 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - uses: Swatinem/rust-cache@v2
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: --all-features
+      - uses: Swatinem/rust-cache@v2
 
   fmt:
     name: Rustfmt check
@@ -74,6 +74,7 @@ jobs:
           toolchain: nightly
           components: rustfmt
       - run: cargo +nightly fmt --check --all
+      - uses: Swatinem/rust-cache@v2
 
   test:
     name: Run tests
@@ -98,12 +99,12 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           override: true
-      - uses: Swatinem/rust-cache@v2
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --all-features --no-fail-fast
+      - uses: Swatinem/rust-cache@v2
   
   no-std:
     name: Test no-std support
@@ -117,12 +118,12 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - uses: Swatinem/rust-cache@v2
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --no-default-features --features "colored, float-cmp, num-bigint, rust-decimal, bigdecimal"
+      - uses: Swatinem/rust-cache@v2
 
   msrv:
     name: Build with MSRV
@@ -159,9 +160,9 @@ jobs:
         with:
           toolchain: nightly
           override: true
-      - uses: Swatinem/rust-cache@v2
       - name: Run cargo doc
         uses: actions-rs/cargo@v1
         with:
           command: doc
           args: --all-features --no-deps
+      - uses: Swatinem/rust-cache@v2
