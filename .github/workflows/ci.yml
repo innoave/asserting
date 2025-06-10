@@ -27,9 +27,9 @@ jobs:
       - clippy
       - msrv
       - doc
-      - test-no-std
+      - test-all-features
       - test-default-features
-      - test-all-featues
+      - test-no-std
     steps:
       - run: exit 0
   
@@ -65,7 +65,7 @@ jobs:
       - run: cargo +nightly fmt --check --all
       - uses: Swatinem/rust-cache@v2
 
-  test-all-featues:
+  test-all-features:
     name: Run tests for all features
     runs-on: ${{ matrix.os }}
     needs:
