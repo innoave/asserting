@@ -18,6 +18,32 @@ permissions:
   contents: read
 
 jobs:
+  # Depends on all actions that are required for a "successful" CI run.
+  tests-pass:
+    name: all checks successful
+    runs-on: ubuntu-latest
+    needs:
+      - fmt
+      - clippy
+      - msrv
+      - doc
+      - no-std
+      - test
+    steps:
+      - run: exit 0
+  
+  # Basic checks that should run shorter than the full tests 
+  basic:
+    name: basic checks
+    runs-on: ubuntu-latest
+    needs:
+      - fmt
+      - clippy
+      - msrv
+      - doc
+    steps:
+      - run: exit 0
+  
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
@@ -52,6 +78,7 @@ jobs:
   test:
     name: Run tests
     runs-on: ${{ matrix.os }}
+    needs: basic
     strategy:
       fail-fast: false
       matrix:
@@ -81,6 +108,7 @@ jobs:
   no-std:
     name: Test no-std support
     runs-on: ubuntu-latest
+    needs: basic
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
