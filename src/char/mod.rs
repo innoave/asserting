@@ -4,7 +4,7 @@ use crate::expectations::{
     IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit, IsLowerCase, IsUpperCase,
     IsWhitespace,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::format;
 use crate::std::string::{String, ToString};
 
@@ -87,22 +87,39 @@ impl Expectation<char> for IsLowerCase {
         subject.is_lowercase()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, expected) = if inverted {
+            ("not ", actual.to_uppercase().to_string())
+        } else {
+            ("", actual.to_lowercase().to_string())
+        };
         let marked_actual = mark_unexpected_char(*actual, format);
-        let marked_expected = mark_missing_substr(&actual.to_lowercase().to_string(), format);
-        format!("expected {expression} is lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        let marked_expected = mark_missing_substr(&expected, format);
+        format!("expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
 
+impl Invertible for IsLowerCase {}
+
 impl Expectation<&char> for IsLowerCase {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_lowercase()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        let marked_expected = mark_missing_substr(&actual.to_lowercase().to_string(), format);
-        format!("expected {expression} is lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -111,22 +128,39 @@ impl Expectation<char> for IsUpperCase {
         subject.is_uppercase()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, expected) = if inverted {
+            ("not ", actual.to_lowercase().to_string())
+        } else {
+            ("", actual.to_uppercase().to_string())
+        };
         let marked_actual = mark_unexpected_char(*actual, format);
-        let marked_expected = mark_missing_substr(&actual.to_uppercase().to_string(), format);
-        format!("expected {expression} is uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        let marked_expected = mark_missing_substr(&expected, format);
+        format!("expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
 
+impl Invertible for IsUpperCase {}
+
 impl Expectation<&char> for IsUpperCase {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_uppercase()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        let marked_expected = mark_missing_substr(&actual.to_uppercase().to_string(), format);
-        format!("expected {expression} is uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -135,20 +169,34 @@ impl Expectation<char> for IsAscii {
         subject.is_ascii()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is an ASCII character\n   but was: {marked_actual}\n  expected: an ASCII character")
+        format!("expected {expression} to be {not}an ASCII character\n   but was: {marked_actual}\n  expected: {not}an ASCII character")
     }
 }
 
+impl Invertible for IsAscii {}
+
 impl Expectation<&char> for IsAscii {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_ascii()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is an ASCII character\n   but was: {marked_actual}\n  expected: an ASCII character")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -157,20 +205,34 @@ impl Expectation<char> for IsAlphabetic {
         subject.is_alphabetic()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is an alphabetic character\n   but was: {marked_actual}\n  expected: an alphabetic character")
+        format!("expected {expression} to be {not}an alphabetic character\n   but was: {marked_actual}\n  expected: {not}an alphabetic character")
     }
 }
 
+impl Invertible for IsAlphabetic {}
+
 impl Expectation<&char> for IsAlphabetic {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_alphabetic()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is an alphabetic character\n   but was: {marked_actual}\n  expected: an alphabetic character")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -179,20 +241,34 @@ impl Expectation<char> for IsAlphanumeric {
         subject.is_alphanumeric()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is an alphanumeric character\n   but was: {marked_actual}\n  expected: an alphanumeric character")
+        format!("expected {expression} to be {not}an alphanumeric character\n   but was: {marked_actual}\n  expected: {not}an alphanumeric character")
     }
 }
 
+impl Invertible for IsAlphanumeric {}
+
 impl Expectation<&char> for IsAlphanumeric {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_alphanumeric()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is an alphanumeric character\n   but was: {marked_actual}\n  expected: an alphanumeric character")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -201,20 +277,34 @@ impl Expectation<char> for IsControlChar {
         subject.is_control()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is a control character\n   but was: {marked_actual}\n  expected: a control character")
+        format!("expected {expression} to be {not}a control character\n   but was: {marked_actual}\n  expected: {not}a control character")
     }
 }
 
+impl Invertible for IsControlChar {}
+
 impl Expectation<&char> for IsControlChar {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_control()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is a control character\n   but was: {marked_actual}\n  expected: a control character")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -223,22 +313,35 @@ impl Expectation<char> for IsDigit {
         subject.is_digit(self.radix)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let radix = self.radix;
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is a digit in the radix {radix}\n   but was: {marked_actual}\n  expected: a digit in the radix {radix}")
+        format!("expected {expression} to be {not}a digit in the radix {radix}\n   but was: {marked_actual}\n  expected: {not}a digit in the radix {radix}")
     }
 }
 
+impl Invertible for IsDigit {}
+
 impl Expectation<&char> for IsDigit {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_digit(self.radix)
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let radix = self.radix;
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is a digit in the radix {radix}\n   but was: {marked_actual}\n  expected: a digit in the radix {radix}")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -247,20 +350,34 @@ impl Expectation<char> for IsWhitespace {
         subject.is_whitespace()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &char, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} is a whitespace\n   but was: {marked_actual}\n  expected: a whitespace")
+        format!("expected {expression} to be {not}whitespace\n   but was: {marked_actual}\n  expected: {not}whitespace")
     }
 }
 
+impl Invertible for IsWhitespace {}
+
 impl Expectation<&char> for IsWhitespace {
     fn test(&mut self, subject: &&char) -> bool {
-        subject.is_whitespace()
+        <Self as Expectation<char>>::test(self, subject)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &&char, format: &DiffFormat) -> String {
-        let marked_actual = mark_unexpected_char(**actual, format);
-        format!("expected {expression} is a whitespace\n   but was: {marked_actual}\n  expected: a whitespace")
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &&char,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        <Self as Expectation<char>>::message(self, expression, actual, inverted, format)
     }
 }
 

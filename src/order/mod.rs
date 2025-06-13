@@ -5,7 +5,7 @@ use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     IsAfter, IsAtLeast, IsAtMost, IsBefore, IsBetween, IsGreaterThan, IsLessThan,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 
@@ -53,15 +53,24 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", ">=") } else { ("", "<") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is less than {:?}\n   but was: {marked_actual}\n  expected: < {marked_expected}",
+            "expected {expression} to be {not}less than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsLessThan<E> {}
 
 impl<S, E> Expectation<S> for IsAtMost<E>
 where
@@ -72,15 +81,24 @@ where
         subject <= &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", ">") } else { ("", "<=") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is at most {:?}\n   but was: {marked_actual}\n  expected: <= {marked_expected}",
+            "expected {expression} to be {not}at most {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsAtMost<E> {}
 
 impl<S, E> Expectation<S> for IsGreaterThan<E>
 where
@@ -91,15 +109,24 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", "<=") } else { ("", ">") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is greater than {:?}\n   but was: {marked_actual}\n  expected: > {marked_expected}",
+            "expected {expression} to be {not}greater than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsGreaterThan<E> {}
 
 impl<S, E> Expectation<S> for IsAtLeast<E>
 where
@@ -110,15 +137,24 @@ where
         subject >= &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", "<") } else { ("", ">=") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is at least {:?}\n   but was: {marked_actual}\n  expected: >= {marked_expected}",
+            "expected {expression} to be {not}at least {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsAtLeast<E> {}
 
 impl<S, E> Expectation<S> for IsBefore<E>
 where
@@ -129,15 +165,24 @@ where
         subject < &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", ">=") } else { ("", "<") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is before {:?}\n   but was: {marked_actual}\n  expected: < {marked_expected}",
+            "expected {expression} to be {not}before {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsBefore<E> {}
 
 impl<S, E> Expectation<S> for IsAfter<E>
 where
@@ -148,15 +193,24 @@ where
         subject > &self.expected
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", "<=") } else { ("", ">") };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} is after {:?}\n   but was: {marked_actual}\n  expected: > {marked_expected}",
+            "expected {expression} to be {not}after {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected,
         )
     }
 }
+
+impl<E> Invertible for IsAfter<E> {}
 
 impl<S, E> Expectation<S> for IsBetween<E>
 where
@@ -167,24 +221,37 @@ where
         subject >= &self.min && subject <= &self.max
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted {
+            ("not ", "> x or x >")
+        } else {
+            ("", "<= x <=")
+        };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_start = if actual < &self.min {
+        let marked_start = if (actual < &self.min) || inverted {
             mark_missing(&self.min, format)
         } else {
             format!("{:?}", &self.min)
         };
-        let marked_end = if actual > &self.max {
+        let marked_end = if (actual > &self.max) || inverted {
             mark_missing(&self.max, format)
         } else {
             format!("{:?}", &self.max)
         };
         format!(
-            "expected {expression} is between {:?} and {:?}\n   but was: {marked_actual}\n  expected: {marked_start} <= x <= {marked_end}",
+            "expected {expression} to be {not}between {:?} and {:?}\n   but was: {marked_actual}\n  expected: {marked_start} {cmp} {marked_end}",
             self.min, self.max
         )
     }
 }
+
+impl<E> Invertible for IsBetween<E> {}
 
 #[cfg(test)]
 mod tests;

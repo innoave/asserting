@@ -23,10 +23,12 @@ fn verify_bool_is_not_equal_to_false_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is not equal to false
+        &[
+            r"assertion failed: expected my_thing to be not equal to false
    but was: false
   expected: not false
-"]
+"
+        ]
     );
 }
 
@@ -47,7 +49,7 @@ fn verify_bool_is_true_fails() {
             .named("my_thing")
             .is_true()
             .display_failures(),
-        &[r"assertion failed: expected my_thing is true
+        &[r"assertion failed: expected my_thing to be true
    but was: false
   expected: true
 "]
@@ -63,7 +65,7 @@ fn verify_bool_is_false_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is false
+        &[r"assertion failed: expected my_thing to be false
    but was: true
   expected: false
 "]
@@ -83,7 +85,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is true\n   \
+            &["assertion failed: expected subject to be true\n   \
                but was: \u{1b}[31mfalse\u{1b}[0m\n  \
               expected: \u{1b}[32mtrue\u{1b}[0m\n\
             "]
@@ -99,7 +101,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is false\n   \
+            &["assertion failed: expected subject to be false\n   \
                but was: \u{1b}[31mtrue\u{1b}[0m\n  \
               expected: \u{1b}[33mfalse\u{1b}[0m\n\
             "]

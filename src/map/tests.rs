@@ -88,7 +88,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains key 7
+                r"assertion failed: expected foo_map to contain the key 7
    but was: {formatted_actual}
   expected: 7
 "
@@ -116,9 +116,9 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map does not contain key 5
+                r"assertion failed: expected foo_map to not contain the key 5
    but was: {formatted_actual}
-  expected: 5
+  expected: not 5
 "
             )]
         );
@@ -158,7 +158,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map contains value "six"
+                r#"assertion failed: expected foo_map to contain the value "six"
    but was: {formatted_actual}
   expected: "six"
 "#
@@ -186,9 +186,9 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map does not contain value "five"
+                r#"assertion failed: expected foo_map to not contain the value "five"
    but was: {formatted_actual}
-  expected: "five"
+  expected: not "five"
 "#
             )]
         );
@@ -214,7 +214,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 4]
    but was: {formatted_actual}
   expected: [5, 3, 4]
    missing: [3]
@@ -236,7 +236,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 4]
    but was: {formatted_actual}
   expected: [5, 3, 4]
    missing: [3]
@@ -258,7 +258,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 4]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 4]
    but was: {formatted_actual}
   expected: [5, 3, 4]
    missing: [3]
@@ -287,7 +287,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+                r#"assertion failed: expected foo_map to contain the values ["one", "two", "three"]
    but was: {formatted_actual}
   expected: ["one", "two", "three"]
    missing: ["two", "three"]
@@ -323,7 +323,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map does not contain keys [5, 3, 4]
+                r"assertion failed: expected foo_map to not contain the keys [5, 3, 4]
    but was: {formatted_actual}
   expected: [5, 3, 4]
      extra: {formatted_extra}
@@ -352,7 +352,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map does not contain values ["one", "two", "three"]
+                r#"assertion failed: expected foo_map to not contain the values ["one", "two", "three"]
    but was: {formatted_actual}
   expected: ["one", "two", "three"]
      extra: ["one"]
@@ -388,7 +388,7 @@ mod hashbrown {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]
+                r"assertion failed: expected foo_map to contain exactly the keys [5, 2, 6, 3]
    but was: {formatted_actual}
   expected: [5, 2, 6, 3]
    missing: [2, 3]
@@ -489,7 +489,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains key 7
+                r"assertion failed: expected foo_map to contain the key 7
    but was: {formatted_actual}
   expected: 7
 "
@@ -517,9 +517,9 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map does not contain key 4
+                r"assertion failed: expected foo_map to not contain the key 4
    but was: {formatted_actual}
-  expected: 4
+  expected: not 4
 "
             )]
         );
@@ -559,7 +559,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map contains value "six"
+                r#"assertion failed: expected foo_map to contain the value "six"
    but was: {formatted_actual}
   expected: "six"
 "#
@@ -587,9 +587,9 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map does not contain value "four"
+                r#"assertion failed: expected foo_map to not contain the value "four"
    but was: {formatted_actual}
-  expected: "four"
+  expected: not "four"
 "#
             )]
         );
@@ -615,7 +615,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+                r"assertion failed: expected foo_map to contain the keys [2, 3, 5]
    but was: {formatted_actual}
   expected: [2, 3, 5]
    missing: [2, 3]
@@ -637,7 +637,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+                r"assertion failed: expected foo_map to contain the keys [2, 3, 5]
    but was: {formatted_actual}
   expected: [2, 3, 5]
    missing: [2, 3]
@@ -659,7 +659,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [2, 3, 5]
+                r"assertion failed: expected foo_map to contain the keys [2, 3, 5]
    but was: {formatted_actual}
   expected: [2, 3, 5]
    missing: [2, 3]
@@ -688,7 +688,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+                r#"assertion failed: expected foo_map to contain the values ["one", "two", "three"]
    but was: {formatted_actual}
   expected: ["one", "two", "three"]
    missing: ["two", "three"]
@@ -717,7 +717,7 @@ mod std_hash_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains exactly the keys [4, 5, 6, 3]
+                r"assertion failed: expected foo_map to contain exactly the keys [4, 5, 6, 3]
    but was: {formatted_actual}
   expected: [4, 5, 6, 3]
    missing: [3]
@@ -816,7 +816,7 @@ mod btree_map {
 
         assert_eq!(
             failures,
-            &[r#"assertion failed: expected foo_map contains key 7
+            &[r#"assertion failed: expected foo_map to contain the key 7
    but was: {1: "one", 4: "four", 5: "five"}
   expected: 7
 "#]
@@ -841,10 +841,12 @@ mod btree_map {
 
         assert_eq!(
             failures,
-            &[r#"assertion failed: expected foo_map does not contain key 1
+            &[
+                r#"assertion failed: expected foo_map to not contain the key 1
    but was: {1: "one", 4: "four", 5: "five"}
-  expected: 1
-"#]
+  expected: not 1
+"#
+            ]
         );
     }
 
@@ -880,10 +882,12 @@ mod btree_map {
 
         assert_eq!(
             failures,
-            &[r#"assertion failed: expected foo_map contains value "six"
+            &[
+                r#"assertion failed: expected foo_map to contain the value "six"
    but was: {1: "one", 4: "four", 5: "five"}
   expected: "six"
-"#]
+"#
+            ]
         );
     }
 
@@ -906,9 +910,9 @@ mod btree_map {
         assert_eq!(
             failures,
             &[
-                r#"assertion failed: expected foo_map does not contain value "one"
+                r#"assertion failed: expected foo_map to not contain the value "one"
    but was: {1: "one", 4: "four", 5: "five"}
-  expected: "one"
+  expected: not "one"
 "#
             ]
         );
@@ -934,7 +938,7 @@ mod btree_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 7]
    but was: {formatted_actual}
   expected: [5, 3, 7]
    missing: [3, 7]
@@ -956,7 +960,7 @@ mod btree_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 7]
    but was: {formatted_actual}
   expected: [5, 3, 7]
    missing: [3, 7]
@@ -978,7 +982,7 @@ mod btree_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains keys [5, 3, 7]
+                r"assertion failed: expected foo_map to contain the keys [5, 3, 7]
    but was: {formatted_actual}
   expected: [5, 3, 7]
    missing: [3, 7]
@@ -1007,7 +1011,7 @@ mod btree_map {
         assert_eq!(
             failures,
             &[format!(
-                r#"assertion failed: expected foo_map contains values ["one", "two", "three"]
+                r#"assertion failed: expected foo_map to contain the values ["one", "two", "three"]
    but was: {formatted_actual}
   expected: ["one", "two", "three"]
    missing: ["two", "three"]
@@ -1043,7 +1047,7 @@ mod btree_map {
         assert_eq!(
             failures,
             &[format!(
-                r"assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]
+                r"assertion failed: expected foo_map to contain exactly the keys [5, 2, 6, 3]
    but was: {formatted_actual}
   expected: [5, 2, 6, 3]
    missing: [2, 3]
@@ -1079,7 +1083,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map contains key 2\n   \
+                "assertion failed: expected foo_map to contain the key 2\n   \
                 but was: {formatted_actual}\n  \
                expected: \u{1b}[32m2\u{1b}[0m\n\
             "
@@ -1102,9 +1106,9 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map does not contain key 1\n   \
+                "assertion failed: expected foo_map to not contain the key 1\n   \
                 but was: {formatted_actual}\n  \
-               expected: \u{1b}[32m1\u{1b}[0m\n\
+               expected: not \u{1b}[32m1\u{1b}[0m\n\
             "
             )]
         );
@@ -1128,7 +1132,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map contains value \"three\"\n   \
+                "assertion failed: expected foo_map to contain the value \"three\"\n   \
                 but was: {formatted_actual}\n  \
                expected: \u{1b}[32m\"three\"\u{1b}[0m\n\
             "
@@ -1151,9 +1155,9 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map does not contain value \"four\"\n   \
+                "assertion failed: expected foo_map to not contain the value \"four\"\n   \
                 but was: {formatted_actual}\n  \
-               expected: \u{1b}[32m\"four\"\u{1b}[0m\n\
+               expected: not \u{1b}[32m\"four\"\u{1b}[0m\n\
             "
             )]
         );
@@ -1175,7 +1179,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map contains keys [5, 2, 4, 7]\n   \
+                "assertion failed: expected foo_map to contain the keys [5, 2, 4, 7]\n   \
                 but was: {formatted_actual}\n  \
                expected: [5, \u{1b}[32m2\u{1b}[0m, 4, \u{1b}[32m7\u{1b}[0m]\n   \
                 missing: [2, 7]\n\
@@ -1207,7 +1211,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map does not contain keys [5, 2, 4, 7]\n   \
+                "assertion failed: expected foo_map to not contain the keys [5, 2, 4, 7]\n   \
                 but was: {formatted_actual}\n  \
                expected: [\u{1b}[32m5\u{1b}[0m, 2, \u{1b}[32m4\u{1b}[0m, 7]\n     \
                   extra: {formatted_extra}\n\
@@ -1232,7 +1236,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map contains values [\"five\", \"two\", \"four\", \"seven\"]\n   \
+                "assertion failed: expected foo_map to contain the values [\"five\", \"two\", \"four\", \"seven\"]\n   \
                     but was: {formatted_actual}\n  \
                    expected: [\"five\", \u{1b}[32m\"two\"\u{1b}[0m, \"four\", \u{1b}[32m\"seven\"\u{1b}[0m]\n   \
                     missing: [\"two\", \"seven\"]\n\
@@ -1264,7 +1268,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map does not contain values [\"five\", \"two\", \"four\", \"seven\"]\n   \
+                "assertion failed: expected foo_map to not contain the values [\"five\", \"two\", \"four\", \"seven\"]\n   \
                     but was: {formatted_actual}\n  \
                    expected: [\u{1b}[32m\"five\"\u{1b}[0m, \"two\", \u{1b}[32m\"four\"\u{1b}[0m, \"seven\"]\n     \
                       extra: {formatted_extra}\n\
@@ -1296,7 +1300,7 @@ mod colored {
         assert_eq!(
             failures,
             &[format!(
-                "assertion failed: expected foo_map contains exactly the keys [5, 2, 6, 3]\n   \
+                "assertion failed: expected foo_map to contain exactly the keys [5, 2, 6, 3]\n   \
                     but was: {formatted_actual}\n  \
                    expected: [5, \u{1b}[32m2\u{1b}[0m, 6, \u{1b}[32m3\u{1b}[0m]\n   \
                     missing: [2, 3]\n     \

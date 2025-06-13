@@ -5,11 +5,11 @@ use crate::colored::{
 };
 use crate::expectations::{
     MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
-    MapDoesNotContainKey, MapDoesNotContainKeys, MapDoesNotContainValue, MapDoesNotContainValues,
+    MapDoesNotContainKeys, MapDoesNotContainValues, Not,
 };
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::string::String;
@@ -29,7 +29,7 @@ where
     }
 
     fn does_not_contain_key(self, expected_key: E) -> Self {
-        self.expecting(MapDoesNotContainKey { expected_key })
+        self.expecting(Not(MapContainsKey { expected_key }))
     }
 
     fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
@@ -56,50 +56,45 @@ where
         subject.keys_property().any(|k| k == &self.expected_key)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_key = &self.expected_key;
         let actual_entries: Vec<_> = actual.entries_property().collect();
-        let marked_actual =
-            mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+        let (not, marked_actual) = if inverted {
+            let found: HashSet<usize> = actual_entries
+                .iter()
+                .enumerate()
+                .filter_map(|(index, (k, _))| {
+                    if *k == &self.expected_key {
+                        Some(index)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            let selected_entries_marked = mark_selected_entries_in_map(
+                &actual_entries,
+                &found,
+                format,
+                mark_unexpected_substr,
+            );
+            ("not ", selected_entries_marked)
+        } else {
+            let all_entries_marked =
+                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+            ("", all_entries_marked)
+        };
         let marked_expected = mark_missing(&self.expected_key, format);
-
-        format!("expected {expression} contains key {expected_key:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!("expected {expression} to {not}contain the key {expected_key:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
     }
 }
 
-impl<M, E> Expectation<M> for MapDoesNotContainKey<E>
-where
-    M: MapProperties,
-    <M as MapProperties>::Key: PartialEq<E> + Debug,
-    <M as MapProperties>::Value: Debug,
-    E: Debug,
-{
-    fn test(&mut self, subject: &M) -> bool {
-        subject.keys_property().all(|k| k != &self.expected_key)
-    }
-
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
-        let expected_key = &self.expected_key;
-        let actual_entries: Vec<_> = actual.entries_property().collect();
-        let found: HashSet<usize> = actual_entries
-            .iter()
-            .enumerate()
-            .filter_map(|(index, (k, _))| {
-                if *k == &self.expected_key {
-                    Some(index)
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_substr);
-        let marked_expected = mark_missing(&self.expected_key, format);
-
-        format!("expected {expression} does not contain key {expected_key:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
-    }
-}
+impl<E> Invertible for MapContainsKey<E> {}
 
 impl<M, E> Expectation<M> for MapContainsKeys<E>
 where
@@ -119,7 +114,13 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_keys = &self.expected_keys;
         let missing = &self.missing;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -143,7 +144,7 @@ where
         let missing_keys = collect_selected_values(missing, expected_keys);
 
         format!(
-            r"expected {expression} contains keys {expected_keys:?}
+            r"expected {expression} to contain the keys {expected_keys:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing_keys:?}"
@@ -169,7 +170,13 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_keys = &self.expected_keys;
         let extra = &self.extra;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -187,7 +194,7 @@ where
         let extra_keys = collect_selected_values(&found, &actual_keys);
 
         format!(
-            r"expected {expression} does not contain keys {expected_keys:?}
+            r"expected {expression} to not contain the keys {expected_keys:?}
    but was: {marked_actual}
   expected: {marked_expected}
      extra: {extra_keys:?}"
@@ -218,7 +225,13 @@ where
         missing.is_empty() && extra.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_keys = &self.expected_keys;
         let missing = &self.missing;
         let extra = &self.extra;
@@ -233,7 +246,7 @@ where
         let extra_keys = collect_selected_values(extra, &actual_keys);
 
         format!(
-            r"expected {expression} contains exactly the keys {expected_keys:?}
+            r"expected {expression} to contain exactly the keys {expected_keys:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing_keys:?}
@@ -255,7 +268,7 @@ where
     }
 
     fn does_not_contain_value(self, expected_value: E) -> Self {
-        self.expecting(MapDoesNotContainValue { expected_value })
+        self.expecting(Not(MapContainsValue { expected_value }))
     }
 
     fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self {
@@ -278,50 +291,46 @@ where
         subject.values_property().any(|v| v == &self.expected_value)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_value = &self.expected_value;
         let actual_entries: Vec<_> = actual.entries_property().collect();
-        let marked_actual =
-            mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+        let (not, marked_actual) = if inverted {
+            let found: HashSet<usize> = actual_entries
+                .iter()
+                .enumerate()
+                .filter_map(|(index, (_, v))| {
+                    if *v == &self.expected_value {
+                        Some(index)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            let selected_entries_marked = mark_selected_entries_in_map(
+                &actual_entries,
+                &found,
+                format,
+                mark_unexpected_substr,
+            );
+            ("not ", selected_entries_marked)
+        } else {
+            let all_entries_marked =
+                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+            ("", all_entries_marked)
+        };
         let marked_expected = mark_missing(&self.expected_value, format);
 
-        format!("expected {expression} contains value {expected_value:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!("expected {expression} to {not}contain the value {expected_value:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
     }
 }
 
-impl<M, E> Expectation<M> for MapDoesNotContainValue<E>
-where
-    M: MapProperties,
-    <M as MapProperties>::Key: Debug,
-    <M as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
-{
-    fn test(&mut self, subject: &M) -> bool {
-        subject.values_property().all(|v| v != &self.expected_value)
-    }
-
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
-        let expected_value = &self.expected_value;
-        let actual_entries: Vec<_> = actual.entries_property().collect();
-        let found: HashSet<usize> = actual_entries
-            .iter()
-            .enumerate()
-            .filter_map(|(index, (_, v))| {
-                if *v == &self.expected_value {
-                    Some(index)
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_substr);
-        let marked_expected = mark_missing(&self.expected_value, format);
-
-        format!("expected {expression} does not contain value {expected_value:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
-    }
-}
+impl<E> Invertible for MapContainsValue<E> {}
 
 impl<M, E> Expectation<M> for MapContainsValues<E>
 where
@@ -341,7 +350,13 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_values = &self.expected_values;
         let missing = &self.missing;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -365,7 +380,7 @@ where
         let missing_values = collect_selected_values(missing, expected_values);
 
         format!(
-            r"expected {expression} contains values {expected_values:?}
+            r"expected {expression} to contain the values {expected_values:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing_values:?}"
@@ -391,7 +406,13 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &M, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &M,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let expected_values = &self.expected_values;
         let extra = &self.extra;
         let actual_entries: Vec<_> = actual.entries_property().collect();
@@ -412,7 +433,7 @@ where
         let extra_values = collect_selected_values(&found, &actual_values);
 
         format!(
-            r"expected {expression} does not contain values {expected_values:?}
+            r"expected {expression} to not contain the values {expected_values:?}
    but was: {marked_actual}
   expected: {marked_expected}
      extra: {extra_values:?}"

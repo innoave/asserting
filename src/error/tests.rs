@@ -57,7 +57,7 @@ fn verify_error_has_no_source_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my error has no source
+        &[r"assertion failed: expected my error to have no source
    but was: SuperError { source: Foo }
   expected: <error with no source>
 "]
@@ -84,7 +84,7 @@ fn verify_error_has_source_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my error has a source
+        &[r"assertion failed: expected my error to have a source
    but was: Bar
   expected: <error with some source>
 "]
@@ -114,7 +114,7 @@ fn verify_error_has_source_message_fails_wrong_source() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my error has source message "foo error"
+            r#"assertion failed: expected my error to have a source message equal to "foo error"
    but was: "bar error"
   expected: "foo error"
 "#
@@ -134,7 +134,7 @@ fn verify_error_has_source_message_fails_error_without_source() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my error has source message "foo error"
+            r#"assertion failed: expected my error to have a source message equal to "foo error"
    but was: Foo - which has no source
   expected: "foo error"
 "#
@@ -172,7 +172,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject has no source\n   \
+            &["assertion failed: expected subject to have no source\n   \
                 but was: \u{1b}[31mSuperError { source: Foo }\u{1b}[0m\n  \
                expected: \u{1b}[33m<error with no source>\u{1b}[0m\n\
             "]
@@ -190,7 +190,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject has a source\n   \
+            &["assertion failed: expected subject to have a source\n   \
                 but was: \u{1b}[31mFoo\u{1b}[0m\n  \
                expected: \u{1b}[33m<error with some source>\u{1b}[0m\n\
             "]
@@ -211,7 +211,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject has source message \"foo error\"\n   \
+                "assertion failed: expected subject to have a source message equal to \"foo error\"\n   \
                     but was: \"\u{1b}[31mbar error\u{1b}[0m\"\n  \
                    expected: \"\u{1b}[33mfoo error\u{1b}[0m\"\n\
             "
@@ -231,7 +231,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject has source message \"foo error\"\n   \
+                "assertion failed: expected subject to have a source message equal to \"foo error\"\n   \
                     but was: \u{1b}[31mFoo\u{1b}[0m - which has no source\n  \
                    expected: \u{1b}[33m\"foo error\"\u{1b}[0m\n\
             "

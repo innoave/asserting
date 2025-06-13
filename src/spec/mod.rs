@@ -430,8 +430,27 @@ pub trait Expectation<S: ?Sized> {
     fn test(&mut self, subject: &S) -> bool;
 
     /// Forms a failure message for this expectation.
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String;
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String;
 }
+
+/// Marks an expectation that it can be inverted by using the [`Not`]
+/// combinator.
+///
+/// An expectation is any type that implements the [`Expectation`] trait.
+///
+/// This trait is meant to be implemented in combination with the
+/// [`Expectation`] trait. It should only be implemented for an expectation if
+/// the inverted test is unmistakably meaningful, and if the failure message
+/// clearly states whether the expectation has been inverted or not.
+///
+/// [`Not`]: crate::expectations::Not
+pub trait Invertible {}
 
 /// A textual representation of the expression or subject that is being
 /// asserted.
@@ -861,7 +880,7 @@ where
         if !expectation.test(&self.subject) {
             let default_expression = Expression::default();
             let expression = self.expression.as_ref().unwrap_or(&default_expression);
-            let message = expectation.message(expression, &self.subject, &self.diff_format);
+            let message = expectation.message(expression, &self.subject, false, &self.diff_format);
             self.do_fail_with_message(message);
         }
         self
@@ -1007,7 +1026,7 @@ impl<S> Spec<'_, S, CollectFailures> {
     ///    but was: "the answer to all important questions is 42"
     ///   expected: "unimportant"
     ///
-    /// assertion failed: expected subject has at most a length of 41
+    /// assertion failed: expected subject to have at most a length of 41
     ///    but was: 43
     ///   expected: <= 41
     /// ```
@@ -1066,15 +1085,15 @@ impl<'a, I, R> Spec<'a, I, R> {
     /// will print:
     ///
     /// ```console
-    /// assertion failed: expected numbers 1. item is greater than 2
+    /// assertion failed: expected numbers 1. item to be greater than 2
     ///    but was: 2
     ///   expected: > 2
     ///
-    /// assertion failed: expected numbers 4. item is at most 7
+    /// assertion failed: expected numbers 4. item to be at most 7
     ///    but was: 8
     ///   expected: <= 7
     ///
-    /// assertion failed: expected numbers 5. item is at most 7
+    /// assertion failed: expected numbers 5. item to be at most 7
     ///    but was: 10
     ///   expected: <= 7
     /// ```
@@ -1257,7 +1276,7 @@ impl FailingStrategy for CollectFailures {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: &Expression<'_>, actual: &Result<T, E>, _format: &DiffFormat) -> String {
+///     fn message(&self, expression: &Expression<'_>, actual: &Result<T, E>, _inverted: bool, _format: &DiffFormat) -> String {
 ///         format!(
 ///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),

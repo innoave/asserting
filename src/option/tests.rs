@@ -56,7 +56,7 @@ fn verify_option_of_custom_struct_is_none_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is None
+        &[r"assertion failed: expected my_thing to be None
    but was: Some(Foo)
   expected: None
 "]
@@ -87,7 +87,7 @@ fn verify_option_of_custom_struct_is_some_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is Some(_)
+        &[r"assertion failed: expected my_thing to be Some(_)
    but was: None
   expected: Some(_)
 "]
@@ -118,7 +118,7 @@ fn verify_borrowed_option_of_custom_struct_is_none_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is None
+        &[r"assertion failed: expected my_thing to be None
    but was: Some(Foo)
   expected: None
 "]
@@ -149,7 +149,7 @@ fn verify_borrowed_option_of_custom_struct_is_some_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is Some(_)
+        &[r"assertion failed: expected my_thing to be Some(_)
    but was: None
   expected: Some(_)
 "]
@@ -195,7 +195,7 @@ fn verify_option_of_string_has_some_value_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing is some containing "labore dolores voluptate culpa"
+            r#"assertion failed: expected my_thing to be some containing "labore dolores voluptate culpa"
    but was: Some("labore dolore voluptate culpa")
   expected: Some("labore dolores voluptate culpa")
 "#
@@ -241,10 +241,12 @@ fn verify_option_of_custom_struct_has_value_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is some containing Foo
+        &[
+            r"assertion failed: expected my_thing to be some containing Foo
    but was: None
   expected: Some(Foo)
-"]
+"
+        ]
     );
 }
 
@@ -272,10 +274,12 @@ fn verify_borrowed_option_of_custom_struct_has_value_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is some containing Foo
+        &[
+            r"assertion failed: expected my_thing to be some containing Foo
    but was: None
   expected: Some(Foo)
-"]
+"
+        ]
     );
 }
 
@@ -341,7 +345,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is Some(_)\n   \
+            &["assertion failed: expected subject to be Some(_)\n   \
                 but was: \u{1b}[31mNone\u{1b}[0m\n  \
                expected: \u{1b}[33mSome(_)\u{1b}[0m\n\
         "]
@@ -359,7 +363,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is None\n   \
+            &["assertion failed: expected subject to be None\n   \
                 but was: \u{1b}[31mSome(3500)\u{1b}[0m\n  \
                expected: \u{1b}[33mNone\u{1b}[0m\n\
         "]
@@ -378,7 +382,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject is some containing [1, 2, 3, 5, 7]\n   \
+                "assertion failed: expected subject to be some containing [1, 2, 3, 5, 7]\n   \
                 but was: \u{1b}[31mNone\u{1b}[0m\n  \
                expected: \u{1b}[33mSome([1, 2, 3, 5, 7])\u{1b}[0m\n\
         "

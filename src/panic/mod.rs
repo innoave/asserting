@@ -54,6 +54,7 @@ where
         &self,
         expression: &Expression<'_>,
         _actual: &Code<S>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         let panic_message = read_panic_message(self.actual_message.as_ref())
@@ -103,6 +104,7 @@ where
         &self,
         expression: &Expression<'_>,
         _actual: &Code<S>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         if let Some(actual_message) = self.actual_message.as_ref() {

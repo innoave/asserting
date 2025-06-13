@@ -5,7 +5,9 @@ use crate::assertions::{
 };
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasValue, IsNone, IsSome};
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
+use crate::spec::{
+    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
+};
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 
@@ -99,13 +101,14 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Option<T>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         let expected = Some(Unknown);
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -115,21 +118,17 @@ where
     T: Debug,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        subject.is_some()
+        <Self as Expectation<Option<T>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Option<T>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = Some(Unknown);
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
-        format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -145,13 +144,14 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Option<T>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         let expected = None::<Unknown>;
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -161,21 +161,17 @@ where
     T: Debug,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        subject.is_none()
+        <Self as Expectation<Option<T>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Option<T>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = None::<Unknown>;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
-        format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -194,14 +190,18 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Option<T>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
+        let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&Some(expected), format);
-        format!("expected {expression} is some containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!("expected {expression} to be some {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
     }
 }
+
+impl<E> Invertible for HasValue<E> {}
 
 impl<T, E> Expectation<&Option<T>> for HasValue<E>
 where
@@ -209,21 +209,17 @@ where
     E: Debug,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        subject
-            .as_ref()
-            .is_some_and(|value| value == &self.expected)
+        <Self as Expectation<Option<T>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Option<T>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = &self.expected;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&Some(expected), format);
-        format!("expected {expression} is some containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
     }
 }
 

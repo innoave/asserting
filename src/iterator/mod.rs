@@ -12,7 +12,7 @@ use crate::expectations::{
     IterContainsSequence, IterEndsWith, IterStartsWith,
 };
 use crate::properties::DefinedOrderProperty;
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
@@ -41,15 +41,24 @@ where
         subject.iter().any(|e| e == &self.expected)
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
         let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
         let marked_expected = mark_missing(&self.expected, format);
         format!(
-            "expected {expression} to contain {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            "expected {expression} to {not}contain {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
             &self.expected,
         )
     }
 }
+
+impl<E> Invertible for IterContains<E> {}
 
 impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
 where
@@ -112,7 +121,13 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let missing = collect_selected_values(&self.missing, &self.expected);
         let extra = collect_selected_values(&self.extra, actual);
         let marked_actual =
@@ -121,7 +136,7 @@ where
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
 
         format!(
-            r"expected {expression} contains exactly in any order {:?}
+            r"expected {expression} to contain exactly in any order {:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
@@ -145,11 +160,17 @@ where
         false
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
         let marked_expected = mark_all_items_in_collection(&self.expected, format, mark_missing);
         format!(
-            r"expected {expression} contains any of {:?}
+            r"expected {expression} to contain any of {:?}
    but was: {marked_actual}
   expected: {marked_expected}",
             &self.expected,
@@ -174,7 +195,13 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let mut extra = HashSet::new();
         for (actual_index, actual) in actual.iter().enumerate() {
             if !self.expected.iter().any(|expected| actual == expected) {
@@ -188,7 +215,7 @@ where
         let missing = collect_selected_values(&self.missing, &self.expected);
 
         format!(
-            r"expected {expression} contains all of {:?}
+            r"expected {expression} to contain all of {:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}",
@@ -214,7 +241,13 @@ where
         extra.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let mut missing = HashSet::new();
         for (expected_index, expected) in self.expected.iter().enumerate() {
             if !actual.iter().any(|value| value == expected) {
@@ -228,7 +261,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} contains only {:?}
+            r"expected {expression} to contain only {:?}
    but was: {marked_actual}
   expected: {marked_expected}
      extra: {extra:?}",
@@ -259,7 +292,13 @@ where
         duplicates.is_empty() && extra.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let actual_duplicates_and_extras = self.duplicates.union(&self.extra).copied().collect();
         let marked_actual = mark_selected_items_in_collection(
             actual,
@@ -285,7 +324,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} contains only once {:?}
+            r"expected {expression} to contain only once {:?}
      but was: {marked_actual}
     expected: {marked_expected}
        extra: {extra:?}
@@ -378,7 +417,13 @@ where
         out_of_order.is_empty() && extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let out_of_order = collect_selected_values(&self.out_of_order, actual);
         let mut expected_indices = self.missing.clone();
         for (expected_index, expected) in self.expected.iter().enumerate() {
@@ -400,7 +445,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} contains exactly in order {:?}
+            r"expected {expression} to contain exactly in order {:?}
        but was: {marked_actual}
       expected: {marked_expected}
        missing: {missing:?}
@@ -477,7 +522,13 @@ where
         false
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let marked_actual =
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
@@ -486,7 +537,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} contains sequence {:?}
+            r"expected {expression} to contain the sequence {:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
@@ -519,13 +570,19 @@ where
         missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let marked_expected =
             mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
         let missing = collect_selected_values(&self.missing, &self.expected);
 
         format!(
-            r"expected {expression} contains all of {:?} in order
+            r"expected {expression} to contain all of {:?} in order
    but was: {actual:?}
   expected: {marked_expected}
    missing: {missing:?}",
@@ -562,7 +619,13 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let marked_actual =
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
@@ -571,7 +634,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} starts with {:?}
+            r"expected {expression} to start with {:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
@@ -609,7 +672,13 @@ where
         extra.is_empty() && missing.is_empty()
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &Vec<T>, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
         let marked_actual =
             mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
         let marked_expected =
@@ -618,7 +687,7 @@ where
         let extra = collect_selected_values(&self.extra, actual);
 
         format!(
-            r"expected {expression} ends with {:?}
+            r"expected {expression} to end with {:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
