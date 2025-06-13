@@ -35,7 +35,7 @@ fn verify_f64_is_negative_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is negative
+        &[r"assertion failed: expected some_number to be negative
    but was: 0.0
   expected: < 0
 "]
@@ -79,7 +79,7 @@ fn verify_f64_is_not_negative_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is not negative
+        &[r"assertion failed: expected some_number to be not negative
    but was: -0.001
   expected: >= 0
 "]
@@ -119,7 +119,7 @@ fn verify_f64_is_positive_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is positive
+        &[r"assertion failed: expected some_number to be positive
    but was: 0.0
   expected: > 0
 "]
@@ -163,7 +163,7 @@ fn verify_f64_is_not_positive_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is not positive
+        &[r"assertion failed: expected some_number to be not positive
    but was: 0.001
   expected: <= 0
 "]
@@ -199,7 +199,7 @@ fn verify_f64_is_zero_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is zero
+        &[r"assertion failed: expected some_number to be zero
    but was: 1.0
   expected: 0.0
 "]
@@ -235,7 +235,7 @@ fn verify_f64_is_one_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is one
+        &[r"assertion failed: expected some_number to be one
    but was: 0.0
   expected: 1.0
 "]
@@ -285,7 +285,7 @@ fn verify_f64_is_finite_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is finite
+        &[r"assertion failed: expected some_number to be finite
    but was: -inf
   expected: a finite number
 "]
@@ -320,7 +320,7 @@ fn verify_f64_is_infinite_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is infinite
+        &[r"assertion failed: expected some_number to be infinite
    but was: 0.0
   expected: an infinite number
 "]
@@ -374,7 +374,7 @@ fn verify_f64_is_a_number_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is a number
+        &[r"assertion failed: expected some_number to be a number
    but was: NaN
   expected: a number
 "]
@@ -395,12 +395,10 @@ fn verify_f32_is_not_a_number_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected some_number is not a number (NaN)
+        &[r"assertion failed: expected some_number to be not a number
    but was: 0.0
   expected: NaN
-"
-        ]
+"]
     );
 }
 
@@ -429,12 +427,10 @@ fn verify_f64_is_not_a_number_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected some_number is not a number (NaN)
+        &[r"assertion failed: expected some_number to be not a number
    but was: 0.0
   expected: NaN
-"
-        ]
+"]
     );
 }
 
@@ -456,7 +452,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is close to 3.15
+            &[r"assertion failed: expected tau / 2 to be close to 3.15
   within a margin of epsilon=4.7683716e-7 and ulps=4
    but was: 3.14
   expected: 3.15
@@ -478,7 +474,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is not close to 3.14
+            &[r"assertion failed: expected tau / 2 to be not close to 3.14
   within a margin of epsilon=4.7683716e-7 and ulps=4
    but was: 3.14
   expected: 3.14
@@ -500,7 +496,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is close to 3.15
+            &[r"assertion failed: expected tau / 2 to be close to 3.15
   within a margin of epsilon=2.3841858e-7 and ulps=3
    but was: 3.14
   expected: 3.15
@@ -522,7 +518,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is not close to 3.14
+            &[r"assertion failed: expected tau / 2 to be not close to 3.14
   within a margin of epsilon=2.3841858e-7 and ulps=3
    but was: 3.14
   expected: 3.14
@@ -544,7 +540,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is close to 3.15
+            &[r"assertion failed: expected tau / 2 to be close to 3.15
   within a margin of epsilon=8.881784197001252e-16 and ulps=4
    but was: 3.14
   expected: 3.15
@@ -566,7 +562,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is not close to 3.14
+            &[r"assertion failed: expected tau / 2 to be not close to 3.14
   within a margin of epsilon=8.881784197001252e-16 and ulps=4
    but was: 3.14
   expected: 3.14
@@ -588,7 +584,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is close to 3.15
+            &[r"assertion failed: expected tau / 2 to be close to 3.15
   within a margin of epsilon=4.440892098500626e-16 and ulps=3
    but was: 3.14
   expected: 3.15
@@ -610,7 +606,7 @@ mod cmp {
 
         assert_eq!(
             failures,
-            &[r"assertion failed: expected tau / 2 is not close to 3.14
+            &[r"assertion failed: expected tau / 2 to be not close to 3.14
   within a margin of epsilon=4.440892098500626e-16 and ulps=3
    but was: 3.14
   expected: 3.14
@@ -631,11 +627,13 @@ mod cmp {
 
             assert_eq!(
                 failures,
-                &["assertion failed: expected subject is close to 3.15148\n  \
+                &[
+                    "assertion failed: expected subject to be close to 3.15148\n  \
                 within a margin of epsilon=2.3841858e-7 and ulps=3\n   \
                  but was: 3.1\u{1b}[31m41\u{1b}[0m5\u{1b}[31m9\u{1b}[0m\n  \
                 expected: 3.15\u{1b}[34m148\u{1b}[0m\n\
-            "]
+            "
+                ]
             );
         }
 
@@ -648,11 +646,13 @@ mod cmp {
 
             assert_eq!(
                 failures,
-                &["assertion failed: expected subject is close to 3.15148\n  \
+                &[
+                    "assertion failed: expected subject to be close to 3.15148\n  \
                 within a margin of epsilon=4.440892098500626e-16 and ulps=3\n   \
                  but was: 3.1\u{1b}[31m41\u{1b}[0m5\u{1b}[31m9\u{1b}[0m\n  \
                 expected: 3.15\u{1b}[34m148\u{1b}[0m\n\
-            "]
+            "
+                ]
             );
         }
     }

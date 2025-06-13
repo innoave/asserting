@@ -64,11 +64,18 @@ where
         subject.char_count_property() == self.expected_char_count
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not in " } else { "" };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
-            "expected {expression} has a char count of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            "expected {expression} to {not}have a char count of {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
             self.expected_char_count
         )
     }
@@ -83,11 +90,18 @@ where
         self.expected_range.contains(&subject.char_count_property())
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not in " } else { "" };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_range, format);
         format!(
-            "expected {expression} has a char count of {:?}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            "expected {expression} to {not}have a char count within {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
             self.expected_range,
         )
     }
@@ -101,11 +115,18 @@ where
         subject.char_count_property() < self.expected_char_count
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", ">=") } else { ("", "<") };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
-            "expected {expression} has a char count less than {:?}\n   but was: {marked_actual}\n  expected: < {marked_expected}",
+            "expected {expression} to {not}have a char count less than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected_char_count,
         )
     }
@@ -119,11 +140,18 @@ where
         subject.char_count_property() > self.expected_char_count
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", "<=") } else { ("", ">") };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
-            "expected {expression} has a char count greater than {:?}\n   but was: {marked_actual}\n  expected: > {marked_expected}",
+            "expected {expression} to {not}have a char count greater than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected_char_count,
         )
     }
@@ -137,11 +165,18 @@ where
         subject.char_count_property() <= self.expected_char_count
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", ">") } else { ("", "<=") };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
-            "expected {expression} has at most a char count of {:?}\n   but was: {marked_actual}\n  expected: <= {marked_expected}",
+            "expected {expression} to {not}have at most a char count of {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected_char_count,
         )
     }
@@ -155,11 +190,18 @@ where
         subject.char_count_property() >= self.expected_char_count
     }
 
-    fn message(&self, expression: &Expression<'_>, actual: &S, format: &DiffFormat) -> String {
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let (not, cmp) = if inverted { ("not ", "<") } else { ("", ">=") };
         let marked_actual = mark_unexpected(&actual.char_count_property(), format);
         let marked_expected = mark_missing(&self.expected_char_count, format);
         format!(
-            "expected {expression} has at least a char count of {:?}\n   but was: {marked_actual}\n  expected: >= {marked_expected}",
+            "expected {expression} to {not}have at least a char count of {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
             self.expected_char_count,
         )
     }

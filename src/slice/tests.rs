@@ -32,7 +32,7 @@ fn verify_slice_is_equal_to_another_slice_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing is equal to [2, 4, 6, 8]
+            r"assertion failed: expected my_thing to be equal to [2, 4, 6, 8]
    but was: [1, 3, 5, 7]
   expected: [2, 4, 6, 8]
 "
@@ -94,7 +94,7 @@ fn verify_slice_has_length_less_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a length less than 6
+            r"assertion failed: expected my_thing to have a length less than 6
    but was: 6
   expected: < 6
 "
@@ -121,7 +121,7 @@ fn verify_slice_has_length_greater_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a length greater than 6
+            r"assertion failed: expected my_thing to have a length greater than 6
    but was: 6
   expected: > 6
 "
@@ -149,7 +149,7 @@ fn verify_slice_has_at_most_length_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at most a length of 5
+            r"assertion failed: expected my_thing to have at most a length of 5
    but was: 6
   expected: <= 5
 "
@@ -177,7 +177,7 @@ fn verify_slice_has_at_least_length_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at least a length of 7
+            r"assertion failed: expected my_thing to have at least a length of 7
    but was: 6
   expected: >= 7
 "
@@ -262,7 +262,7 @@ fn verify_slice_contains_exactly_in_any_order_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains exactly in any order [0, 1, 3, 5, 7, 11, 11, 13, 17, 19, 23, 29, 31, 37, 41]
+            r"assertion failed: expected my_thing to contain exactly in any order [0, 1, 3, 5, 7, 11, 11, 13, 17, 19, 23, 29, 31, 37, 41]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [0, 1, 3, 5, 7, 11, 11, 13, 17, 19, 23, 29, 31, 37, 41]
    missing: [0, 19]
@@ -291,7 +291,7 @@ fn verify_slice_contains_any_of_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains any of [0, 2, 4, 8, 16, 32, 64]
+            r"assertion failed: expected my_thing to contain any of [0, 2, 4, 8, 16, 32, 64]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [0, 2, 4, 8, 16, 32, 64]
 "
@@ -318,7 +318,7 @@ fn verify_slice_contains_all_of_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains all of [5, 18, 3, 17, 45, 1, 1, 29, 0]
+            r"assertion failed: expected my_thing to contain all of [5, 18, 3, 17, 45, 1, 1, 29, 0]
    but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
   expected: [5, 18, 3, 17, 45, 1, 1, 29, 0]
    missing: [18, 45, 0]
@@ -346,7 +346,7 @@ fn verify_slice_contains_only_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains only [1, 3, 7, 11, 19]
+            r"assertion failed: expected my_thing to contain only [1, 3, 7, 11, 19]
    but was: [5, 11, 1, 3, 19, 17, 11, 43]
   expected: [1, 3, 7, 11, 19]
      extra: [5, 17, 43]
@@ -374,7 +374,7 @@ fn verify_slice_contains_only_once_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing contains only once [1, 3, 7, 11, 19]
+            r"assertion failed: expected my_thing to contain only once [1, 3, 7, 11, 19]
      but was: [5, 11, 1, 3, 3, 19, 17, 11, 3, 43]
     expected: [1, 3, 7, 11, 19]
        extra: [5, 17, 43]
@@ -431,7 +431,7 @@ fn verify_slice_contains_exactly_fails_out_of_order() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains exactly in order ["two", "two", "one", "three", "four", "five", "six", "seven", "four", "eight", "nine"]
+            r#"assertion failed: expected my_thing to contain exactly in order ["two", "two", "one", "three", "four", "five", "six", "seven", "four", "eight", "nine"]
        but was: ["one", "two", "two", "three", "four", "five", "six", "four", "seven", "eight", "nine"]
       expected: ["two", "two", "one", "three", "four", "five", "six", "seven", "four", "eight", "nine"]
        missing: []
@@ -471,7 +471,7 @@ fn verify_slice_contains_exactly_fails_missing_and_extra() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains exactly in order ["one", "two", "two", "three", "four", "five", "six", "six", "seven", "four", "eight", "nine"]
+            r#"assertion failed: expected my_thing to contain exactly in order ["one", "two", "two", "three", "four", "five", "six", "six", "seven", "four", "eight", "nine"]
        but was: ["one", "two", "six", "three", "four", "five", "six", "six", "seven", "eleven", "eight", "nine", "ten"]
       expected: ["one", "two", "two", "three", "four", "five", "six", "six", "seven", "four", "eight", "nine"]
        missing: ["two", "four"]
@@ -509,7 +509,7 @@ fn verify_slice_contains_exactly_fails_expected_longer_than_vec() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains exactly in order ["one", "two", "two", "three", "four", "five", "six", "four", "seven", "eight", "nine", "ten"]
+            r#"assertion failed: expected my_thing to contain exactly in order ["one", "two", "two", "three", "four", "five", "six", "four", "seven", "eight", "nine", "ten"]
        but was: ["one", "two", "two", "three", "four", "five", "six", "four", "seven", "eight", "nine"]
       expected: ["one", "two", "two", "three", "four", "five", "six", "four", "seven", "eight", "nine", "ten"]
        missing: ["ten"]
@@ -572,7 +572,7 @@ fn verify_slice_contains_sequence_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains sequence ["two", "three", "four", "five", "six", "six", "four"]
+            r#"assertion failed: expected my_thing to contain the sequence ["two", "three", "four", "five", "six", "six", "four"]
    but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
   expected: ["two", "three", "four", "five", "six", "six", "four"]
    missing: ["six", "four"]
@@ -601,7 +601,7 @@ fn verify_slice_contains_sequence_fails_expected_longer_than_vec() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains sequence ["one", "two", "three", "four", "five", "six", "seven"]
+            r#"assertion failed: expected my_thing to contain the sequence ["one", "two", "three", "four", "five", "six", "seven"]
    but was: ["one", "two", "three", "four", "five", "six"]
   expected: ["one", "two", "three", "four", "five", "six", "seven"]
    missing: ["seven"]
@@ -666,7 +666,7 @@ fn verify_slice_contains_all_in_order_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing contains all of ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"] in order
+            r#"assertion failed: expected my_thing to contain all of ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"] in order
    but was: ["one", "two", "two", "three", "four", "five", "six", "four", "two", "seven", "two", "three", "five", "four", "six", "four", "eight", "nine", "ten"]
   expected: ["one", "two", "two", "seven", "two", "three", "six", "six", "ten"]
    missing: ["six"]
@@ -715,7 +715,7 @@ fn verify_vec_starts_with_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing starts with [13, 5, 7, 1, 19]
+            r"assertion failed: expected my_thing to start with [13, 5, 7, 1, 19]
    but was: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]
   expected: [13, 5, 7, 1, 19]
    missing: [1, 19]
@@ -737,7 +737,7 @@ fn verify_empty_vec_starts_with_expected_sequence_longer_than_vec_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing starts with [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]
+            r"assertion failed: expected my_thing to start with [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]
    but was: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31]
   expected: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]
    missing: [37]
@@ -787,7 +787,7 @@ fn verify_vec_ends_with_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing ends with [11, 23, 23, 31, 73]
+            r"assertion failed: expected my_thing to end with [11, 23, 23, 31, 73]
    but was: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]
   expected: [11, 23, 23, 31, 73]
    missing: [23, 73]
@@ -809,7 +809,7 @@ fn verify_empty_vec_ends_with_expected_sequence_longer_than_vec_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing ends with [41, 13, 5, 7, 19, 1, 3, 11, 29, 23, 31]
+            r"assertion failed: expected my_thing to end with [41, 13, 5, 7, 19, 1, 3, 11, 29, 23, 31]
    but was: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31]
   expected: [41, 13, 5, 7, 19, 1, 3, 11, 29, 23, 31]
    missing: [41]
@@ -851,7 +851,7 @@ mod colored {
             .display_failures();
 
         assert_eq!(failures, &[
-            "assertion failed: expected subject contains exactly in any order [1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31]\n   \
+            "assertion failed: expected subject to contain exactly in any order [1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31]\n   \
                 but was: [13, \u{1b}[31m5\u{1b}[0m, 7, 19, 1, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, 31, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: [1, \u{1b}[34m2\u{1b}[0m, 3, 13, \u{1b}[34m8\u{1b}[0m, 7, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, 31, 19, \u{1b}[34m20\u{1b}[0m, 11, \u{1b}[34m31\u{1b}[0m]\n   \
                 missing: [2, 8, 12, 15, 20, 31]\n     \
@@ -870,7 +870,7 @@ mod colored {
             .display_failures();
 
         assert_eq!(failures, &[
-            "assertion failed: expected subject contains any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
+            "assertion failed: expected subject to contain any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
                 but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: [\u{1b}[34m2\u{1b}[0m, \u{1b}[34m4\u{1b}[0m, \u{1b}[34m6\u{1b}[0m, \u{1b}[34m8\u{1b}[0m, \u{1b}[34m9\u{1b}[0m, \u{1b}[34m10\u{1b}[0m, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, \u{1b}[34m32\u{1b}[0m, \u{1b}[34m20\u{1b}[0m, \u{1b}[34m18\u{1b}[0m]\n\
             "
@@ -887,7 +887,7 @@ mod colored {
             .display_failures();
 
         assert_eq!(failures, &[
-            "assertion failed: expected subject contains all of [2, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+            "assertion failed: expected subject to contain all of [2, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [\u{1b}[34m2\u{1b}[0m, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n   \
                 missing: [2, 20, 22]\n\
@@ -905,7 +905,7 @@ mod colored {
             .display_failures();
 
         assert_eq!(failures, &[
-            "assertion failed: expected subject contains only [13, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+            "assertion failed: expected subject to contain only [13, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [13, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n     \
                   extra: [7, 1, 29, 23, 31]\n\
@@ -925,7 +925,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject contains only once [1, 3, 7, 11, 19]\n     \
+                "assertion failed: expected subject to contain only once [1, 3, 7, 11, 19]\n     \
                     but was: [\u{1b}[31m5\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, 1, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, 19, \u{1b}[31m17\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m43\u{1b}[0m]\n    \
                    expected: [1, \u{1b}[34m3\u{1b}[0m, \u{1b}[34m7\u{1b}[0m, \u{1b}[34m11\u{1b}[0m, 19]\n       \
                       extra: [5, 17, 43]\n  \
@@ -945,7 +945,7 @@ mod colored {
             .display_failures();
 
         assert_eq!(failures, &[
-            "assertion failed: expected subject contains exactly in order [13, 20, 5, 19, 11, 29, 8, 1, 23, 31, 41]\n       \
+            "assertion failed: expected subject to contain exactly in order [13, 20, 5, 19, 11, 29, 8, 1, 23, 31, 41]\n       \
                     but was: [13, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, 23, 31, \u{1b}[31m37\u{1b}[0m]\n      \
                    expected: [13, \u{1b}[33m20\u{1b}[0m, \u{1b}[33m5\u{1b}[0m, 19, \u{1b}[33m11\u{1b}[0m, \u{1b}[33m29\u{1b}[0m, \u{1b}[33m8\u{1b}[0m, \u{1b}[33m1\u{1b}[0m, 23, 31, \u{1b}[33m41\u{1b}[0m]\n       \
                     missing: [20, 8, 41]\n         \
@@ -967,7 +967,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject contains sequence [19, 3, 7, 11, 29]\n   \
+                "assertion failed: expected subject to contain the sequence [19, 3, 7, 11, 29]\n   \
                     but was: [13, 5, 7, 19, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, 11, 29, 23, 31, 37]\n  \
                    expected: [19, \u{1b}[33m3\u{1b}[0m, \u{1b}[33m7\u{1b}[0m, 11, 29]\n   \
                     missing: [3, 7]\n     \
@@ -989,7 +989,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject contains all of [13, 3, 7, 22, 11, 20, 29, 37] in order\n   \
+                "assertion failed: expected subject to contain all of [13, 3, 7, 22, 11, 20, 29, 37] in order\n   \
                     but was: [13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37]\n  \
                    expected: [13, 3, \u{1b}[33m7\u{1b}[0m, \u{1b}[33m22\u{1b}[0m, 11, \u{1b}[33m20\u{1b}[0m, 29, 37]\n   \
                     missing: [7, 22, 20]\n\
@@ -1010,7 +1010,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject starts with [13, 5, 8, 19, 4]\n   \
+                "assertion failed: expected subject to start with [13, 5, 8, 19, 4]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, 29, 23, 31, 37]\n  \
                expected: [13, 5, \u{1b}[33m8\u{1b}[0m, 19, \u{1b}[33m4\u{1b}[0m]\n   \
                 missing: [8, 4]\n     \
@@ -1032,7 +1032,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject ends with [3, 11, 28, 29, 30, 37]\n   \
+                "assertion failed: expected subject to end with [3, 11, 28, 29, 30, 37]\n   \
                 but was: [13, 5, 7, 19, 1, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [3, 11, \u{1b}[33m28\u{1b}[0m, \u{1b}[33m29\u{1b}[0m, \u{1b}[33m30\u{1b}[0m, 37]\n   \
                 missing: [28, 29, 30]\n     \

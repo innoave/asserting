@@ -6,7 +6,9 @@ use crate::assertions::{
 };
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec, Unknown};
+use crate::spec::{
+    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
+};
 use crate::std::fmt::{Debug, Display};
 use crate::std::{
     format,
@@ -192,13 +194,14 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Result<T, E>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         let expected = Ok::<_, Unknown>(Unknown);
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -216,13 +219,14 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Result<T, E>,
+        _inverted: bool,
         format: &DiffFormat,
     ) -> String {
         let expected = Err::<Unknown, Unknown>(Unknown);
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&expected, format);
         format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -233,21 +237,17 @@ where
     E: Debug,
 {
     fn test(&mut self, subject: &&Result<T, E>) -> bool {
-        subject.is_ok()
+        <Self as Expectation<Result<T, E>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = Ok::<_, Unknown>(Unknown);
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
-        format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Result<T, E>>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -257,21 +257,17 @@ where
     E: Debug,
 {
     fn test(&mut self, subject: &&Result<T, E>) -> bool {
-        subject.is_err()
+        <Self as Expectation<Result<T, E>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = Err::<Unknown, Unknown>(Unknown);
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
-        format!(
-            "expected {expression} is {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Result<T, E>>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -289,13 +285,15 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
+        let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&Ok::<_, E>(expected), format);
         format!(
-            "expected {expression} is ok containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be ok {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
     }
 }
@@ -307,21 +305,17 @@ where
     X: Debug,
 {
     fn test(&mut self, subject: &&Result<T, E>) -> bool {
-        subject.as_ref().is_ok_and(|value| value == &self.expected)
+        <Self as Expectation<Result<T, E>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = &self.expected;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&Ok::<_, E>(expected), format);
-        format!(
-            "expected {expression} is ok containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Result<T, E>>>::message(self, expression, actual, inverted, format)
     }
 }
 
@@ -339,16 +333,20 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
+        let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&Err::<T, _>(expected), format);
         format!(
-            "expected {expression} is error containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be an error {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
     }
 }
+
+impl<X> Invertible for HasError<X> {}
 
 impl<T, E, X> Expectation<&Result<T, E>> for HasError<X>
 where
@@ -357,21 +355,17 @@ where
     X: Debug,
 {
     fn test(&mut self, subject: &&Result<T, E>) -> bool {
-        subject.as_ref().is_err_and(|err| err == &self.expected)
+        <Self as Expectation<Result<T, E>>>::test(self, subject)
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
         actual: &&Result<T, E>,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let expected = &self.expected;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&Err::<T, _>(expected), format);
-        format!(
-            "expected {expression} is error containing {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
-        )
+        <Self as Expectation<Result<T, E>>>::message(self, expression, actual, inverted, format)
     }
 }
 

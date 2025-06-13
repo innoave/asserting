@@ -83,7 +83,7 @@ fn verify_string_is_equal_to_str_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing is equal to "aute duis eleifend molestie"
+            r#"assertion failed: expected my_thing to be equal to "aute duis eleifend molestie"
    but was: ""
   expected: "aute duis eleifend molestie"
 "#
@@ -144,7 +144,7 @@ fn verify_str_is_empty_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing is empty
+        &[r#"assertion failed: expected my_thing to be empty
    but was: "ABC"
   expected: <empty>
 "#]
@@ -162,7 +162,7 @@ fn verify_string_is_not_empty_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing is not empty
+        &[r#"assertion failed: expected my_thing to be not empty
    but was: ""
   expected: <non-empty>
 "#]
@@ -201,7 +201,7 @@ fn verify_str_has_length_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing has length 29
+        &[r"assertion failed: expected my_thing to have a length of 29
    but was: 28
   expected: 29
 "]
@@ -227,7 +227,7 @@ fn verify_has_length_in_range_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has length in range 1..25
+            r"assertion failed: expected my_thing to have a length within range 1..25
    but was: 25
   expected: 1..25
 "
@@ -254,7 +254,7 @@ fn verify_has_length_in_inclusive_range_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has length in range 1..=24
+            r"assertion failed: expected my_thing to have a length within range 1..=24
    but was: 25
   expected: 1..=24
 "
@@ -281,7 +281,7 @@ fn verify_string_has_length_less_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a length less than 25
+            r"assertion failed: expected my_thing to have a length less than 25
    but was: 25
   expected: < 25
 "
@@ -308,7 +308,7 @@ fn verify_string_has_length_greater_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a length greater than 28
+            r"assertion failed: expected my_thing to have a length greater than 28
    but was: 28
   expected: > 28
 "
@@ -336,7 +336,7 @@ fn verify_string_has_at_most_length_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at most a length of 29
+            r"assertion failed: expected my_thing to have at most a length of 29
    but was: 30
   expected: <= 29
 "
@@ -364,7 +364,7 @@ fn verify_string_has_at_least_length_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at least a length of 22
+            r"assertion failed: expected my_thing to have at least a length of 22
    but was: 21
   expected: >= 22
 "
@@ -415,10 +415,12 @@ fn verify_str_has_char_count_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing has a char count of 7
+        &[
+            r"assertion failed: expected my_thing to have a char count of 7
    but was: 5
   expected: 7
-"]
+"
+        ]
     );
 }
 
@@ -462,7 +464,7 @@ fn verify_str_has_char_count_in_range_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a char count of 6..12
+            r"assertion failed: expected my_thing to have a char count within 6..12
    but was: 5
   expected: 6..12
 "
@@ -489,7 +491,7 @@ fn verify_str_has_char_count_in_inclusive_range_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a char count of 6..=12
+            r"assertion failed: expected my_thing to have a char count within 6..=12
    but was: 5
   expected: 6..=12
 "
@@ -516,7 +518,7 @@ fn verify_string_has_char_count_less_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a char count less than 7
+            r"assertion failed: expected my_thing to have a char count less than 7
    but was: 7
   expected: < 7
 "
@@ -543,7 +545,7 @@ fn verify_string_has_char_count_greater_than_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has a char count greater than 7
+            r"assertion failed: expected my_thing to have a char count greater than 7
    but was: 7
   expected: > 7
 "
@@ -571,7 +573,7 @@ fn verify_string_has_at_most_char_count_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at most a char count of 6
+            r"assertion failed: expected my_thing to have at most a char count of 6
    but was: 7
   expected: <= 6
 "
@@ -599,7 +601,7 @@ fn verify_string_has_at_least_char_count_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_thing has at least a char count of 8
+            r"assertion failed: expected my_thing to have at least a char count of 8
    but was: 7
   expected: >= 8
 "
@@ -1004,7 +1006,7 @@ mod regex {
         assert_eq!(
             failures,
             &[
-                r"assertion failed: expected my_thing matches regex \b\w{12}\b
+                r"assertion failed: expected my_thing to match the regex \b\w{12}\b
                but was: volutpat lobortis aliquam diam
   does not match regex: \b\w{12}\b
 "
@@ -1024,7 +1026,7 @@ mod regex {
         assert_eq!(
             failures,
             &[
-                r"assertion failed: expected password matches regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
+                r"assertion failed: expected password to match the regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
   but the regex can not be compiled: regex parse error:
     ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
      ^^^
@@ -1046,7 +1048,7 @@ error: look-around, including look-ahead and look-behind, is not supported
         assert_eq!(
             failures,
             &[
-                r"assertion failed: expected my_thing matches regex ^(\/[\w-]{1,255}){1,64}\/?$
+                r"assertion failed: expected my_thing to match the regex ^(\/[\w-]{1,255}){1,64}\/?$
   but the compiled regex exceeds the size limit of 10485760 bytes
 "
             ]
@@ -1069,7 +1071,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject is equal to \"invi wisi exercitation anim placerat\"\n   \
+                "assertion failed: expected subject to be equal to \"invi wisi exercitation anim placerat\"\n   \
                     but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
                    expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
                 "
@@ -1086,7 +1088,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is not equal to \"aute aliquip culpa blandit\"\n   \
+            &["assertion failed: expected subject to be not equal to \"aute aliquip culpa blandit\"\n   \
                but was: \"aute aliquip culpa blandit\"\n  \
               expected: not \"aute aliquip culpa blandit\"\n\
             "]
@@ -1104,7 +1106,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is empty\n   \
+            &["assertion failed: expected subject to be empty\n   \
                but was: \u{1b}[31m\"voluptua quod quis dignissim\"\u{1b}[0m\n  \
               expected: <empty>\n\
             "]
@@ -1122,7 +1124,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is not empty\n   \
+            &["assertion failed: expected subject to be not empty\n   \
                but was: \u{1b}[31m\"\"\u{1b}[0m\n  \
               expected: <non-empty>\n\
             "]
@@ -1140,10 +1142,12 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject has length 29\n   \
+            &[
+                "assertion failed: expected subject to have a length of 29\n   \
                but was: \u{1b}[31m23\u{1b}[0m\n  \
               expected: \u{1b}[32m29\u{1b}[0m\n\
-            "]
+            "
+            ]
         );
     }
 
@@ -1159,7 +1163,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject has length in range 8..=20\n   \
+                "assertion failed: expected subject to have a length within range 8..=20\n   \
                    but was: \u{1b}[31m26\u{1b}[0m\n  \
                   expected: \u{1b}[32m8..=20\u{1b}[0m\n\
             "
@@ -1420,7 +1424,7 @@ mod colored_regex {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected my_thing matches regex \\b\\w{12}\\b\n               \
+                "assertion failed: expected my_thing to match the regex \\b\\w{12}\\b\n               \
                                 but was: \u{1b}[31mvolutpat lobortis aliquam diam\u{1b}[0m\n  \
                    does not match regex: \u{1b}[32m\\b\\w{12}\\b\u{1b}[0m\n\
                 "
@@ -1441,7 +1445,7 @@ mod colored_regex {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected password matches regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n  \
+                "assertion failed: expected password to match the regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n  \
                    but the regex can not be compiled: \u{1b}[31mregex parse error:\n    \
                      ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n     \
                       ^^^\n\
@@ -1464,7 +1468,7 @@ mod colored_regex {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected my_thing matches regex ^(\\/[\\w-]{1,255}){1,64}\\/?$\n  \
+                "assertion failed: expected my_thing to match the regex ^(\\/[\\w-]{1,255}){1,64}\\/?$\n  \
                    but \u{1b}[31mthe compiled regex exceeds the size limit of 10485760 bytes\u{1b}[0m\n\
                 "
             ]

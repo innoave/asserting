@@ -53,7 +53,7 @@ fn code_does_panic_with_message_from_assertion() {
             .is_equal_to(4);
     })
     .panics_with_message(
-        "assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n",
+        "assertion failed: expected subject to be equal to 4\n   but was: 5\n  expected: 4\n",
     );
 }
 
@@ -117,7 +117,7 @@ fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() 
         failures,
         &[
             "assertion failed: expected my_closure to panic with message \"lobortis lorem aliquam ex\"\n   \
-   but was: \"assertion failed: expected subject is equal to 4\n   but was: 5\n  expected: 4\n\"\n  \
+   but was: \"assertion failed: expected subject to be equal to 4\n   but was: 5\n  expected: 4\n\"\n  \
   expected: \"lobortis lorem aliquam ex\"\n\
 "
         ]

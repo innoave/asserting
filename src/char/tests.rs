@@ -13,7 +13,7 @@ fn verify_char_is_lowercase_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is lowercase
+        &[r"assertion failed: expected subject to be lowercase
    but was: M
   expected: m
 "]
@@ -31,7 +31,7 @@ fn verify_borrowed_char_is_lowercase_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is lowercase
+        &[r"assertion failed: expected subject to be lowercase
    but was: M
   expected: m
 "]
@@ -49,7 +49,7 @@ fn verify_char_is_uppercase_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is uppercase
+        &[r"assertion failed: expected subject to be uppercase
    but was: k
   expected: K
 "]
@@ -67,7 +67,7 @@ fn verify_borrowed_char_is_uppercase_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is uppercase
+        &[r"assertion failed: expected subject to be uppercase
    but was: x
   expected: X
 "]
@@ -85,10 +85,12 @@ fn verify_char_is_ascii_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is an ASCII character
+        &[
+            r"assertion failed: expected subject to be an ASCII character
    but was: €
   expected: an ASCII character
-"]
+"
+        ]
     );
 }
 
@@ -103,10 +105,12 @@ fn verify_borrowed_char_is_ascii_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is an ASCII character
+        &[
+            r"assertion failed: expected subject to be an ASCII character
    but was: ❤
   expected: an ASCII character
-"]
+"
+        ]
     );
 }
 
@@ -122,7 +126,7 @@ fn verify_char_is_alphabetic_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is an alphabetic character
+            r"assertion failed: expected subject to be an alphabetic character
    but was: 1
   expected: an alphabetic character
 "
@@ -142,7 +146,7 @@ fn verify_borrowed_char_is_alphabetic_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is an alphabetic character
+            r"assertion failed: expected subject to be an alphabetic character
    but was: @
   expected: an alphabetic character
 "
@@ -163,7 +167,7 @@ fn verify_char_is_alphanumeric_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is an alphanumeric character
+            r"assertion failed: expected subject to be an alphanumeric character
    but was: @
   expected: an alphanumeric character
 "
@@ -184,7 +188,7 @@ fn verify_borrowed_char_is_alphanumeric_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is an alphanumeric character
+            r"assertion failed: expected subject to be an alphanumeric character
    but was: +
   expected: an alphanumeric character
 "
@@ -203,10 +207,12 @@ fn verify_char_is_control_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is a control character
+        &[
+            r"assertion failed: expected subject to be a control character
    but was: [
   expected: a control character
-"]
+"
+        ]
     );
 }
 
@@ -221,10 +227,12 @@ fn verify_borrowed_char_is_control_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is a control character
+        &[
+            r"assertion failed: expected subject to be a control character
    but was: @
   expected: a control character
-"]
+"
+        ]
     );
 }
 
@@ -240,7 +248,7 @@ fn verify_char_is_digit_in_radix_10_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 10
+            r"assertion failed: expected subject to be a digit in the radix 10
    but was: A
   expected: a digit in the radix 10
 "
@@ -260,7 +268,7 @@ fn verify_borrowed_char_is_digit_in_radix_10_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 10
+            r"assertion failed: expected subject to be a digit in the radix 10
    but was: F
   expected: a digit in the radix 10
 "
@@ -280,7 +288,7 @@ fn verify_char_is_digit_in_radix_16_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 16
+            r"assertion failed: expected subject to be a digit in the radix 16
    but was: G
   expected: a digit in the radix 16
 "
@@ -300,7 +308,7 @@ fn verify_borrowed_char_is_digit_in_radix_16_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 16
+            r"assertion failed: expected subject to be a digit in the radix 16
    but was: g
   expected: a digit in the radix 16
 "
@@ -320,7 +328,7 @@ fn verify_char_is_digit_in_radix_7_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 7
+            r"assertion failed: expected subject to be a digit in the radix 7
    but was: 7
   expected: a digit in the radix 7
 "
@@ -340,7 +348,7 @@ fn verify_borrowed_char_is_digit_in_radix_7_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is a digit in the radix 7
+            r"assertion failed: expected subject to be a digit in the radix 7
    but was: 9
   expected: a digit in the radix 7
 "
@@ -359,9 +367,9 @@ fn verify_char_is_whitespace_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is a whitespace
+        &[r"assertion failed: expected subject to be whitespace
    but was: _
-  expected: a whitespace
+  expected: whitespace
 "]
     );
 }
@@ -377,9 +385,9 @@ fn verify_borrowed_char_is_whitespace_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is a whitespace
+        &[r"assertion failed: expected subject to be whitespace
    but was: =
-  expected: a whitespace
+  expected: whitespace
 "]
     );
 }

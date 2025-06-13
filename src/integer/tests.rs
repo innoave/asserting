@@ -37,7 +37,7 @@ fn verify_i32_is_equal_to_i32_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing is equal to -42
+        &[r"assertion failed: expected my_thing to be equal to -42
    but was: 42
   expected: -42
 "]
@@ -101,7 +101,7 @@ fn verify_i32_is_negative_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is negative
+        &[r"assertion failed: expected some_number to be negative
    but was: 0
   expected: < 0
 "]
@@ -173,7 +173,7 @@ fn verify_i32_is_not_negative_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is not negative
+        &[r"assertion failed: expected some_number to be not negative
    but was: -1
   expected: >= 0
 "]
@@ -237,7 +237,7 @@ fn verify_i32_is_positive_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is positive
+        &[r"assertion failed: expected some_number to be positive
    but was: 0
   expected: > 0
 "]
@@ -309,7 +309,7 @@ fn verify_i32_is_not_positive_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is not positive
+        &[r"assertion failed: expected some_number to be not positive
    but was: 1
   expected: <= 0
 "]
@@ -390,7 +390,7 @@ fn verify_u64_is_zero_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is zero
+        &[r"assertion failed: expected some_number to be zero
    but was: 1
   expected: 0
 "]
@@ -471,7 +471,7 @@ fn verify_u64_is_one_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected some_number is one
+        &[r"assertion failed: expected some_number to be one
    but was: 0
   expected: 1
 "]
@@ -491,7 +491,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is equal to 42\n   \
+            &["assertion failed: expected subject to be equal to 42\n   \
                but was: \u{1b}[31m37\u{1b}[0m\n  \
               expected: \u{1b}[34m42\u{1b}[0m\n\
             "]
@@ -507,10 +507,12 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject is not equal to 42\n   \
+            &[
+                "assertion failed: expected subject to be not equal to 42\n   \
                but was: 42\n  \
               expected: not 42\n\
-            "]
+            "
+            ]
         );
     }
 }

@@ -120,7 +120,7 @@ fn assert_that_macro_with_borrowed_str_subject() {
 
 #[test]
 #[should_panic(
-    expected = "assertion failed: expected ultimate_answer is equal to 42\n   but was: 51\n  expected: 42\n"
+    expected = "assertion failed: expected ultimate_answer to be equal to 42\n   but was: 51\n  expected: 42\n"
 )]
 fn assert_that_macro_is_equal_to_with_integers_fails() {
     let ultimate_answer = 51;
@@ -149,11 +149,11 @@ fn verify_that_option_is_some_chained_with_has_value_fails_as_none() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected my_variable is Some(_)
+            r"assertion failed: expected my_variable to be Some(_)
    but was: None
   expected: Some(_)
 ",
-            r"assertion failed: expected my_variable is some containing 42
+            r"assertion failed: expected my_variable to be some containing 42
    but was: None
   expected: Some(42)
 ",
@@ -174,7 +174,7 @@ fn verify_that_a_subject_with_custom_description_is_equal_to_fails() {
         failures,
         &[
             r"assertion failed: the answer to all important questions is 42
-expected subject is equal to 42
+expected subject to be equal to 42
    but was: 51
   expected: 42
 "
@@ -196,7 +196,7 @@ fn verify_that_a_subject_with_custom_name_and_custom_description_is_equal_to_fai
         failures,
         &[
             r"assertion failed: the answer to all important questions is 42
-expected answer is equal to 42
+expected answer to be equal to 42
    but was: 51
   expected: 42
 "
@@ -219,7 +219,7 @@ fn soft_assertions_with_chained_assertion_methods() {
        but was: \"the answer to all important questions is 42\"\n  \
       expected: \"unimportant\"\n\
     \n\
-    assertion failed: expected subject has at most a length of 41\n   \
+    assertion failed: expected subject to have at most a length of 41\n   \
        but was: 43\n  \
       expected: <= 41\n\
 "]
@@ -251,7 +251,7 @@ fn assert_each_item_of_a_borrowed_iterator() {
 }
 
 #[test]
-#[should_panic = "assertion failed: expected numbers 2. item is not equal to 4\n   but was: 4\n  expected: not 4\n"]
+#[should_panic = "assertion failed: expected numbers 2. item to be not equal to 4\n   but was: 4\n  expected: not 4\n"]
 fn assert_each_item_of_an_iterator_panics_if_one_assertion_fails() {
     let subject = [2, 4, 6, 8, 10];
 
@@ -273,15 +273,15 @@ fn verify_assert_each_item_of_an_iterator_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected numbers 1. item is greater than 2
+            r"assertion failed: expected numbers 1. item to be greater than 2
    but was: 2
   expected: > 2
 ",
-            r"assertion failed: expected numbers 4. item is at most 7
+            r"assertion failed: expected numbers 4. item to be at most 7
    but was: 8
   expected: <= 7
 ",
-            r"assertion failed: expected numbers 5. item is at most 7
+            r"assertion failed: expected numbers 5. item to be at most 7
    but was: 10
   expected: <= 7
 ",
@@ -298,7 +298,7 @@ mod colored {
        but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
       expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
     \n\
-    assertion failed: expected subject has at most a length of 41\n   \
+    assertion failed: expected subject to have at most a length of 41\n   \
        but was: \u{1b}[31m43\u{1b}[0m\n  \
       expected: <= \u{1b}[32m41\u{1b}[0m\n\
 "]

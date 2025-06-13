@@ -18,7 +18,7 @@ fn verify_bigint_is_equal_to_other_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is equal to -42
+        &[r"assertion failed: expected subject to be equal to -42
    but was: 42
   expected: -42
 "]
@@ -156,7 +156,7 @@ fn verify_biguint_is_equal_to_other_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is equal to 22
+        &[r"assertion failed: expected subject to be equal to 22
    but was: 42
   expected: 22
 "]

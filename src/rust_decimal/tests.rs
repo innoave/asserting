@@ -22,7 +22,7 @@ fn verify_decimal_is_equal_to_other_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject is equal to -42.831
+        &[r"assertion failed: expected subject to be equal to -42.831
    but was: 42.831
   expected: -42.831
 "]

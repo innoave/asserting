@@ -7,6 +7,32 @@ use crate::std::marker::PhantomData;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
+/// Combinator for expectations that inverts the contained expectation.
+///
+/// This combinator can only be used with expectations that implement the
+/// [`Invertible`] trait (additional to the [`Expectation`] trait).
+///
+/// Most of the expectations provided by this crate do implement the
+/// [`Invertible`] trait and thus can be used with the [`Not`] combinator.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::expectations::{HasLength, IsEmpty, IsEqualTo, IsNegative, StringContains};
+/// use asserting::prelude::*;
+///
+/// assert_that!(41).expecting(Not(IsEqualTo { expected: 42 }));
+/// assert_that!([1, 2, 3]).expecting(Not(IsEmpty));
+/// assert_that!(37.9).expecting(Not(IsNegative));
+/// assert_that!([1, 2, 3]).expecting(Not(HasLength { expected_length: 4 }));
+/// assert_that!("almost").expecting(Not(StringContains { expected: "entire" }));
+/// ```
+///
+/// [`Expectation`]: crate::spec::Expectation
+/// [`Invertible`]: crate::spec::Invertible
+#[must_use]
+pub struct Not<E>(pub E);
+
 #[must_use]
 pub struct Predicate<F> {
     pub predicate: F,
@@ -21,11 +47,6 @@ pub struct IsFalse;
 
 #[must_use]
 pub struct IsEqualTo<E> {
-    pub expected: E,
-}
-
-#[must_use]
-pub struct IsNotEqualTo<E> {
     pub expected: E,
 }
 
@@ -48,31 +69,6 @@ where
 }
 
 impl<E, M> IsCloseTo<E, M> {
-    pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
-        self.margin = margin.into();
-        self
-    }
-}
-
-#[must_use]
-pub struct IsNotCloseTo<E, M> {
-    pub expected: E,
-    pub margin: M,
-}
-
-impl<E, M> IsNotCloseTo<E, M>
-where
-    M: Default,
-{
-    pub fn new(expected: E) -> Self {
-        Self {
-            expected,
-            margin: M::default(),
-        }
-    }
-}
-
-impl<E, M> IsNotCloseTo<E, M> {
     pub fn within_margin(mut self, margin: impl Into<M>) -> Self {
         self.margin = margin.into();
         self
@@ -131,31 +127,10 @@ impl<R, E> IsInRange<R, E> {
 }
 
 #[must_use]
-pub struct IsNotInRange<R, E> {
-    pub expected_range: R,
-    _element_type: PhantomData<E>,
-}
-
-impl<R, E> IsNotInRange<R, E> {
-    pub fn new(expected_range: R) -> Self {
-        Self {
-            expected_range,
-            _element_type: PhantomData,
-        }
-    }
-}
-
-#[must_use]
 pub struct IsNegative;
 
 #[must_use]
-pub struct IsNotNegative;
-
-#[must_use]
 pub struct IsPositive;
-
-#[must_use]
-pub struct IsNotPositive;
 
 #[must_use]
 pub struct IsZero;
@@ -168,9 +143,6 @@ pub struct IsFinite;
 
 #[must_use]
 pub struct IsInfinite;
-
-#[must_use]
-pub struct IsNotANumber;
 
 #[must_use]
 pub struct IsANumber;
@@ -196,9 +168,6 @@ pub struct IsUpperCase;
 
 #[must_use]
 pub struct IsAscii;
-
-#[must_use]
-pub struct IsNonAscii;
 
 #[must_use]
 pub struct IsAlphabetic;
@@ -240,9 +209,6 @@ pub struct HasError<E> {
 }
 
 #[must_use]
-pub struct ErrorHasNoSource;
-
-#[must_use]
 pub struct ErrorHasSource;
 
 #[must_use]
@@ -252,9 +218,6 @@ pub struct ErrorHasSourceMessage {
 
 #[must_use]
 pub struct IsEmpty;
-
-#[must_use]
-pub struct IsNotEmpty;
 
 #[must_use]
 pub struct HasLength<E> {
@@ -545,17 +508,7 @@ pub struct MapContainsKey<E> {
 }
 
 #[must_use]
-pub struct MapDoesNotContainKey<E> {
-    pub expected_key: E,
-}
-
-#[must_use]
 pub struct MapContainsValue<E> {
-    pub expected_value: E,
-}
-
-#[must_use]
-pub struct MapDoesNotContainValue<E> {
     pub expected_value: E,
 }
 
@@ -670,5 +623,30 @@ mod panic {
     #[derive(Default)]
     pub struct DoesNotPanic {
         pub actual_message: Option<Box<dyn Any + Send>>,
+    }
+}
+
+mod combinators {
+    use crate::expectations::Not;
+    use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
+    use crate::std::string::String;
+
+    impl<S, E> Expectation<S> for Not<E>
+    where
+        E: Invertible + Expectation<S>,
+    {
+        fn test(&mut self, subject: &S) -> bool {
+            !self.0.test(subject)
+        }
+
+        fn message(
+            &self,
+            expression: &Expression<'_>,
+            actual: &S,
+            inverted: bool,
+            format: &DiffFormat,
+        ) -> String {
+            self.0.message(expression, actual, !inverted, format)
+        }
     }
 }

@@ -27,7 +27,7 @@ fn verify_bigdecimal_is_equal_to_other_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is equal to BigDecimal(sign=Minus, scale=3, digits=[42831])
+            r"assertion failed: expected subject to be equal to BigDecimal(sign=Minus, scale=3, digits=[42831])
    but was: BigDecimal(sign=Plus, scale=3, digits=[42831])
   expected: BigDecimal(sign=Minus, scale=3, digits=[42831])
 "
@@ -181,7 +181,7 @@ fn verify_bigdecimalref_is_equal_to_other_fails() {
     assert_eq!(
         failures,
         &[
-            r"assertion failed: expected subject is equal to BigDecimalRef { sign: Minus, digits: 42831, scale: 3 }
+            r"assertion failed: expected subject to be equal to BigDecimalRef { sign: Minus, digits: 42831, scale: 3 }
    but was: BigDecimalRef { sign: Plus, digits: 42831, scale: 3 }
   expected: BigDecimalRef { sign: Minus, digits: 42831, scale: 3 }
 "

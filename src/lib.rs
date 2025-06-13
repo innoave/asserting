@@ -59,7 +59,7 @@
 //! will print the error message:
 //!
 //! ```console
-//! assertion failed: expected 6 * 8 - 5 is equal to 42
+//! assertion failed: expected 6 * 8 - 5 to be equal to 42
 //!    but was: 43
 //!   expected: 42
 //! ```
@@ -153,7 +153,7 @@
 //!    but was: "the answer to all important questions is 42"
 //!   expected: "unimportant"
 //!
-//! assertion failed: expected subject has at most a length of 41
+//! assertion failed: expected subject to have at most a length of 41
 //!    but was: 43
 //!   expected: <= 41
 //! ```
@@ -319,7 +319,7 @@
 //! let failures = verify_that!(7 * 5).is_equal_to(42).display_failures();
 //!
 //! assert_that!(failures).contains_exactly([
-//!     r"assertion failed: expected 7 * 5 is equal to 42
+//!     r"assertion failed: expected 7 * 5 to be equal to 42
 //!    but was: 35
 //!   expected: 42
 //! "
@@ -424,7 +424,7 @@
 //!         }
 //!     }
 //!
-//!     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//!     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
 //!         format!(
 //!             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //!             Either::Left::<_, Unknown>(Unknown),
@@ -461,7 +461,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -508,7 +508,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
@@ -562,7 +562,7 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _format: &DiffFormat) -> String {
+//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
 //! #         format!(
 //! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
