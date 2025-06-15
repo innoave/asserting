@@ -784,6 +784,180 @@ fn verify_str_contains_any_char_of_a_borrowed_array_of_chars_fails() {
 }
 
 #[test]
+fn string_does_not_contain_other_str() {
+    let subject: String = "illum kasd nostrud possim".to_string();
+
+    assert_that(subject).does_not_contain("laboris");
+}
+
+#[test]
+fn string_does_not_contain_other_string() {
+    let subject: String = "consectetuer nulla anim nihil".to_string();
+
+    assert_that(subject).does_not_contain("doming".to_string());
+}
+
+#[test]
+fn str_does_not_contain_other_str() {
+    let subject: &str = "consectetuer duis quis veniam";
+
+    assert_that(subject).does_not_contain("duis veniam");
+}
+
+#[test]
+fn str_does_not_contain_other_string() {
+    let subject: &str = "voluptua liber assum facilisis";
+
+    assert_that(subject).does_not_contain("tue liber assum".to_string());
+}
+
+#[test]
+fn str_does_not_contain_a_char() {
+    let subject: &str = "praesent doming liber accusam";
+
+    assert_that(subject).does_not_contain('v');
+}
+
+#[test]
+fn verify_string_does_not_contain_other_str_fails() {
+    let subject: String = "invidunt eos hendrerit commodo".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(" eos ")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not contain " eos "
+   but was: "invidunt eos hendrerit commodo"
+  expected: not " eos "
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_contain_other_string_fails() {
+    let subject: String = "invidunt eos hendrerit commodo".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain("eos hend".to_string())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not contain "eos hend"
+   but was: "invidunt eos hendrerit commodo"
+  expected: not "eos hend"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_contain_char_fails() {
+    let subject: String = "consectetur ex hendrerit officia".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain('x')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing to not contain 'x'
+   but was: "consectetur ex hendrerit officia"
+  expected: not 'x'
+"#]
+    );
+}
+
+#[test]
+fn string_does_not_contain_any_char_of_a_slice_of_chars() {
+    let subject: String = "dolore reprehenderit erat duis".to_string();
+
+    assert_that(subject).does_not_contain_any_of(&['v', 'm', 'z', 'b'][..]);
+}
+
+#[test]
+fn str_does_not_contain_any_char_of_an_array_of_chars() {
+    let subject: &str = "duo excepteur invidunt nonumy";
+
+    assert_that(subject).does_not_contain_any_of(['b', 'a', 'z']);
+}
+
+#[test]
+fn string_does_not_contain_any_char_of_a_borrowed_array_of_chars() {
+    let subject: String = "sadipscing nibh nisi voluptua".to_string();
+
+    assert_that(subject).does_not_contain_any_of(&['q', 'x', 'k', 'm', 'r']);
+}
+
+#[test]
+fn verify_str_does_not_contain_any_char_of_a_slice_of_chars_fails() {
+    let subject: &str = "luptatum in nihil laoreet";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain_any_of(&['x', 'n', 'z'][..])
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not contain any of ['x', 'n', 'z']
+   but was: "luptatum in nihil laoreet"
+  expected: not ['x', 'n', 'z']
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_contain_any_char_of_an_array_of_chars_fails() {
+    let subject: String = "luptatum in nihil laoreet".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain_any_of(['d', 'k', 'n'])
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not contain any of ['d', 'k', 'n']
+   but was: "luptatum in nihil laoreet"
+  expected: not ['d', 'k', 'n']
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_str_does_not_contain_any_char_of_a_borrowed_array_of_chars_fails() {
+    let subject: &str = "luptatum in nihil laoreet";
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain_any_of(&['u', 'a', 'l'])
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not contain any of ['u', 'a', 'l']
+   but was: "luptatum in nihil laoreet"
+  expected: not ['u', 'a', 'l']
+"#
+        ]
+    );
+}
+
+#[test]
 fn string_starts_with_str() {
     let subject: String = "wisi option excepteur labore".to_string();
 
@@ -983,6 +1157,206 @@ fn verify_string_ends_with_char_fails() {
     );
 }
 
+#[test]
+fn string_does_not_start_with_str() {
+    let subject: String = "wisi option excepteur labore".to_string();
+
+    assert_that(subject).does_not_start_with("vidi");
+}
+
+#[test]
+fn string_does_not_start_with_string() {
+    let subject: String = "sanctus stet eirmod voluptate".to_string();
+
+    assert_that(subject).does_not_start_with("sandusen ".to_string());
+}
+
+#[test]
+fn string_does_not_start_with_char() {
+    let subject: String = "odio gubergren aliquip blandit".to_string();
+
+    assert_that(subject).does_not_start_with('v');
+}
+
+#[test]
+fn str_does_not_start_with_str() {
+    let subject: &str = "stet nam consetetur placerat";
+
+    assert_that(subject).does_not_start_with("stet ma");
+}
+
+#[test]
+fn str_does_not_start_with_string() {
+    let subject: &str = "dolores invidunt exerci nostrud";
+
+    assert_that(subject).does_not_start_with("color".to_string());
+}
+
+#[test]
+fn str_does_not_start_with_char() {
+    let subject: &str = "odio gubergren aliquip blandit";
+
+    assert_that(subject).does_not_start_with('m');
+}
+
+#[test]
+fn verify_string_does_not_start_with_str_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_start_with("possim des")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not start with "possim des"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not "possim des"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_start_with_string_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_start_with("poss".to_string())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not start with "poss"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not "poss"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_start_with_char_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_start_with('p')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing to not start with 'p'
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not 'p'
+"#]
+    );
+}
+
+#[test]
+fn string_does_not_end_with_str() {
+    let subject: String = "wisi option excepteur labore".to_string();
+
+    assert_that(subject).does_not_end_with("libory");
+}
+
+#[test]
+fn string_does_not_end_with_string() {
+    let subject: String = "sanctus stet eirmod voluptate".to_string();
+
+    assert_that(subject).does_not_end_with(" volerate".to_string());
+}
+
+#[test]
+fn string_does_not_end_with_char() {
+    let subject: String = "odio gubergren aliquip blandit".to_string();
+
+    assert_that(subject).does_not_end_with('i');
+}
+
+#[test]
+fn str_does_not_end_with_str() {
+    let subject: &str = "stet nam consetetur placerat";
+
+    assert_that(subject).does_not_end_with("etur benerat");
+}
+
+#[test]
+fn str_does_not_end_with_string() {
+    let subject: &str = "dolores invidunt exerci nostrud";
+
+    assert_that(subject).does_not_end_with("tru".to_string());
+}
+
+#[test]
+fn str_does_not_end_with_char() {
+    let subject: &str = "odio gubergren aliquip blandit";
+
+    assert_that(subject).does_not_end_with('v');
+}
+
+#[test]
+fn verify_string_does_not_end_with_str_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_end_with("rerit")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not end with "rerit"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not "rerit"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_end_with_string_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_end_with("caecat hendrerit".to_string())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected my_thing to not end with "caecat hendrerit"
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not "caecat hendrerit"
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_string_does_not_end_with_char_fails() {
+    let subject: String = "possim deserunt obcaecat hendrerit".to_string();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_end_with('t')
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r#"assertion failed: expected my_thing to not end with 't'
+   but was: "possim deserunt obcaecat hendrerit"
+  expected: not 't'
+"#]
+    );
+}
+
 #[cfg(feature = "regex")]
 mod regex {
     use crate::prelude::*;
@@ -1015,44 +1389,54 @@ mod regex {
     }
 
     #[test]
-    fn verify_string_matches_regex_given_an_invalid_regex_fails() {
-        let subject: String = "s3cr3tPass".to_string();
+    fn string_does_not_match_regex() {
+        let subject: String = "tincidunt\tLaoreet ❤ Molestie eros".to_string();
+
+        assert_that(subject).does_not_match(r"^[a-zA-Z0-9 ]{8,32}$");
+    }
+
+    #[test]
+    fn verify_string_does_not_match_regex_fails() {
+        let subject: String = "volutpat lobortis aliquam diam".to_string();
 
         let failures = verify_that(subject)
-            .named("password")
-            .matches(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$")
+            .named("my_thing")
+            .does_not_match(r"^[a-zA-Z0-9 ]{8,32}$")
             .display_failures();
 
         assert_eq!(
             failures,
             &[
-                r"assertion failed: expected password to match the regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
-  but the regex can not be compiled: regex parse error:
-    ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
-     ^^^
-error: look-around, including look-ahead and look-behind, is not supported
+                r"assertion failed: expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$
+               but was: volutpat lobortis aliquam diam
+      does match regex: ^[a-zA-Z0-9 ]{8,32}$
 "
             ]
         );
     }
 
     #[test]
-    fn verify_string_matcher_regex_given_regex_exceeds_default_size_limit_failes() {
+    #[should_panic = r"failed to match string with regex: regex parse error:
+    ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$
+     ^^^
+error: look-around, including look-ahead and look-behind, is not supported"]
+    fn string_matches_regex_given_an_invalid_regex_panics() {
         let subject: String = "s3cr3tPass".to_string();
 
-        let failures = verify_that(subject)
-            .named("my_thing")
-            .matches(r"^(\/[\w-]{1,255}){1,64}\/?$")
-            .display_failures();
+        assert_that(subject)
+            .named("password")
+            .matches(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$");
+    }
 
-        assert_eq!(
-            failures,
-            &[
-                r"assertion failed: expected my_thing to match the regex ^(\/[\w-]{1,255}){1,64}\/?$
-  but the compiled regex exceeds the size limit of 10485760 bytes
-"
-            ]
-        );
+    #[test]
+    #[should_panic = "failed to match string with regex: Compiled regex exceeds size limit of 10485760 bytes"]
+    fn string_matches_regex_given_regex_exceeds_default_size_limit_panics() {
+        let subject: String = "s3cr3tPass".to_string();
+
+        assert_that(subject)
+            .named("my_thing")
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .matches(r"^(\/[\w-]{1,255}){1,64}\/?$");
     }
 }
 
@@ -1230,6 +1614,64 @@ mod colored {
     }
 
     #[test]
+    fn highlight_diffs_string_does_not_contain_str() {
+        let subject = "sanctus stet eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .does_not_contain("stet eius")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not contain \"stet eius\"\n   \
+                    but was: \"sanctus \u{1b}[31mstet eius\u{1b}[0mmod odio\"\n  \
+                   expected: not \"\u{1b}[33mstet eius\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_contain_string() {
+        let subject = "sanctus stet eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .does_not_contain("stet eius".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not contain \"stet eius\"\n   \
+                    but was: \"sanctus \u{1b}[31mstet eius\u{1b}[0mmod odio\"\n  \
+                   expected: not \"\u{1b}[33mstet eius\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_contain_char() {
+        let subject = "sanctus stett eiusmod odio".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .does_not_contain('t')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to not contain 't'\n   \
+                 but was: \"sanc\u{1b}[31mt\u{1b}[0mus s\u{1b}[31mt\u{1b}[0me\u{1b}[31mtt\u{1b}[0m eiusmod odio\"\n  \
+                expected: not '\u{1b}[33mt\u{1b}[0m'\n\
+            "]
+        );
+    }
+
+    #[test]
     fn highlight_diffs_string_starts_with_str() {
         let subject = "nulla feugiat illum culpa".to_string();
 
@@ -1270,6 +1712,46 @@ mod colored {
     }
 
     #[test]
+    fn highlight_diffs_string_does_not_start_with_str() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_start_with("null")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not start with \"null\"\n   \
+                   but was: \"\u{1b}[31mnull\u{1b}[0ma feugiat illum culpa\"\n  \
+                  expected: not \"\u{1b}[32mnull\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_start_with_string() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_start_with("null".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not start with \"null\"\n   \
+                    but was: \"\u{1b}[31mnull\u{1b}[0ma feugiat illum culpa\"\n  \
+                   expected: not \"\u{1b}[32mnull\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
     fn highlight_diffs_string_starts_with_char() {
         let subject = "commodo sadipscing id imperdiet".to_string();
 
@@ -1284,6 +1766,26 @@ mod colored {
                    but was: \"\u{1b}[31mc\u{1b}[0mommodo sadipscing id imperdiet\"\n  \
                   expected: '\u{1b}[32mo\u{1b}[0m'\n\
             "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_start_with_char() {
+        let subject = "commodo sadipscing id imperdiet".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_start_with('c')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not start with 'c'\n   \
+                   but was: \"\u{1b}[31mc\u{1b}[0mommodo sadipscing id imperdiet\"\n  \
+                  expected: not '\u{1b}[32mc\u{1b}[0m'\n\
+            "
+            ]
         );
     }
 
@@ -1328,6 +1830,46 @@ mod colored {
     }
 
     #[test]
+    fn highlight_diffs_string_does_not_end_with_str() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_end_with("um culpa")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not end with \"um culpa\"\n   \
+                   but was: \"nulla feugiat ill\u{1b}[31mum culpa\u{1b}[0m\"\n  \
+                  expected: not \"\u{1b}[32mum culpa\u{1b}[0m\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_end_with_string() {
+        let subject = "nulla feugiat illum culpa".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_end_with("lpa".to_string())
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not end with \"lpa\"\n   \
+                    but was: \"nulla feugiat illum cu\u{1b}[31mlpa\u{1b}[0m\"\n  \
+                   expected: not \"\u{1b}[32mlpa\u{1b}[0m\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
     fn highlight_diffs_string_ends_with_char() {
         let subject = "commodo sadipscing id imperdiet".to_string();
 
@@ -1346,6 +1888,26 @@ mod colored {
     }
 
     #[test]
+    fn highlight_diffs_string_does_not_end_with_char() {
+        let subject = "commodo sadipscing id imperdiet".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_end_with('t')
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not end with 't'\n   \
+                   but was: \"commodo sadipscing id imperdie\u{1b}[31mt\u{1b}[0m\"\n  \
+                  expected: not '\u{1b}[32mt\u{1b}[0m'\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
     fn highlight_diffs_string_contains_any_of_a_char_slice() {
         let subject = "proident tempor est sed".to_string();
 
@@ -1358,7 +1920,7 @@ mod colored {
             failures,
             &[
                 "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
-                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                    but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
                 "
             ]
@@ -1378,7 +1940,7 @@ mod colored {
             failures,
             &[
                 "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
-                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                    but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
                 "
             ]
@@ -1398,8 +1960,68 @@ mod colored {
             failures,
             &[
                 "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
-                    but was: \u{1b}[31m\"proident tempor est sed\"\u{1b}[0m\n  \
+                    but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_contain_any_of_a_char_slice() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .does_not_contain_any_of(&['r', 'b', 'c'][..])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not contain any of ['r', 'b', 'c']\n   \
+                    but was: \"p\u{1b}[31mr\u{1b}[0moident tempo\u{1b}[31mr\u{1b}[0m est sed\"\n  \
+                   expected: not [\u{1b}[34m'r'\u{1b}[0m, 'b', 'c']\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_contain_any_of_a_char_array() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .does_not_contain_any_of(['a', 's', 'e'])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not contain any of ['a', 's', 'e']\n   \
+                    but was: \"proid\u{1b}[31me\u{1b}[0mnt t\u{1b}[31me\u{1b}[0mmpor \u{1b}[31mes\u{1b}[0mt \u{1b}[31mse\u{1b}[0md\"\n  \
+                   expected: not ['a', \u{1b}[34m's'\u{1b}[0m, \u{1b}[34m'e'\u{1b}[0m]\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_string_does_not_contain_any_of_a_borrowed_char_array() {
+        let subject = "proident tempor est sed".to_string();
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .does_not_contain_any_of(&['p', 'o', 'r'])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "assertion failed: expected subject to not contain any of ['p', 'o', 'r']\n   \
+                    but was: \"\u{1b}[31mpro\u{1b}[0mident tem\u{1b}[31mpor\u{1b}[0m est sed\"\n  \
+                   expected: not [\u{1b}[34m'p'\u{1b}[0m, \u{1b}[34m'o'\u{1b}[0m, \u{1b}[34m'r'\u{1b}[0m]\n\
                 "
             ]
         );
@@ -1412,7 +2034,7 @@ mod colored_regex {
     use crate::std::string::ToString;
 
     #[test]
-    fn verify_string_matches_regex_fails() {
+    fn highlight_diffs_string_matches_regex() {
         let subject: String = "volutpat lobortis aliquam diam".to_string();
 
         let failures = verify_that(subject)
@@ -1433,43 +2055,21 @@ mod colored_regex {
     }
 
     #[test]
-    fn verify_string_matches_regex_given_an_invalid_regex_fails() {
-        let subject: String = "s3cr3tPass".to_string();
-
-        let failures = verify_that(subject)
-            .named("password")
-            .with_diff_format(DIFF_FORMAT_RED_GREEN)
-            .matches(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$")
-            .display_failures();
-
-        assert_eq!(
-            failures,
-            &[
-                "assertion failed: expected password to match the regex ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n  \
-                   but the regex can not be compiled: \u{1b}[31mregex parse error:\n    \
-                     ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,32}$\n     \
-                      ^^^\n\
-                 error: look-around, including look-ahead and look-behind, is not supported\u{1b}[0m\n\
-"
-            ]
-        );
-    }
-
-    #[test]
-    fn verify_string_matcher_regex_given_regex_exceeds_default_size_limit_failes() {
-        let subject: String = "s3cr3tPass".to_string();
+    fn highlight_diffs_string_does_not_match_regex() {
+        let subject: String = "volutpat lobortis aliquam diam".to_string();
 
         let failures = verify_that(subject)
             .named("my_thing")
-            .with_diff_format(DIFF_FORMAT_RED_GREEN)
-            .matches(r"^(\/[\w-]{1,255}){1,64}\/?$")
+            .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+            .does_not_match(r"^[a-zA-Z0-9 ]{8,32}$")
             .display_failures();
 
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected my_thing to match the regex ^(\\/[\\w-]{1,255}){1,64}\\/?$\n  \
-                   but \u{1b}[31mthe compiled regex exceeds the size limit of 10485760 bytes\u{1b}[0m\n\
+                "assertion failed: expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$\n               \
+                             but was: \u{1b}[31mvolutpat lobortis aliquam diam\u{1b}[0m\n      \
+                    does match regex: \u{1b}[33m^[a-zA-Z0-9 ]{8,32}$\u{1b}[0m\n\
                 "
             ]
         );

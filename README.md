@@ -260,27 +260,32 @@ for `bool`.
 
 for strings of type `String` and `str`:
 
-| assertion                   | description                                                                    |
-|-----------------------------|--------------------------------------------------------------------------------|
-| is_empty                    | verify that a string is empty                                                  |                                                 
-| is_not_empty                | verify that a string is not empty                                              |
-| has_length                  | verify that a string has exactly the expected length                           |                                                 
-| has_length_in_range         | verify that a string has a length that is in the expected range                |
-| has_length_less_than        | verify that a string has a length less than the expected length                |
-| has_length_greater_than     | verify that a string has a length greater than the expected length             |
-| has_at_most_length          | verify that a string has a length less than or equal to the expected length    |
-| has_at_least_length         | verify that a string has a length greater than or equal to the expected length |
-| has_char_count              | verify that a string contains exactly the expected number of characters        |                                                 
-| has_char_count_in_range     | verify that a string contains a number of characters in the expected range     |
-| has_char_count_less_than    | verify that a string contains less than the expected number of characters      |
-| has_char_count_greater_than | verify that a string contains more than the expected number of characters      |
-| has_at_most_char_count      | verify that a string contains at most the expected number of characters        |
-| has_at_least_char_count     | verify that a string contains at least the expected number of characters       |
-| contains                    | verify that a string contains the expected substring or character              |
-| starts_with                 | verify that a string starts with the expected substring or character           |
-| ends_with                   | verify that a string ends with the expected substring or character             |
-| contains_any_of             | verify that a string contains any character from a collection of `char`s       |
-| matches                     | verify that a string matches the given regex (requires `regex` feature)        |                                                 
+| assertion                   | description                                                                      |
+|-----------------------------|----------------------------------------------------------------------------------|
+| is_empty                    | verify that a string is empty                                                    |                                                 
+| is_not_empty                | verify that a string is not empty                                                |
+| has_length                  | verify that a string has exactly the expected length                             |                                                 
+| has_length_in_range         | verify that a string has a length that is in the expected range                  |
+| has_length_less_than        | verify that a string has a length less than the expected length                  |
+| has_length_greater_than     | verify that a string has a length greater than the expected length               |
+| has_at_most_length          | verify that a string has a length less than or equal to the expected length      |
+| has_at_least_length         | verify that a string has a length greater than or equal to the expected length   |
+| has_char_count              | verify that a string contains exactly the expected number of characters          |                                                 
+| has_char_count_in_range     | verify that a string contains a number of characters in the expected range       |
+| has_char_count_less_than    | verify that a string contains less than the expected number of characters        |
+| has_char_count_greater_than | verify that a string contains more than the expected number of characters        |
+| has_at_most_char_count      | verify that a string contains at most the expected number of characters          |
+| has_at_least_char_count     | verify that a string contains at least the expected number of characters         |
+| contains                    | verify that a string contains the expected substring or character                |
+| does_not_contain            | verify that a string does not contain the expected substring or character        |
+| starts_with                 | verify that a string starts with the expected substring or character             |
+| does_not_start_with         | verify that a string does not start with the expected substring or character     |
+| ends_with                   | verify that a string ends with the expected substring or character               |
+| does_not_end_with           | verify that a string does not end with the expected substring or character       |
+| contains_any_of             | verify that a string contains any character from a collection of `char`s         |
+| does_not_contain_any_of     | verify that a string does not contain any character from a collection of `char`s |
+| matches                     | verify that a string matches the given regex (requires `regex` feature)          |                                                 
+| does_not_match              | verify that a string does not match the given regex (requires `regex` feature)   |                                                 
 
 for strings of type `CString` and `CStr`:
 

@@ -330,14 +330,21 @@ mod regex {
     #[must_use]
     pub struct StringMatches<'a> {
         pub pattern: &'a str,
-        pub regex: Result<Regex, regex::Error>,
+        pub regex: Regex,
     }
 
     impl<'a> StringMatches<'a> {
+        /// Creates a new `StringMatches`-expectation.
+        ///
+        /// # Panics
+        ///
+        /// Panics, if the regex pattern is invalid or exceeds the size limit.
         pub fn new(regex_pattern: &'a str) -> Self {
+            let regex = Regex::new(regex_pattern)
+                .unwrap_or_else(|err| panic!("failed to match string with regex: {err}"));
             Self {
                 pattern: regex_pattern,
-                regex: Regex::new(regex_pattern),
+                regex,
             }
         }
     }

@@ -1,7 +1,7 @@
 use crate::assertions::{AssertMapContainsKey, AssertMapContainsValue};
 use crate::colored::{
     mark_all_entries_in_map, mark_missing, mark_selected_entries_in_map,
-    mark_selected_items_in_collection, mark_unexpected_substr,
+    mark_selected_items_in_collection, mark_unexpected_string,
 };
 use crate::expectations::{
     MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
@@ -81,12 +81,12 @@ where
                 &actual_entries,
                 &found,
                 format,
-                mark_unexpected_substr,
+                mark_unexpected_string,
             );
             ("not ", selected_entries_marked)
         } else {
             let all_entries_marked =
-                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_string);
             ("", all_entries_marked)
         };
         let marked_expected = mark_missing(&self.expected_key, format);
@@ -137,7 +137,7 @@ where
             &actual_entries,
             &extra_entries,
             format,
-            mark_unexpected_substr,
+            mark_unexpected_string,
         );
         let marked_expected =
             mark_selected_items_in_collection(expected_keys, missing, format, mark_missing);
@@ -188,7 +188,7 @@ where
             }
         }
         let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_substr);
+            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_string);
         let marked_expected =
             mark_selected_items_in_collection(expected_keys, extra, format, mark_missing);
         let extra_keys = collect_selected_values(&found, &actual_keys);
@@ -239,7 +239,7 @@ where
         let actual_keys: Vec<_> = actual.keys_property().collect();
 
         let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, extra, format, mark_unexpected_substr);
+            mark_selected_entries_in_map(&actual_entries, extra, format, mark_unexpected_string);
         let marked_expected =
             mark_selected_items_in_collection(expected_keys, missing, format, mark_missing);
         let missing_keys = collect_selected_values(missing, expected_keys);
@@ -316,12 +316,12 @@ where
                 &actual_entries,
                 &found,
                 format,
-                mark_unexpected_substr,
+                mark_unexpected_string,
             );
             ("not ", selected_entries_marked)
         } else {
             let all_entries_marked =
-                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_substr);
+                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_string);
             ("", all_entries_marked)
         };
         let marked_expected = mark_missing(&self.expected_value, format);
@@ -373,7 +373,7 @@ where
             &actual_entries,
             &extra_entries,
             format,
-            mark_unexpected_substr,
+            mark_unexpected_string,
         );
         let marked_expected =
             mark_selected_items_in_collection(expected_values, missing, format, mark_missing);
@@ -427,7 +427,7 @@ where
             }
         }
         let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_substr);
+            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_string);
         let marked_expected =
             mark_selected_items_in_collection(expected_values, extra, format, mark_missing);
         let extra_values = collect_selected_values(&found, &actual_values);

@@ -1,5 +1,5 @@
 use crate::assertions::AssertErrorHasSource;
-use crate::colored::{mark_missing, mark_missing_substr, mark_unexpected, mark_unexpected_substr};
+use crate::colored::{mark_missing, mark_missing_string, mark_unexpected, mark_unexpected_string};
 use crate::expectations::{ErrorHasSource, ErrorHasSourceMessage, Not};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::error::Error;
@@ -52,7 +52,7 @@ where
             ("a", "<error with some source>")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to have {a} source\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -79,8 +79,8 @@ where
         let not = if inverted { "not " } else { "" };
         let expected = &self.expected_source_message;
         if let Some(actual_source) = actual.source() {
-            let marked_actual = mark_unexpected_substr(&actual_source.to_string(), format);
-            let marked_expected = mark_missing_substr(expected, format);
+            let marked_actual = mark_unexpected_string(&actual_source.to_string(), format);
+            let marked_expected = mark_missing_string(expected, format);
             format!("expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\"")
         } else {
             let mut marked_actual = mark_unexpected(actual, format);

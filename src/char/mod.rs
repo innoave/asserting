@@ -1,5 +1,5 @@
 use crate::assertions::AssertChar;
-use crate::colored::{mark_missing_substr, mark_unexpected_char};
+use crate::colored::{mark_missing_string, mark_unexpected_char};
 use crate::expectations::{
     IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit, IsLowerCase, IsUpperCase,
     IsWhitespace,
@@ -100,7 +100,7 @@ impl Expectation<char> for IsLowerCase {
             ("", actual.to_lowercase().to_string())
         };
         let marked_actual = mark_unexpected_char(*actual, format);
-        let marked_expected = mark_missing_substr(&expected, format);
+        let marked_expected = mark_missing_string(&expected, format);
         format!("expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -141,7 +141,7 @@ impl Expectation<char> for IsUpperCase {
             ("", actual.to_uppercase().to_string())
         };
         let marked_actual = mark_unexpected_char(*actual, format);
-        let marked_expected = mark_missing_substr(&expected, format);
+        let marked_expected = mark_missing_string(&expected, format);
         format!("expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
