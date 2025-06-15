@@ -2,9 +2,13 @@
 
 use crate::assertions::{AssertStringContainsAnyOf, AssertStringPattern};
 use crate::colored::{
-    mark_missing, mark_missing_char, mark_missing_substr, mark_unexpected, mark_unexpected_substr,
+    mark_missing, mark_missing_char, mark_missing_string,
+    mark_selected_chars_in_string_as_unexpected, mark_selected_items_in_collection,
+    mark_unexpected_char_in_string, mark_unexpected_string, mark_unexpected_substring_in_string,
 };
-use crate::expectations::{StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith};
+use crate::expectations::{
+    Not, StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith,
+};
 use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
@@ -12,7 +16,9 @@ use crate::std::str::Chars;
 use crate::std::{
     format,
     string::{String, ToString},
+    vec::Vec,
 };
+use hashbrown::HashSet;
 
 impl IsEmptyProperty for &str {
     fn is_empty_property(&self) -> bool {
@@ -66,12 +72,24 @@ where
         self.expecting(StringContains { expected: pattern })
     }
 
+    fn does_not_contain(self, pattern: &'a str) -> Self {
+        self.expecting(Not(StringContains { expected: pattern }))
+    }
+
     fn starts_with(self, pattern: &str) -> Self {
         self.expecting(StringStartWith { expected: pattern })
     }
 
+    fn does_not_start_with(self, pattern: &'a str) -> Self {
+        self.expecting(Not(StringStartWith { expected: pattern }))
+    }
+
     fn ends_with(self, pattern: &str) -> Self {
         self.expecting(StringEndsWith { expected: pattern })
+    }
+
+    fn does_not_end_with(self, pattern: &'a str) -> Self {
+        self.expecting(Not(StringEndsWith { expected: pattern }))
     }
 }
 
@@ -84,12 +102,24 @@ where
         self.expecting(StringContains { expected: pattern })
     }
 
+    fn does_not_contain(self, pattern: String) -> Self {
+        self.expecting(Not(StringContains { expected: pattern }))
+    }
+
     fn starts_with(self, pattern: String) -> Self {
         self.expecting(StringStartWith { expected: pattern })
     }
 
+    fn does_not_start_with(self, pattern: String) -> Self {
+        self.expecting(Not(StringStartWith { expected: pattern }))
+    }
+
     fn ends_with(self, pattern: String) -> Self {
         self.expecting(StringEndsWith { expected: pattern })
+    }
+
+    fn does_not_end_with(self, pattern: String) -> Self {
+        self.expecting(Not(StringEndsWith { expected: pattern }))
     }
 }
 
@@ -102,12 +132,24 @@ where
         self.expecting(StringContains { expected })
     }
 
+    fn does_not_contain(self, pattern: char) -> Self {
+        self.expecting(Not(StringContains { expected: pattern }))
+    }
+
     fn starts_with(self, expected: char) -> Self {
         self.expecting(StringStartWith { expected })
     }
 
+    fn does_not_start_with(self, pattern: char) -> Self {
+        self.expecting(Not(StringStartWith { expected: pattern }))
+    }
+
     fn ends_with(self, pattern: char) -> Self {
         self.expecting(StringEndsWith { expected: pattern })
+    }
+
+    fn does_not_end_with(self, pattern: char) -> Self {
+        self.expecting(Not(StringEndsWith { expected: pattern }))
     }
 }
 
@@ -126,9 +168,15 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
-        let marked_expected = mark_missing_substr(self.expected, format);
+        let (not, marked_actual) = if inverted {
+            let marked_actual =
+                mark_unexpected_substring_in_string(actual.as_ref(), self.expected, format);
+            ("not ", marked_actual)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            ("", marked_actual)
+        };
+        let marked_expected = mark_missing_string(self.expected, format);
         format!(
             "expected {expression} to {not}contain {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -153,9 +201,15 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
-        let marked_expected = mark_missing_substr(self.expected.as_ref(), format);
+        let (not, marked_actual) = if inverted {
+            let marked_actual =
+                mark_unexpected_substring_in_string(actual.as_ref(), &self.expected, format);
+            ("not ", marked_actual)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            ("", marked_actual)
+        };
+        let marked_expected = mark_missing_string(&self.expected, format);
         format!(
             "expected {expression} to {not}contain {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -180,8 +234,14 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
+        let (not, marked_actual) = if inverted {
+            let marked_actual =
+                mark_unexpected_char_in_string(actual.as_ref(), self.expected, format);
+            ("not ", marked_actual)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            ("", marked_actual)
+        };
         let marked_expected = mark_missing_char(self.expected, format);
         format!(
             "expected {expression} to {not}contain {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}'{marked_expected}'",
@@ -219,8 +279,8 @@ where
             .chars()
             .skip(expected_char_len)
             .collect::<String>();
-        let marked_actual_start = mark_unexpected_substr(&actual_start, format);
-        let marked_expected = mark_missing_substr(self.expected, format);
+        let marked_actual_start = mark_unexpected_string(&actual_start, format);
+        let marked_expected = mark_missing_string(self.expected, format);
         format!(
             "expected {expression} to {not}start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -257,8 +317,8 @@ where
             .chars()
             .skip(expected_char_len)
             .collect::<String>();
-        let marked_actual_start = mark_unexpected_substr(&actual_start, format);
-        let marked_expected = mark_missing_substr(&self.expected, format);
+        let marked_actual_start = mark_unexpected_string(&actual_start, format);
+        let marked_expected = mark_missing_string(&self.expected, format);
         format!(
             "expected {expression} to {not}start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -286,7 +346,7 @@ where
         let not = if inverted { "not " } else { "" };
         let actual_first_char = actual.as_ref().chars().take(1).collect::<String>();
         let actual_rest = actual.as_ref().chars().skip(1).collect::<String>();
-        let marked_actual_start = mark_unexpected_substr(&actual_first_char, format);
+        let marked_actual_start = mark_unexpected_string(&actual_first_char, format);
         let marked_expected = mark_missing_char(self.expected, format);
         format!(
             "expected {expression} to {not}start with {:?}\n   but was: \"{marked_actual_start}{actual_rest}\"\n  expected: {not}'{marked_expected}'",
@@ -326,8 +386,8 @@ where
             .chars()
             .skip(split_point)
             .collect::<String>();
-        let marked_actual_end = mark_unexpected_substr(&actual_end, format);
-        let marked_expected = mark_missing_substr(self.expected, format);
+        let marked_actual_end = mark_unexpected_string(&actual_end, format);
+        let marked_expected = mark_missing_string(self.expected, format);
         format!(
             "expected {expression} to {not}end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -366,8 +426,8 @@ where
             .chars()
             .skip(split_point)
             .collect::<String>();
-        let marked_actual_end = mark_unexpected_substr(&actual_end, format);
-        let marked_expected = mark_missing_substr(&self.expected, format);
+        let marked_actual_end = mark_unexpected_string(&actual_end, format);
+        let marked_expected = mark_missing_string(&self.expected, format);
         format!(
             "expected {expression} to {not}end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: {not}\"{marked_expected}\"",
             self.expected,
@@ -401,7 +461,7 @@ where
             .unwrap_or_default();
         let mut actual_start = actual.as_ref().to_string();
         actual_start.pop();
-        let marked_actual_end = mark_unexpected_substr(&actual_last_char, format);
+        let marked_actual_end = mark_unexpected_string(&actual_last_char, format);
         let marked_expected = mark_missing_char(self.expected, format);
         format!(
             "expected {expression} to {not}end with {:?}\n   but was: \"{actual_start}{marked_actual_end}\"\n  expected: {not}'{marked_expected}'",
@@ -426,6 +486,10 @@ where
     fn contains_any_of(self, expected: &'a [char]) -> Self {
         self.expecting(StringContainsAnyOf { expected })
     }
+
+    fn does_not_contain_any_of(self, expected: &'a [char]) -> Self {
+        self.expecting(Not(StringContainsAnyOf { expected }))
+    }
 }
 
 impl<'a, S, R, const N: usize> AssertStringContainsAnyOf<[char; N]> for Spec<'a, S, R>
@@ -436,6 +500,10 @@ where
     fn contains_any_of(self, expected: [char; N]) -> Self {
         self.expecting(StringContainsAnyOf { expected })
     }
+
+    fn does_not_contain_any_of(self, expected: [char; N]) -> Self {
+        self.expecting(Not(StringContainsAnyOf { expected }))
+    }
 }
 
 impl<'a, S, R, const N: usize> AssertStringContainsAnyOf<&'a [char; N]> for Spec<'a, S, R>
@@ -445,6 +513,10 @@ where
 {
     fn contains_any_of(self, expected: &'a [char; N]) -> Self {
         self.expecting(StringContainsAnyOf { expected })
+    }
+
+    fn does_not_contain_any_of(self, expected: &'a [char; N]) -> Self {
+        self.expecting(Not(StringContainsAnyOf { expected }))
     }
 }
 
@@ -463,11 +535,43 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let (not, marked_actual, marked_expected) = if inverted {
+            let actual = actual.as_ref();
+            let mut found_in_actual = HashSet::new();
+            let mut found_in_expected = HashSet::new();
+            for (exp_idx, expected_char) in self.expected.iter().enumerate() {
+                let found = actual
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(idx, chr)| {
+                        if chr == *expected_char {
+                            Some(idx)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                if !found.is_empty() {
+                    found_in_actual.extend(found);
+                    found_in_expected.insert(exp_idx);
+                }
+            }
+            let marked_actual =
+                mark_selected_chars_in_string_as_unexpected(actual, &found_in_actual, format);
+            let marked_expected = mark_selected_items_in_collection(
+                self.expected,
+                &found_in_expected,
+                format,
+                mark_missing,
+            );
+            ("not ", marked_actual, marked_expected)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            let marked_expected = mark_missing(&self.expected, format);
+            ("", marked_actual, marked_expected)
+        };
         format!(
-            "expected {expression} to {not}contain any of {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to {not}contain any of {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}{marked_expected}",
             self.expected,
         )
     }
@@ -490,11 +594,43 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let (not, marked_actual, marked_expected) = if inverted {
+            let actual = actual.as_ref();
+            let mut found_in_actual = HashSet::new();
+            let mut found_in_expected = HashSet::new();
+            for (exp_idx, expected_char) in self.expected.iter().enumerate() {
+                let found = actual
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(idx, chr)| {
+                        if chr == *expected_char {
+                            Some(idx)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                if !found.is_empty() {
+                    found_in_actual.extend(found);
+                    found_in_expected.insert(exp_idx);
+                }
+            }
+            let marked_actual =
+                mark_selected_chars_in_string_as_unexpected(actual, &found_in_actual, format);
+            let marked_expected = mark_selected_items_in_collection(
+                &self.expected,
+                &found_in_expected,
+                format,
+                mark_missing,
+            );
+            ("not ", marked_actual, marked_expected)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            let marked_expected = mark_missing(&self.expected, format);
+            ("", marked_actual, marked_expected)
+        };
         format!(
-            "expected {expression} to {not}contain any of {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to {not}contain any of {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}{marked_expected}",
             self.expected,
         )
     }
@@ -517,11 +653,43 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let (not, marked_actual, marked_expected) = if inverted {
+            let actual = actual.as_ref();
+            let mut found_in_actual = HashSet::new();
+            let mut found_in_expected = HashSet::new();
+            for (exp_idx, expected_char) in self.expected.iter().enumerate() {
+                let found = actual
+                    .chars()
+                    .enumerate()
+                    .filter_map(|(idx, chr)| {
+                        if chr == *expected_char {
+                            Some(idx)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                if !found.is_empty() {
+                    found_in_actual.extend(found);
+                    found_in_expected.insert(exp_idx);
+                }
+            }
+            let marked_actual =
+                mark_selected_chars_in_string_as_unexpected(actual, &found_in_actual, format);
+            let marked_expected = mark_selected_items_in_collection(
+                self.expected,
+                &found_in_expected,
+                format,
+                mark_missing,
+            );
+            ("not ", marked_actual, marked_expected)
+        } else {
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            let marked_expected = mark_missing(&self.expected, format);
+            ("", marked_actual, marked_expected)
+        };
         format!(
-            "expected {expression} to {not}contain any of {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to {not}contain any of {:?}\n   but was: \"{marked_actual}\"\n  expected: {not}{marked_expected}",
             self.expected,
         )
     }
@@ -532,9 +700,9 @@ impl<const N: usize> Invertible for StringContainsAnyOf<&[char; N]> {}
 #[cfg(feature = "regex")]
 mod regex {
     use crate::assertions::AssertStringMatches;
-    use crate::colored::{mark_missing_substr, mark_unexpected_substr};
-    use crate::expectations::StringMatches;
-    use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+    use crate::colored::{mark_missing_string, mark_unexpected_string};
+    use crate::expectations::{Not, StringMatches};
+    use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::fmt::Debug;
 
     impl<S, R> AssertStringMatches for Spec<'_, S, R>
@@ -545,6 +713,10 @@ mod regex {
         fn matches(self, regex_pattern: &str) -> Self {
             self.expecting(StringMatches::new(regex_pattern))
         }
+
+        fn does_not_match(self, regex_pattern: &str) -> Self {
+            self.expecting(Not(StringMatches::new(regex_pattern)))
+        }
     }
 
     impl<S> Expectation<S> for StringMatches<'_>
@@ -552,9 +724,7 @@ mod regex {
         S: AsRef<str> + Debug,
     {
         fn test(&mut self, subject: &S) -> bool {
-            self.regex
-                .as_ref()
-                .is_ok_and(|regex| regex.is_match(subject.as_ref()))
+            self.regex.is_match(subject.as_ref())
         }
 
         fn message(
@@ -569,35 +739,14 @@ mod regex {
             } else {
                 ("", "does not match")
             };
-            let pattern = self.pattern;
-            match self.regex.as_ref() {
-                Ok(regex) => {
-                    let marked_actual = mark_unexpected_substr(actual.as_ref(), format);
-                    let marked_expected = mark_missing_substr(regex.as_str(), format);
-                    format!("expected {expression} to {not}match the regex {pattern}\n               but was: {marked_actual}\n  {does_not_match} regex: {marked_expected}")
-                },
-                Err(regex::Error::Syntax(error)) => {
-                    let marked_error = mark_unexpected_substr(error, format);
-                    format!("expected {expression} to {not}match the regex {pattern}\n  but the regex can not be compiled: {marked_error}")
-                },
-                Err(regex::Error::CompiledTooBig(limit)) => {
-                    let marked_error = mark_unexpected_substr(
-                        &format!("the compiled regex exceeds the size limit of {limit} bytes"),
-                        format,
-                    );
-                    format!(
-                        "expected {expression} to {not}match the regex {pattern}\n  but {marked_error}"
-                    )
-                },
-                Err(err) => {
-                    let marked_error = mark_unexpected_substr(&err.to_string(), format);
-                    format!(
-                        "expected {expression} to {not}match the regex {pattern}\n  but {marked_error}"
-                    )
-                },
-            }
+            let regex = self.regex.as_str();
+            let marked_actual = mark_unexpected_string(actual.as_ref(), format);
+            let marked_expected = mark_missing_string(regex, format);
+            format!("expected {expression} to {not}match the regex {regex}\n               but was: {marked_actual}\n  {does_not_match} regex: {marked_expected}")
         }
     }
+
+    impl Invertible for StringMatches<'_> {}
 }
 
 #[cfg(test)]

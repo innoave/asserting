@@ -3,7 +3,7 @@
 use crate::assertions::{
     AssertDecimalNumber, AssertInfinity, AssertNotANumber, AssertNumericIdentity, AssertSignum,
 };
-use crate::colored::{mark_missing, mark_missing_substr, mark_unexpected};
+use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
 use crate::expectations::{
     HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite, IsInteger, IsNegative, IsOne,
     IsPositive, IsZero, Not,
@@ -60,7 +60,7 @@ where
             ("", "< 0")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}negative\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -88,7 +88,7 @@ where
             ("", "> 0")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}positive\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -192,7 +192,7 @@ where
             ("", "a finite number")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}finite\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -220,7 +220,7 @@ where
             ("", "an infinite number")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}infinite\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -262,7 +262,7 @@ where
             ("", "a number")
         };
         let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}a number\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }
@@ -356,7 +356,7 @@ where
             ("", "an integer value")
         };
         let marked_actual = mark_unexpected(&actual, format);
-        let marked_expected = mark_missing_substr(expected, format);
+        let marked_expected = mark_missing_string(expected, format);
         format!("expected {expression} to be {not}an integer value\n   but was: {marked_actual}\n  expected: {marked_expected}")
     }
 }

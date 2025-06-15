@@ -1,7 +1,7 @@
 //! Implementation of assertions for `Range` and `RangeInclusive` values.
 
 use crate::assertions::AssertInRange;
-use crate::colored::{mark_missing, mark_missing_substr, mark_unexpected};
+use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
 use crate::expectations::{IsInRange, Not};
 use crate::properties::IsEmptyProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -71,12 +71,12 @@ where
             let marked_expected_start = match self.expected_range.start_bound() {
                 Bound::Included(start) => format!("< {}", mark_missing(start, format)),
                 Bound::Excluded(start) => format!("<= {}", mark_missing(start, format)),
-                Bound::Unbounded => format!("< {}", mark_missing_substr("..", format)),
+                Bound::Unbounded => format!("< {}", mark_missing_string("..", format)),
             };
             let marked_expected_end = match self.expected_range.end_bound() {
                 Bound::Included(end) => format!("> {}", mark_missing(end, format)),
                 Bound::Excluded(end) => format!(">= {}", mark_missing(end, format)),
-                Bound::Unbounded => format!("> {}", mark_missing_substr("..", format)),
+                Bound::Unbounded => format!("> {}", mark_missing_string("..", format)),
             };
 
             (
@@ -99,7 +99,7 @@ where
                         format!("{start:?} <")
                     }
                 },
-                Bound::Unbounded => format!("{} <", mark_missing_substr("..", format)),
+                Bound::Unbounded => format!("{} <", mark_missing_string("..", format)),
             };
             let marked_expected_end = match self.expected_range.end_bound() {
                 Bound::Included(end) => {
@@ -116,7 +116,7 @@ where
                         format!("< {end:?}")
                     }
                 },
-                Bound::Unbounded => format!("< {}", mark_missing_substr("..", format)),
+                Bound::Unbounded => format!("< {}", mark_missing_string("..", format)),
             };
 
             (

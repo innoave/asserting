@@ -1,7 +1,7 @@
 //! Implementation of assertions for code that should or should not panic.
 
 use crate::assertions::AssertCodePanics;
-use crate::colored::{mark_missing_substr, mark_unexpected_substr};
+use crate::colored::{mark_missing_string, mark_unexpected_string};
 use crate::expectations::{DoesNotPanic, DoesPanic};
 use crate::spec::{Code, DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
@@ -63,8 +63,8 @@ where
         if panic_message == ONLY_ONE_EXPECTATION {
             format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
         } else {
-            let marked_did_panic = mark_unexpected_substr("did panic", format);
-            let marked_panic_message = mark_unexpected_substr(&panic_message, format);
+            let marked_did_panic = mark_unexpected_string("did panic", format);
+            let marked_panic_message = mark_unexpected_string(&panic_message, format);
             format!(
                 "expected {expression} to not panic, but {marked_did_panic}\n  with message: \"{marked_panic_message}\""
             )
@@ -111,18 +111,18 @@ where
             if actual_message == ONLY_ONE_EXPECTATION {
                 format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
             } else if let Some(expected_message) = &self.expected_message {
-                let marked_expected_message = mark_missing_substr(expected_message, format);
-                let marked_actual_message = mark_unexpected_substr(actual_message, format);
+                let marked_expected_message = mark_missing_string(expected_message, format);
+                let marked_actual_message = mark_unexpected_string(actual_message, format);
                 format!("expected {expression} to panic with message {expected_message:?}\n   but was: \"{marked_actual_message}\"\n  expected: \"{marked_expected_message}\"")
             } else {
                 // should be unreachable
                 format!("expected {expression} to panic, but did not panic")
             }
         } else if let Some(expected_message) = &self.expected_message {
-            let marked_did_not_panic = mark_unexpected_substr("did not panic", format);
+            let marked_did_not_panic = mark_unexpected_string("did not panic", format);
             format!("expected {expression} to panic with message {expected_message:?},\n  but {marked_did_not_panic}")
         } else {
-            let marked_did_not_panic = mark_unexpected_substr("did not panic", format);
+            let marked_did_not_panic = mark_unexpected_string("did not panic", format);
             format!("expected {expression} to panic, but {marked_did_not_panic}")
         }
     }

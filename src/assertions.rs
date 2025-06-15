@@ -2234,6 +2234,13 @@ pub trait AssertErrorHasSource<'a, R> {
 /// assert_that!(subject).starts_with('d');
 /// assert_that!(subject).ends_with("t eum");
 /// assert_that!(subject).ends_with('m');
+///
+/// assert_that!(subject).does_not_contain("pat");
+/// assert_that!(subject).does_not_contain('k');
+/// assert_that!(subject).does_not_start_with("omi");
+/// assert_that!(subject).does_not_start_with('o');
+/// assert_that!(subject).does_not_end_with("meum");
+/// assert_that!(subject).does_not_end_with('u');
 /// ```
 pub trait AssertStringPattern<E> {
     /// Verifies that a string contains a substring or character.
@@ -2251,6 +2258,21 @@ pub trait AssertStringPattern<E> {
     #[track_caller]
     fn contains(self, pattern: E) -> Self;
 
+    /// Verifies that a string does not contain a substring or character.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "consequat nihil sanctus commodo";
+    ///
+    /// assert_that!(subject).does_not_contain("nixil");
+    /// assert_that!(subject).does_not_contain('v');
+    /// ```
+    #[track_caller]
+    fn does_not_contain(self, pattern: E) -> Self;
+
     /// Verifies that a string starts with a substring or character.
     ///
     /// # Examples
@@ -2266,6 +2288,21 @@ pub trait AssertStringPattern<E> {
     #[track_caller]
     fn starts_with(self, pattern: E) -> Self;
 
+    /// Verifies that a string does not start with a substring or character.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "ex nulla nostrud proident";
+    ///
+    /// assert_that!(subject).does_not_start_with("nulla");
+    /// assert_that!(subject).does_not_start_with('v');
+    /// ```
+    #[track_caller]
+    fn does_not_start_with(self, pattern: E) -> Self;
+
     /// Verifies that a string ends with a substring or character.
     ///
     /// # Examples
@@ -2280,6 +2317,19 @@ pub trait AssertStringPattern<E> {
     /// ```
     #[track_caller]
     fn ends_with(self, pattern: E) -> Self;
+
+    /// Verifies that a string does not end with a substring or character.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "sunt lorem at duo";
+    ///
+    /// assert_that!(subject).does_not_end_with("duos");
+    /// assert_that!(subject).does_not_end_with('v');
+    /// ```
+    #[track_caller]
+    fn does_not_end_with(self, pattern: E) -> Self;
 }
 
 /// Assert that a string contains any char from a collection of chars.
@@ -2294,9 +2344,14 @@ pub trait AssertStringPattern<E> {
 /// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
 /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
 /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z'][..]);
+///
+/// assert_that!(subject).does_not_contain_any_of(['x', 'y', 'z']);
+/// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z']);
+/// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z'][..]);
 /// ```
 pub trait AssertStringContainsAnyOf<E> {
-    /// Verifies that a string contains any char from a collection of chars.
+    /// Verifies that a string contains any char from a collection of
+    /// characters.
     ///
     /// # Examples
     ///
@@ -2310,7 +2365,24 @@ pub trait AssertStringContainsAnyOf<E> {
     /// assert_that!(subject).contains_any_of(&['a', 'b',  'm', 'z'][..]);
     /// ```
     #[track_caller]
-    fn contains_any_of(self, pattern: E) -> Self;
+    fn contains_any_of(self, expected: E) -> Self;
+
+    /// Verifies that a string does not contain any char from a collection of
+    /// characters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "sunt lorem at duo";
+    ///
+    /// assert_that!(subject).does_not_contain_any_of(['v', 'w', 'x']);
+    /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x']);
+    /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x'][..]);
+    /// ```
+    #[track_caller]
+    fn does_not_contain_any_of(self, expected: E) -> Self;
 }
 
 /// Assert that a string matches a regex pattern.
@@ -2325,12 +2397,13 @@ pub trait AssertStringContainsAnyOf<E> {
 /// use asserting::prelude::*;
 ///
 /// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
+/// assert_that("tation odio placerat in").does_not_match(r"^[A-Z0-9 ]+$");
 /// # }
 /// ```
 #[cfg(feature = "regex")]
 #[cfg_attr(docsrs, doc(cfg(feature = "regex")))]
 pub trait AssertStringMatches {
-    /// Verifies that a string matches the given regex pattern.
+    /// Verifies that a string matches a regex pattern.
     ///
     /// # Example
     ///
@@ -2344,8 +2417,35 @@ pub trait AssertStringMatches {
     /// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
     /// # }
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the given regex pattern is invalid or exceeds the
+    /// size limit.
     #[track_caller]
     fn matches(self, regex_pattern: &str) -> Self;
+
+    /// Verifies that a string does not match a regex pattern.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "regex"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "regex")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that("tation odio placerat in").does_not_match(r"^[A-Z0-9 ]+$");
+    /// # }
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This method panics if the given regex pattern is invalid or exceeds the
+    /// size limit.
+    #[track_caller]
+    fn does_not_match(self, regex_pattern: &str) -> Self;
 }
 
 /// Assert that an iterator or collection contains the expected value.
