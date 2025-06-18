@@ -65,7 +65,7 @@ fn rec_combinator_returns_failure_message_if_test_is_failure() {
 fn all_combinator_asserts_2_expectations() {
     let subject = 42;
 
-    assert_that(subject).expecting(all((IsPositive, Not(IsZero))));
+    assert_that(subject).expecting(all((IsPositive, not(IsZero))));
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn all_combinator_asserts_3_expectations() {
 
     assert_that(subject).expecting(all((
         IsNegative,
-        Not(IsZero),
+        not(IsZero),
         IsBetween { min: -43, max: -42 },
     )));
 }
@@ -106,7 +106,7 @@ fn verify_all_combinator_asserts_3_expectations_fails() {
     let failures = verify_that(subject)
         .expecting(all((
             IsPositive,
-            Not(IsZero),
+            not(IsZero),
             IsBetween { min: 41, max: 43 },
         )))
         .display_failures();
@@ -129,7 +129,7 @@ fn all_combinator_asserts_4_expectations() {
 
     assert_that(subject).expecting(all((
         IsNegative,
-        Not(IsZero),
+        not(IsZero),
         IsLessThan { expected: 2 },
         IsBetween { min: -43, max: -42 },
     )));
@@ -142,7 +142,7 @@ fn verify_all_combinator_asserts_4_expectations_fails() {
     let failures = verify_that(subject)
         .expecting(all((
             IsPositive,
-            Not(IsZero),
+            not(IsZero),
             IsGreaterThan { expected: 2 },
             IsBetween { min: 41, max: 43 },
         )))
@@ -354,7 +354,7 @@ fn any_combinator_asserts_4_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -370,7 +370,7 @@ fn any_combinator_asserts_5_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -387,7 +387,7 @@ fn any_combinator_asserts_6_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -405,7 +405,7 @@ fn any_combinator_asserts_7_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -424,7 +424,7 @@ fn any_combinator_asserts_8_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -444,7 +444,7 @@ fn any_combinator_asserts_9_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -465,7 +465,7 @@ fn any_combinator_asserts_10_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -487,7 +487,7 @@ fn any_combinator_asserts_11_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },
@@ -510,7 +510,7 @@ fn any_combinator_asserts_12_expectations() {
     let subject = "nulla elit fugiat reprehenderit";
 
     assert_that(subject).expecting(any((
-        Not(IsEmpty),
+        not(IsEmpty),
         StringContainsAnyOf {
             expected: ['a', 'b', 'c'],
         },

@@ -18,7 +18,7 @@ pub use super::{
     assert_that,
     assertions::*,
     colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
-    expectations::{all, any, rec, All, Any, Not, Rec},
+    expectations::{all, any, not, rec},
     properties::*,
     spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail},
     verify_that,

@@ -7,6 +7,24 @@ use crate::std::marker::PhantomData;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
+/// Creates a [`Not`] expectation combinator wrapping the given expectation.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::expectations::{HasLength, IsEmpty, IsEqualTo, IsNegative, StringContains};
+/// use asserting::prelude::*;
+///
+/// assert_that!(41).expecting(not(IsEqualTo { expected: 42 }));
+/// assert_that!([1, 2, 3]).expecting(not(IsEmpty));
+/// assert_that!(37.9).expecting(not(IsNegative));
+/// assert_that!([1, 2, 3]).expecting(not(HasLength { expected_length: 4 }));
+/// assert_that!("almost").expecting(not(StringContains { expected: "entire" }));
+/// ```
+pub fn not<E>(expectation: E) -> Not<E> {
+    Not(expectation)
+}
+
 /// A combinator expectation that inverts the wrapped expectation.
 ///
 /// This combinator can only be used with expectations that implement the
@@ -15,18 +33,8 @@ use hashbrown::HashSet;
 /// Most of the expectations provided by this crate do implement the
 /// [`Invertible`] trait and thus can be used with the `Not` combinator.
 ///
-/// # Examples
-///
-/// ```
-/// use asserting::expectations::{HasLength, IsEmpty, IsEqualTo, IsNegative, StringContains};
-/// use asserting::prelude::*;
-///
-/// assert_that!(41).expecting(Not(IsEqualTo { expected: 42 }));
-/// assert_that!([1, 2, 3]).expecting(Not(IsEmpty));
-/// assert_that!(37.9).expecting(Not(IsNegative));
-/// assert_that!([1, 2, 3]).expecting(Not(HasLength { expected_length: 4 }));
-/// assert_that!("almost").expecting(Not(StringContains { expected: "entire" }));
-/// ```
+/// Use the function [`not()`] to construct a `Not` combinator containing the
+/// given expectation.
 ///
 /// [`Expectation`]: crate::spec::Expectation
 /// [`Invertible`]: crate::spec::Invertible
@@ -75,7 +83,7 @@ pub fn rec<E>(expectations: E) -> Rec<E> {
 /// use asserting::expectations::{IsEmpty, StringContains};
 /// use asserting::prelude::*;
 ///
-/// let custom_expectation = any((Not(IsEmpty), StringContains { expected: "unfugiaty" }));
+/// let custom_expectation = any((not(IsEmpty), StringContains { expected: "unfugiaty" }));
 ///
 /// assert_that("elit fugiat dolores").expecting(custom_expectation);
 /// ```
