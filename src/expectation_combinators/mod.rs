@@ -1,4 +1,4 @@
-use crate::expectations::{All, IntoRec, Not, Rec};
+use crate::expectations::{All, Any, IntoRec, Not, Rec};
 use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
 use crate::std::string::String;
 
@@ -81,10 +81,10 @@ where
     }
 }
 
-macro_rules! impl_expectation_for_tuple_combinator {
-    ( $combinator:ident: $( $tp_name:ident )+ ) => {
+macro_rules! impl_expectation_for_all_combinator {
+    ( $( $tp_name:ident )+ ) => {
         #[allow(non_snake_case)]
-        impl<S, $($tp_name: Expectation<S>),+> Expectation<S> for $combinator<($(Rec<$tp_name>,)+)> {
+        impl<S, $($tp_name: Expectation<S>),+> Expectation<S> for All<($(Rec<$tp_name>,)+)> {
             fn test(&mut self, subject: &S) -> bool {
                 let ($($tp_name,)+) = &mut self.0;
                 $(
@@ -111,18 +111,61 @@ macro_rules! impl_expectation_for_tuple_combinator {
     };
 }
 
-impl_expectation_for_tuple_combinator! { All: A1 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 A8 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 A8 A9 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 }
-impl_expectation_for_tuple_combinator! { All: A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 }
+impl_expectation_for_all_combinator! { A1 }
+impl_expectation_for_all_combinator! { A1 A2 }
+impl_expectation_for_all_combinator! { A1 A2 A3 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 }
+impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 }
+
+macro_rules! impl_expectation_for_any_combinator {
+    ( $( $tp_name:ident )+ ) => {
+        #[allow(non_snake_case)]
+        impl<S, $($tp_name: Expectation<S>),+> Expectation<S> for Any<($(Rec<$tp_name>,)+)> {
+            fn test(&mut self, subject: &S) -> bool {
+                let ($($tp_name,)+) = &mut self.0;
+                $(
+                    let $tp_name = $tp_name.test(subject);
+                )+
+                $( $tp_name )||+
+            }
+
+            fn message(
+                &self,
+                expression: &Expression<'_>,
+                actual: &S,
+                inverted: bool,
+                format: &DiffFormat,
+            ) -> String {
+                let ($($tp_name,)+) = &self.0;
+                let mut message = String::new();
+                $(
+                    message.push_str(&$tp_name.message(expression, actual, inverted, format));
+                )+
+                message
+            }
+        }
+    };
+}
+
+impl_expectation_for_any_combinator! { A1 }
+impl_expectation_for_any_combinator! { A1 A2 }
+impl_expectation_for_any_combinator! { A1 A2 A3 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 }
+impl_expectation_for_any_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 }
 
 #[cfg(test)]
 mod tests;

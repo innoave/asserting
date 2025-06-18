@@ -67,6 +67,32 @@ pub fn rec<E>(expectations: E) -> Rec<E> {
     Rec::new(expectations)
 }
 
+/// Creates an [`Any`] expectation combinator from a tuple of expectations.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::expectations::{IsEmpty, StringContains};
+/// use asserting::prelude::*;
+///
+/// let custom_expectation = any((Not(IsEmpty), StringContains { expected: "unfugiaty" }));
+///
+/// assert_that("elit fugiat dolores").expecting(custom_expectation);
+/// ```
+pub fn any<A>(expectations: A) -> Any<A::Output>
+where
+    A: IntoRec,
+{
+    Any(expectations.into_rec())
+}
+
+/// A combinator expectation that verifies that any containing expectation is
+/// met.
+///
+/// Use the function [`any()`] to construct an `Any` combinator for a tuple of
+/// expectations.
+pub struct Any<E>(pub E);
+
 /// A combinator expectation that memorizes ("records") the result of the
 /// wrapped expectation.
 ///
@@ -131,7 +157,7 @@ impl<E> Rec<E> {
 /// tuples of expectations, each expectation should be wrapped into its own
 /// `Rec`.
 pub trait IntoRec {
-    /// The result type with the expectation(s) wrapped into [`Rec`](s).
+    /// The result type with the expectation(s) wrapped into [`Rec`].
     type Output;
 
     /// Wraps an expectation of this type into [`Rec`].
