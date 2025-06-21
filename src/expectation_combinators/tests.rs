@@ -20,6 +20,7 @@ fn rec_combinator_is_success_after_test_method_has_been_called() {
     rec.test(&0);
 
     assert_that(rec.is_success()).is_true();
+    assert_that(rec.is_failure()).is_false();
 }
 
 #[test]
@@ -29,6 +30,7 @@ fn rec_combinator_is_failure_after_test_method_has_been_called() {
     rec.test(&1);
 
     assert_that(rec.is_failure()).is_true();
+    assert_that(rec.is_success()).is_false();
 }
 
 #[test]
