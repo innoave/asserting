@@ -131,6 +131,7 @@ pub struct Any<E>(pub E);
 /// assert_that(expectation.is_success()).is_false();
 /// assert_that(expectation.is_failure()).is_true();
 /// ```
+#[must_use]
 pub struct Rec<E> {
     pub expectation: E,
     pub result: Option<bool>,
