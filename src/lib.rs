@@ -682,6 +682,7 @@ mod collection;
 mod env;
 mod equality;
 mod error;
+mod expectation_combinators;
 mod float;
 mod integer;
 mod iterator;

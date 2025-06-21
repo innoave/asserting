@@ -395,14 +395,14 @@ fn verify_borrowed_char_is_whitespace_fails() {
 proptest! {
     #[test]
     fn asserting_ascii_and_lowercase_is_equivalent_to_ascii_lowercase_method(
-        chr in any::<char>(),
+        chr in prop::arbitrary::any::<char>(),
     ) {
         prop_assert_eq!(chr.is_ascii() && chr.is_lowercase(), chr.is_ascii_lowercase());
     }
 
     #[test]
     fn asserting_ascii_and_uppercase_is_equivalent_to_ascii_uppercase_method(
-        chr in any::<char>(),
+        chr in prop::arbitrary::any::<char>(),
     ) {
         prop_assert_eq!(chr.is_ascii() && chr.is_uppercase(), chr.is_ascii_uppercase());
     }

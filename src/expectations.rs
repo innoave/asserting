@@ -7,13 +7,7 @@ use crate::std::marker::PhantomData;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
 
-/// Combinator for expectations that inverts the contained expectation.
-///
-/// This combinator can only be used with expectations that implement the
-/// [`Invertible`] trait (additional to the [`Expectation`] trait).
-///
-/// Most of the expectations provided by this crate do implement the
-/// [`Invertible`] trait and thus can be used with the [`Not`] combinator.
+/// Creates a [`Not`] expectation combinator wrapping the given expectation.
 ///
 /// # Examples
 ///
@@ -21,17 +15,167 @@ use hashbrown::HashSet;
 /// use asserting::expectations::{HasLength, IsEmpty, IsEqualTo, IsNegative, StringContains};
 /// use asserting::prelude::*;
 ///
-/// assert_that!(41).expecting(Not(IsEqualTo { expected: 42 }));
-/// assert_that!([1, 2, 3]).expecting(Not(IsEmpty));
-/// assert_that!(37.9).expecting(Not(IsNegative));
-/// assert_that!([1, 2, 3]).expecting(Not(HasLength { expected_length: 4 }));
-/// assert_that!("almost").expecting(Not(StringContains { expected: "entire" }));
+/// assert_that!(41).expecting(not(IsEqualTo { expected: 42 }));
+/// assert_that!([1, 2, 3]).expecting(not(IsEmpty));
+/// assert_that!(37.9).expecting(not(IsNegative));
+/// assert_that!([1, 2, 3]).expecting(not(HasLength { expected_length: 4 }));
+/// assert_that!("almost").expecting(not(StringContains { expected: "entire" }));
 /// ```
+pub fn not<E>(expectation: E) -> Not<E> {
+    Not(expectation)
+}
+
+/// A combinator expectation that inverts the wrapped expectation.
+///
+/// This combinator can only be used with expectations that implement the
+/// [`Invertible`] trait (additional to the [`Expectation`] trait).
+///
+/// Most of the expectations provided by this crate do implement the
+/// [`Invertible`] trait and thus can be used with the `Not` combinator.
+///
+/// Use the function [`not()`] to construct a `Not` combinator containing the
+/// given expectation.
 ///
 /// [`Expectation`]: crate::spec::Expectation
 /// [`Invertible`]: crate::spec::Invertible
 #[must_use]
 pub struct Not<E>(pub E);
+
+/// Creates an [`All`] expectation combinator from a tuple of expectations.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::expectations::{IsAtMost, IsPositive};
+/// use asserting::prelude::*;
+///
+/// let custom_expectation = all((IsPositive, IsAtMost { expected: 99 }));
+///
+/// assert_that(42).expecting(custom_expectation);  
+/// ```
+pub fn all<A>(expectations: A) -> All<A::Output>
+where
+    A: IntoRec,
+{
+    All(expectations.into_rec())
+}
+
+/// A combinator expectation that verifies that all containing expectations are
+/// met.
+///
+/// Use the function [`all()`] to construct an `All` combinator for a tuple of
+/// expectations.
+#[must_use]
+pub struct All<E>(pub E);
+
+/// Creates a [`Rec`] expectation combinator that wraps the given expectation.
+///
+/// This is a convenience function that is equivalent to `Rec::new()`.
+pub fn rec<E>(expectations: E) -> Rec<E> {
+    Rec::new(expectations)
+}
+
+/// Creates an [`Any`] expectation combinator from a tuple of expectations.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::expectations::{IsEmpty, StringContains};
+/// use asserting::prelude::*;
+///
+/// let custom_expectation = any((not(IsEmpty), StringContains { expected: "unfugiaty" }));
+///
+/// assert_that("elit fugiat dolores").expecting(custom_expectation);
+/// ```
+pub fn any<A>(expectations: A) -> Any<A::Output>
+where
+    A: IntoRec,
+{
+    Any(expectations.into_rec())
+}
+
+/// A combinator expectation that verifies that any containing expectation is
+/// met.
+///
+/// Use the function [`any()`] to construct an `Any` combinator for a tuple of
+/// expectations.
+pub struct Any<E>(pub E);
+
+/// A combinator expectation that memorizes ("records") the result of the
+/// wrapped expectation.
+///
+/// Use the function [`rec()`] to conveniently wrap an expectation into the
+/// `Rec` combinator.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+/// use asserting::expectations::{IsNegative, rec};
+/// use asserting::spec::Expectation;
+///
+/// // the result of new `Rec` is neither `success` nor `failure`
+/// let mut expectation = rec(IsNegative);
+/// assert_that(expectation.is_failure()).is_false();
+/// assert_that(expectation.is_success()).is_false();
+///
+/// // once the `test` method has been called, the result can be queried at a
+/// // later time.
+/// _ = expectation.test(&-42);  // returns true
+/// assert_that(expectation.is_success()).is_true();
+/// assert_that(expectation.is_failure()).is_false();
+///
+/// // once the `test` method has been called, the result can be queried at a
+/// // later time.
+/// _= expectation.test(&42);  // returns false
+/// assert_that(expectation.is_success()).is_false();
+/// assert_that(expectation.is_failure()).is_true();
+/// ```
+#[must_use]
+pub struct Rec<E> {
+    pub expectation: E,
+    pub result: Option<bool>,
+}
+
+impl<E> Rec<E> {
+    /// Creates a new ìnstance of `Rec` that wraps the given expectation.
+    pub fn new(expectation: E) -> Self {
+        Self {
+            expectation,
+            result: None,
+        }
+    }
+
+    /// Returns true if the `test` method has been called and the result of the
+    /// wrapped expectation was true ("success") and false otherwise.
+    pub fn is_success(&self) -> bool {
+        self.result.is_some_and(|r| r)
+    }
+
+    /// Returns true if the `test` method has been called and the result of the
+    /// wrapped expectation was false ("failure") and false otherwise.
+    pub fn is_failure(&self) -> bool {
+        self.result.is_some_and(|r| !r)
+    }
+}
+
+/// Trait to convert a type into another type that wraps the contained
+/// expectation(s) into `Rec`(s).
+///
+/// If this type contains multiple expectations like `Vec<E: Expectation>` or
+/// tuples of expectations, each expectation should be wrapped into its own
+/// `Rec`.
+pub trait IntoRec {
+    /// The result type with the expectation(s) wrapped into [`Rec`].
+    type Output;
+
+    /// Wraps an expectation of this type into [`Rec`].
+    ///
+    /// If this type contains multiple expectations like `Vec<E: Expectation` or
+    /// tuples of expectations, each expectation should be wrapped into its own
+    /// [`Rec`].
+    fn into_rec(self) -> Self::Output;
+}
 
 #[must_use]
 pub struct Predicate<F> {
@@ -630,30 +774,5 @@ mod panic {
     #[derive(Default)]
     pub struct DoesNotPanic {
         pub actual_message: Option<Box<dyn Any + Send>>,
-    }
-}
-
-mod combinators {
-    use crate::expectations::Not;
-    use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
-    use crate::std::string::String;
-
-    impl<S, E> Expectation<S> for Not<E>
-    where
-        E: Invertible + Expectation<S>,
-    {
-        fn test(&mut self, subject: &S) -> bool {
-            !self.0.test(subject)
-        }
-
-        fn message(
-            &self,
-            expression: &Expression<'_>,
-            actual: &S,
-            inverted: bool,
-            format: &DiffFormat,
-        ) -> String {
-            self.0.message(expression, actual, !inverted, format)
-        }
     }
 }
