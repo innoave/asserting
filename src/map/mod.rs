@@ -4,8 +4,10 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected_string,
 };
 use crate::expectations::{
+    map_contains_exactly_keys, map_contains_key, map_contains_keys, map_contains_value,
+    map_contains_values, map_does_not_contain_keys, map_does_not_contain_values, not,
     MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
-    MapDoesNotContainKeys, MapDoesNotContainValues, Not,
+    MapDoesNotContainKeys, MapDoesNotContainValues,
 };
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
@@ -25,23 +27,23 @@ where
     R: FailingStrategy,
 {
     fn contains_key(self, expected_key: E) -> Self {
-        self.expecting(MapContainsKey { expected_key })
+        self.expecting(map_contains_key(expected_key))
     }
 
     fn does_not_contain_key(self, expected_key: E) -> Self {
-        self.expecting(Not(MapContainsKey { expected_key }))
+        self.expecting(not(map_contains_key(expected_key)))
     }
 
     fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
-        self.expecting(MapContainsKeys::new(expected_keys))
+        self.expecting(map_contains_keys(expected_keys))
     }
 
     fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
-        self.expecting(MapDoesNotContainKeys::new(expected_keys))
+        self.expecting(map_does_not_contain_keys(expected_keys))
     }
 
     fn contains_exactly_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
-        self.expecting(MapContainsExactlyKeys::new(expected_keys))
+        self.expecting(map_contains_exactly_keys(expected_keys))
     }
 }
 
@@ -264,19 +266,19 @@ where
     R: FailingStrategy,
 {
     fn contains_value(self, expected_value: E) -> Self {
-        self.expecting(MapContainsValue { expected_value })
+        self.expecting(map_contains_value(expected_value))
     }
 
     fn does_not_contain_value(self, expected_value: E) -> Self {
-        self.expecting(Not(MapContainsValue { expected_value }))
+        self.expecting(not(map_contains_value(expected_value)))
     }
 
     fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self {
-        self.expecting(MapContainsValues::new(expected_values))
+        self.expecting(map_contains_values(expected_values))
     }
 
     fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self {
-        self.expecting(MapDoesNotContainValues::new(expected_values))
+        self.expecting(map_does_not_contain_values(expected_values))
     }
 }
 

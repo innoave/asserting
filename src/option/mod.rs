@@ -4,7 +4,7 @@ use crate::assertions::{
     AssertBorrowedOptionValue, AssertHasValue, AssertOption, AssertOptionValue,
 };
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{HasValue, IsNone, IsSome};
+use crate::expectations::{has_value, is_none, is_some, HasValue, IsNone, IsSome};
 use crate::spec::{
     DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
@@ -17,11 +17,11 @@ where
     R: FailingStrategy,
 {
     fn is_some(self) -> Self {
-        self.expecting(IsSome)
+        self.expecting(is_some())
     }
 
     fn is_none(self) -> Self {
-        self.expecting(IsNone)
+        self.expecting(is_none())
     }
 }
 
@@ -31,11 +31,11 @@ where
     R: FailingStrategy,
 {
     fn is_some(self) -> Self {
-        self.expecting(IsSome)
+        self.expecting(is_some())
     }
 
     fn is_none(self) -> Self {
-        self.expecting(IsNone)
+        self.expecting(is_none())
     }
 }
 
@@ -74,7 +74,7 @@ where
     R: FailingStrategy,
 {
     fn has_value(self, expected: E) -> Self {
-        self.expecting(HasValue { expected })
+        self.expecting(has_value(expected))
     }
 }
 
@@ -85,7 +85,7 @@ where
     R: FailingStrategy,
 {
     fn has_value(self, expected: E) -> Self {
-        self.expecting(HasValue { expected })
+        self.expecting(has_value(expected))
     }
 }
 

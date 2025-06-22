@@ -1,8 +1,9 @@
 use crate::assertions::AssertChar;
 use crate::colored::{mark_missing_string, mark_unexpected_char};
 use crate::expectations::{
-    IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit, IsLowerCase, IsUpperCase,
-    IsWhitespace,
+    is_alphabetic, is_alphanumeric, is_ascii, is_control_char, is_digit, is_lower_case,
+    is_upper_case, is_whitespace, IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit,
+    IsLowerCase, IsUpperCase, IsWhitespace,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::format;
@@ -13,35 +14,35 @@ where
     R: FailingStrategy,
 {
     fn is_lowercase(self) -> Self {
-        self.expecting(IsLowerCase)
+        self.expecting(is_lower_case())
     }
 
     fn is_uppercase(self) -> Self {
-        self.expecting(IsUpperCase)
+        self.expecting(is_upper_case())
     }
 
     fn is_ascii(self) -> Self {
-        self.expecting(IsAscii)
+        self.expecting(is_ascii())
     }
 
     fn is_alphabetic(self) -> Self {
-        self.expecting(IsAlphabetic)
+        self.expecting(is_alphabetic())
     }
 
     fn is_alphanumeric(self) -> Self {
-        self.expecting(IsAlphanumeric)
+        self.expecting(is_alphanumeric())
     }
 
     fn is_control_char(self) -> Self {
-        self.expecting(IsControlChar)
+        self.expecting(is_control_char())
     }
 
     fn is_digit(self, radix: u32) -> Self {
-        self.expecting(IsDigit { radix })
+        self.expecting(is_digit(radix))
     }
 
     fn is_whitespace(self) -> Self {
-        self.expecting(IsWhitespace)
+        self.expecting(is_whitespace())
     }
 }
 
@@ -50,35 +51,35 @@ where
     R: FailingStrategy,
 {
     fn is_lowercase(self) -> Self {
-        self.expecting(IsLowerCase)
+        self.expecting(is_lower_case())
     }
 
     fn is_uppercase(self) -> Self {
-        self.expecting(IsUpperCase)
+        self.expecting(is_upper_case())
     }
 
     fn is_ascii(self) -> Self {
-        self.expecting(IsAscii)
+        self.expecting(is_ascii())
     }
 
     fn is_alphabetic(self) -> Self {
-        self.expecting(IsAlphabetic)
+        self.expecting(is_alphabetic())
     }
 
     fn is_alphanumeric(self) -> Self {
-        self.expecting(IsAlphanumeric)
+        self.expecting(is_alphanumeric())
     }
 
     fn is_control_char(self) -> Self {
-        self.expecting(IsControlChar)
+        self.expecting(is_control_char())
     }
 
     fn is_digit(self, radix: u32) -> Self {
-        self.expecting(IsDigit { radix })
+        self.expecting(is_digit(radix))
     }
 
     fn is_whitespace(self) -> Self {
-        self.expecting(IsWhitespace)
+        self.expecting(is_whitespace())
     }
 }
 

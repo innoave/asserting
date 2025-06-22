@@ -3,6 +3,7 @@
 use crate::assertions::AssertOrder;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
+    is_after, is_at_least, is_at_most, is_before, is_between, is_greater_than, is_less_than,
     IsAfter, IsAtLeast, IsAtMost, IsBefore, IsBetween, IsGreaterThan, IsLessThan,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -16,31 +17,31 @@ where
     R: FailingStrategy,
 {
     fn is_less_than(self, expected: E) -> Self {
-        self.expecting(IsLessThan { expected })
+        self.expecting(is_less_than(expected))
     }
 
     fn is_greater_than(self, expected: E) -> Self {
-        self.expecting(IsGreaterThan { expected })
+        self.expecting(is_greater_than(expected))
     }
 
     fn is_at_most(self, expected: E) -> Self {
-        self.expecting(IsAtMost { expected })
+        self.expecting(is_at_most(expected))
     }
 
     fn is_at_least(self, expected: E) -> Self {
-        self.expecting(IsAtLeast { expected })
+        self.expecting(is_at_least(expected))
     }
 
     fn is_before(self, expected: E) -> Self {
-        self.expecting(IsBefore { expected })
+        self.expecting(is_before(expected))
     }
 
     fn is_after(self, expected: E) -> Self {
-        self.expecting(IsAfter { expected })
+        self.expecting(is_after(expected))
     }
 
     fn is_between(self, min: E, max: E) -> Self {
-        self.expecting(IsBetween { min, max })
+        self.expecting(is_between(min, max))
     }
 }
 

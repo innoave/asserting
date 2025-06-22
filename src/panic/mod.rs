@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertCodePanics;
 use crate::colored::{mark_missing_string, mark_unexpected_string};
-use crate::expectations::{DoesNotPanic, DoesPanic};
+use crate::expectations::{does_not_panic, does_panic, DoesNotPanic, DoesPanic};
 use crate::spec::{Code, DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
 use crate::std::panic;
@@ -16,16 +16,15 @@ where
     R: FailingStrategy,
 {
     fn does_not_panic(self) -> Spec<'a, (), R> {
-        self.expecting(DoesNotPanic::default()).mapping(|_| ())
+        self.expecting(does_not_panic()).mapping(|_| ())
     }
 
     fn panics(self) -> Spec<'a, (), R> {
-        self.expecting(DoesPanic::with_any_message())
-            .mapping(|_| ())
+        self.expecting(does_panic()).mapping(|_| ())
     }
 
     fn panics_with_message(self, message: impl Into<String>) -> Spec<'a, (), R> {
-        self.expecting(DoesPanic::with_message(message))
+        self.expecting(does_panic().with_message(message))
             .mapping(|_| ())
     }
 }

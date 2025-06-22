@@ -3,8 +3,9 @@
 use crate::assertions::{AssertEmptiness, AssertHasLength};
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
-    HasAtLeastLength, HasAtMostLength, HasLength, HasLengthGreaterThan, HasLengthInRange,
-    HasLengthLessThan, IsEmpty, Not,
+    has_at_least_length, has_at_most_length, has_length, has_length_greater_than,
+    has_length_in_range, has_length_less_than, is_empty, not, HasAtLeastLength, HasAtMostLength,
+    HasLength, HasLengthGreaterThan, HasLengthInRange, HasLengthLessThan, IsEmpty,
 };
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -18,11 +19,11 @@ where
     R: FailingStrategy,
 {
     fn is_empty(self) -> Self {
-        self.expecting(IsEmpty)
+        self.expecting(is_empty())
     }
 
     fn is_not_empty(self) -> Self {
-        self.expecting(Not(IsEmpty))
+        self.expecting(not(is_empty()))
     }
 }
 
@@ -59,30 +60,30 @@ where
     R: FailingStrategy,
 {
     fn has_length(self, expected_length: usize) -> Self {
-        self.expecting(HasLength { expected_length })
+        self.expecting(has_length(expected_length))
     }
 
     fn has_length_in_range<U>(self, expected_range: U) -> Self
     where
         U: RangeBounds<usize> + Debug,
     {
-        self.expecting(HasLengthInRange::new(expected_range))
+        self.expecting(has_length_in_range(expected_range))
     }
 
     fn has_length_less_than(self, expected_length: usize) -> Self {
-        self.expecting(HasLengthLessThan { expected_length })
+        self.expecting(has_length_less_than(expected_length))
     }
 
     fn has_length_greater_than(self, expected_length: usize) -> Self {
-        self.expecting(HasLengthGreaterThan { expected_length })
+        self.expecting(has_length_greater_than(expected_length))
     }
 
     fn has_at_most_length(self, expected_length: usize) -> Self {
-        self.expecting(HasAtMostLength { expected_length })
+        self.expecting(has_at_most_length(expected_length))
     }
 
     fn has_at_least_length(self, expected_length: usize) -> Self {
-        self.expecting(HasAtLeastLength { expected_length })
+        self.expecting(has_at_least_length(expected_length))
     }
 }
 

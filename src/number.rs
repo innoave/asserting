@@ -5,8 +5,9 @@ use crate::assertions::{
 };
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
 use crate::expectations::{
-    HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite, IsInteger, IsNegative, IsOne,
-    IsPositive, IsZero, Not,
+    has_precision_of, has_scale_of, is_a_number, is_finite, is_infinite, is_integer, is_negative,
+    is_one, is_positive, is_zero, not, HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite,
+    IsInteger, IsNegative, IsOne, IsPositive, IsZero,
 };
 use crate::properties::{
     AdditiveIdentityProperty, DecimalProperties, InfinityProperty, IsNanProperty,
@@ -23,19 +24,19 @@ where
     R: FailingStrategy,
 {
     fn is_negative(self) -> Self {
-        self.expecting(IsNegative)
+        self.expecting(is_negative())
     }
 
     fn is_not_negative(self) -> Self {
-        self.expecting(Not(IsNegative))
+        self.expecting(not(is_negative()))
     }
 
     fn is_positive(self) -> Self {
-        self.expecting(IsPositive)
+        self.expecting(is_positive())
     }
 
     fn is_not_positive(self) -> Self {
-        self.expecting(Not(IsPositive))
+        self.expecting(not(is_positive()))
     }
 }
 
@@ -101,11 +102,11 @@ where
     R: FailingStrategy,
 {
     fn is_zero(self) -> Self {
-        self.expecting(IsZero)
+        self.expecting(is_zero())
     }
 
     fn is_one(self) -> Self {
-        self.expecting(IsOne)
+        self.expecting(is_one())
     }
 }
 
@@ -163,11 +164,11 @@ where
     R: FailingStrategy,
 {
     fn is_infinite(self) -> Self {
-        self.expecting(IsInfinite)
+        self.expecting(is_infinite())
     }
 
     fn is_finite(self) -> Self {
-        self.expecting(IsFinite)
+        self.expecting(is_finite())
     }
 }
 
@@ -233,11 +234,11 @@ where
     R: FailingStrategy,
 {
     fn is_not_a_number(self) -> Self {
-        self.expecting(Not(IsANumber))
+        self.expecting(not(is_a_number()))
     }
 
     fn is_a_number(self) -> Self {
-        self.expecting(IsANumber)
+        self.expecting(is_a_number())
     }
 }
 
@@ -275,15 +276,15 @@ where
     R: FailingStrategy,
 {
     fn has_scale_of(self, expected_scale: i64) -> Self {
-        self.expecting(HasScaleOf { expected_scale })
+        self.expecting(has_scale_of(expected_scale))
     }
 
     fn has_precision_of(self, expected_precision: u64) -> Self {
-        self.expecting(HasPrecisionOf { expected_precision })
+        self.expecting(has_precision_of(expected_precision))
     }
 
     fn is_integer(self) -> Self {
-        self.expecting(IsInteger)
+        self.expecting(is_integer())
     }
 }
 

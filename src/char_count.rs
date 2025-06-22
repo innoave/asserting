@@ -3,8 +3,9 @@
 use crate::assertions::AssertHasCharCount;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
-    HasAtLeastCharCount, HasAtMostCharCount, HasCharCount, HasCharCountGreaterThan,
-    HasCharCountInRange, HasCharCountLessThan,
+    has_at_least_char_count, has_at_most_char_count, has_char_count, has_char_count_greater_than,
+    has_char_count_in_range, has_char_count_less_than, HasAtLeastCharCount, HasAtMostCharCount,
+    HasCharCount, HasCharCountGreaterThan, HasCharCountInRange, HasCharCountLessThan,
 };
 use crate::properties::CharCountProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
@@ -19,40 +20,30 @@ where
     R: FailingStrategy,
 {
     fn has_char_count(self, expected_char_count: usize) -> Self {
-        self.expecting(HasCharCount {
-            expected_char_count,
-        })
+        self.expecting(has_char_count(expected_char_count))
     }
 
     fn has_char_count_in_range<U>(self, expected_range: U) -> Self
     where
         U: RangeBounds<usize> + Debug,
     {
-        self.expecting(HasCharCountInRange::new(expected_range))
+        self.expecting(has_char_count_in_range(expected_range))
     }
 
     fn has_char_count_less_than(self, expected_char_count: usize) -> Self {
-        self.expecting(HasCharCountLessThan {
-            expected_char_count,
-        })
+        self.expecting(has_char_count_less_than(expected_char_count))
     }
 
     fn has_char_count_greater_than(self, expected_char_count: usize) -> Self {
-        self.expecting(HasCharCountGreaterThan {
-            expected_char_count,
-        })
+        self.expecting(has_char_count_greater_than(expected_char_count))
     }
 
     fn has_at_most_char_count(self, expected_char_count: usize) -> Self {
-        self.expecting(HasAtMostCharCount {
-            expected_char_count,
-        })
+        self.expecting(has_at_most_char_count(expected_char_count))
     }
 
     fn has_at_least_char_count(self, expected_char_count: usize) -> Self {
-        self.expecting(HasAtLeastCharCount {
-            expected_char_count,
-        })
+        self.expecting(has_at_least_char_count(expected_char_count))
     }
 }
 

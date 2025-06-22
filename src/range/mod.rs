@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertInRange;
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
-use crate::expectations::{IsInRange, Not};
+use crate::expectations::{is_in_range, not, IsInRange};
 use crate::properties::IsEmptyProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
@@ -38,14 +38,14 @@ where
     where
         U: RangeBounds<E> + Debug,
     {
-        self.expecting(IsInRange::new(range))
+        self.expecting(is_in_range(range))
     }
 
     fn is_not_in_range<U>(self, range: U) -> Self
     where
         U: RangeBounds<E> + Debug,
     {
-        self.expecting(Not(IsInRange::new(range)))
+        self.expecting(not(is_in_range(range)))
     }
 }
 

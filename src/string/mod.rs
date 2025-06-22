@@ -7,7 +7,8 @@ use crate::colored::{
     mark_unexpected_char_in_string, mark_unexpected_string, mark_unexpected_substring_in_string,
 };
 use crate::expectations::{
-    Not, StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith,
+    not, string_contains, string_contains_any_of, string_ends_with, string_starts_with,
+    StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith,
 };
 use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -69,27 +70,27 @@ where
     R: FailingStrategy,
 {
     fn contains(self, pattern: &'a str) -> Self {
-        self.expecting(StringContains { expected: pattern })
+        self.expecting(string_contains(pattern))
     }
 
     fn does_not_contain(self, pattern: &'a str) -> Self {
-        self.expecting(Not(StringContains { expected: pattern }))
+        self.expecting(not(string_contains(pattern)))
     }
 
     fn starts_with(self, pattern: &str) -> Self {
-        self.expecting(StringStartWith { expected: pattern })
+        self.expecting(string_starts_with(pattern))
     }
 
     fn does_not_start_with(self, pattern: &'a str) -> Self {
-        self.expecting(Not(StringStartWith { expected: pattern }))
+        self.expecting(not(string_starts_with(pattern)))
     }
 
     fn ends_with(self, pattern: &str) -> Self {
-        self.expecting(StringEndsWith { expected: pattern })
+        self.expecting(string_ends_with(pattern))
     }
 
     fn does_not_end_with(self, pattern: &'a str) -> Self {
-        self.expecting(Not(StringEndsWith { expected: pattern }))
+        self.expecting(not(string_ends_with(pattern)))
     }
 }
 
@@ -99,27 +100,27 @@ where
     R: FailingStrategy,
 {
     fn contains(self, pattern: String) -> Self {
-        self.expecting(StringContains { expected: pattern })
+        self.expecting(string_contains(pattern))
     }
 
     fn does_not_contain(self, pattern: String) -> Self {
-        self.expecting(Not(StringContains { expected: pattern }))
+        self.expecting(not(string_contains(pattern)))
     }
 
     fn starts_with(self, pattern: String) -> Self {
-        self.expecting(StringStartWith { expected: pattern })
+        self.expecting(string_starts_with(pattern))
     }
 
     fn does_not_start_with(self, pattern: String) -> Self {
-        self.expecting(Not(StringStartWith { expected: pattern }))
+        self.expecting(not(string_starts_with(pattern)))
     }
 
     fn ends_with(self, pattern: String) -> Self {
-        self.expecting(StringEndsWith { expected: pattern })
+        self.expecting(string_ends_with(pattern))
     }
 
     fn does_not_end_with(self, pattern: String) -> Self {
-        self.expecting(Not(StringEndsWith { expected: pattern }))
+        self.expecting(not(string_ends_with(pattern)))
     }
 }
 
@@ -129,27 +130,27 @@ where
     R: FailingStrategy,
 {
     fn contains(self, expected: char) -> Self {
-        self.expecting(StringContains { expected })
+        self.expecting(string_contains(expected))
     }
 
     fn does_not_contain(self, pattern: char) -> Self {
-        self.expecting(Not(StringContains { expected: pattern }))
+        self.expecting(not(string_contains(pattern)))
     }
 
     fn starts_with(self, expected: char) -> Self {
-        self.expecting(StringStartWith { expected })
+        self.expecting(string_starts_with(expected))
     }
 
     fn does_not_start_with(self, pattern: char) -> Self {
-        self.expecting(Not(StringStartWith { expected: pattern }))
+        self.expecting(not(string_starts_with(pattern)))
     }
 
     fn ends_with(self, pattern: char) -> Self {
-        self.expecting(StringEndsWith { expected: pattern })
+        self.expecting(string_ends_with(pattern))
     }
 
     fn does_not_end_with(self, pattern: char) -> Self {
-        self.expecting(Not(StringEndsWith { expected: pattern }))
+        self.expecting(not(string_ends_with(pattern)))
     }
 }
 
@@ -484,11 +485,11 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: &'a [char]) -> Self {
-        self.expecting(StringContainsAnyOf { expected })
+        self.expecting(string_contains_any_of(expected))
     }
 
     fn does_not_contain_any_of(self, expected: &'a [char]) -> Self {
-        self.expecting(Not(StringContainsAnyOf { expected }))
+        self.expecting(not(string_contains_any_of(expected)))
     }
 }
 
@@ -498,11 +499,11 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: [char; N]) -> Self {
-        self.expecting(StringContainsAnyOf { expected })
+        self.expecting(string_contains_any_of(expected))
     }
 
     fn does_not_contain_any_of(self, expected: [char; N]) -> Self {
-        self.expecting(Not(StringContainsAnyOf { expected }))
+        self.expecting(not(string_contains_any_of(expected)))
     }
 }
 
@@ -512,11 +513,11 @@ where
     R: FailingStrategy,
 {
     fn contains_any_of(self, expected: &'a [char; N]) -> Self {
-        self.expecting(StringContainsAnyOf { expected })
+        self.expecting(string_contains_any_of(expected))
     }
 
     fn does_not_contain_any_of(self, expected: &'a [char; N]) -> Self {
-        self.expecting(Not(StringContainsAnyOf { expected }))
+        self.expecting(not(string_contains_any_of(expected)))
     }
 }
 
@@ -701,7 +702,7 @@ impl<const N: usize> Invertible for StringContainsAnyOf<&[char; N]> {}
 mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::colored::{mark_missing_string, mark_unexpected_string};
-    use crate::expectations::{Not, StringMatches};
+    use crate::expectations::{not, string_matches, StringMatches};
     use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::fmt::Debug;
 
@@ -711,11 +712,11 @@ mod regex {
         R: FailingStrategy,
     {
         fn matches(self, regex_pattern: &str) -> Self {
-            self.expecting(StringMatches::new(regex_pattern))
+            self.expecting(string_matches(regex_pattern))
         }
 
         fn does_not_match(self, regex_pattern: &str) -> Self {
-            self.expecting(Not(StringMatches::new(regex_pattern)))
+            self.expecting(not(string_matches(regex_pattern)))
         }
     }
 

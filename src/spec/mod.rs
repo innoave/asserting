@@ -1,7 +1,7 @@
 //! This is the core of the `asserting` crate.
 
 use crate::colored;
-use crate::expectations::Predicate;
+use crate::expectations::satisfies;
 use crate::std::any;
 use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
@@ -923,10 +923,7 @@ where
     where
         P: Fn(&S) -> bool,
     {
-        self.expecting(Predicate {
-            predicate,
-            message: None,
-        })
+        self.expecting(satisfies(predicate))
     }
 
     /// Asserts whether the given predicate is meet.
@@ -968,10 +965,7 @@ where
     where
         P: Fn(&S) -> bool,
     {
-        self.expecting(Predicate {
-            predicate,
-            message: Some(message.into()),
-        })
+        self.expecting(satisfies(predicate).with_message(message))
     }
 
     /// Fails the assertion according the current failing strategy of this

@@ -1,6 +1,8 @@
 use crate::assertions::AssertErrorHasSource;
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected, mark_unexpected_string};
-use crate::expectations::{ErrorHasSource, ErrorHasSourceMessage, Not};
+use crate::expectations::{
+    error_has_source, error_has_source_message, not, ErrorHasSource, ErrorHasSourceMessage,
+};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::error::Error;
 use crate::std::format;
@@ -12,11 +14,11 @@ where
     R: FailingStrategy,
 {
     fn has_no_source(self) -> Self {
-        self.expecting(Not(ErrorHasSource))
+        self.expecting(not(error_has_source()))
     }
 
     fn has_source(self) -> Self {
-        self.expecting(ErrorHasSource)
+        self.expecting(error_has_source())
     }
 
     fn has_source_message(
@@ -24,10 +26,8 @@ where
         expected_source_message: impl Into<String>,
     ) -> Spec<'a, Option<String>, R> {
         let expected_source_message = expected_source_message.into();
-        self.expecting(ErrorHasSourceMessage {
-            expected_source_message,
-        })
-        .mapping(|err| err.source().map(ToString::to_string))
+        self.expecting(error_has_source_message(expected_source_message))
+            .mapping(|err| err.source().map(ToString::to_string))
     }
 }
 
