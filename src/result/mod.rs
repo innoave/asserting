@@ -5,7 +5,9 @@ use crate::assertions::{
     AssertResultValue,
 };
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{HasError, HasValue, IsEqualTo, IsErr, IsOk};
+use crate::expectations::{
+    has_error, has_value, is_equal_to, is_err, is_ok, HasError, HasValue, IsErr, IsOk,
+};
 use crate::spec::{
     DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
@@ -22,11 +24,11 @@ where
     R: FailingStrategy,
 {
     fn is_ok(self) -> Self {
-        self.expecting(IsOk)
+        self.expecting(is_ok())
     }
 
     fn is_err(self) -> Self {
-        self.expecting(IsErr)
+        self.expecting(is_err())
     }
 }
 
@@ -37,11 +39,11 @@ where
     R: FailingStrategy,
 {
     fn is_ok(self) -> Self {
-        self.expecting(IsOk)
+        self.expecting(is_ok())
     }
 
     fn is_err(self) -> Self {
-        self.expecting(IsErr)
+        self.expecting(is_err())
     }
 }
 
@@ -101,7 +103,7 @@ where
     R: FailingStrategy,
 {
     fn has_value(self, expected: X) -> Self {
-        self.expecting(HasValue { expected })
+        self.expecting(has_value(expected))
     }
 }
 
@@ -113,7 +115,7 @@ where
     R: FailingStrategy,
 {
     fn has_value(self, expected: X) -> Self {
-        self.expecting(HasValue { expected })
+        self.expecting(has_value(expected))
     }
 }
 
@@ -125,7 +127,7 @@ where
     R: FailingStrategy,
 {
     fn has_error(self, expected: X) -> Self {
-        self.expecting(HasError { expected })
+        self.expecting(has_error(expected))
     }
 }
 
@@ -137,7 +139,7 @@ where
     R: FailingStrategy,
 {
     fn has_error(self, expected: X) -> Self {
-        self.expecting(HasError { expected })
+        self.expecting(has_error(expected))
     }
 }
 
@@ -157,7 +159,7 @@ where
             Err(error) => {
                 error.to_string()
             },
-        }).expecting(IsEqualTo {expected})
+        }).expecting(is_equal_to(expected))
     }
 }
 
@@ -177,7 +179,7 @@ where
             Err(error) => {
                 error.to_string()
             },
-        }).expecting(IsEqualTo {expected})
+        }).expecting(is_equal_to(expected))
     }
 }
 

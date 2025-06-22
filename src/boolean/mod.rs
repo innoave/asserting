@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertBoolean;
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{IsFalse, IsTrue};
+use crate::expectations::{is_false, is_true, IsFalse, IsTrue};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::format;
 use crate::std::string::String;
@@ -12,11 +12,11 @@ where
     R: FailingStrategy,
 {
     fn is_true(self) -> Self {
-        self.expecting(IsTrue)
+        self.expecting(is_true())
     }
 
     fn is_false(self) -> Self {
-        self.expecting(IsFalse)
+        self.expecting(is_false())
     }
 }
 

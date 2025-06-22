@@ -7,9 +7,13 @@ use crate::colored::{
     mark_all_items_in_collection, mark_missing, mark_selected_items_in_collection, mark_unexpected,
 };
 use crate::expectations::{
-    IterContains, IterContainsAllInOrder, IterContainsAllOf, IterContainsAnyOf,
-    IterContainsExactly, IterContainsExactlyInAnyOrder, IterContainsOnly, IterContainsOnlyOnce,
-    IterContainsSequence, IterEndsWith, IterStartsWith,
+    iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
+    iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
+    iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
+    iterator_ends_with, iterator_starts_with, IteratorContains, IteratorContainsAllInOrder,
+    IteratorContainsAllOf, IteratorContainsAnyOf, IteratorContainsExactly,
+    IteratorContainsExactlyInAnyOrder, IteratorContainsOnly, IteratorContainsOnlyOnce,
+    IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -28,11 +32,11 @@ where
 {
     fn contains(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContains { expected })
+            .expecting(iterator_contains(expected))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContains<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContains<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -58,7 +62,7 @@ where
     }
 }
 
-impl<E> Invertible for IterContains<E> {}
+impl<E> Invertible for IteratorContains<E> {}
 
 impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
 where
@@ -70,32 +74,31 @@ where
 {
     fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsExactlyInAnyOrder::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_exactly_in_any_order(expected))
     }
 
     fn contains_any_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
-        self.mapping(Vec::from_iter).expecting(IterContainsAnyOf {
-            expected: Vec::from_iter(expected),
-        })
+        self.mapping(Vec::from_iter)
+            .expecting(iterator_contains_any_of(expected))
     }
 
     fn contains_all_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsAllOf::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_all_of(expected))
     }
 
     fn contains_only(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsOnly::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_only(expected))
     }
 
     fn contains_only_once(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsOnlyOnce::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_only_once(expected))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsExactlyInAnyOrder<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsExactlyInAnyOrder<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -146,7 +149,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsAnyOf<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsAnyOf<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -178,7 +181,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsAllOf<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsAllOf<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -224,7 +227,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsOnly<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsOnly<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -270,7 +273,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsOnlyOnce<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsOnlyOnce<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -346,31 +349,31 @@ where
 {
     fn contains_exactly(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsExactly::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_exactly(expected))
     }
 
     fn contains_sequence(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsSequence::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_sequence(expected))
     }
 
     fn contains_all_in_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterContainsAllInOrder::new(Vec::from_iter(expected)))
+            .expecting(iterator_contains_all_in_order(expected))
     }
 
     fn starts_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterStartsWith::new(Vec::from_iter(expected)))
+            .expecting(iterator_starts_with(expected))
     }
 
     fn ends_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
-            .expecting(IterEndsWith::new(Vec::from_iter(expected)))
+            .expecting(iterator_ends_with(expected))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsExactly<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsExactly<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -456,7 +459,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsSequence<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsSequence<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -547,7 +550,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterContainsAllInOrder<E>
+impl<T, E> Expectation<Vec<T>> for IteratorContainsAllInOrder<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -591,7 +594,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterStartsWith<E>
+impl<T, E> Expectation<Vec<T>> for IteratorStartsWith<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,
@@ -644,7 +647,7 @@ where
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IterEndsWith<E>
+impl<T, E> Expectation<Vec<T>> for IteratorEndsWith<E>
 where
     T: PartialEq<E> + Debug,
     E: Debug,

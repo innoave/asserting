@@ -97,7 +97,7 @@ impl IsNanProperty for f64 {
 mod cmp {
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::colored::mark_diff;
-    use crate::expectations::{IsCloseTo, Not};
+    use crate::expectations::{is_close_to, not, IsCloseTo};
     use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::{format, string::String};
     use float_cmp::{ApproxEq, F32Margin, F64Margin};
@@ -107,14 +107,12 @@ mod cmp {
         R: FailingStrategy,
     {
         fn is_close_to(self, expected: f32) -> Self {
-            self.expecting(
-                IsCloseTo::<_, F32Margin>::new(expected).within_margin((4. * f32::EPSILON, 4)),
-            )
+            self.expecting(is_close_to(expected).within_margin((4. * f32::EPSILON, 4)))
         }
 
         fn is_not_close_to(self, expected: f32) -> Self {
-            self.expecting(Not(
-                IsCloseTo::<_, F32Margin>::new(expected).within_margin((4. * f32::EPSILON, 4))
+            self.expecting(not(
+                is_close_to(expected).within_margin((4. * f32::EPSILON, 4))
             ))
         }
     }
@@ -124,11 +122,11 @@ mod cmp {
         R: FailingStrategy,
     {
         fn is_close_to_with_margin(self, expected: f32, margin: impl Into<F32Margin>) -> Self {
-            self.expecting(IsCloseTo::new(expected).within_margin(margin))
+            self.expecting(is_close_to(expected).within_margin(margin))
         }
 
         fn is_not_close_to_with_margin(self, expected: f32, margin: impl Into<F32Margin>) -> Self {
-            self.expecting(Not(IsCloseTo::new(expected).within_margin(margin)))
+            self.expecting(not(is_close_to(expected).within_margin(margin)))
         }
     }
 
@@ -137,14 +135,12 @@ mod cmp {
         R: FailingStrategy,
     {
         fn is_close_to(self, expected: f64) -> Self {
-            self.expecting(
-                IsCloseTo::<_, F64Margin>::new(expected).within_margin((4. * f64::EPSILON, 4)),
-            )
+            self.expecting(is_close_to(expected).within_margin((4. * f64::EPSILON, 4)))
         }
 
         fn is_not_close_to(self, expected: f64) -> Self {
-            self.expecting(Not(
-                IsCloseTo::<_, F64Margin>::new(expected).within_margin((4. * f64::EPSILON, 4))
+            self.expecting(not(
+                is_close_to(expected).within_margin((4. * f64::EPSILON, 4))
             ))
         }
     }
@@ -154,11 +150,11 @@ mod cmp {
         R: FailingStrategy,
     {
         fn is_close_to_with_margin(self, expected: f64, margin: impl Into<F64Margin>) -> Self {
-            self.expecting(IsCloseTo::new(expected).within_margin(margin))
+            self.expecting(is_close_to(expected).within_margin(margin))
         }
 
         fn is_not_close_to_with_margin(self, expected: f64, margin: impl Into<F64Margin>) -> Self {
-            self.expecting(Not(IsCloseTo::new(expected).within_margin(margin)))
+            self.expecting(not(is_close_to(expected).within_margin(margin)))
         }
     }
 

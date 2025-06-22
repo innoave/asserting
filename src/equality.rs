@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertEquality;
 use crate::colored::mark_diff;
-use crate::expectations::{IsEqualTo, Not};
+use crate::expectations::{is_equal_to, not, IsEqualTo};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
@@ -14,11 +14,11 @@ where
     R: FailingStrategy,
 {
     fn is_equal_to(self, expected: E) -> Self {
-        self.expecting(IsEqualTo { expected })
+        self.expecting(is_equal_to(expected))
     }
 
     fn is_not_equal_to(self, expected: E) -> Self {
-        self.expecting(Not(IsEqualTo { expected }))
+        self.expecting(not(is_equal_to(expected)))
     }
 }
 
