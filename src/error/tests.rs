@@ -38,6 +38,126 @@ impl Display for SourceError {
 impl Error for SourceError {}
 
 #[test]
+fn error_has_debug_message() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    assert_that(error).has_debug_message("SuperError { source: Bar }");
+}
+
+#[test]
+fn verify_error_has_debug_message_fails() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    let failures = verify_that(error)
+        .has_debug_message("SuperError { source: Bar }")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected subject to have debug message "SuperError { source: Bar }"
+   but was: SuperError { source: Foo }
+  expected: SuperError { source: Bar }
+"#
+        ]
+    );
+}
+
+#[test]
+fn error_does_not_have_debug_message() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    assert_that(error).does_not_have_debug_message("SuperError { source: Foo }");
+}
+
+#[test]
+fn verify_error_does_not_have_debug_message_fails() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    let failures = verify_that(error)
+        .does_not_have_debug_message("SuperError { source: Bar }")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected subject to not have debug message "SuperError { source: Bar }"
+   but was: SuperError { source: Bar }
+  expected: not SuperError { source: Bar }
+"#
+        ]
+    );
+}
+
+#[test]
+fn error_has_display_message() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    assert_that(error).has_display_message("super-error caused by bar error");
+}
+
+#[test]
+fn verify_error_has_display_message_fails() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    let failures = verify_that(error)
+        .has_display_message("super-error caused by bar error")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected subject to have display message "super-error caused by bar error"
+   but was: "super-error caused by foo error"
+  expected: "super-error caused by bar error"
+"#
+        ]
+    );
+}
+
+#[test]
+fn error_does_not_have_display_message() {
+    let error = SuperError {
+        source: SourceError::Bar,
+    };
+
+    assert_that(error).does_not_have_display_message("super-error caused by foo error");
+}
+
+#[test]
+fn verify_error_does_not_have_display_message_fails() {
+    let error = SuperError {
+        source: SourceError::Foo,
+    };
+
+    let failures = verify_that(error)
+        .does_not_have_display_message("super-error caused by foo error")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"assertion failed: expected subject to not have display message "super-error caused by foo error"
+   but was: "super-error caused by foo error"
+  expected: not "super-error caused by foo error"
+"#
+        ]
+    );
+}
+
+#[test]
 fn source_error_has_no_source() {
     let error = SourceError::Foo;
 
