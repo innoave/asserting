@@ -193,6 +193,26 @@ where
     S: Debug + ?Sized,
     E: Debug + ?Sized,
 {
+    let actual = format!("{actual:?}");
+    let expected = format!("{expected:?}");
+    mark_diff_impl(&actual, &expected, format)
+}
+
+/// Highlights differences between the expected and the actual string and
+/// returns new strings with marked differences.
+///
+/// The style for marking differences is determined by the provided
+/// [`DiffFormat`].
+///
+/// A diff algorithm is applied to determine the differences between the
+/// expected and the actual string. The differences are marked according to the
+/// provided [`DiffFormat`].
+///
+/// It returns a tuple of two `String`s. The first string contains the actual
+/// value, and the second one contains the expected value. Both strings
+/// are a copy of the actual respectively expected string but with differences
+/// highlighted.
+pub fn mark_diff_str(actual: &str, expected: &str, format: &DiffFormat) -> (String, String) {
     mark_diff_impl(actual, expected, format)
 }
 
@@ -792,12 +812,8 @@ mod without_colored_feature {
     }
 
     #[inline]
-    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, _format: &DiffFormat) -> (String, String)
-    where
-        S: Debug + ?Sized,
-        E: Debug + ?Sized,
-    {
-        (format!("{actual:?}"), format!("{expected:?}"))
+    pub fn mark_diff_impl(actual: &str, expected: &str, _format: &DiffFormat) -> (String, String) {
+        (actual.to_string(), expected.to_string())
     }
 
     #[inline]
@@ -1025,16 +1041,12 @@ mod with_colored_feature {
     }
 
     #[inline]
-    pub fn mark_diff_impl<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
-    where
-        S: Debug + ?Sized,
-        E: Debug + ?Sized,
-    {
+    pub fn mark_diff_impl(actual: &str, expected: &str, format: &DiffFormat) -> (String, String) {
         use crate::std::vec::Vec;
         use sdiff::Diff;
 
-        let actual = format!("{actual:?}").chars().collect::<Vec<_>>();
-        let expected = format!("{expected:?}").chars().collect::<Vec<_>>();
+        let actual = actual.chars().collect::<Vec<_>>();
+        let expected = expected.chars().collect::<Vec<_>>();
         let mut marked_actual = Vec::with_capacity(actual.len());
         let mut marked_expected = Vec::with_capacity(expected.len());
         let diffs = sdiff::diff(&actual, &expected);

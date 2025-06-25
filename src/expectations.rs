@@ -628,6 +628,24 @@ pub struct ErrorHasSourceMessage {
     pub expected_source_message: String,
 }
 
+/// Creates a [`HasDebugMessage`] expectation.
+pub fn has_debug_message<E>(expected: E) -> HasDebugMessage<E> {
+    HasDebugMessage { expected }
+}
+
+pub struct HasDebugMessage<E> {
+    pub expected: E,
+}
+
+/// Creates a [`HasDisplayMessage`] expectation.
+pub fn has_display_message<E>(expected: E) -> HasDisplayMessage<E> {
+    HasDisplayMessage { expected }
+}
+
+pub struct HasDisplayMessage<E> {
+    pub expected: E,
+}
+
 /// Creates an [`IsEmpty`] expectation.
 pub fn is_empty() -> IsEmpty {
     IsEmpty

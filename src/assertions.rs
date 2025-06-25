@@ -2219,6 +2219,145 @@ pub trait AssertErrorHasSource<'a, R> {
     ) -> Spec<'a, Option<String>, R>;
 }
 
+/// Assert a type formatted into a debug string.
+///
+/// The subject's type must implement `Debug` and the expected type must
+/// implement `AsRef<str>`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// #[derive(Debug)]
+/// struct Foo {
+///     hello: String,
+/// }
+///
+/// let subject = Foo { hello: "World".into() };
+///
+/// assert_that!(&subject).has_debug_message("Foo { hello: \"World\" }");
+/// assert_that!(&subject).does_not_have_debug_message("Bar { hello: \"World\" }");
+/// ```
+pub trait AssertHasDebugMessage<E> {
+    /// Verifies that a subject formatted for debugging results in the expected
+    /// string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug)]
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(subject).has_debug_message("Foo { hello: \"World\" }");
+    /// ```
+    #[track_caller]
+    fn has_debug_message(self, expected: E) -> Self;
+
+    /// Verifies that a subject formatted for debugging does not result in the
+    /// expected string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug)]
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(subject).does_not_have_debug_message("Hello World");
+    /// ```
+    #[track_caller]
+    fn does_not_have_debug_message(self, expected: E) -> Self;
+}
+
+/// Assert a type formatted into a display string.
+///
+/// The subject's type must implement `Display` and the expected type must
+/// implement `AsRef<str>`.
+///
+/// # Examples
+///
+/// ```
+/// use core::fmt::{self, Display};
+/// use asserting::prelude::*;
+///
+/// struct Foo {
+///     hello: String,
+/// }
+///
+/// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+///         write!(f, "Hello {}", self.hello)
+///     }
+/// }
+///
+/// let subject = Foo { hello: "World".into() };
+///
+/// assert_that!(&subject).has_display_message("Hello World");
+/// assert_that!(&subject).does_not_have_display_message("Foo { hello: \"World\" }");
+/// ```
+pub trait AssertHasDisplayMessage<E> {
+    /// Verifies that a subject formatted for display results in the expected
+    /// string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use core::fmt::{self, Display};
+    /// use asserting::prelude::*;
+    ///
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         write!(f, "Hello {}", self.hello)
+    ///     }
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(&subject).has_display_message("Hello World");
+    /// ```
+    #[track_caller]
+    fn has_display_message(self, expected: E) -> Self;
+
+    /// Verifies that a subject formatted for display does not result in the
+    /// expected string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use core::fmt::{self, Display};
+    /// use asserting::prelude::*;
+    ///
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         write!(f, "Hello {}", self.hello)
+    ///     }
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(&subject).does_not_have_display_message("Foo { hello: \"World\" }");
+    /// ```
+    #[track_caller]
+    fn does_not_have_display_message(self, expected: E) -> Self;
+}
+
 /// Assert that a string contains a substring or character.
 ///
 /// # Examples

@@ -348,6 +348,22 @@ for types that implement `std::error::Error`.
 | has_source         | verify that an error has some source                                                               |
 | has_source_message | verify that an error has a source which converts to a string that is equal to the expected message |
 
+### Debug and Display string
+
+for types that implement `core::fmt::Debug`:
+
+| assertion                   | description                                                                |
+|-----------------------------|----------------------------------------------------------------------------|
+| has_debug_message           | verify that a type formatted for debug is equal to the expected string     |                                                 
+| does_not_have_debug_message | verify that a type formatted for debug is not equal to the expected string |
+
+for types that implement `core::fmt::Display`:
+
+| assertion                     | description                                                                  |
+|-------------------------------|------------------------------------------------------------------------------|
+| has_display_message           | verify that a type formatted for display is equal to the expected string     |                                                 
+| does_not_have_display_message | verify that a type formatted for display is not equal to the expected string |
+
 ### Emptiness
 
 for collections and strings.
