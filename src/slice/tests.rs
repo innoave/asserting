@@ -242,6 +242,62 @@ fn verify_slice_iterator_contains_fails() {
 }
 
 #[test]
+fn slice_does_not_contain() {
+    let subject: &[i32] = &[1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
+
+    assert_that(subject)
+        .does_not_contain(&2)
+        .does_not_contain(&4)
+        .does_not_contain(&6);
+}
+
+#[test]
+fn verify_slice_does_not_contain_fails() {
+    let subject: &[i32] = &[1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(&19)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing to not contain 19
+   but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+  expected: not 19
+"]
+    );
+}
+
+#[test]
+fn slice_iterator_does_not_contain() {
+    let subject: slice::Iter<'_, i32> = [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43].iter();
+
+    assert_that(subject)
+        .does_not_contain(&2)
+        .does_not_contain(&4)
+        .does_not_contain(&6);
+}
+
+#[test]
+fn verify_slice_iterator_does_not_contain_fails() {
+    let subject: slice::Iter<'_, i32> = [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43].iter();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(&19)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing to not contain 19
+   but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+  expected: not 19
+"]
+    );
+}
+
+#[test]
 fn slice_contains_exactly_in_any_order() {
     let subject: &[i32] = &[5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
 
@@ -837,6 +893,24 @@ mod colored {
             &["assertion failed: expected subject to contain 21\n   \
                 but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: \u{1b}[32m21\u{1b}[0m\n\
+            "]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_slice_does_not_contain() {
+        let subject: &[i64] = &[13, 5, 7, 19, 1, 3, 11, 29, 19, 19, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_GREEN)
+            .does_not_contain(&19)
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &["assertion failed: expected subject to not contain 19\n   \
+                but was: [13, 5, 7, \u{1b}[31m19\u{1b}[0m, 1, 3, 11, 29, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, 37]\n  \
+               expected: not \u{1b}[32m19\u{1b}[0m\n\
             "]
         );
     }

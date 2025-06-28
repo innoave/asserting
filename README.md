@@ -399,6 +399,7 @@ for all iterators.
 | assertion                     | description                                                                                                             |
 |-------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | contains                      | verify that an iterator/collection contains an item that is equal to the expected value                                 |                                                
+| does_not_contain              | verify that an iterator/collection does not contain an item that is equal to the expected value                         |                                                
 | contains_exactly_in_any_order | verify that an iterator/collection contains exactly the expected values and nothing else in any order                   |
 | contains_any_of               | verify that an iterator/collection contains at least one of the given values                                            |
 | contains_all_of               | verify that an iterator/collection contains all the expected values in any order (and maybe more)                       |

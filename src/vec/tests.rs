@@ -93,6 +93,34 @@ fn verify_vec_contains_fails() {
 }
 
 #[test]
+fn vec_does_not_contain() {
+    let subject: Vec<i32> = vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
+
+    assert_that(subject)
+        .does_not_contain(2)
+        .does_not_contain(4)
+        .does_not_contain(6);
+}
+
+#[test]
+fn verify_vec_does_not_contain_fails() {
+    let subject: Vec<i32> = vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(19)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing to not contain 19
+   but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+  expected: not 19
+"]
+    );
+}
+
+#[test]
 fn vec_contains_exactly_in_any_order() {
     let subject: Vec<i32> = vec![5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
 
