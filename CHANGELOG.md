@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.9.0 - 2025-06-28
+
+_"Does not contain" assertions for strings, collections and iterators and expectation combinators
+(not, all, any)_
+
+### Added
+
+* assert types formatted for debug and display
+  [(PR #56)](https://github.com/innoave/asserting/pull/56)
+* provide "does not..." assertions for strings
+  [(PR #53)](https://github.com/innoave/asserting/pull/53)
+* `does_not_contain` assertion for collections and iterators
+  [(PR #57)](https://github.com/innoave/asserting/pull/57)
+* `does_not_contain_any_of` assertion for collection and iterators
+  [(PR #58)](https://github.com/innoave/asserting/pull/58)
+* **Breaking:** provide `Not` expectation combinator and revise failure messages
+  [(PR #52)](https://github.com/innoave/asserting/pull/52)
+* provide expectation combinators `All` and `Any`
+  [(PR #54)](https://github.com/innoave/asserting/pull/54)
+* **Breaking:** provide constructor functions for all expectations (including the combinators)
+  [(PR #55)](https://github.com/innoave/asserting/pull/55)
+
 ## 0.8.0 - 2025-06-08
 
 _Asserting big and accurate numbers_
