@@ -179,6 +179,33 @@ fn verify_vec_contains_any_of_fails() {
 }
 
 #[test]
+fn vec_does_not_contain_any_of() {
+    let subject: Vec<i32> = vec![5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
+
+    assert_that(subject).does_not_contain_any_of([2, 20, 4, 40, 6, 8]);
+}
+
+#[test]
+fn verify_vec_does_not_contain_any_of_fails() {
+    let subject: Vec<i32> = vec![5, 7, 20, 1, 17, 23, 23, 40, 20, 20, 41, 37, 43];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain_any_of([2, 20, 4, 40, 8, 80])
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing to not contain any of [2, 20, 4, 40, 8, 80]
+   but was: [5, 7, 20, 1, 17, 23, 23, 40, 20, 20, 41, 37, 43]
+  expected: not [2, 20, 4, 40, 8, 80]
+"
+        ]
+    );
+}
+
+#[test]
 fn vec_contains_all_of() {
     let subject: Vec<i32> = vec![5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
 

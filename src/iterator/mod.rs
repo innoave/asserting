@@ -108,6 +108,11 @@ where
             .expecting(iterator_contains_any_of(expected))
     }
 
+    fn does_not_contain_any_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.mapping(Vec::from_iter)
+            .expecting(not(iterator_contains_any_of(expected)))
+    }
+
     fn contains_all_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains_all_of(expected))
@@ -193,19 +198,58 @@ where
         &self,
         expression: &Expression<'_>,
         actual: &Vec<T>,
-        _inverted: bool,
+        inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
-        let marked_expected = mark_all_items_in_collection(&self.expected, format, mark_missing);
+        let (not, marked_actual, marked_expected) = if inverted {
+            let mut found_in_actual = HashSet::new();
+            let mut found_in_expected = HashSet::new();
+            for (exp_idx, expected_item) in self.expected.iter().enumerate() {
+                let found = actual
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(idx, elem)| {
+                        if elem == expected_item {
+                            Some(idx)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                if !found.is_empty() {
+                    found_in_actual.extend(found);
+                    found_in_expected.insert(exp_idx);
+                }
+            }
+            let marked_actual = mark_selected_items_in_collection(
+                actual,
+                &found_in_actual,
+                format,
+                mark_unexpected,
+            );
+            let marked_expected = mark_selected_items_in_collection(
+                &self.expected,
+                &found_in_expected,
+                format,
+                mark_missing,
+            );
+            ("not ", marked_actual, marked_expected)
+        } else {
+            let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+            let marked_expected =
+                mark_all_items_in_collection(&self.expected, format, mark_missing);
+            ("", marked_actual, marked_expected)
+        };
         format!(
-            r"expected {expression} to contain any of {:?}
+            r"expected {expression} to {not}contain any of {:?}
    but was: {marked_actual}
-  expected: {marked_expected}",
+  expected: {not}{marked_expected}",
             &self.expected,
         )
     }
 }
+
+impl<E> Invertible for IteratorContainsAnyOf<E> {}
 
 impl<T, E> Expectation<Vec<T>> for IteratorContainsAllOf<E>
 where
