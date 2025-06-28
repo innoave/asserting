@@ -2692,7 +2692,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains at least one of
-    /// the given values.
+    /// the specified values.
     ///
     /// # Examples
     ///
@@ -2714,6 +2714,30 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// ```
     #[track_caller]
     fn contains_any_of(self, expected: E) -> Spec<'a, S, R>;
+
+    /// Verifies that the actual collection/iterator does not contain any of
+    /// the specified values.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use std::collections::BTreeMap;
+    ///
+    /// let some_array = [1, 3, 5, 7];
+    /// assert_that!(some_array).does_not_contain_any_of([2, 4, 6]);
+    ///
+    /// let some_slice = &['b', 'X', 'k', 'G'][..];
+    /// assert_that!(some_slice).does_not_contain_any_of(&['a', 'A', 'c', 'd']);
+    ///
+    /// let some_vec = vec![12, 4, 6, 10, 8];
+    /// assert_that!(some_vec).does_not_contain_any_of([1, 2, 3, 5, 7]);
+    ///
+    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+    /// assert_that!(some_btree_map).does_not_contain_any_of([('x', 2), ('z', 3), ('y', 7)]);
+    /// ```
+    #[track_caller]
+    fn does_not_contain_any_of(self, expected: E) -> Spec<'a, S, R>;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// in any order.

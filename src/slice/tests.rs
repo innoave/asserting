@@ -356,6 +356,33 @@ fn verify_slice_contains_any_of_fails() {
 }
 
 #[test]
+fn slice_does_not_contain_any_of() {
+    let subject: &[i32] = &[5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
+
+    assert_that(subject).does_not_contain_any_of(&[10, 2, 4, 44, 6, 8]);
+}
+
+#[test]
+fn verify_slice_does_not_contain_any_of_fails() {
+    let subject: &[i32] = &[5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain_any_of(&[0, 2, 4, 41, 16, 32, 64])
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r"assertion failed: expected my_thing to not contain any of [0, 2, 4, 41, 16, 32, 64]
+   but was: [5, 7, 11, 13, 1, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43]
+  expected: not [0, 2, 4, 41, 16, 32, 64]
+"
+        ]
+    );
+}
+
+#[test]
 fn slice_contains_all_of() {
     let subject: &[i32] = &[5, 7, 11, 13, 1, 19, 11, 3, 17, 23, 23, 29, 31, 41, 37, 43];
 
@@ -947,6 +974,23 @@ mod colored {
             "assertion failed: expected subject to contain any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
                 but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: [\u{1b}[34m2\u{1b}[0m, \u{1b}[34m4\u{1b}[0m, \u{1b}[34m6\u{1b}[0m, \u{1b}[34m8\u{1b}[0m, \u{1b}[34m9\u{1b}[0m, \u{1b}[34m10\u{1b}[0m, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, \u{1b}[34m32\u{1b}[0m, \u{1b}[34m20\u{1b}[0m, \u{1b}[34m18\u{1b}[0m]\n\
+            "
+        ]);
+    }
+
+    #[test]
+    fn highlight_diffs_slice_does_not_contain_any_of() {
+        let subject: &[i64] = &[13, 5, 7, 19, 11, 11, 3, 11, 29, 23, 31, 37];
+
+        let failures = verify_that(subject)
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .does_not_contain_any_of(&[2, 4, 6, 8, 9, 10, 11, 15, 32, 20, 18])
+            .display_failures();
+
+        assert_eq!(failures, &[
+            "assertion failed: expected subject to not contain any of [2, 4, 6, 8, 9, 10, 11, 15, 32, 20, 18]\n   \
+                but was: [13, 5, 7, 19, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, 3, \u{1b}[31m11\u{1b}[0m, 29, 23, 31, 37]\n  \
+               expected: not [2, 4, 6, 8, 9, 10, \u{1b}[34m11\u{1b}[0m, 15, 32, 20, 18]\n\
             "
         ]);
     }

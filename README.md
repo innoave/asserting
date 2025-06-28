@@ -396,15 +396,16 @@ Implementing this property for any type enables these assertions for that type.
 
 for all iterators.
 
-| assertion                     | description                                                                                                             |
-|-------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| contains                      | verify that an iterator/collection contains an item that is equal to the expected value                                 |                                                
-| does_not_contain              | verify that an iterator/collection does not contain an item that is equal to the expected value                         |                                                
-| contains_exactly_in_any_order | verify that an iterator/collection contains exactly the expected values and nothing else in any order                   |
-| contains_any_of               | verify that an iterator/collection contains at least one of the given values                                            |
-| contains_all_of               | verify that an iterator/collection contains all the expected values in any order (and maybe more)                       |
-| contains_only                 | verify that an iterator/collection contains only the given values and nothing else in any order and ignoring duplicates |
-| contains_only_once            | verify that an iterator/collection contains only the given values in any order and each of them only once               |
+| assertion                     | description                                                                                                                 |
+|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| contains                      | verify that an iterator/collection contains an item that is equal to the expected value                                     |                                                
+| does_not_contain              | verify that an iterator/collection does not contain an item that is equal to the expected value                             |                                                
+| contains_exactly_in_any_order | verify that an iterator/collection contains exactly the expected values and nothing else in any order                       |
+| contains_any_of               | verify that an iterator/collection contains at least one of the specified values                                            |
+| does_not_contain_any_of       | verify that an iterator/collection does not contain any of the specified values                                             |
+| contains_all_of               | verify that an iterator/collection contains all the expected values in any order (and maybe more)                           |
+| contains_only                 | verify that an iterator/collection contains only the specified values and nothing else in any order and ignoring duplicates |
+| contains_only_once            | verify that an iterator/collection contains only the specified values in any order and each of them only once               |
 
 for iterators that yield items in a well-defined order.
 
