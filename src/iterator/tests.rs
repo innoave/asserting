@@ -134,3 +134,69 @@ fn verify_custom_iterator_contains_fails() {
 "]
     );
 }
+
+#[test]
+fn custom_collection_does_not_contain() {
+    let subject: CustomCollection<i32> = CustomCollection {
+        inner: vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43],
+    };
+
+    assert_that(subject)
+        .does_not_contain(2)
+        .does_not_contain(4)
+        .does_not_contain(6);
+}
+
+#[test]
+fn verify_custom_collection_does_not_contain_fails() {
+    let subject: CustomCollection<i32> = CustomCollection {
+        inner: vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43],
+    };
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(19)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing to not contain 19
+   but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+  expected: not 19
+"]
+    );
+}
+
+#[test]
+fn custom_iterator_does_not_contain() {
+    let subject: CustomIter<i32> = CustomCollection {
+        inner: vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43],
+    }
+    .into_iter();
+
+    assert_that(subject)
+        .does_not_contain(2)
+        .does_not_contain(4)
+        .does_not_contain(6);
+}
+
+#[test]
+fn verify_custom_iterator_does_not_contain_fails() {
+    let subject: CustomIter<i32> = CustomCollection {
+        inner: vec![1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43],
+    }
+    .into_iter();
+
+    let failures = verify_that(subject)
+        .named("my_thing")
+        .does_not_contain(19)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[r"assertion failed: expected my_thing to not contain 19
+   but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+  expected: not 19
+"]
+    );
+}

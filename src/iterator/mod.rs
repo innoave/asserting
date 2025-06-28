@@ -10,7 +10,7 @@ use crate::expectations::{
     iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
     iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
     iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
-    iterator_ends_with, iterator_starts_with, IteratorContains, IteratorContainsAllInOrder,
+    iterator_ends_with, iterator_starts_with, not, IteratorContains, IteratorContainsAllInOrder,
     IteratorContainsAllOf, IteratorContainsAnyOf, IteratorContainsExactly,
     IteratorContainsExactlyInAnyOrder, IteratorContainsOnly, IteratorContainsOnlyOnce,
     IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
@@ -34,6 +34,11 @@ where
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains(expected))
     }
+
+    fn does_not_contain(self, expected: E) -> Spec<'a, Vec<T>, R> {
+        self.mapping(Vec::from_iter)
+            .expecting(not(iterator_contains(expected)))
+    }
 }
 
 impl<T, E> Expectation<Vec<T>> for IteratorContains<E>
@@ -52,8 +57,29 @@ where
         inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+        let (not, marked_actual) = if inverted {
+            let found_unexpected = actual
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, element)| {
+                    if element == &self.expected {
+                        Some(idx)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            let marked_actual = mark_selected_items_in_collection(
+                actual,
+                &found_unexpected,
+                format,
+                mark_unexpected,
+            );
+            ("not ", marked_actual)
+        } else {
+            let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+            ("", marked_actual)
+        };
         let marked_expected = mark_missing(&self.expected, format);
         format!(
             "expected {expression} to {not}contain {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",

@@ -2611,8 +2611,8 @@ pub trait AssertStringMatches {
 /// assert_that!(some_btree_map).contains(('b', 0));
 /// ```
 pub trait AssertIteratorContains<'a, U, E, R> {
-    /// Verifies that the actual collection/iterator contains the expected
-    /// value.
+    /// Verifies that the actual collection/iterator contains at least one
+    /// element that is equal to the expected value.
     ///
     /// # Examples
     ///
@@ -2634,6 +2634,30 @@ pub trait AssertIteratorContains<'a, U, E, R> {
     /// ```
     #[track_caller]
     fn contains(self, element: E) -> Spec<'a, U, R>;
+
+    /// Verifies that the actual collection/iterator does not contain an element
+    /// that is equal to the expected value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use std::collections::BTreeMap;
+    ///
+    /// let some_array = [1, 3, 5, 7];
+    /// assert_that!(some_array).does_not_contain(2);
+    ///
+    /// let some_slice = &['b', 'X', 'k', 'G'][..];
+    /// assert_that!(some_slice).does_not_contain(&'Y');
+    ///
+    /// let some_vec = vec![12, 4, 6, 10, 8];
+    /// assert_that!(some_vec).does_not_contain(5);
+    ///
+    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+    /// assert_that!(some_btree_map).does_not_contain(('d', 5));
+    /// ```
+    #[track_caller]
+    fn does_not_contain(self, element: E) -> Spec<'a, U, R>;
 }
 
 /// Assert values in a collection.
