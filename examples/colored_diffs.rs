@@ -1,5 +1,6 @@
 //! Example printing colored diffs in the terminal for a failed assertion.
 
+// just to prevent some linter warnings
 mod fixture;
 
 use asserting::prelude::*;
