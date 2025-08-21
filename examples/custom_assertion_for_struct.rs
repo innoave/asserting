@@ -60,6 +60,7 @@ impl Expectation<Snake> for HasBody {
                 inverted,
                 format,
             ));
+            failure.push('\n');
         }
         if !self.head {
             failure.push_str(&is_equal_to(&self.expected[0]).message(
@@ -68,6 +69,7 @@ impl Expectation<Snake> for HasBody {
                 inverted,
                 format,
             ));
+            failure.push('\n');
         }
         if !self.body {
             failure.push_str(&iterator_contains_exactly(self.expected.clone()).message(
@@ -76,6 +78,7 @@ impl Expectation<Snake> for HasBody {
                 inverted,
                 format,
             ));
+            failure.push('\n');
         }
         failure
     }
