@@ -30,7 +30,7 @@ regex = ["dep:regex"]
 std = []
 
 [dependencies]
-hashbrown = "0.15"
+hashbrown = "0.16"
 
 # optional
 bigdecimal = { version = "0.4", optional = true, default-features = false }
