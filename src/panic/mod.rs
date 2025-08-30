@@ -129,6 +129,7 @@ where
 
 fn read_panic_message(error: Option<&Box<dyn Any + Send>>) -> Option<String> {
     error.and_then(|message| {
+        let message = &**message;
         message
             .downcast_ref::<String>()
             .cloned()
