@@ -19,28 +19,39 @@ struct Snake {
 
 /// Helper function for asserting a snake's state.
 fn assert_snake_body(snake: &Snake, expected_body: &[Coord]) {
-    assert_that!(snake)
+    let mut failures = verify_that!(snake)
+        .with_configured_diff_format()
         .extracting(|s| s.length)
         .named("snake.length")
-        .is_equal_to(expected_body.len());
-    assert_that!(snake)
-        .extracting(|s| &s.body)
-        .named("snake.body")
-        .contains_exactly(expected_body);
-    assert_that!(snake)
-        .extracting(|s| s.head)
-        .named("snake.head")
-        .is_equal_to(expected_body[0]);
+        .is_equal_to(expected_body.len())
+        .display_failures();
+    failures.extend(
+        verify_that!(snake)
+            .with_configured_diff_format()
+            .extracting(|s| &s.body)
+            .named("snake.body")
+            .contains_exactly(expected_body)
+            .display_failures(),
+    );
+    failures.extend(
+        verify_that!(snake)
+            .with_configured_diff_format()
+            .extracting(|s| s.head)
+            .named("snake.head")
+            .is_equal_to(expected_body[0])
+            .display_failures(),
+    );
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
 fn test() {
     let snake = Snake {
-        length: 3,
-        head: Coord { x: 2, y: 1 },
+        length: 2,
+        head: Coord { x: 3, y: 1 },
         body: vec![
             Coord { x: 2, y: 1 },
-            Coord { x: -1, y: 1 },
             Coord { x: 1, y: 2 },
+            Coord { x: -1, y: 1 },
         ],
     };
 
