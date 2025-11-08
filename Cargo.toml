@@ -48,6 +48,11 @@ proptest = "1"
 time = { version = "0.3", default-features = false, features = ["macros"] }
 version-sync = "0.9"
 
+[profile.dev.package]
+fakeenv.opt-level = 3
+proptest.opt-level = 3
+version-sync.opt-level = 3
+
 [lints.rust]
 unsafe_code = "forbid"
 unstable_features = "forbid"
