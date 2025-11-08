@@ -80,7 +80,7 @@ fn verify_all_combinator_asserts_2_expectations_fails() {
 
     assert_eq!(
         failures,
-        &["assertion failed: expected subject to be negative\n   \
+        &["expected subject to be negative\n   \
                 but was: 42\n  \
                expected: < 0\n\
              expected subject to be zero\n   \
@@ -115,7 +115,7 @@ fn verify_all_combinator_asserts_3_expectations_fails() {
 
     assert_eq!(
         failures,
-        &["assertion failed: expected subject to be positive\n   \
+        &["expected subject to be positive\n   \
                 but was: -42\n  \
                expected: > 0\n\
              expected subject to be between 41 and 43\n   \
@@ -152,7 +152,7 @@ fn verify_all_combinator_asserts_4_expectations_fails() {
 
     assert_eq!(
         failures,
-        &["assertion failed: expected subject to be positive\n   \
+        &["expected subject to be positive\n   \
                 but was: -42\n  \
                expected: > 0\n\
              expected subject to be greater than 2\n   \
@@ -255,12 +255,10 @@ fn verify_any_combinator_asserts_1_expectations_fails() {
 
     assert_eq!(
         failures,
-        &[
-            "assertion failed: expected subject to contain \"fugiaty\"\n   \
+        &["expected subject to contain \"fugiaty\"\n   \
                 but was: \"nulla elit fugiat reprehenderit\"\n  \
                expected: \"fugiaty\"\n\
-           \n"
-        ]
+           \n"]
     );
 }
 
@@ -291,15 +289,13 @@ fn verify_any_combinator_asserts_2_expectations_fails() {
 
     assert_eq!(
         failures,
-        &[
-            "assertion failed: expected subject to contain \"fugiaty\"\n   \
+        &["expected subject to contain \"fugiaty\"\n   \
                 but was: \"nulla elit fugiat reprehenderit\"\n  \
                expected: \"fugiaty\"\n\
              expected subject to contain \"ellit\"\n   \
                 but was: \"nulla elit fugiat reprehenderit\"\n  \
                expected: \"ellit\"\n\
-           \n"
-        ]
+           \n"]
     );
 }
 
@@ -336,8 +332,7 @@ fn verify_any_combinator_asserts_3_expectations_fails() {
 
     assert_eq!(
         failures,
-        &[
-            "assertion failed: expected subject to contain \"fugiaty\"\n   \
+        &["expected subject to contain \"fugiaty\"\n   \
                 but was: \"nulla elit fugiat reprehenderit\"\n  \
                expected: \"fugiaty\"\n\
              expected subject to contain \"ellit\"\n   \
@@ -346,8 +341,7 @@ fn verify_any_combinator_asserts_3_expectations_fails() {
              expected subject to contain any of ['x', 'y', 'z']\n   \
                 but was: \"nulla elit fugiat reprehenderit\"\n  \
                expected: ['x', 'y', 'z']\n\
-           \n"
-        ]
+           \n"]
     );
 }
 

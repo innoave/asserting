@@ -58,7 +58,7 @@ fn verify_result_of_custom_types_is_ok_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to be Ok(_)
+        &[r#"expected my_thing to be Ok(_)
    but was: Err(MyError("aute nam ad amet"))
   expected: Ok(_)
 "#]
@@ -83,7 +83,7 @@ fn verify_result_of_custom_types_is_err_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be Err(_)
+        &[r"expected my_thing to be Err(_)
    but was: Ok(MyValue(42))
   expected: Err(_)
 "]
@@ -135,7 +135,7 @@ fn verify_result_of_custom_types_has_value_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing to be ok containing MyValue("sea non obcaecat nostrud")
+            r#"expected my_thing to be ok containing MyValue("sea non obcaecat nostrud")
    but was: Err(MyError("amet esse rebum feugait"))
   expected: Ok(MyValue("sea non obcaecat nostrud"))
 "#
@@ -161,12 +161,10 @@ fn verify_result_of_custom_types_has_error_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be an error containing MyError(-1)
+        &[r"expected my_thing to be an error containing MyError(-1)
    but was: Ok(MyValue(42))
   expected: Err(MyError(-1))
-"
-        ]
+"]
     );
 }
 
@@ -214,7 +212,7 @@ fn verify_borrowed_result_of_custom_types_is_ok_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to be Ok(_)
+        &[r#"expected my_thing to be Ok(_)
    but was: Err(MyError("aute nam ad amet"))
   expected: Ok(_)
 "#]
@@ -239,7 +237,7 @@ fn verify_borrowed_result_of_custom_types_is_err_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be Err(_)
+        &[r"expected my_thing to be Err(_)
    but was: Ok(MyValue(42))
   expected: Err(_)
 "]
@@ -291,7 +289,7 @@ fn verify_borrowed_result_of_custom_types_has_value_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing to be ok containing MyValue("sea non obcaecat nostrud")
+            r#"expected my_thing to be ok containing MyValue("sea non obcaecat nostrud")
    but was: Err(MyError("amet esse rebum feugait"))
   expected: Ok(MyValue("sea non obcaecat nostrud"))
 "#
@@ -317,12 +315,10 @@ fn verify_borrowed_result_of_custom_types_has_error_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be an error containing MyError(-1)
+        &[r"expected my_thing to be an error containing MyError(-1)
    but was: Ok(MyValue(42))
   expected: Err(MyError(-1))
-"
-        ]
+"]
     );
 }
 
@@ -341,7 +337,9 @@ fn map_result_with_err_value_to_its_ok_value() {
     assert_that_code(|| {
         assert_that(subject).ok().is_not_empty();
     })
-        .panics_with_message("assertion failed: expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`");
+    .panics_with_message(
+        "expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`",
+    );
 }
 
 #[test]
@@ -359,9 +357,7 @@ fn map_result_with_ok_value_to_its_err_value() {
     assert_that_code(|| {
         assert_that(subject).err().is_not_empty();
     })
-    .panics_with_message(
-        "assertion failed: expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`",
-    );
+    .panics_with_message("expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`");
 }
 
 #[test]
@@ -379,7 +375,9 @@ fn map_borrowed_result_with_err_value_to_its_ok_value() {
     assert_that_code(|| {
         assert_that(&subject).ok().is_not_empty();
     })
-        .panics_with_message("assertion failed: expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`");
+    .panics_with_message(
+        "expected the subject to be `Ok(_)`, but was `Err(\"nam nihil iure liber\")`",
+    );
 }
 
 #[test]
@@ -397,9 +395,7 @@ fn map_borrowed_result_with_ok_value_to_its_err_value() {
     assert_that_code(|| {
         assert_that(&subject).err().is_not_empty();
     })
-    .panics_with_message(
-        "assertion failed: expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`",
-    );
+    .panics_with_message("expected the subject to be `Err(_)`, but was `Ok([1, 2, 3])`");
 }
 
 #[test]
@@ -434,7 +430,7 @@ fn verify_result_error_has_message_for_ok_value() {
     assert_that_code(|| {
         assert_that(subject).has_error_message("vulputate voluptate sanctus quod");
     }).panics_with_message(
-        r#"assertion failed: expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
+        r#"expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
     );
 }
 
@@ -470,7 +466,7 @@ fn verify_borrowed_result_error_has_message_for_ok_value() {
     assert_that_code(|| {
         assert_that(&subject).has_error_message("vulputate voluptate sanctus quod");
     }).panics_with_message(
-        r#"assertion failed: expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
+        r#"expected the subject to be `Err(_)` with message "vulputate voluptate sanctus quod", but was `Ok(())`"#,
     );
 }
 
@@ -494,7 +490,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to be Ok(_)\n   \
+            &["expected subject to be Ok(_)\n   \
                 but was: \u{1b}[31mErr(\"esse augue id esse\")\u{1b}[0m\n  \
                expected: \u{1b}[34mOk(_)\u{1b}[0m\n\
             "]
@@ -512,7 +508,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to be Err(_)\n   \
+            &["expected subject to be Err(_)\n   \
                 but was: \u{1b}[31mOk(3500)\u{1b}[0m\n  \
                expected: \u{1b}[32mErr(_)\u{1b}[0m\n\
             "]
@@ -530,12 +526,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be ok containing [1, 2, 3, 5, 7]\n   \
+            &["expected subject to be ok containing [1, 2, 3, 5, 7]\n   \
                 but was: \u{1b}[31mErr(\"minim facer liber kasd\")\u{1b}[0m\n  \
                expected: \u{1b}[33mOk([1, 2, 3, 5, 7])\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -551,7 +545,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject to be an error containing \"at feugait nihil qui\"\n   \
+                "expected subject to be an error containing \"at feugait nihil qui\"\n   \
                 but was: \u{1b}[31mOk([1, 2, 3, 5, 7])\u{1b}[0m\n  \
                expected: \u{1b}[33mErr(\"at feugait nihil qui\")\u{1b}[0m\n\
             "

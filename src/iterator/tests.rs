@@ -97,7 +97,7 @@ fn verify_custom_collection_contains_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to contain 42
+        &[r"expected my_thing to contain 42
    but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
   expected: 42
 "]
@@ -128,7 +128,7 @@ fn verify_custom_iterator_contains_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to contain 42
+        &[r"expected my_thing to contain 42
    but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
   expected: 42
 "]
@@ -160,7 +160,7 @@ fn verify_custom_collection_does_not_contain_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to not contain 19
+        &[r"expected my_thing to not contain 19
    but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
   expected: not 19
 "]
@@ -194,7 +194,7 @@ fn verify_custom_iterator_does_not_contain_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to not contain 19
+        &[r"expected my_thing to not contain 19
    but was: [1, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
   expected: not 19
 "]
