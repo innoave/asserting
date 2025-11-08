@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use crate::std::format;
 use proptest::prelude::*;
 
 #[test]
