@@ -21,11 +21,9 @@ fn verify_code_does_not_panic_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_closure to not panic, but did panic
+        &[r#"expected my_closure to not panic, but did panic
   with message: "excepteur stet sadipscing eu"
-"#
-        ]
+"#]
     );
 }
 
@@ -52,9 +50,7 @@ fn code_does_panic_with_message_from_assertion() {
             .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
             .is_equal_to(4);
     })
-    .panics_with_message(
-        "assertion failed: expected subject to be equal to 4\n   but was: 5\n  expected: 4\n",
-    );
+    .panics_with_message("expected subject to be equal to 4\n   but was: 5\n  expected: 4\n");
 }
 
 #[test]
@@ -76,10 +72,8 @@ fn verify_code_does_panic_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_closure to panic, but did not panic
-"
-        ]
+        &[r"expected my_closure to panic, but did not panic
+"]
     );
 }
 
@@ -95,7 +89,7 @@ fn verify_code_does_panic_with_message_fails_because_code_does_not_panic() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_closure to panic with message "nam veniam ut et",
+            r#"expected my_closure to panic with message "nam veniam ut et",
   but did not panic
 "#
         ]
@@ -116,8 +110,8 @@ fn verify_code_does_panic_with_message_fails_because_unexpected_panic_message() 
     assert_eq!(
         failures,
         &[
-            "assertion failed: expected my_closure to panic with message \"lobortis lorem aliquam ex\"\n   \
-   but was: \"assertion failed: expected subject to be equal to 4\n   but was: 5\n  expected: 4\n\"\n  \
+            "expected my_closure to panic with message \"lobortis lorem aliquam ex\"\n   \
+   but was: \"expected subject to be equal to 4\n   but was: 5\n  expected: 4\n\"\n  \
   expected: \"lobortis lorem aliquam ex\"\n\
 "
         ]
@@ -145,7 +139,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected foo to not panic, but \u{1b}[31mdid panic\u{1b}[0m\n  \
+                "expected foo to not panic, but \u{1b}[31mdid panic\u{1b}[0m\n  \
                    with message: \"\u{1b}[31mfoo does not work with message\u{1b}[0m\"\n\
                 "
             ]
@@ -162,7 +156,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected foo to panic, but \u{1b}[31mdid not panic\u{1b}[0m\n"]
+            &["expected foo to panic, but \u{1b}[31mdid not panic\u{1b}[0m\n"]
         );
     }
 
@@ -176,8 +170,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected foo to panic with message \"hendrerit sint tempor ipsum\",\n  \
-                 but \u{1b}[31mdid not panic\u{1b}[0m\n"]
+            &[
+                "expected foo to panic with message \"hendrerit sint tempor ipsum\",\n  \
+                 but \u{1b}[31mdid not panic\u{1b}[0m\n"
+            ]
         );
     }
 
@@ -191,7 +187,8 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected foo to panic with message \"hendrerit sint tempor ipsum\"\n   \
+            &[
+                "expected foo to panic with message \"hendrerit sint tempor ipsum\"\n   \
                   but was: \"\u{1b}[31mfoo does not work with message\u{1b}[0m\"\n  \
                  expected: \"\u{1b}[32mhendrerit sint tempor ipsum\u{1b}[0m\"\n\
               "

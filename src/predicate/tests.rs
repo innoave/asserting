@@ -20,7 +20,7 @@ fn verify_that_subject_satisfies_predicate_fails() {
 
     assert_eq!(
         failures,
-        &["assertion failed: expected my_thing to satisfy the given predicate, but returned false\n"]
+        &["expected my_thing to satisfy the given predicate, but returned false\n"]
     );
 }
 
@@ -35,8 +35,5 @@ fn verify_that_subject_satisfies_predicate_fails_with_custom_message() {
         })
         .display_failures();
 
-    assert_eq!(
-        failures,
-        &["assertion failed: the answer to all important questions is 42\n"]
-    );
+    assert_eq!(failures, &["the answer to all important questions is 42\n"]);
 }

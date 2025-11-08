@@ -46,7 +46,7 @@ where
     fn some(self) -> Spec<'a, T, R> {
         self.mapping(|subject| match subject {
             None => {
-                panic!("assertion failed: expected the subject to be `Some(_)`, but was `None`")
+                panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
@@ -60,7 +60,7 @@ where
     fn some(self) -> Spec<'a, &'a T, R> {
         self.mapping(|subject| match subject {
             None => {
-                panic!("assertion failed: expected the subject to be `Some(_)`, but was `None`")
+                panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })

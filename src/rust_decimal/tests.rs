@@ -22,7 +22,7 @@ fn verify_decimal_is_equal_to_other_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject to be equal to -42.831
+        &[r"expected subject to be equal to -42.831
    but was: 42.831
   expected: -42.831
 "]
@@ -168,12 +168,10 @@ fn verify_decimal_has_precision_of_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected subject to have a precision of 7
+        &[r"expected subject to have a precision of 7
    but was: 29
   expected: 7
-"
-        ]
+"]
     );
 }
 
@@ -210,7 +208,7 @@ fn verify_decimal_has_scale_of_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject to have a scale of 5
+        &[r"expected subject to have a scale of 5
    but was: 2
   expected: 5
 "]
@@ -239,7 +237,7 @@ fn verify_decimal_is_integer_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected subject to be an integer value
+        &[r"expected subject to be an integer value
    but was: 4208.10
   expected: an integer value
 "]

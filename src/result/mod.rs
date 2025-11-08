@@ -56,7 +56,7 @@ where
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
-                panic!("assertion failed: expected the subject to be `Ok(_)`, but was `Err({error:?})`")
+                panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
     }
@@ -64,7 +64,7 @@ where
     fn err(self) -> Spec<'a, E, R> {
         self.mapping(|subject| match subject {
             Ok(value) => {
-                panic!("assertion failed: expected the subject to be `Err(_)`, but was `Ok({value:?})`")
+                panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
@@ -80,7 +80,7 @@ where
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
-                panic!("assertion failed: expected the subject to be `Ok(_)`, but was `Err({error:?})`")
+                panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
     }
@@ -88,7 +88,7 @@ where
     fn err(self) -> Spec<'a, &'a E, R> {
         self.mapping(|subject| match subject {
             Ok(value) => {
-                panic!("assertion failed: expected the subject to be `Err(_)`, but was `Ok({value:?})`")
+                panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
@@ -154,7 +154,7 @@ where
     fn has_error_message(self, expected: X) -> Spec<'a, String, R> {
         self.mapping(|result| match result {
             Ok(value) => panic!(
-                r"assertion failed: expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
+                r"expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
             ),
             Err(error) => {
                 error.to_string()
@@ -174,7 +174,7 @@ where
     fn has_error_message(self, expected: X) -> Spec<'a, String, R> {
         self.mapping(|result| match result {
             Ok(value) => panic!(
-                r"assertion failed: expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
+                r"expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
             ),
             Err(error) => {
                 error.to_string()

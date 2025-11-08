@@ -59,7 +59,7 @@
 //! will print the error message:
 //!
 //! ```console
-//! assertion failed: expected 6 * 8 - 5 to be equal to 42
+//! expected 6 * 8 - 5 to be equal to 42
 //!    but was: 43
 //!   expected: 42
 //! ```
@@ -149,11 +149,11 @@
 //! assertions in the panic message:
 //!
 //! ```console
-//! assertion failed: expected subject to contain "unimportant"
+//! expected subject to contain "unimportant"
 //!    but was: "the answer to all important questions is 42"
 //!   expected: "unimportant"
 //!
-//! assertion failed: expected subject to have at most a length of 41
+//! expected subject to have at most a length of 41
 //!    but was: 43
 //!   expected: <= 41
 //! ```
@@ -319,7 +319,7 @@
 //! let failures = verify_that!(7 * 5).is_equal_to(42).display_failures();
 //!
 //! assert_that!(failures).contains_exactly([
-//!     r"assertion failed: expected 7 * 5 to be equal to 42
+//!     r"expected 7 * 5 to be equal to 42
 //!    but was: 35
 //!   expected: 42
 //! "

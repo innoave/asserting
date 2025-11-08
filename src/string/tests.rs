@@ -83,7 +83,7 @@ fn verify_string_is_equal_to_str_fails() {
     assert_eq!(
         failures,
         &[
-            r#"assertion failed: expected my_thing to be equal to "aute duis eleifend molestie"
+            r#"expected my_thing to be equal to "aute duis eleifend molestie"
    but was: ""
   expected: "aute duis eleifend molestie"
 "#
@@ -144,7 +144,7 @@ fn verify_str_is_empty_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to be empty
+        &[r#"expected my_thing to be empty
    but was: "ABC"
   expected: <empty>
 "#]
@@ -162,7 +162,7 @@ fn verify_string_is_not_empty_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to be not empty
+        &[r#"expected my_thing to be not empty
    but was: ""
   expected: <non-empty>
 "#]
@@ -201,7 +201,7 @@ fn verify_str_has_length_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to have a length of 29
+        &[r"expected my_thing to have a length of 29
    but was: 28
   expected: 29
 "]
@@ -226,12 +226,10 @@ fn verify_has_length_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a length within range 1..25
+        &[r"expected my_thing to have a length within range 1..25
    but was: 25
   expected: 1..25
-"
-        ]
+"]
     );
 }
 
@@ -253,12 +251,10 @@ fn verify_has_length_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a length within range 1..=24
+        &[r"expected my_thing to have a length within range 1..=24
    but was: 25
   expected: 1..=24
-"
-        ]
+"]
     );
 }
 
@@ -280,12 +276,10 @@ fn verify_string_has_length_less_than_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a length less than 25
+        &[r"expected my_thing to have a length less than 25
    but was: 25
   expected: < 25
-"
-        ]
+"]
     );
 }
 
@@ -307,12 +301,10 @@ fn verify_string_has_length_greater_than_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a length greater than 28
+        &[r"expected my_thing to have a length greater than 28
    but was: 28
   expected: > 28
-"
-        ]
+"]
     );
 }
 
@@ -335,12 +327,10 @@ fn verify_string_has_at_most_length_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have at most a length of 29
+        &[r"expected my_thing to have at most a length of 29
    but was: 30
   expected: <= 29
-"
-        ]
+"]
     );
 }
 
@@ -363,12 +353,10 @@ fn verify_string_has_at_least_length_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have at least a length of 22
+        &[r"expected my_thing to have at least a length of 22
    but was: 21
   expected: >= 22
-"
-        ]
+"]
     );
 }
 
@@ -415,12 +403,10 @@ fn verify_str_has_char_count_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a char count of 7
+        &[r"expected my_thing to have a char count of 7
    but was: 5
   expected: 7
-"
-        ]
+"]
     );
 }
 
@@ -463,12 +449,10 @@ fn verify_str_has_char_count_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a char count within 6..12
+        &[r"expected my_thing to have a char count within 6..12
    but was: 5
   expected: 6..12
-"
-        ]
+"]
     );
 }
 
@@ -490,12 +474,10 @@ fn verify_str_has_char_count_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a char count within 6..=12
+        &[r"expected my_thing to have a char count within 6..=12
    but was: 5
   expected: 6..=12
-"
-        ]
+"]
     );
 }
 
@@ -517,12 +499,10 @@ fn verify_string_has_char_count_less_than_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a char count less than 7
+        &[r"expected my_thing to have a char count less than 7
    but was: 7
   expected: < 7
-"
-        ]
+"]
     );
 }
 
@@ -544,12 +524,10 @@ fn verify_string_has_char_count_greater_than_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have a char count greater than 7
+        &[r"expected my_thing to have a char count greater than 7
    but was: 7
   expected: > 7
-"
-        ]
+"]
     );
 }
 
@@ -572,12 +550,10 @@ fn verify_string_has_at_most_char_count_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have at most a char count of 6
+        &[r"expected my_thing to have at most a char count of 6
    but was: 7
   expected: <= 6
-"
-        ]
+"]
     );
 }
 
@@ -600,12 +576,10 @@ fn verify_string_has_at_least_char_count_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to have at least a char count of 8
+        &[r"expected my_thing to have at least a char count of 8
    but was: 7
   expected: >= 8
-"
-        ]
+"]
     );
 }
 
@@ -655,12 +629,10 @@ fn verify_string_contains_other_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to contain "not a substring"
+        &[r#"expected my_thing to contain "not a substring"
    but was: "invidunt eos hendrerit commodo"
   expected: "not a substring"
-"#
-        ]
+"#]
     );
 }
 
@@ -675,12 +647,10 @@ fn verify_string_contains_other_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to contain "not a substring"
+        &[r#"expected my_thing to contain "not a substring"
    but was: "invidunt eos hendrerit commodo"
   expected: "not a substring"
-"#
-        ]
+"#]
     );
 }
 
@@ -695,7 +665,7 @@ fn verify_string_contains_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to contain 'Q'
+        &[r#"expected my_thing to contain 'Q'
    but was: "consectetur ex hendrerit officia"
   expected: 'Q'
 "#]
@@ -734,12 +704,10 @@ fn verify_str_contains_any_char_of_a_slice_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
+        &[r#"expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
   expected: ['x', 'y', 'z']
-"#
-        ]
+"#]
     );
 }
 
@@ -754,12 +722,10 @@ fn verify_string_contains_any_char_of_an_array_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
+        &[r#"expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
   expected: ['x', 'y', 'z']
-"#
-        ]
+"#]
     );
 }
 
@@ -774,12 +740,10 @@ fn verify_str_contains_any_char_of_a_borrowed_array_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to contain any of ['x', 'y', 'z']
+        &[r#"expected my_thing to contain any of ['x', 'y', 'z']
    but was: "luptatum in nihil laoreet"
   expected: ['x', 'y', 'z']
-"#
-        ]
+"#]
     );
 }
 
@@ -829,12 +793,10 @@ fn verify_string_does_not_contain_other_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not contain " eos "
+        &[r#"expected my_thing to not contain " eos "
    but was: "invidunt eos hendrerit commodo"
   expected: not " eos "
-"#
-        ]
+"#]
     );
 }
 
@@ -849,12 +811,10 @@ fn verify_string_does_not_contain_other_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not contain "eos hend"
+        &[r#"expected my_thing to not contain "eos hend"
    but was: "invidunt eos hendrerit commodo"
   expected: not "eos hend"
-"#
-        ]
+"#]
     );
 }
 
@@ -869,7 +829,7 @@ fn verify_string_does_not_contain_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to not contain 'x'
+        &[r#"expected my_thing to not contain 'x'
    but was: "consectetur ex hendrerit officia"
   expected: not 'x'
 "#]
@@ -908,12 +868,10 @@ fn verify_str_does_not_contain_any_char_of_a_slice_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not contain any of ['x', 'n', 'z']
+        &[r#"expected my_thing to not contain any of ['x', 'n', 'z']
    but was: "luptatum in nihil laoreet"
   expected: not ['x', 'n', 'z']
-"#
-        ]
+"#]
     );
 }
 
@@ -928,12 +886,10 @@ fn verify_string_does_not_contain_any_char_of_an_array_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not contain any of ['d', 'k', 'n']
+        &[r#"expected my_thing to not contain any of ['d', 'k', 'n']
    but was: "luptatum in nihil laoreet"
   expected: not ['d', 'k', 'n']
-"#
-        ]
+"#]
     );
 }
 
@@ -948,12 +904,10 @@ fn verify_str_does_not_contain_any_char_of_a_borrowed_array_of_chars_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not contain any of ['u', 'a', 'l']
+        &[r#"expected my_thing to not contain any of ['u', 'a', 'l']
    but was: "luptatum in nihil laoreet"
   expected: not ['u', 'a', 'l']
-"#
-        ]
+"#]
     );
 }
 
@@ -1010,12 +964,10 @@ fn verify_string_starts_with_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to start with "false start"
+        &[r#"expected my_thing to start with "false start"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "false start"
-"#
-        ]
+"#]
     );
 }
 
@@ -1030,12 +982,10 @@ fn verify_string_starts_with_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to start with "false start"
+        &[r#"expected my_thing to start with "false start"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "false start"
-"#
-        ]
+"#]
     );
 }
 
@@ -1050,7 +1000,7 @@ fn verify_string_starts_with_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to start with 'X'
+        &[r#"expected my_thing to start with 'X'
    but was: "possim deserunt obcaecat hendrerit"
   expected: 'X'
 "#]
@@ -1110,12 +1060,10 @@ fn verify_string_ends_with_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to end with "abrupt end"
+        &[r#"expected my_thing to end with "abrupt end"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "abrupt end"
-"#
-        ]
+"#]
     );
 }
 
@@ -1130,12 +1078,10 @@ fn verify_string_ends_with_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to end with "abrupt end"
+        &[r#"expected my_thing to end with "abrupt end"
    but was: "possim deserunt obcaecat hendrerit"
   expected: "abrupt end"
-"#
-        ]
+"#]
     );
 }
 
@@ -1150,7 +1096,7 @@ fn verify_string_ends_with_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to end with 'Z'
+        &[r#"expected my_thing to end with 'Z'
    but was: "possim deserunt obcaecat hendrerit"
   expected: 'Z'
 "#]
@@ -1210,12 +1156,10 @@ fn verify_string_does_not_start_with_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not start with "possim des"
+        &[r#"expected my_thing to not start with "possim des"
    but was: "possim deserunt obcaecat hendrerit"
   expected: not "possim des"
-"#
-        ]
+"#]
     );
 }
 
@@ -1230,12 +1174,10 @@ fn verify_string_does_not_start_with_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not start with "poss"
+        &[r#"expected my_thing to not start with "poss"
    but was: "possim deserunt obcaecat hendrerit"
   expected: not "poss"
-"#
-        ]
+"#]
     );
 }
 
@@ -1250,7 +1192,7 @@ fn verify_string_does_not_start_with_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to not start with 'p'
+        &[r#"expected my_thing to not start with 'p'
    but was: "possim deserunt obcaecat hendrerit"
   expected: not 'p'
 "#]
@@ -1310,12 +1252,10 @@ fn verify_string_does_not_end_with_str_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not end with "rerit"
+        &[r#"expected my_thing to not end with "rerit"
    but was: "possim deserunt obcaecat hendrerit"
   expected: not "rerit"
-"#
-        ]
+"#]
     );
 }
 
@@ -1330,12 +1270,10 @@ fn verify_string_does_not_end_with_string_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r#"assertion failed: expected my_thing to not end with "caecat hendrerit"
+        &[r#"expected my_thing to not end with "caecat hendrerit"
    but was: "possim deserunt obcaecat hendrerit"
   expected: not "caecat hendrerit"
-"#
-        ]
+"#]
     );
 }
 
@@ -1350,7 +1288,7 @@ fn verify_string_does_not_end_with_char_fails() {
 
     assert_eq!(
         failures,
-        &[r#"assertion failed: expected my_thing to not end with 't'
+        &[r#"expected my_thing to not end with 't'
    but was: "possim deserunt obcaecat hendrerit"
   expected: not 't'
 "#]
@@ -1379,12 +1317,10 @@ mod regex {
 
         assert_eq!(
             failures,
-            &[
-                r"assertion failed: expected my_thing to match the regex \b\w{12}\b
+            &[r"expected my_thing to match the regex \b\w{12}\b
                but was: volutpat lobortis aliquam diam
   does not match regex: \b\w{12}\b
-"
-            ]
+"]
         );
     }
 
@@ -1407,7 +1343,7 @@ mod regex {
         assert_eq!(
             failures,
             &[
-                r"assertion failed: expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$
+                r"expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$
                but was: volutpat lobortis aliquam diam
       does match regex: ^[a-zA-Z0-9 ]{8,32}$
 "
@@ -1455,7 +1391,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject to be equal to \"invi wisi exercitation anim placerat\"\n   \
+                "expected subject to be equal to \"invi wisi exercitation anim placerat\"\n   \
                     but was: \"invi\u{1b}[31mdunt\u{1b}[0m wisi \u{1b}[31mfacilisis \u{1b}[0mexercitation\"\n  \
                    expected: \"invi wisi exercitation\u{1b}[34m anim placerat\u{1b}[0m\"\n\
                 "
@@ -1472,10 +1408,12 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to be not equal to \"aute aliquip culpa blandit\"\n   \
+            &[
+                "expected subject to be not equal to \"aute aliquip culpa blandit\"\n   \
                but was: \"aute aliquip culpa blandit\"\n  \
               expected: not \"aute aliquip culpa blandit\"\n\
-            "]
+            "
+            ]
         );
     }
 
@@ -1490,7 +1428,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to be empty\n   \
+            &["expected subject to be empty\n   \
                but was: \u{1b}[31m\"voluptua quod quis dignissim\"\u{1b}[0m\n  \
               expected: <empty>\n\
             "]
@@ -1508,7 +1446,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to be not empty\n   \
+            &["expected subject to be not empty\n   \
                but was: \u{1b}[31m\"\"\u{1b}[0m\n  \
               expected: <non-empty>\n\
             "]
@@ -1526,12 +1464,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to have a length of 29\n   \
+            &["expected subject to have a length of 29\n   \
                but was: \u{1b}[31m23\u{1b}[0m\n  \
               expected: \u{1b}[32m29\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1546,12 +1482,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to have a length within range 8..=20\n   \
+            &["expected subject to have a length within range 8..=20\n   \
                    but was: \u{1b}[31m26\u{1b}[0m\n  \
                   expected: \u{1b}[32m8..=20\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1566,12 +1500,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to contain \"status\"\n   \
+            &["expected subject to contain \"status\"\n   \
                     but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
                    expected: \"\u{1b}[33mstatus\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1586,12 +1518,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to contain \"status\"\n   \
+            &["expected subject to contain \"status\"\n   \
                     but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
                    expected: \"\u{1b}[33mstatus\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1606,7 +1536,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to contain 'E'\n   \
+            &["expected subject to contain 'E'\n   \
                  but was: \"\u{1b}[31msanctus stet eiusmod odio\u{1b}[0m\"\n  \
                 expected: '\u{1b}[33mE\u{1b}[0m'\n\
             "]
@@ -1624,12 +1554,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not contain \"stet eius\"\n   \
+            &["expected subject to not contain \"stet eius\"\n   \
                     but was: \"sanctus \u{1b}[31mstet eius\u{1b}[0mmod odio\"\n  \
                    expected: not \"\u{1b}[33mstet eius\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1644,12 +1572,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not contain \"stet eius\"\n   \
+            &["expected subject to not contain \"stet eius\"\n   \
                     but was: \"sanctus \u{1b}[31mstet eius\u{1b}[0mmod odio\"\n  \
                    expected: not \"\u{1b}[33mstet eius\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1664,7 +1590,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to not contain 't'\n   \
+            &["expected subject to not contain 't'\n   \
                  but was: \"sanc\u{1b}[31mt\u{1b}[0mus s\u{1b}[31mt\u{1b}[0me\u{1b}[31mtt\u{1b}[0m eiusmod odio\"\n  \
                 expected: not '\u{1b}[33mt\u{1b}[0m'\n\
             "]
@@ -1682,12 +1608,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to start with \"una\"\n   \
+            &["expected subject to start with \"una\"\n   \
                    but was: \"\u{1b}[31mnul\u{1b}[0mla feugiat illum culpa\"\n  \
                   expected: \"\u{1b}[32muna\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1702,12 +1626,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to start with \"una\"\n   \
+            &["expected subject to start with \"una\"\n   \
                     but was: \"\u{1b}[31mnul\u{1b}[0mla feugiat illum culpa\"\n  \
                    expected: \"\u{1b}[32muna\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1722,12 +1644,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not start with \"null\"\n   \
+            &["expected subject to not start with \"null\"\n   \
                    but was: \"\u{1b}[31mnull\u{1b}[0ma feugiat illum culpa\"\n  \
                   expected: not \"\u{1b}[32mnull\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1742,12 +1662,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not start with \"null\"\n   \
+            &["expected subject to not start with \"null\"\n   \
                     but was: \"\u{1b}[31mnull\u{1b}[0ma feugiat illum culpa\"\n  \
                    expected: not \"\u{1b}[32mnull\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1762,7 +1680,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to start with 'o'\n   \
+            &["expected subject to start with 'o'\n   \
                    but was: \"\u{1b}[31mc\u{1b}[0mommodo sadipscing id imperdiet\"\n  \
                   expected: '\u{1b}[32mo\u{1b}[0m'\n\
             "]
@@ -1780,12 +1698,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not start with 'c'\n   \
+            &["expected subject to not start with 'c'\n   \
                    but was: \"\u{1b}[31mc\u{1b}[0mommodo sadipscing id imperdiet\"\n  \
                   expected: not '\u{1b}[32mc\u{1b}[0m'\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1800,12 +1716,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to end with \"innocence\"\n   \
+            &["expected subject to end with \"innocence\"\n   \
                    but was: \"nulla feugiat il\u{1b}[31mlum culpa\u{1b}[0m\"\n  \
                   expected: \"\u{1b}[32minnocence\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1820,12 +1734,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to end with \"innocence\"\n   \
+            &["expected subject to end with \"innocence\"\n   \
                     but was: \"nulla feugiat il\u{1b}[31mlum culpa\u{1b}[0m\"\n  \
                    expected: \"\u{1b}[32minnocence\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1840,12 +1752,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not end with \"um culpa\"\n   \
+            &["expected subject to not end with \"um culpa\"\n   \
                    but was: \"nulla feugiat ill\u{1b}[31mum culpa\u{1b}[0m\"\n  \
                   expected: not \"\u{1b}[32mum culpa\u{1b}[0m\"\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1860,12 +1770,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not end with \"lpa\"\n   \
+            &["expected subject to not end with \"lpa\"\n   \
                     but was: \"nulla feugiat illum cu\u{1b}[31mlpa\u{1b}[0m\"\n  \
                    expected: not \"\u{1b}[32mlpa\u{1b}[0m\"\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1880,7 +1788,7 @@ mod colored {
 
         assert_eq!(
             failures,
-            &["assertion failed: expected subject to end with 'e'\n   \
+            &["expected subject to end with 'e'\n   \
                    but was: \"commodo sadipscing id imperdie\u{1b}[31mt\u{1b}[0m\"\n  \
                   expected: '\u{1b}[32me\u{1b}[0m'\n\
             "]
@@ -1898,12 +1806,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to not end with 't'\n   \
+            &["expected subject to not end with 't'\n   \
                    but was: \"commodo sadipscing id imperdie\u{1b}[31mt\u{1b}[0m\"\n  \
                   expected: not '\u{1b}[32mt\u{1b}[0m'\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1918,12 +1824,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+            &["expected subject to contain any of ['a', 'b', 'c']\n   \
                     but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1938,12 +1842,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+            &["expected subject to contain any of ['a', 'b', 'c']\n   \
                     but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1958,12 +1860,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to contain any of ['a', 'b', 'c']\n   \
+            &["expected subject to contain any of ['a', 'b', 'c']\n   \
                     but was: \"\u{1b}[31mproident tempor est sed\u{1b}[0m\"\n  \
                    expected: \u{1b}[34m['a', 'b', 'c']\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -1979,7 +1879,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject to not contain any of ['r', 'b', 'c']\n   \
+                "expected subject to not contain any of ['r', 'b', 'c']\n   \
                     but was: \"p\u{1b}[31mr\u{1b}[0moident tempo\u{1b}[31mr\u{1b}[0m est sed\"\n  \
                    expected: not [\u{1b}[34m'r'\u{1b}[0m, 'b', 'c']\n\
                 "
@@ -1999,7 +1899,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject to not contain any of ['a', 's', 'e']\n   \
+                "expected subject to not contain any of ['a', 's', 'e']\n   \
                     but was: \"proid\u{1b}[31me\u{1b}[0mnt t\u{1b}[31me\u{1b}[0mmpor \u{1b}[31mes\u{1b}[0mt \u{1b}[31mse\u{1b}[0md\"\n  \
                    expected: not ['a', \u{1b}[34m's'\u{1b}[0m, \u{1b}[34m'e'\u{1b}[0m]\n\
                 "
@@ -2019,7 +1919,7 @@ mod colored {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected subject to not contain any of ['p', 'o', 'r']\n   \
+                "expected subject to not contain any of ['p', 'o', 'r']\n   \
                     but was: \"\u{1b}[31mpro\u{1b}[0mident tem\u{1b}[31mpor\u{1b}[0m est sed\"\n  \
                    expected: not [\u{1b}[34m'p'\u{1b}[0m, \u{1b}[34m'o'\u{1b}[0m, \u{1b}[34m'r'\u{1b}[0m]\n\
                 "
@@ -2046,7 +1946,7 @@ mod colored_regex {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected my_thing to match the regex \\b\\w{12}\\b\n               \
+                "expected my_thing to match the regex \\b\\w{12}\\b\n               \
                                 but was: \u{1b}[31mvolutpat lobortis aliquam diam\u{1b}[0m\n  \
                    does not match regex: \u{1b}[32m\\b\\w{12}\\b\u{1b}[0m\n\
                 "
@@ -2067,7 +1967,7 @@ mod colored_regex {
         assert_eq!(
             failures,
             &[
-                "assertion failed: expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$\n               \
+                "expected my_thing to not match the regex ^[a-zA-Z0-9 ]{8,32}$\n               \
                              but was: \u{1b}[31mvolutpat lobortis aliquam diam\u{1b}[0m\n      \
                     does match regex: \u{1b}[33m^[a-zA-Z0-9 ]{8,32}$\u{1b}[0m\n\
                 "

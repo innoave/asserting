@@ -173,7 +173,7 @@ macro_rules! assert_that_code {
 ///     .display_failures();
 ///
 /// assert_that!(failures).contains_exactly([
-///     r#"assertion failed: expected || { divide(7, 0); } to not panic, but did panic
+///     r#"expected || { divide(7, 0); } to not panic, but did panic
 ///   with message: "attempt to divide by zero"
 /// "#
 /// ]);
@@ -183,7 +183,7 @@ macro_rules! assert_that_code {
 ///     .display_failures();
 ///
 /// assert_that!(failures).contains_exactly([
-///     r#"assertion failed: expected || { divide(7, 0); } to panic with message "division by zero"
+///     r#"expected || { divide(7, 0); } to panic with message "division by zero"
 ///    but was: "attempt to divide by zero"
 ///   expected: "division by zero"
 /// "#
@@ -296,11 +296,11 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 ///     .display_failures();
 ///
 /// assert_that!(failures).contains_exactly([
-///     r#"assertion failed: expected my_thing to start with "nibh"
+///     r#"expected my_thing to start with "nibh"
 ///    but was: "vel tempor augue delenit"
 ///   expected: "nibh"
 /// "#,
-///     r#"assertion failed: expected my_thing to end with "magna"
+///     r#"expected my_thing to end with "magna"
 ///    but was: "vel tempor augue delenit"
 ///   expected: "magna"
 /// "#,
@@ -393,7 +393,7 @@ where
 ///     .display_failures();
 ///
 /// assert_that!(failures).contains_exactly([
-///     r#"assertion failed: expected the closure to not panic, but did panic
+///     r#"expected the closure to not panic, but did panic
 ///   with message: "attempt to divide by zero"
 /// "#
 /// ]);
@@ -403,7 +403,7 @@ where
 ///     .display_failures();
 ///
 /// assert_that!(failures).contains_exactly([
-///     r#"assertion failed: expected the closure to panic with message "division by zero"
+///     r#"expected the closure to panic with message "division by zero"
 ///    but was: "attempt to divide by zero"
 ///   expected: "division by zero"
 /// "#
@@ -910,7 +910,7 @@ where
     /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
     ///
     /// assert_that!(failures).contains_exactly([
-    ///     "assertion failed: expected 22 to satisfy the given predicate, but returned false\n"
+    ///     "expected 22 to satisfy the given predicate, but returned false\n"
     /// ]);
     /// ```
     ///
@@ -952,7 +952,7 @@ where
     ///         .display_failures();
     ///
     /// assert_that!(failures).contains_exactly([
-    ///     "assertion failed: expected my number to be odd\n"
+    ///     "expected my number to be odd\n"
     /// ]);
     /// ```
     ///
@@ -1016,11 +1016,11 @@ impl<S> Spec<'_, S, CollectFailures> {
     /// assertions in the panic message:
     ///
     /// ```console
-    /// assertion failed: expected subject to contain "unimportant"
+    /// expected subject to contain "unimportant"
     ///    but was: "the answer to all important questions is 42"
     ///   expected: "unimportant"
     ///
-    /// assertion failed: expected subject to have at most a length of 41
+    /// expected subject to have at most a length of 41
     ///    but was: 43
     ///   expected: <= 41
     /// ```
@@ -1079,15 +1079,15 @@ impl<'a, I, R> Spec<'a, I, R> {
     /// will print:
     ///
     /// ```console
-    /// assertion failed: expected numbers 1. item to be greater than 2
+    /// expected numbers 1. item to be greater than 2
     ///    but was: 2
     ///   expected: > 2
     ///
-    /// assertion failed: expected numbers 4. item to be at most 7
+    /// expected numbers 4. item to be at most 7
     ///    but was: 8
     ///   expected: <= 7
     ///
-    /// assertion failed: expected numbers 5. item to be at most 7
+    /// expected numbers 5. item to be at most 7
     ///    but was: 10
     ///   expected: <= 7
     /// ```
@@ -1145,10 +1145,10 @@ impl Display for AssertFailure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.description {
             None => {
-                writeln!(f, "assertion failed: {}", &self.message)?;
+                writeln!(f, "{}", &self.message)?;
             },
             Some(description) => {
-                writeln!(f, "assertion failed: {description}\n{}", &self.message)?;
+                writeln!(f, "{description}\n{}", &self.message)?;
             },
         }
         Ok(())

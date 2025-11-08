@@ -22,7 +22,7 @@ fn verify_i32_is_less_than_other_i32_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be less than 42
+        &[r"expected my_thing to be less than 42
    but was: 42
   expected: < 42
 "]
@@ -47,7 +47,7 @@ fn verify_i32_is_greater_than_other_i32_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be greater than 42
+        &[r"expected my_thing to be greater than 42
    but was: 42
   expected: > 42
 "]
@@ -72,7 +72,7 @@ fn verify_i32_is_at_most_other_i32_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be at most 41
+        &[r"expected my_thing to be at most 41
    but was: 42
   expected: <= 41
 "]
@@ -97,7 +97,7 @@ fn verify_i32_is_at_least_other_i32_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be at least 43
+        &[r"expected my_thing to be at least 43
    but was: 42
   expected: >= 43
 "]
@@ -126,7 +126,7 @@ fn verify_char_is_less_than_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be less than 'C'
+        &[r"expected my_thing to be less than 'C'
    but was: 'C'
   expected: < 'C'
 "]
@@ -151,7 +151,7 @@ fn verify_char_is_greater_than_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be greater than 'D'
+        &[r"expected my_thing to be greater than 'D'
    but was: 'D'
   expected: > 'D'
 "]
@@ -176,7 +176,7 @@ fn verify_char_is_at_most_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be at most 'B'
+        &[r"expected my_thing to be at most 'B'
    but was: 'C'
   expected: <= 'B'
 "]
@@ -201,7 +201,7 @@ fn verify_char_is_at_least_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be at least 'E'
+        &[r"expected my_thing to be at least 'E'
    but was: 'D'
   expected: >= 'E'
 "]
@@ -226,7 +226,7 @@ fn verify_char_is_before_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be before 'L'
+        &[r"expected my_thing to be before 'L'
    but was: 'L'
   expected: < 'L'
 "]
@@ -251,7 +251,7 @@ fn verify_char_is_after_other_char_fails() {
 
     assert_eq!(
         failures,
-        &[r"assertion failed: expected my_thing to be after 'L'
+        &[r"expected my_thing to be after 'L'
    but was: 'L'
   expected: > 'L'
 "]
@@ -278,12 +278,10 @@ fn verify_char_is_between_a_min_char_and_a_max_char_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be between 'M' and 'P'
+        &[r"expected my_thing to be between 'M' and 'P'
    but was: 'L'
   expected: 'M' <= x <= 'P'
-"
-        ]
+"]
     );
 }
 
@@ -302,12 +300,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be less than 3.779\n   \
+            &["expected subject to be less than 3.779\n   \
                   but was: \u{1b}[31m3.781\u{1b}[0m\n  \
                  expected: < \u{1b}[32m3.779\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -322,12 +318,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be at most 3.779\n   \
+            &["expected subject to be at most 3.779\n   \
                   but was: \u{1b}[31m3.781\u{1b}[0m\n  \
                  expected: <= \u{1b}[34m3.779\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -342,12 +336,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be greater than 3.782\n   \
+            &["expected subject to be greater than 3.782\n   \
                   but was: \u{1b}[31m3.781\u{1b}[0m\n  \
                  expected: > \u{1b}[33m3.782\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -362,12 +354,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be at least 3.782\n   \
+            &["expected subject to be at least 3.782\n   \
                   but was: \u{1b}[31m3.781\u{1b}[0m\n  \
                  expected: >= \u{1b}[34m3.782\u{1b}[0m\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -382,12 +372,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be between 'M' and 'P'\n   \
+            &["expected subject to be between 'M' and 'P'\n   \
                     but was: \u{1b}[31m'L'\u{1b}[0m\n  \
                    expected: \u{1b}[33m'M'\u{1b}[0m <= x <= 'P'\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -402,12 +390,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be between 'H' and 'K'\n   \
+            &["expected subject to be between 'H' and 'K'\n   \
                     but was: \u{1b}[31m'L'\u{1b}[0m\n  \
                    expected: 'H' <= x <= \u{1b}[33m'K'\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 }

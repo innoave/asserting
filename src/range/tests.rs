@@ -22,12 +22,10 @@ fn verify_i32_is_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of 43..51
+        &[r"expected my_thing to be within range of 43..51
    but was: 42
   expected: 43 <= x < 51
-"
-        ]
+"]
     );
 }
 
@@ -49,12 +47,10 @@ fn verify_i32_is_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of 43..=51
+        &[r"expected my_thing to be within range of 43..=51
    but was: 42
   expected: 43 <= x <= 51
-"
-        ]
+"]
     );
 }
 
@@ -76,12 +72,10 @@ fn verify_i32_is_in_range_from_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of 43..
+        &[r"expected my_thing to be within range of 43..
    but was: 42
   expected: 43 <= x < ..
-"
-        ]
+"]
     );
 }
 
@@ -103,12 +97,10 @@ fn verify_i32_is_in_range_to_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of ..42
+        &[r"expected my_thing to be within range of ..42
    but was: 42
   expected: .. < x < 42
-"
-        ]
+"]
     );
 }
 
@@ -130,12 +122,10 @@ fn verify_i32_is_in_range_to_inclusive_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of ..=41
+        &[r"expected my_thing to be within range of ..=41
    but was: 42
   expected: .. < x <= 41
-"
-        ]
+"]
     );
 }
 
@@ -157,12 +147,10 @@ fn verify_i32_is_not_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of 41..43
+        &[r"expected my_thing to be not within range of 41..43
    but was: 42
   expected: x < 41 || x >= 43
-"
-        ]
+"]
     );
 }
 
@@ -184,12 +172,10 @@ fn verify_i32_is_not_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of 41..=42
+        &[r"expected my_thing to be not within range of 41..=42
    but was: 42
   expected: x < 41 || x > 42
-"
-        ]
+"]
     );
 }
 
@@ -211,12 +197,10 @@ fn verify_i32_is_not_in_range_from_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of 42..
+        &[r"expected my_thing to be not within range of 42..
    but was: 42
   expected: x < 42 || x > ..
-"
-        ]
+"]
     );
 }
 
@@ -238,12 +222,10 @@ fn verify_i32_is_not_in_range_to_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of ..43
+        &[r"expected my_thing to be not within range of ..43
    but was: 42
   expected: x < .. || x >= 43
-"
-        ]
+"]
     );
 }
 
@@ -265,12 +247,10 @@ fn verify_i32_is_not_in_range_to_inclusive_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of ..=42
+        &[r"expected my_thing to be not within range of ..=42
    but was: 42
   expected: x < .. || x > 42
-"
-        ]
+"]
     );
 }
 
@@ -296,12 +276,10 @@ fn verify_char_is_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of 'L'..'Z'
+        &[r"expected my_thing to be within range of 'L'..'Z'
    but was: 'K'
   expected: 'L' <= x < 'Z'
-"
-        ]
+"]
     );
 }
 
@@ -323,12 +301,10 @@ fn verify_char_is_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be within range of 'L'..='Z'
+        &[r"expected my_thing to be within range of 'L'..='Z'
    but was: 'K'
   expected: 'L' <= x <= 'Z'
-"
-        ]
+"]
     );
 }
 
@@ -350,12 +326,10 @@ fn verify_char_is_not_in_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of 'J'..'L'
+        &[r"expected my_thing to be not within range of 'J'..'L'
    but was: 'K'
   expected: x < 'J' || x >= 'L'
-"
-        ]
+"]
     );
 }
 
@@ -377,12 +351,10 @@ fn verify_char_is_not_in_inclusive_range_fails() {
 
     assert_eq!(
         failures,
-        &[
-            r"assertion failed: expected my_thing to be not within range of 'J'..='K'
+        &[r"expected my_thing to be not within range of 'J'..='K'
    but was: 'K'
   expected: x < 'J' || x > 'K'
-"
-        ]
+"]
     );
 }
 
@@ -434,12 +406,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be within range of -4321..4322\n   \
+            &["expected subject to be within range of -4321..4322\n   \
                      but was: \u{1b}[31m29834\u{1b}[0m\n  \
                     expected: -4321 <= x < \u{1b}[34m4322\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -454,12 +424,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be within range of -4321..4322\n   \
+            &["expected subject to be within range of -4321..4322\n   \
                      but was: \u{1b}[31m-29834\u{1b}[0m\n  \
                     expected: \u{1b}[34m-4321\u{1b}[0m <= x < 4322\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -474,12 +442,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be within range of -4321..=4321\n   \
+            &["expected subject to be within range of -4321..=4321\n   \
                      but was: \u{1b}[31m29834\u{1b}[0m\n  \
                     expected: -4321 <= x <= \u{1b}[34m4321\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -494,12 +460,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be within range of -4321..=4321\n   \
+            &["expected subject to be within range of -4321..=4321\n   \
                      but was: \u{1b}[31m-29834\u{1b}[0m\n  \
                     expected: \u{1b}[34m-4321\u{1b}[0m <= x <= 4321\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -514,12 +478,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be not within range of 'a'..'p'\n   \
+            &["expected subject to be not within range of 'a'..'p'\n   \
                      but was: \u{1b}[31m'm'\u{1b}[0m\n  \
                     expected: x < \u{1b}[32m'a'\u{1b}[0m || x >= \u{1b}[32m'p'\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 
@@ -534,12 +496,10 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "assertion failed: expected subject to be not within range of 'a'..='z'\n   \
+            &["expected subject to be not within range of 'a'..='z'\n   \
                      but was: \u{1b}[31m'm'\u{1b}[0m\n  \
                     expected: x < \u{1b}[32m'a'\u{1b}[0m || x > \u{1b}[32m'z'\u{1b}[0m\n\
-                "
-            ]
+                "]
         );
     }
 }
