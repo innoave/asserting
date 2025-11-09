@@ -1,10 +1,12 @@
 //! Implementation of the equality assertions.
 
-use crate::assertions::{AssertEquality, AssertHasDebugMessage, AssertHasDisplayMessage};
+use crate::assertions::{
+    AssertEquality, AssertHasDebugMessage, AssertHasDisplayMessage, AssertSameAs,
+};
 use crate::colored::{mark_diff, mark_diff_str};
 use crate::expectations::{
-    has_debug_message, has_display_message, is_equal_to, not, HasDebugMessage, HasDisplayMessage,
-    IsEqualTo,
+    has_debug_message, has_display_message, is_equal_to, is_same_as, not, HasDebugMessage,
+    HasDisplayMessage, IsEqualTo, IsSameAs,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::{Debug, Display};
@@ -52,6 +54,46 @@ where
 }
 
 impl<E> Invertible for IsEqualTo<E> {}
+
+impl<S, R> AssertSameAs<S> for Spec<'_, S, R>
+where
+    S: PartialEq + Debug,
+    R: FailingStrategy,
+{
+    fn is_same_as(self, expected: S) -> Self {
+        self.expecting(is_same_as(expected))
+    }
+
+    fn is_not_same_as(self, expected: S) -> Self {
+        self.expecting(not(is_same_as(expected)))
+    }
+}
+
+impl<S> Expectation<S> for IsSameAs<S>
+where
+    S: PartialEq + Debug,
+{
+    fn test(&mut self, subject: &S) -> bool {
+        subject == &self.expected
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &S,
+        inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let expected = &self.expected;
+        let (marked_actual, marked_expected) = mark_diff(actual, expected, format);
+        format!(
+            "expected {expression} to be {not}the same as {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+        )
+    }
+}
+
+impl<E> Invertible for IsSameAs<E> {}
 
 impl<S, E, R> AssertHasDebugMessage<E> for Spec<'_, S, R>
 where

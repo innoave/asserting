@@ -135,16 +135,24 @@ The documentation of the assertion traits contains examples on how to use each a
 
 ### Equality
 
-for all types that implement `PartialEq<E>` with `E` being the type of the expected value.
+for all types that implement `PartialEq<E>` with `E` being the type of the expected value:
 
 | assertion       | description                                              |
 |-----------------|----------------------------------------------------------|
 | is_equal_to     | verify that the subject is equal to an expected value    |
-| is_not_equal_to | verify that the subject is not equal to a specific value |                                                 
+| is_not_equal_to | verify that the subject is not equal to a specific value |
+
+for all types that implement `PartialEq` and the subject is of the same type as the expected
+value:
+
+| assertion      | description                                                                                   |
+|----------------|-----------------------------------------------------------------------------------------------|
+| is_same_as     | verify that the subject is of the same type and has the same value than the expected value    |
+| is_not_same_as | verify that the subject is of the same type and has a different value than the expected value |
 
 ### Order
 
-for all types that implement `PartialOrd<E>` with `E` being the type of the expected value.
+for all types that implement `PartialOrd<E>` with `E` being the type of the expected value:
 
 | assertion       | description                                                                            |
 |-----------------|----------------------------------------------------------------------------------------|
@@ -159,7 +167,7 @@ for all types that implement `PartialOrd<E>` with `E` being the type of the expe
 ### Range
 
 for all types `T` that implement `PartialOrd<E>` and `E` implementing `PartialOrd<T>` with `E`
-being the type of the expected value.
+being the type of the expected value:
 
 | assertion       | description                                           |
 |-----------------|-------------------------------------------------------|

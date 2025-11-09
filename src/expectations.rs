@@ -250,6 +250,15 @@ pub struct IsEqualTo<E> {
     pub expected: E,
 }
 
+/// Creates an [`IsSameAs`] expectation.
+pub fn is_same_as<E>(expected: E) -> IsSameAs<E> {
+    IsSameAs { expected }
+}
+
+pub struct IsSameAs<E> {
+    pub expected: E,
+}
+
 /// Creates an [`IsCloseTo`] expectation.
 ///
 /// The margin is set to a default value. To define a custom margin, use the

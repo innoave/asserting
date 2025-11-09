@@ -92,6 +92,84 @@ fn verify_string_is_equal_to_str_fails() {
 }
 
 #[test]
+fn string_is_same_as_string() {
+    let subject: String = "aliqua esse consectetur ullamcorper".to_string();
+
+    assert_that(subject).is_same_as("aliqua esse consectetur ullamcorper".to_string());
+}
+
+#[test]
+fn string_ref_is_same_as_string_ref() {
+    let subject: &String = &"adipiscing liber esse anim".to_string();
+
+    assert_that(subject).is_same_as(&"adipiscing liber esse anim".to_string());
+}
+
+#[test]
+fn str_is_same_as_str() {
+    let subject: &str = "diam accusam tation luptatum";
+
+    assert_that(subject).is_same_as("diam accusam tation luptatum");
+}
+
+#[test]
+fn verify_string_is_same_as_string_fails() {
+    let failures = verify_that("diam accusam tation luptatum".to_string())
+        .named("my_text")
+        .is_same_as("diam accusam Tation luptatum".to_string())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected my_text to be the same as "diam accusam Tation luptatum"
+   but was: "diam accusam tation luptatum"
+  expected: "diam accusam Tation luptatum"
+"#
+        ]
+    );
+}
+
+#[test]
+fn string_is_not_same_as_string() {
+    let subject: String = "aliqua esse consectetur ullamcorper".to_string();
+
+    assert_that(subject).is_not_same_as("Aliqua esse consectetur ullamcorper".to_string());
+}
+
+#[test]
+fn string_ref_is_not_same_as_string_ref() {
+    let subject: &String = &"adipiscing liber esse anim".to_string();
+
+    assert_that(subject).is_not_same_as(&"adipiscing liber rese anim".to_string());
+}
+
+#[test]
+fn str_is_not_same_as_str() {
+    let subject: &str = "Diam accusam tation luptatum";
+
+    assert_that(subject).is_not_same_as("diam accusam tation luptatum");
+}
+
+#[test]
+fn verify_str_is_not_same_as_str_fails() {
+    let failures = verify_that("diam accusam tation luptatum")
+        .named("my_text")
+        .is_not_same_as("diam accusam tation luptatum")
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected my_text to be not the same as "diam accusam tation luptatum"
+   but was: "diam accusam tation luptatum"
+  expected: not "diam accusam tation luptatum"
+"#
+        ]
+    );
+}
+
+#[test]
 fn string_is_empty() {
     let subject: String = String::new();
 
@@ -1412,6 +1490,42 @@ mod colored {
                 "expected subject to be not equal to \"aute aliquip culpa blandit\"\n   \
                but was: \"aute aliquip culpa blandit\"\n  \
               expected: not \"aute aliquip culpa blandit\"\n\
+            "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_same_as_for_strings() {
+        let failures = verify_that("no fugiat pariatur placerat")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_same_as("no Fugiat Pariatur placerat")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to be the same as \"no Fugiat Pariatur placerat\"\n   \
+                    but was: \"no \u{1b}[31mf\u{1b}[0mugiat \u{1b}[31mp\u{1b}[0mariatur placerat\"\n  \
+                   expected: \"no \u{1b}[34mF\u{1b}[0mugiat \u{1b}[34mP\u{1b}[0mariatur placerat\"\n\
+                "
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_is_not_same_as_for_strings() {
+        let failures = verify_that("justo clita in stet")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_not_same_as("justo clita in stet")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to be not the same as \"justo clita in stet\"\n   \
+               but was: \"justo clita in stet\"\n  \
+              expected: not \"justo clita in stet\"\n\
             "
             ]
         );
