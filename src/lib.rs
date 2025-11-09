@@ -85,6 +85,12 @@
 //! assert_that!('M').is_in_range('A'..='Z');
 //! assert_that!('M').is_not_in_range('a'..='z');
 //!
+//! let subject = "at invidunt quis placerat".to_string();
+//! assert_that!(subject).is_equal_to("at invidunt quis placerat");
+//!
+//! let subject = "justo clita in stet".to_string();
+//! assert_that!(subject).is_same_as("justo clita in stet".to_string());
+//!
 //! let subject = "anim proident eiusmod sint".to_string();
 //! assert_that!(subject).contains("eiusmod");
 //!

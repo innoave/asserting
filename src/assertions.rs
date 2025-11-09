@@ -50,7 +50,7 @@ pub trait AssertEquality<E> {
     #[track_caller]
     fn is_equal_to(self, expected: E) -> Self;
 
-    /// Verifies that subject is not equal to some other value.
+    /// Verifies that the subject is not equal to some other value.
     ///
     /// # Examples
     ///
@@ -64,6 +64,56 @@ pub trait AssertEquality<E> {
     /// ```
     #[track_caller]
     fn is_not_equal_to(self, expected: E) -> Self;
+}
+
+/// Assert whether two values are of the same type and have the same value.
+///
+/// These assertions are implemented for all types that implement `PartialEq`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = String::from("adipiscing liber esse anim");
+/// assert_that!(subject).is_same_as("adipiscing liber esse anim".to_string());
+///
+/// let subject = "ea eu exercitation eu";
+/// assert_that!(subject).is_not_same_as("Ea eu exercitation");
+///
+/// assert_that!(42).is_same_as(42);
+/// assert_that!(41).is_not_same_as(42);
+/// ```
+pub trait AssertSameAs<E> {
+    /// Verifies that the subject is of the same type and has the same value as
+    /// some other value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = String::from("adipiscing liber esse anim");
+    /// assert_that!(subject).is_same_as("adipiscing liber esse anim".to_string());
+    ///
+    /// assert_that!(42).is_same_as(42);
+    /// ```
+    fn is_same_as(self, expected: E) -> Self;
+
+    /// Verifies that the subject is of the same type but has a different value
+    /// as some other value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "ea eu exercitation eu";
+    /// assert_that!(subject).is_not_same_as("Ea eu exercitation");
+    ///
+    /// assert_that!(41).is_not_same_as(42);
+    /// ```
+    fn is_not_same_as(self, expected: E) -> Self;
 }
 
 /// Assert approximate equality for floating point numbers.
