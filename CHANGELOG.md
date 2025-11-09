@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.10.0 - 2025-11-09
+
+### Added
+
+* add a new assertion that assures that the type and value are as expected
+  [(PR #66)](https://github.com/innoave/asserting/pull/66)
+
+### Changed
+
+* do not print "assertion failed" with every assertion failure
+  [(PR #65)](https://github.com/innoave/asserting/pull/65)
+
+### Documented
+
+* add an example of a helper function for asserting fields of a custom struct reusing existing
+  assertions
+  [(PR #67)](https://github.com/innoave/asserting/pull/67)
+
 ## 0.9.0 - 2025-06-28
 
 _"Does not contain" assertions for strings, collections and iterators and expectation combinators
