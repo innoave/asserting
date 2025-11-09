@@ -341,6 +341,13 @@
 //! 3. Custom expectations used with the [`Spec::expecting()`] method
 //! 4. Custom assertions methods
 //!
+//! > &#x1F4A1;
+//! > Often the easiest way to assert a custom type is to write a helper
+//! > function that asserts parts (e.g., fields of a struct) using existing
+//! > assertions. See the example [`assertion_function.rs`](examples/assertion_function.rs)
+//! > which demonstrates how to use a helper function for asserting a custom
+//! > struct.
+//!
 //! How to use predicate functions as custom assertions is described on the
 //! [`Spec::satisfies()`] method and in the [Examples](#predicate-as-custom-assertion)
 //! chapter above. The other 3 ways are described in the following subchapters.

@@ -95,3 +95,8 @@ unwrap_used = "deny"
 name = "colored_diffs"
 path = "examples/colored_diffs.rs"
 required-features = ["colored"]
+
+[[example]]
+name = "assertion_function"
+path = "examples/assertion_function.rs"
+required-features = ["colored"]
