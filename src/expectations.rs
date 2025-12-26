@@ -1177,6 +1177,26 @@ impl<E> IteratorEndsWith<E> {
     }
 }
 
+pub fn has_single_element() -> HasSingleElement {
+    HasSingleElement
+}
+
+#[must_use]
+pub struct HasSingleElement;
+
+pub fn has_at_least_number_of_elements(
+    expected_number_of_elements: usize,
+) -> HasAtLeastNumberOfElements {
+    HasAtLeastNumberOfElements {
+        expected_number_of_elements,
+    }
+}
+
+#[must_use]
+pub struct HasAtLeastNumberOfElements {
+    pub expected_number_of_elements: usize,
+}
+
 /// Creates a [`MapContainsKey`] expectation.
 pub fn map_contains_key<E>(expected_key: E) -> MapContainsKey<E> {
     MapContainsKey { expected_key }

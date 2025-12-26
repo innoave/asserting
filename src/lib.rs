@@ -125,7 +125,7 @@
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
 //!
-//! ## Asserting each item of a collection or iterator
+//! ## Asserting each item of a collection or an iterator
 //!
 //! ```
 //! use asserting::prelude::*;
@@ -139,6 +139,23 @@
 //! ```
 //!
 //! For more details see [`Spec::each_item()`].
+//!
+//! ## Asserting specific elements of a collection or an iterator
+//!
+//! Filter assertions are handy to assert a specific element of a collection or
+//! an iterator.
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let subject = ["single"];
+//! assert_that!(subject).single_element().is_equal_to("single");
+//!
+//! let numbers = [1, 2, 3, 4, 5];
+//! assert_that!(numbers).first_element().is_equal_to(1);
+//! assert_that!(numbers).last_element().is_equal_to(5);
+//! assert_that!(numbers).nth_element(3).is_equal_to(4);
+//! ```
 //!
 //! ## Soft assertions
 //!

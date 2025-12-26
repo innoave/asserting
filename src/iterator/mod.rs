@@ -1,22 +1,28 @@
 //! Implementations of assertions for `Iterator` values.
 
 use crate::assertions::{
-    AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
+    AssertElements, AssertIteratorContains, AssertIteratorContainsInAnyOrder,
+    AssertIteratorContainsInOrder,
 };
 use crate::colored::{
-    mark_all_items_in_collection, mark_missing, mark_selected_items_in_collection, mark_unexpected,
+    mark_all_items_in_collection, mark_missing, mark_missing_string,
+    mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
 };
 use crate::expectations::{
-    iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
-    iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
-    iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
-    iterator_ends_with, iterator_starts_with, not, IteratorContains, IteratorContainsAllInOrder,
-    IteratorContainsAllOf, IteratorContainsAnyOf, IteratorContainsExactly,
-    IteratorContainsExactlyInAnyOrder, IteratorContainsOnly, IteratorContainsOnlyOnce,
-    IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
+    has_at_least_number_of_elements, has_single_element, iterator_contains,
+    iterator_contains_all_in_order, iterator_contains_all_of, iterator_contains_any_of,
+    iterator_contains_exactly, iterator_contains_exactly_in_any_order, iterator_contains_only,
+    iterator_contains_only_once, iterator_contains_sequence, iterator_ends_with,
+    iterator_starts_with, not, HasAtLeastNumberOfElements, HasSingleElement, IteratorContains,
+    IteratorContainsAllInOrder, IteratorContainsAllOf, IteratorContainsAnyOf,
+    IteratorContainsExactly, IteratorContainsExactlyInAnyOrder, IteratorContainsOnly,
+    IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
 };
+use crate::prelude::AssertOrderedElements;
 use crate::properties::DefinedOrderProperty;
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, PanicOnFail, Spec,
+};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
@@ -767,6 +773,137 @@ where
      extra: {extra:?}",
             &self.expected,
         )
+    }
+}
+
+impl<T> Expectation<Vec<T>> for HasSingleElement
+where
+    T: Debug,
+{
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        subject.len() == 1
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let actual_length = actual.len();
+        let actual_elements = match actual_length {
+            0 => mark_unexpected_string("no elements", format),
+            1 => mark_unexpected_string("exactly one element", format),
+            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
+        };
+        let expected_elements = mark_missing_string("exactly one element", format);
+        format!(
+            r"expected {expression} to have {expected_elements}, but has {actual_elements}
+  actual: {actual:?}"
+        )
+    }
+}
+
+impl<'a, S, T, R> AssertElements<'a, T, R> for Spec<'a, S, R>
+where
+    S: IntoIterator<Item = T>,
+    T: Debug,
+    R: FailingStrategy,
+{
+    fn single_element(self) -> Spec<'a, T, R> {
+        let spec = self.mapping(Vec::from_iter).expecting(has_single_element());
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| {
+            collection.pop().unwrap_or_else(|| {
+                unreachable!("Assertion failed and should have panicked! Please report a bug.")
+            })
+        })
+    }
+}
+
+impl<T> Expectation<Vec<T>> for HasAtLeastNumberOfElements
+where
+    T: Debug,
+{
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        subject.len() >= self.expected_number_of_elements
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let actual_length = actual.len();
+        let actual_elements = match actual_length {
+            0 => mark_unexpected_string("no elements", format),
+            1 => mark_unexpected_string("one element", format),
+            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
+        };
+        let expected_elements = match self.expected_number_of_elements {
+            0 => mark_missing_string("no elements", format),
+            1 => mark_missing_string("at least one element", format),
+            _ => mark_missing_string(
+                &format!("at least {} elements", self.expected_number_of_elements),
+                format,
+            ),
+        };
+        format!(
+            r"expected {expression} to have {expected_elements}, but has {actual_elements}
+  actual: {actual:?}"
+        )
+    }
+}
+
+impl<'a, S, T, R> AssertOrderedElements<'a, T, R> for Spec<'a, S, R>
+where
+    S: IntoIterator<Item = T>,
+    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
+    T: Debug,
+    R: FailingStrategy,
+{
+    fn first_element(self) -> Spec<'a, T, R> {
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| collection.remove(0))
+    }
+
+    fn last_element(self) -> Spec<'a, T, R> {
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| {
+            collection.pop().unwrap_or_else(|| {
+                unreachable!("Assertion failed and should have panicked! Please report a bug.")
+            })
+        })
+    }
+
+    fn nth_element(self, n: usize) -> Spec<'a, T, R> {
+        let min_len = n + 1;
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(min_len));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| collection.remove(n))
     }
 }
 

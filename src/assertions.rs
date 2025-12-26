@@ -3651,3 +3651,95 @@ pub trait AssertMapContainsValue<E> {
     #[track_caller]
     fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
 }
+
+/// Filter assertions for elements of a collection or an iterator.
+///
+/// Filtering is used to target the assertions on specific elements of a
+/// collection or an iterator, such as a single element.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = ["single"];
+/// assert_that!(subject).single_element().is_equal_to("single");
+/// ```
+pub trait AssertElements<'a, T, R> {
+    /// Verify that the iterator contains exactly one element and return a
+    /// [`Spec`] for that single element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["single"];
+    /// assert_that!(subject).single_element().is_equal_to("single");
+    /// ```
+    #[track_caller]
+    fn single_element(self) -> Spec<'a, T, R>;
+}
+
+/// Filter assertions for elements of a collection or an iterator that yields
+/// its elements in a defined order.
+///
+/// Filtering is used to target the assertions on specific elements of a
+/// collection or an iterator, such as the first or last element.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = ["first", "second", "third"];
+/// assert_that!(subject).first_element().is_equal_to("first");
+/// assert_that!(subject).last_element().is_equal_to("third");
+/// ```
+pub trait AssertOrderedElements<'a, T, R> {
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the first element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    /// assert_that!(subject).first_element().is_equal_to("first");
+    /// ```
+    #[track_caller]
+    fn first_element(self) -> Spec<'a, T, R>;
+
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the last element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    /// assert_that!(subject).last_element().is_equal_to("third");
+    /// ```
+    #[track_caller]
+    fn last_element(self) -> Spec<'a, T, R>;
+
+    /// Verify that a collection or an iterator contains at least n + 1 elements
+    /// and return a [`Spec`] for the nth element.
+    ///
+    /// The index n is zero-based (similar to the `nth` method of iterators).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    /// assert_that!(subject).nth_element(0).is_equal_to("first");
+    /// assert_that!(subject).nth_element(1).is_equal_to("second");
+    /// assert_that!(subject).nth_element(2).is_equal_to("third");
+    /// ```
+    #[track_caller]
+    fn nth_element(self, n: usize) -> Spec<'a, T, R>;
+}

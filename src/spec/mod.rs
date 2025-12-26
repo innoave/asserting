@@ -669,6 +669,11 @@ impl<S, R> Spec<'_, S, R> {
         &self.failing_strategy
     }
 
+    /// Returns whether there are assertion failures collected so far.
+    pub fn has_failures(&self) -> bool {
+        !self.failures.is_empty()
+    }
+
     /// Returns the assertion failures that have been collected so far.
     pub fn failures(&self) -> Vec<AssertFailure> {
         self.failures.clone()
