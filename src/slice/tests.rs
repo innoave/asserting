@@ -748,37 +748,37 @@ fn verify_slice_contains_all_in_order_fails() {
 fn vec_starts_with() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).starts_with([13, 5, 7, 19, 1]);
+    assert_that(&subject).starts_with(&[13, 5, 7, 19, 1]);
 }
 
 #[test]
 fn vec_starts_with_one_element() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).starts_with([13]);
+    assert_that(&subject).starts_with(&[13]);
 }
 
 #[test]
 fn vec_starts_with_empty_sequence() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).starts_with([]);
+    assert_that(&subject).starts_with(&[]);
 }
 
 #[test]
 fn empty_vec_starts_with_empty_sequence() {
     let subject: Vec<i64> = vec![];
 
-    assert_that(subject).starts_with([]);
+    assert_that(&subject).starts_with(&[]);
 }
 
 #[test]
 fn verify_vec_starts_with_fails() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    let failures = verify_that(subject)
+    let failures = verify_that(&subject)
         .named("my_thing")
-        .starts_with([13, 5, 7, 1, 19])
+        .starts_with(&[13, 5, 7, 1, 19])
         .display_failures();
 
     assert_eq!(
@@ -796,9 +796,9 @@ fn verify_vec_starts_with_fails() {
 fn verify_empty_vec_starts_with_expected_sequence_longer_than_vec_fails() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31];
 
-    let failures = verify_that(subject)
+    let failures = verify_that(&subject)
         .named("my_thing")
-        .starts_with([13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37])
+        .starts_with(&[13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37])
         .display_failures();
 
     assert_eq!(
@@ -818,37 +818,37 @@ fn verify_empty_vec_starts_with_expected_sequence_longer_than_vec_fails() {
 fn vec_ends_with() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).ends_with([11, 29, 23, 31, 37]);
+    assert_that(&subject).ends_with(&[11, 29, 23, 31, 37]);
 }
 
 #[test]
 fn vec_ends_with_one_element() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).ends_with([37]);
+    assert_that(&subject).ends_with(&[37]);
 }
 
 #[test]
 fn vec_ends_with_empty_sequence() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    assert_that(subject).ends_with([]);
+    assert_that(&subject).ends_with(&[]);
 }
 
 #[test]
 fn empty_vec_ends_with_empty_sequence() {
     let subject: Vec<i64> = vec![];
 
-    assert_that(subject).ends_with([]);
+    assert_that(&subject).ends_with(&[]);
 }
 
 #[test]
 fn verify_vec_ends_with_fails() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31, 37];
 
-    let failures = verify_that(subject)
+    let failures = verify_that(&subject)
         .named("my_thing")
-        .ends_with([11, 23, 23, 31, 73])
+        .ends_with(&[11, 23, 23, 31, 73])
         .display_failures();
 
     assert_eq!(
@@ -866,9 +866,9 @@ fn verify_vec_ends_with_fails() {
 fn verify_empty_vec_ends_with_expected_sequence_longer_than_vec_fails() {
     let subject: Vec<i64> = vec![13, 5, 7, 19, 1, 3, 11, 29, 23, 31];
 
-    let failures = verify_that(subject)
+    let failures = verify_that(&subject)
         .named("my_thing")
-        .ends_with([41, 13, 5, 7, 19, 1, 3, 11, 29, 23, 31])
+        .ends_with(&[41, 13, 5, 7, 19, 1, 3, 11, 29, 23, 31])
         .display_failures();
 
     assert_eq!(
