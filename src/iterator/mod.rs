@@ -908,6 +908,17 @@ where
         }
         spec.extracting(|mut collection| collection.remove(n))
     }
+
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Spec<'a, Vec<T>, R> {
+        let indices = HashSet::<_>::from_iter(indices);
+        self.mapping(|subject| {
+            subject
+                .into_iter()
+                .enumerate()
+                .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
+                .collect()
+        })
+    }
 }
 
 pub fn collect_selected_values<'a, T>(indices: &HashSet<usize>, collection: &'a [T]) -> Vec<&'a T> {

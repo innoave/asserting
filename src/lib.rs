@@ -145,27 +145,57 @@
 //! Filter assertions are handy to assert specific elements of a collection or
 //! an iterator.
 //!
+//! Assert the only element of a collection or an iterator:
+//!
 //! ```
 //! use asserting::prelude::*;
 //!
 //! let subject = ["single"];
+//!
 //! assert_that!(subject).single_element().is_equal_to("single");
+//! ```
+//!
+//! Assert the first, the last, or the nth element of a collection or an iterator:
+//!
+//! ```
+//! use asserting::prelude::*;
 //!
 //! let numbers = [1, 2, 3, 4, 5];
+//!
 //! assert_that!(numbers).first_element().is_equal_to(1);
 //! assert_that!(numbers).last_element().is_equal_to(5);
 //! assert_that!(numbers).nth_element(3).is_equal_to(4);
+//! ```
+//!
+//! Filter the elements to be asserted on a condition:
+//!
+//! ```
+//! use asserting::prelude::*;
 //!
 //! let subject = [1, 2, 3, 4, 5];
+//!
 //! assert_that!(subject)
 //!     .filtered_on(|e| e & 1 == 0)
 //!     .contains_exactly_in_any_order([2, 4]);
 //!
 //! let subject = ["one", "two", "three", "four"];
+//!
 //! assert_that!(subject)
 //!     .filtered_on(|e| e.len() == 5)
 //!     .single_element()
 //!     .is_equal_to("three");
+//! ```
+//!
+//! Pick the elements of a collection or an iterator at given positions:
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let subject = ["one", "two", "three", "four", "five"];
+//!
+//! assert_that!(subject)
+//!     .elements_at([0, 2, 4])
+//!     .contains_exactly(["one", "three", "five"]);
 //! ```
 //!
 //! ## Soft assertions

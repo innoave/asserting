@@ -438,13 +438,24 @@ mod element_filters {
     }
 
     #[test]
-    fn filtered_on_elements_of_iterator_event_elements() {
-        let subject = CustomOrderedCollection {
+    fn filtered_on_elements_of_iterator_even_elements() {
+        let subject = CustomCollection {
             inner: vec![1, 2, 3, 4, 5],
         };
 
         assert_that(subject)
             .filtered_on(|e| e & 1 == 0)
             .contains_exactly_in_any_order([2, 4]);
+    }
+
+    #[test]
+    fn elements_at_positions_of_iterator() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .elements_at([0, 2, 4])
+            .contains_exactly(["one", "three", "five"]);
     }
 }

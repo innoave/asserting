@@ -3680,6 +3680,7 @@ pub trait AssertElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = ["single"];
+    ///
     /// assert_that!(subject).single_element().is_equal_to("single");
     /// ```
     #[track_caller]
@@ -3719,9 +3720,17 @@ pub trait AssertElements<'a, T, R> {
 /// ```
 /// use asserting::prelude::*;
 ///
-/// let subject = ["first", "second", "third"];
+/// let subject = ["first", "second", "third", "four", "five"];
+///
 /// assert_that!(subject).first_element().is_equal_to("first");
-/// assert_that!(subject).last_element().is_equal_to("third");
+/// assert_that!(subject).last_element().is_equal_to("five");
+/// assert_that!(subject).nth_element(3).is_equal_to("four");
+///
+/// let subject = ["one", "two", "three", "four", "five"];
+///
+/// assert_that!(subject)
+///     .elements_at([0, 2, 4])
+///     .contains_exactly(["one", "three", "five"]);
 /// ```
 pub trait AssertOrderedElements<'a, T, R> {
     /// Verify that a collection or an iterator contains at least one element
@@ -3733,6 +3742,7 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = ["first", "second", "third"];
+    ///
     /// assert_that!(subject).first_element().is_equal_to("first");
     /// ```
     #[track_caller]
@@ -3747,6 +3757,7 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = ["first", "second", "third"];
+    ///
     /// assert_that!(subject).last_element().is_equal_to("third");
     /// ```
     #[track_caller]
@@ -3763,10 +3774,28 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = ["first", "second", "third"];
+    ///
     /// assert_that!(subject).nth_element(0).is_equal_to("first");
     /// assert_that!(subject).nth_element(1).is_equal_to("second");
     /// assert_that!(subject).nth_element(2).is_equal_to("third");
     /// ```
     #[track_caller]
     fn nth_element(self, n: usize) -> Spec<'a, T, R>;
+
+    /// Pick the elements of a collection or an iterator at the given positions
+    /// and return a [`Spec`] only containing the selected elements.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three", "four", "five"];
+    ///
+    /// assert_that!(subject)
+    ///     .elements_at([0, 2, 4])
+    ///     .contains_exactly(["one", "three", "five"]);
+    /// ```
+    #[track_caller]
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Spec<'a, Vec<T>, R>;
 }
