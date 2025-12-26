@@ -23,6 +23,9 @@ Features of `asserting`:
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
 
+The assertion methods are mostly inspired by the [AssertJ] library for Java but adopted to Rust's
+syntax and idioms.
+
 To see what is changed with each release, see the [changelog](CHANGELOG.md).
 
 ### Convenient to write
@@ -70,7 +73,7 @@ Easy-to-extend means that we can write assertions for custom types with minimal 
 3. write custom assertions by implementing two simple traits (see "[custom assertions]")
 
 The mentioned references link to a chapter in the crate's documentation that describes the
-possibilities for custom assertions including examples.
+possibilities for custom assertions, including examples.
 
 ## no-std support
 
@@ -460,7 +463,7 @@ requires the crate feature `panic` which is enabled by default.
 | panics              | verify that some code panics                           |
 | panics_with_message | verify that some code panics with the expected message |
 
-To start assertions on code use the `assert_that_code!()` macro.
+To start assertions on code, use the `assert_that_code!()` macro.
 
 <!-- Badges and related URLs -->
 
@@ -501,3 +504,5 @@ To start assertions on code use the `assert_that_code!()` macro.
 [`MapProperties`]: https://docs.rs/asserting/latest/asserting/properties/trait.MapProperties.html
 
 [`NO_COLOR`]: https://no-color.org/
+
+[AssertJ]: https://assertj.github.io/doc/
