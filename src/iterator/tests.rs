@@ -436,4 +436,15 @@ mod element_filters {
 "#,
         );
     }
+
+    #[test]
+    fn filtered_on_elements_of_iterator_event_elements() {
+        let subject = CustomOrderedCollection {
+            inner: vec![1, 2, 3, 4, 5],
+        };
+
+        assert_that(subject)
+            .filtered_on(|e| e & 1 == 0)
+            .contains_exactly_in_any_order([2, 4]);
+    }
 }

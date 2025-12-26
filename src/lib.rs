@@ -142,7 +142,7 @@
 //!
 //! ## Asserting specific elements of a collection or an iterator
 //!
-//! Filter assertions are handy to assert a specific element of a collection or
+//! Filter assertions are handy to assert specific elements of a collection or
 //! an iterator.
 //!
 //! ```
@@ -155,6 +155,17 @@
 //! assert_that!(numbers).first_element().is_equal_to(1);
 //! assert_that!(numbers).last_element().is_equal_to(5);
 //! assert_that!(numbers).nth_element(3).is_equal_to(4);
+//!
+//! let subject = [1, 2, 3, 4, 5];
+//! assert_that!(subject)
+//!     .filtered_on(|e| e & 1 == 0)
+//!     .contains_exactly_in_any_order([2, 4]);
+//!
+//! let subject = ["one", "two", "three", "four"];
+//! assert_that!(subject)
+//!     .filtered_on(|e| e.len() == 5)
+//!     .single_element()
+//!     .is_equal_to("three");
 //! ```
 //!
 //! ## Soft assertions

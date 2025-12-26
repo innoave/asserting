@@ -14,6 +14,7 @@ use crate::spec::Spec;
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeBounds;
 use crate::std::string::String;
+use crate::std::vec::Vec;
 
 /// Assert whether two values are equal or not.
 ///
@@ -3655,7 +3656,8 @@ pub trait AssertMapContainsValue<E> {
 /// Filter assertions for elements of a collection or an iterator.
 ///
 /// Filtering is used to target the assertions on specific elements of a
-/// collection or an iterator, such as a single element.
+/// collection or an iterator, such as a single element or elements matching a
+/// condition.
 ///
 /// # Examples
 ///
@@ -3664,6 +3666,9 @@ pub trait AssertMapContainsValue<E> {
 ///
 /// let subject = ["single"];
 /// assert_that!(subject).single_element().is_equal_to("single");
+///
+/// let subject = [1, 2, 3, 4, 5];
+/// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
 /// ```
 pub trait AssertElements<'a, T, R> {
     /// Verify that the iterator contains exactly one element and return a
@@ -3679,6 +3684,28 @@ pub trait AssertElements<'a, T, R> {
     /// ```
     #[track_caller]
     fn single_element(self) -> Spec<'a, T, R>;
+
+    /// Filter the elements of a collection or an iterator on a condition and
+    /// return a [`Spec`] only containing the elements that match the condition.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = [1, 2, 3, 4, 5];
+    /// assert_that!(subject)
+    ///     .filtered_on(|e| e & 1 == 0)
+    ///     .contains_exactly_in_any_order([2, 4]);
+    ///
+    /// let subject = ["one", "two", "three", "four"];
+    /// assert_that!(subject)
+    ///     .filtered_on(|e| e.len() == 5)
+    ///     .single_element()
+    ///     .is_equal_to("three");
+    /// ```
+    #[track_caller]
+    fn filtered_on(self, condition: impl Fn(&T) -> bool) -> Spec<'a, Vec<T>, R>;
 }
 
 /// Filter assertions for elements of a collection or an iterator that yields

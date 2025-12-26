@@ -2,7 +2,7 @@
 
 use crate::assertions::{
     AssertElements, AssertIteratorContains, AssertIteratorContainsInAnyOrder,
-    AssertIteratorContainsInOrder,
+    AssertIteratorContainsInOrder, AssertOrderedElements,
 };
 use crate::colored::{
     mark_all_items_in_collection, mark_missing, mark_missing_string,
@@ -18,7 +18,6 @@ use crate::expectations::{
     IteratorContainsExactly, IteratorContainsExactlyInAnyOrder, IteratorContainsOnly,
     IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
 };
-use crate::prelude::AssertOrderedElements;
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{
     DiffFormat, Expectation, Expression, FailingStrategy, Invertible, PanicOnFail, Spec,
@@ -822,6 +821,10 @@ where
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
+    }
+
+    fn filtered_on(self, condition: impl Fn(&T) -> bool) -> Spec<'a, Vec<T>, R> {
+        self.mapping(|subject| subject.into_iter().filter(condition).collect())
     }
 }
 
