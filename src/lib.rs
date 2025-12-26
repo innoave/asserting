@@ -681,7 +681,7 @@
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at
 
-#![doc(html_root_url = "https://docs.rs/asserting/0.10.0")]
+#![doc(html_root_url = "https://docs.rs/asserting/0.11.0")]
 #![cfg_attr(not(feature = "std"), no_std)]
 // Render feature requirements in docs.rs
 #![cfg_attr(docsrs, feature(doc_cfg))]

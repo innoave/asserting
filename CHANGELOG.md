@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.11.0 - 2025-12-27
+
+_Pick elements of collections or iterators for assertion_
+
+### Added
+
+* add new filter assertions for collections and iterators to pick specific elements for assertion
+  [(PR #70)](https://github.com/innoave/asserting/pull/70)
+
 ## 0.10.0 - 2025-11-09
 
 ### Added
