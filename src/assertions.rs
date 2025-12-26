@@ -14,6 +14,7 @@ use crate::spec::Spec;
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeBounds;
 use crate::std::string::String;
+use crate::std::vec::Vec;
 
 /// Assert whether two values are equal or not.
 ///
@@ -3650,4 +3651,151 @@ pub trait AssertMapContainsValue<E> {
     /// ```
     #[track_caller]
     fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
+}
+
+/// Filter assertions for elements of a collection or an iterator.
+///
+/// Filtering is used to target the assertions on specific elements of a
+/// collection or an iterator, such as a single element or elements matching a
+/// condition.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = ["single"];
+/// assert_that!(subject).single_element().is_equal_to("single");
+///
+/// let subject = [1, 2, 3, 4, 5];
+/// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
+/// ```
+pub trait AssertElements<'a, T, R> {
+    /// Verify that the iterator contains exactly one element and return a
+    /// [`Spec`] for that single element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["single"];
+    ///
+    /// assert_that!(subject).single_element().is_equal_to("single");
+    /// ```
+    #[track_caller]
+    fn single_element(self) -> Spec<'a, T, R>;
+
+    /// Filter the elements of a collection or an iterator on a condition and
+    /// return a [`Spec`] only containing the elements that match the condition.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = [1, 2, 3, 4, 5];
+    /// assert_that!(subject)
+    ///     .filtered_on(|e| e & 1 == 0)
+    ///     .contains_exactly_in_any_order([2, 4]);
+    ///
+    /// let subject = ["one", "two", "three", "four"];
+    /// assert_that!(subject)
+    ///     .filtered_on(|e| e.len() == 5)
+    ///     .single_element()
+    ///     .is_equal_to("three");
+    /// ```
+    #[track_caller]
+    fn filtered_on(self, condition: impl Fn(&T) -> bool) -> Spec<'a, Vec<T>, R>;
+}
+
+/// Filter assertions for elements of a collection or an iterator that yields
+/// its elements in a defined order.
+///
+/// Filtering is used to target the assertions on specific elements of a
+/// collection or an iterator, such as the first or last element.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = ["first", "second", "third", "four", "five"];
+///
+/// assert_that!(subject).first_element().is_equal_to("first");
+/// assert_that!(subject).last_element().is_equal_to("five");
+/// assert_that!(subject).nth_element(3).is_equal_to("four");
+///
+/// let subject = ["one", "two", "three", "four", "five"];
+///
+/// assert_that!(subject)
+///     .elements_at([0, 2, 4])
+///     .contains_exactly(["one", "three", "five"]);
+/// ```
+pub trait AssertOrderedElements<'a, T, R> {
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the first element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    ///
+    /// assert_that!(subject).first_element().is_equal_to("first");
+    /// ```
+    #[track_caller]
+    fn first_element(self) -> Spec<'a, T, R>;
+
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the last element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    ///
+    /// assert_that!(subject).last_element().is_equal_to("third");
+    /// ```
+    #[track_caller]
+    fn last_element(self) -> Spec<'a, T, R>;
+
+    /// Verify that a collection or an iterator contains at least n + 1 elements
+    /// and return a [`Spec`] for the nth element.
+    ///
+    /// The index n is zero-based (similar to the `nth` method of iterators).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["first", "second", "third"];
+    ///
+    /// assert_that!(subject).nth_element(0).is_equal_to("first");
+    /// assert_that!(subject).nth_element(1).is_equal_to("second");
+    /// assert_that!(subject).nth_element(2).is_equal_to("third");
+    /// ```
+    #[track_caller]
+    fn nth_element(self, n: usize) -> Spec<'a, T, R>;
+
+    /// Pick the elements of a collection or an iterator at the given positions
+    /// and return a [`Spec`] only containing the selected elements.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three", "four", "five"];
+    ///
+    /// assert_that!(subject)
+    ///     .elements_at([0, 2, 4])
+    ///     .contains_exactly(["one", "three", "five"]);
+    /// ```
+    #[track_caller]
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Spec<'a, Vec<T>, R>;
 }
