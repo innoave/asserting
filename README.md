@@ -414,10 +414,10 @@ for all iterators.
 | contains_all_of               | verify that an iterator/collection contains all the expected values in any order (and maybe more)                           |
 | contains_only                 | verify that an iterator/collection contains only the specified values and nothing else in any order and ignoring duplicates |
 | contains_only_once            | verify that an iterator/collection contains only the specified values in any order and each of them only once               |
+| single_element                | verify that an iterator/collection contains exaclty one element and return a `Spec` for that one element                    |
+| filtered_on                   | filter the elements of an iterator/collection on a condition and return a `Spec` that contains the filtered elements        |
 
 for iterators that yield items in a well-defined order.
-
-All the above assertions provided for any kind of iterator plus the following:
 
 | assertion             | description                                                                                                                                      |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -426,6 +426,10 @@ All the above assertions provided for any kind of iterator plus the following:
 | contains_all_in_order | verify that an iterator/collection contains all the given values and in the given order, possibly with other values between them                 |
 | starts_with           | verify that an iterator/collection contains the given values as the first elements in order                                                      |
 | ends_with             | verify that an iterator/collection contains the given values as the last elements in order                                                       |
+| first_element         | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the first element                                |
+| last_element          | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the last element                                 |
+| nth_element           | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the nth element                                  |
+| elements_at           | pick the elements of an iterator/collection at the given positions and return a `Spec` containing the selected elements                          |
 
 ### Maps
 
