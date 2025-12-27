@@ -1093,7 +1093,7 @@ impl<'a, I, R> Spec<'a, I, R> {
     ///    but was: 8
     ///   expected: <= 7
     ///
-    /// expected numbers [4] item to be at most 7
+    /// expected numbers [4] to be at most 7
     ///    but was: 10
     ///   expected: <= 7
     /// ```
