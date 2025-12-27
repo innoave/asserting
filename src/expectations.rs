@@ -1197,6 +1197,41 @@ pub struct HasAtLeastNumberOfElements {
     pub expected_number_of_elements: usize,
 }
 
+pub fn any_satisfies<P>(predicate: P) -> AnySatisfies<P> {
+    AnySatisfies { predicate }
+}
+
+#[must_use]
+pub struct AnySatisfies<P> {
+    pub predicate: P,
+}
+
+pub fn all_satisfy<P>(predicate: P) -> AllSatisfy<P> {
+    AllSatisfy {
+        predicate,
+        failing: HashSet::new(),
+    }
+}
+
+#[must_use]
+pub struct AllSatisfy<P> {
+    pub predicate: P,
+    pub failing: HashSet<usize>,
+}
+
+pub fn none_satisfies<P>(predicate: P) -> NoneSatisfies<P> {
+    NoneSatisfies {
+        predicate,
+        failing: HashSet::new(),
+    }
+}
+
+#[must_use]
+pub struct NoneSatisfies<P> {
+    pub predicate: P,
+    pub failing: HashSet<usize>,
+}
+
 /// Creates a [`MapContainsKey`] expectation.
 pub fn map_contains_key<E>(expected_key: E) -> MapContainsKey<E> {
     MapContainsKey { expected_key }

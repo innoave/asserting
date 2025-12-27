@@ -3661,6 +3661,8 @@ pub trait AssertMapContainsValue<E> {
 ///
 /// # Examples
 ///
+/// Filtering elements:
+///
 /// ```
 /// use asserting::prelude::*;
 ///
@@ -3669,6 +3671,21 @@ pub trait AssertMapContainsValue<E> {
 ///
 /// let subject = [1, 2, 3, 4, 5];
 /// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
+/// ```
+///
+/// Some elements satisfy a predicate:
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = [1, 41, 43, 42, 5];
+/// assert_that!(subject).any_satisfies(|e| *e == 42);
+///
+/// let subject = [43, 44, 45, 46, 47];
+/// assert_that!(subject).all_satisfy(|e| *e > 42);
+///
+/// let subject = [42, 43, 44, 45, 46];
+/// assert_that!(subject).none_satisfies(|e| *e < 42);
 /// ```
 pub trait AssertElements<'a, T, R> {
     /// Verify that the iterator contains exactly one element and return a
@@ -3706,7 +3723,57 @@ pub trait AssertElements<'a, T, R> {
     ///     .is_equal_to("three");
     /// ```
     #[track_caller]
-    fn filtered_on(self, condition: impl Fn(&T) -> bool) -> Spec<'a, Vec<T>, R>;
+    fn filtered_on<C>(self, condition: C) -> Spec<'a, Vec<T>, R>
+    where
+        C: FnMut(&T) -> bool;
+
+    /// Verify that any element of a collection or an iterator satisfies a given
+    /// predicate.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = [1, 41, 43, 42, 5];
+    /// assert_that!(subject).any_satisfies(|e| *e == 42);
+    /// ```
+    #[track_caller]
+    fn any_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool;
+
+    /// Verify that all elements of a collection or an iterator satisfy a given
+    /// predicate.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = [43, 44, 45, 46, 47];
+    /// assert_that!(subject).all_satisfy(|e| *e > 42);
+    /// ```
+    #[track_caller]
+    fn all_satisfy<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool;
+
+    /// Verify that none of the elements of a collection or an iterator
+    /// satisfies a given predicate.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = [42, 43, 44, 45, 46];
+    /// assert_that!(subject).none_satisfies(|e| *e < 42);
+    /// ```
+    #[track_caller]
+    fn none_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool;
 }
 
 /// Filter assertions for elements of a collection or an iterator that yields
