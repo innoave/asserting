@@ -1055,16 +1055,17 @@ impl<S> Spec<'_, S, CollectFailures> {
 }
 
 impl<'a, I, R> Spec<'a, I, R> {
-    /// Iterates over the items of a collection or iterator and executes the
-    /// given assertions for each of those items.
+    /// Iterates over the elements of a collection or iterator and executes the
+    /// given assertions for each of those elements.
     ///
-    /// It iterates over all items of the collection or iterator and collects
-    /// the failure messages for those items where the assertion fails. In other
-    /// words, it does not stop iterating when the assertion for one item fails.
+    /// It iterates over all elements of the collection or iterator and collects
+    /// the failure messages for those elements where the assertion fails. In
+    /// other words, it does not stop iterating when the assertion for one
+    /// element fails.
     ///
-    /// The failure messages contain the position of the item within the
-    /// collection or iterator. The position is 1 based. So a failure message
-    /// for the first item contains "1. item", the second "2. item", etc.
+    /// The failure messages contain the position of the element within the
+    /// collection or iterator. The position is 0-based. So a failure message
+    /// for the first element contains `[0]`, the second `[1]`, and so on.
     ///
     /// # Example
     ///
@@ -1075,7 +1076,7 @@ impl<'a, I, R> Spec<'a, I, R> {
     ///
     /// let numbers = [2, 4, 6, 8, 10];
     ///
-    /// assert_that!(numbers).each_item(|e|
+    /// assert_that!(numbers).each_element(|e|
     ///     e.is_greater_than(2)
     ///         .is_at_most(7)
     /// );
@@ -1084,32 +1085,32 @@ impl<'a, I, R> Spec<'a, I, R> {
     /// will print:
     ///
     /// ```console
-    /// expected numbers 1. item to be greater than 2
+    /// expected numbers [0] to be greater than 2
     ///    but was: 2
     ///   expected: > 2
     ///
-    /// expected numbers 4. item to be at most 7
+    /// expected numbers [3] to be at most 7
     ///    but was: 8
     ///   expected: <= 7
     ///
-    /// expected numbers 5. item to be at most 7
+    /// expected numbers [4] item to be at most 7
     ///    but was: 10
     ///   expected: <= 7
     /// ```
     #[allow(clippy::return_self_not_must_use)]
-    pub fn each_item<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    pub fn each_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
         I: IntoIterator<Item = T>,
         for<'c> A: Fn(Spec<'c, T, CollectFailures>) -> Spec<'c, B, CollectFailures>,
     {
         let default_expression = &Expression::default();
         let root_expression = self.expression.as_ref().unwrap_or(default_expression);
-        let mut position = 0;
+        let mut position = -1;
         for item in self.subject {
             position += 1;
             let element_spec = Spec {
                 subject: item,
-                expression: Some(format!("{root_expression} {position}. item").into()),
+                expression: Some(format!("{root_expression} [{position}]").into()),
                 description: None,
                 location: self.location,
                 failures: vec![],
