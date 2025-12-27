@@ -198,6 +198,21 @@
 //!     .contains_exactly(["one", "three", "five"]);
 //! ```
 //!
+//! Assert some elements of a collection or an iterator match a predicate:
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let subject = [1, 41, 43, 42, 5];
+//! assert_that!(subject).any_match(|e| *e == 42);
+//!
+//! let subject = [43, 44, 45, 46, 47];
+//! assert_that!(subject).all_match(|e| *e > 42);
+//!
+//! let subject = [42, 43, 44, 45, 46];
+//! assert_that!(subject).none_match(|e| *e < 42);
+//! ```
+//!
 //! ## Soft assertions
 //!
 //! ```should_panic

@@ -9,14 +9,15 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
 };
 use crate::expectations::{
-    has_at_least_number_of_elements, has_single_element, iterator_contains,
+    all_match, any_match, has_at_least_number_of_elements, has_single_element, iterator_contains,
     iterator_contains_all_in_order, iterator_contains_all_of, iterator_contains_any_of,
     iterator_contains_exactly, iterator_contains_exactly_in_any_order, iterator_contains_only,
     iterator_contains_only_once, iterator_contains_sequence, iterator_ends_with,
-    iterator_starts_with, not, HasAtLeastNumberOfElements, HasSingleElement, IteratorContains,
-    IteratorContainsAllInOrder, IteratorContainsAllOf, IteratorContainsAnyOf,
-    IteratorContainsExactly, IteratorContainsExactlyInAnyOrder, IteratorContainsOnly,
-    IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
+    iterator_starts_with, none_match, not, AllMatch, AnyMatch, HasAtLeastNumberOfElements,
+    HasSingleElement, IteratorContains, IteratorContainsAllInOrder, IteratorContainsAllOf,
+    IteratorContainsAnyOf, IteratorContainsExactly, IteratorContainsExactlyInAnyOrder,
+    IteratorContainsOnly, IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith,
+    IteratorStartsWith, NoneMatch,
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{
@@ -775,6 +776,55 @@ where
     }
 }
 
+impl<'a, S, T, R> AssertElements<'a, T, R> for Spec<'a, S, R>
+where
+    S: IntoIterator<Item = T>,
+    T: Debug,
+    R: FailingStrategy,
+{
+    fn single_element(self) -> Spec<'a, T, R> {
+        let spec = self.mapping(Vec::from_iter).expecting(has_single_element());
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| {
+            collection.pop().unwrap_or_else(|| {
+                unreachable!("Assertion failed and should have panicked! Please report a bug.")
+            })
+        })
+    }
+
+    fn filtered_on<C>(self, condition: C) -> Spec<'a, Vec<T>, R>
+    where
+        C: FnMut(&T) -> bool,
+    {
+        self.mapping(|subject| subject.into_iter().filter(condition).collect())
+    }
+
+    fn any_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        self.mapping(Vec::from_iter).expecting(any_match(predicate))
+    }
+
+    fn all_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        self.mapping(Vec::from_iter).expecting(all_match(predicate))
+    }
+
+    fn none_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        self.mapping(Vec::from_iter)
+            .expecting(none_match(predicate))
+    }
+}
+
 impl<T> Expectation<Vec<T>> for HasSingleElement
 where
     T: Debug,
@@ -804,36 +854,41 @@ where
     }
 }
 
-impl<'a, S, T, R> AssertElements<'a, T, R> for Spec<'a, S, R>
+impl<T, P> Expectation<Vec<T>> for AnyMatch<P>
 where
-    S: IntoIterator<Item = T>,
     T: Debug,
-    R: FailingStrategy,
+    P: FnMut(&T) -> bool,
 {
-    fn single_element(self) -> Spec<'a, T, R> {
-        let spec = self.mapping(Vec::from_iter).expecting(has_single_element());
-        if spec.has_failures() {
-            PanicOnFail.do_fail_with(&spec.failures());
-            unreachable!("Assertion failed and should have panicked! Please report a bug.")
-        }
-        spec.extracting(|mut collection| {
-            collection.pop().unwrap_or_else(|| {
-                unreachable!("Assertion failed and should have panicked! Please report a bug.")
-            })
-        })
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        subject.iter().any(|e| (self.predicate)(e))
     }
 
-    fn filtered_on(self, condition: impl Fn(&T) -> bool) -> Spec<'a, Vec<T>, R> {
-        self.mapping(|subject| subject.into_iter().filter(condition).collect())
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        _format: &DiffFormat,
+    ) -> String {
+        format!(
+            r"expected any element of {expression} to match the predicate, but none did match
+  actual: {actual:?}"
+        )
     }
 }
 
-impl<T> Expectation<Vec<T>> for HasAtLeastNumberOfElements
+impl<T, P> Expectation<Vec<T>> for AllMatch<P>
 where
     T: Debug,
+    P: FnMut(&T) -> bool,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
-        subject.len() >= self.expected_number_of_elements
+        for (i, e) in subject.iter().enumerate() {
+            if !(self.predicate)(e) {
+                self.not_matching.insert(i);
+            }
+        }
+        self.not_matching.is_empty()
     }
 
     fn message(
@@ -843,23 +898,47 @@ where
         _inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let actual_length = actual.len();
-        let actual_elements = match actual_length {
-            0 => mark_unexpected_string("no elements", format),
-            1 => mark_unexpected_string("one element", format),
-            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
-        };
-        let expected_elements = match self.expected_number_of_elements {
-            0 => mark_missing_string("no elements", format),
-            1 => mark_missing_string("at least one element", format),
-            _ => mark_missing_string(
-                &format!("at least {} elements", self.expected_number_of_elements),
-                format,
-            ),
-        };
+        let number_not_matching = self.not_matching.len();
+        let not_matching = collect_selected_values(&self.not_matching, actual);
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.not_matching, format, mark_unexpected);
         format!(
-            r"expected {expression} to have {expected_elements}, but has {actual_elements}
-  actual: {actual:?}"
+            r"expected all elements of {expression} to match the predicate, but {number_not_matching} did not match
+        actual: {marked_actual}
+  not matching: {not_matching:?}"
+        )
+    }
+}
+
+impl<T, P> Expectation<Vec<T>> for NoneMatch<P>
+where
+    T: Debug,
+    P: FnMut(&T) -> bool,
+{
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        for (i, e) in subject.iter().enumerate() {
+            if (self.predicate)(e) {
+                self.matching.insert(i);
+            }
+        }
+        self.matching.is_empty()
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let number_of_matches = self.matching.len();
+        let matching = collect_selected_values(&self.matching, actual);
+        let marked_actual =
+            mark_selected_items_in_collection(actual, &self.matching, format, mark_unexpected);
+        format!(
+            r"expected none of the elements of {expression} to match the predicate, but {number_of_matches} did match
+    actual: {marked_actual}
+  matching: {matching:?}"
         )
     }
 }
@@ -918,6 +997,42 @@ where
                 .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
                 .collect()
         })
+    }
+}
+
+impl<T> Expectation<Vec<T>> for HasAtLeastNumberOfElements
+where
+    T: Debug,
+{
+    fn test(&mut self, subject: &Vec<T>) -> bool {
+        subject.len() >= self.expected_number_of_elements
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Vec<T>,
+        _inverted: bool,
+        format: &DiffFormat,
+    ) -> String {
+        let actual_length = actual.len();
+        let actual_elements = match actual_length {
+            0 => mark_unexpected_string("no elements", format),
+            1 => mark_unexpected_string("one element", format),
+            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
+        };
+        let expected_elements = match self.expected_number_of_elements {
+            0 => mark_missing_string("no elements", format),
+            1 => mark_missing_string("at least one element", format),
+            _ => mark_missing_string(
+                &format!("at least {} elements", self.expected_number_of_elements),
+                format,
+            ),
+        };
+        format!(
+            r"expected {expression} to have {expected_elements}, but has {actual_elements}
+  actual: {actual:?}"
+        )
     }
 }
 
