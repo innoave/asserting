@@ -134,11 +134,13 @@
 //!
 //! let numbers = [2, 4, 6, 8, 10];
 //!
-//! assert_that!(numbers).each_item(|e|
+//! assert_that!(numbers).each_element(|e|
 //!     e.is_greater_than(1)
 //!         .is_at_most(10)
 //! );
 //! ```
+//!
+//! See [`Spec::each_element()`] for more details.
 //!
 //! Assert some elements of a collection or an iterator to satisfy a predicate:
 //!
@@ -155,7 +157,7 @@
 //! assert_that!(subject).none_satisfies(|e| *e < 42);
 //! ```
 //!
-//! For more details see [`Spec::each_item()`].
+//! See [`AssertElements`] for more details.
 //!
 //! ## Asserting specific elements of a collection or an iterator
 //!
@@ -681,11 +683,12 @@
 //! assert_that!(subject).is_left();
 //! ```
 //!
+//! [`AssertElements`]: assertions::AssertElements
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
 //! [`Spec`]: spec::Spec
-//! [`Spec::each_item()`]: spec::Spec::each_item
+//! [`Spec::each_element()`]: spec::Spec::each_element
 //! [`Spec::expecting()`]: spec::Spec::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies
 //! [`Spec::soft_panic()`]: spec::Spec::soft_panic

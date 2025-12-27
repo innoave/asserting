@@ -230,55 +230,55 @@ fn soft_assertions_panic_once_with_multiple_failure_messages() {
 }
 
 #[test]
-fn assert_each_item_of_an_iterator() {
+fn assert_each_element_of_an_iterator() {
     let subject = [2, 4, 6, 8, 10];
 
     assert_that(subject)
         .is_not_empty()
-        .each_item(|e| e.is_positive().is_at_most(20));
+        .each_element(|e| e.is_positive().is_at_most(20));
 }
 
 #[test]
-fn assert_each_item_of_a_borrowed_iterator() {
+fn assert_each_element_of_a_borrowed_iterator() {
     let subject = [2, 4, 6, 8, 10];
 
     assert_that(&subject)
         .is_not_empty()
-        .each_item(|e| e.is_positive().is_at_most(&20));
+        .each_element(|e| e.is_positive().is_at_most(&20));
 }
 
 #[test]
-#[should_panic = "expected numbers 2. item to be not equal to 4\n   but was: 4\n  expected: not 4\n"]
-fn assert_each_item_of_an_iterator_panics_if_one_assertion_fails() {
+#[should_panic = "expected numbers [1] to be not equal to 4\n   but was: 4\n  expected: not 4\n"]
+fn assert_each_element_of_an_iterator_panics_if_one_assertion_fails() {
     let subject = [2, 4, 6, 8, 10];
 
     assert_that(subject)
         .named("numbers")
         .is_not_empty()
-        .each_item(|e| e.is_not_equal_to(4));
+        .each_element(|e| e.is_not_equal_to(4));
 }
 
 #[test]
-fn verify_assert_each_item_of_an_iterator_fails() {
+fn verify_assert_each_element_of_an_iterator_fails() {
     let subject = [2, 4, 6, 8, 10];
 
     let failures = verify_that(&subject)
         .named("numbers")
-        .each_item(|e| e.is_greater_than(&2).is_at_most(&7))
+        .each_element(|e| e.is_greater_than(&2).is_at_most(&7))
         .display_failures();
 
     assert_eq!(
         failures,
         &[
-            r"expected numbers 1. item to be greater than 2
+            r"expected numbers [0] to be greater than 2
    but was: 2
   expected: > 2
 ",
-            r"expected numbers 4. item to be at most 7
+            r"expected numbers [3] to be at most 7
    but was: 8
   expected: <= 7
 ",
-            r"expected numbers 5. item to be at most 7
+            r"expected numbers [4] to be at most 7
    but was: 10
   expected: <= 7
 ",
