@@ -3743,7 +3743,7 @@ pub trait AssertElements<'a, T, R> {
     where
         P: FnMut(&T) -> bool;
 
-    /// Verify that all elements of a collection or an iterator matches a given
+    /// Verify that all elements of a collection or an iterator match a given
     /// predicate.
     ///
     /// # Examples
@@ -3759,7 +3759,7 @@ pub trait AssertElements<'a, T, R> {
     where
         P: FnMut(&T) -> bool;
 
-    /// Verify that none of the elements of a collection or an iterator matches
+    /// Verify that none of the elements of a collection or an iterator match
     /// a given predicate.
     ///
     /// # Examples
