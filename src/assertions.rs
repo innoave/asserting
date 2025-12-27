@@ -3673,19 +3673,19 @@ pub trait AssertMapContainsValue<E> {
 /// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
 /// ```
 ///
-/// Some elements match a predicate:
+/// Some elements satisfy a predicate:
 ///
 /// ```
 /// use asserting::prelude::*;
 ///
 /// let subject = [1, 41, 43, 42, 5];
-/// assert_that!(subject).any_match(|e| *e == 42);
+/// assert_that!(subject).any_satisfies(|e| *e == 42);
 ///
 /// let subject = [43, 44, 45, 46, 47];
-/// assert_that!(subject).all_match(|e| *e > 42);
+/// assert_that!(subject).all_satisfy(|e| *e > 42);
 ///
 /// let subject = [42, 43, 44, 45, 46];
-/// assert_that!(subject).none_match(|e| *e < 42);
+/// assert_that!(subject).none_satisfies(|e| *e < 42);
 /// ```
 pub trait AssertElements<'a, T, R> {
     /// Verify that the iterator contains exactly one element and return a
@@ -3727,7 +3727,7 @@ pub trait AssertElements<'a, T, R> {
     where
         C: FnMut(&T) -> bool;
 
-    /// Verify that any element of a collection or an iterator matches a given
+    /// Verify that any element of a collection or an iterator satisfies a given
     /// predicate.
     ///
     /// # Examples
@@ -3736,14 +3736,14 @@ pub trait AssertElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = [1, 41, 43, 42, 5];
-    /// assert_that!(subject).any_match(|e| *e == 42);
+    /// assert_that!(subject).any_satisfies(|e| *e == 42);
     /// ```
     #[track_caller]
-    fn any_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn any_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
     where
         P: FnMut(&T) -> bool;
 
-    /// Verify that all elements of a collection or an iterator match a given
+    /// Verify that all elements of a collection or an iterator satisfy a given
     /// predicate.
     ///
     /// # Examples
@@ -3752,15 +3752,15 @@ pub trait AssertElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = [43, 44, 45, 46, 47];
-    /// assert_that!(subject).all_match(|e| *e > 42);
+    /// assert_that!(subject).all_satisfy(|e| *e > 42);
     /// ```
     #[track_caller]
-    fn all_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn all_satisfy<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
     where
         P: FnMut(&T) -> bool;
 
-    /// Verify that none of the elements of a collection or an iterator match
-    /// a given predicate.
+    /// Verify that none of the elements of a collection or an iterator
+    /// satisfies a given predicate.
     ///
     /// # Examples
     ///
@@ -3768,10 +3768,10 @@ pub trait AssertElements<'a, T, R> {
     /// use asserting::prelude::*;
     ///
     /// let subject = [42, 43, 44, 45, 46];
-    /// assert_that!(subject).none_match(|e| *e < 42);
+    /// assert_that!(subject).none_satisfies(|e| *e < 42);
     /// ```
     #[track_caller]
-    fn none_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn none_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
     where
         P: FnMut(&T) -> bool;
 }

@@ -419,9 +419,9 @@ for all iterators.
 | contains_only_once            | verify that an iterator/collection contains only the specified values in any order and each of them only once               |
 | single_element                | verify that an iterator/collection contains exaclty one element and return a `Spec` for that one element                    |
 | filtered_on                   | filter the elements of an iterator/collection on a condition and return a `Spec` that contains the filtered elements        |
-| any_match                     | verify that any element of an iterator/collection matches a predicate                                                       |
-| all_match                     | verify that all elements of an iterator/collection match a predicate                                                        |
-| none_match                    | verify that none of the elements of an iterator/collection match a predicate                                                |
+| any_satisfies                 | verify that any element of an iterator/collection satisfies a predicate                                                     |
+| all_satisfy                   | verify that all elements of an iterator/collection satisfy a predicate                                                      |
+| none_satisfies                | verify that none of the elements of an iterator/collection satisfies a predicate                                            |
 
 for iterators that yield items in a well-defined order.
 

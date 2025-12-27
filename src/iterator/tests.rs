@@ -460,29 +460,29 @@ mod element_filters {
     }
 
     #[test]
-    fn any_match_on_elements_of_iterator_value_is_equal_to_42() {
+    fn any_satisfies_on_elements_of_iterator_value_is_equal_to_42() {
         let subject = CustomCollection {
             inner: vec![1, 41, 43, 42, 5],
         };
 
-        assert_that(subject).any_match(|e| *e == 42);
+        assert_that(subject).any_satisfies(|e| *e == 42);
     }
 
     #[test]
-    fn verify_any_match_on_elements_of_iterator_value_is_equal_to_42_fails() {
+    fn verify_any_satisfies_on_elements_of_iterator_value_is_equal_to_42_fails() {
         let subject = CustomCollection {
             inner: vec![1, 2, 43, 41, 5],
         };
 
         let failures = verify_that(subject)
             .named("my_numbers")
-            .any_match(|e| *e == 42)
+            .any_satisfies(|e| *e == 42)
             .display_failures();
 
         assert_eq!(
             failures,
             &[
-                r"expected any element of my_numbers to match the predicate, but none did match
+                r"expected any element of my_numbers to satisfy the predicate, but none did
   actual: [1, 2, 43, 41, 5]
 "
             ]
@@ -490,62 +490,62 @@ mod element_filters {
     }
 
     #[test]
-    fn all_match_on_elements_of_iterator_value_is_greater_than_42() {
+    fn all_satisfy_on_elements_of_iterator_value_is_greater_than_42() {
         let subject = CustomCollection {
             inner: vec![47, 46, 45, 44, 43],
         };
 
-        assert_that(subject).all_match(|e| *e > 42);
+        assert_that(subject).all_satisfy(|e| *e > 42);
     }
 
     #[test]
-    fn verify_all_match_on_elements_of_iterator_value_is_greater_than_42_fails() {
+    fn verify_all_satisfy_on_elements_of_iterator_value_is_greater_than_42_fails() {
         let subject = CustomCollection {
             inner: vec![43, 44, 45, 42, 47],
         };
 
         let failures = verify_that(subject)
             .named("my_numbers")
-            .all_match(|e| *e > 42)
+            .all_satisfy(|e| *e > 42)
             .display_failures();
 
         assert_eq!(
             failures,
             &[
-                r"expected all elements of my_numbers to match the predicate, but 1 did not match
-        actual: [43, 44, 45, 42, 47]
-  not matching: [42]
+                r"expected all elements of my_numbers to satisfy the predicate, but 1 did not
+   actual: [43, 44, 45, 42, 47]
+  failing: [42]
 "
             ]
         );
     }
 
     #[test]
-    fn none_match_on_elements_of_iterator_value_is_greater_than_42() {
+    fn none_satisfies_on_elements_of_iterator_value_is_greater_than_42() {
         let subject = CustomCollection {
             inner: vec![42, 41, 40, 39, 38],
         };
 
-        assert_that(subject).none_match(|e| *e > 42);
+        assert_that(subject).none_satisfies(|e| *e > 42);
     }
 
     #[test]
-    fn verify_none_match_on_elements_of_iterator_value_is_greater_than_42_fails() {
+    fn verify_none_satisfies_on_elements_of_iterator_value_is_greater_than_42_fails() {
         let subject = CustomCollection {
             inner: vec![41, 43, 45, 42, 47],
         };
 
         let failures = verify_that(subject)
             .named("my_numbers")
-            .none_match(|e| *e > 42)
+            .none_satisfies(|e| *e > 42)
             .display_failures();
 
         assert_eq!(
             failures,
             &[
-                r"expected none of the elements of my_numbers to match the predicate, but 3 did match
-    actual: [41, 43, 45, 42, 47]
-  matching: [43, 45, 47]
+                r"expected none of the elements of my_numbers to satisfy the predicate, but 3 did
+   actual: [41, 43, 45, 42, 47]
+  failing: [43, 45, 47]
 "
             ]
         );
@@ -556,7 +556,7 @@ mod element_filters {
         use super::*;
 
         #[test]
-        fn highlight_all_match_on_elements_of_iterator() {
+        fn highlight_all_satisfy_on_elements_of_iterator() {
             let subject = CustomCollection {
                 inner: vec![43, 44, 45, 42, 47],
             };
@@ -564,21 +564,21 @@ mod element_filters {
             let failures = verify_that(subject)
                 .named("my_numbers")
                 .with_diff_format(DIFF_FORMAT_RED_YELLOW)
-                .all_match(|e| *e > 42)
+                .all_satisfy(|e| *e > 42)
                 .display_failures();
 
             assert_eq!(
                 failures,
                 &[
-                    "expected all elements of my_numbers to match the predicate, but 1 did not match\n        \
-                           actual: [43, 44, 45, \u{1b}[31m42\u{1b}[0m, 47]\n  \
-                     not matching: [42]\n"
+                    "expected all elements of my_numbers to satisfy the predicate, but 1 did not\n   \
+                        actual: [43, 44, 45, \u{1b}[31m42\u{1b}[0m, 47]\n  \
+                       failing: [42]\n"
                 ]
             );
         }
 
         #[test]
-        fn highlight_none_match_on_elements_of_iterator() {
+        fn highlight_none_satisfies_on_elements_of_iterator() {
             let subject = CustomCollection {
                 inner: vec![41, 43, 45, 42, 47],
             };
@@ -586,15 +586,15 @@ mod element_filters {
             let failures = verify_that(subject)
                 .named("my_numbers")
                 .with_diff_format(DIFF_FORMAT_RED_YELLOW)
-                .none_match(|e| *e > 42)
+                .none_satisfies(|e| *e > 42)
                 .display_failures();
 
             assert_eq!(
                 failures,
                 &[
-                    "expected none of the elements of my_numbers to match the predicate, but 3 did match\n    \
-                       actual: [41, \u{1b}[31m43\u{1b}[0m, \u{1b}[31m45\u{1b}[0m, 42, \u{1b}[31m47\u{1b}[0m]\n  \
-                     matching: [43, 45, 47]\n"
+                    "expected none of the elements of my_numbers to satisfy the predicate, but 3 did\n   \
+                        actual: [41, \u{1b}[31m43\u{1b}[0m, \u{1b}[31m45\u{1b}[0m, 42, \u{1b}[31m47\u{1b}[0m]\n  \
+                       failing: [43, 45, 47]\n"
                 ]
             );
         }

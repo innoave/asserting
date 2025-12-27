@@ -125,7 +125,9 @@
 //!     .contains_only([1, 3, 5, 7, 9, 11, 13, 17, 19, 23, 29, 31, 37, 43]);
 //! ```
 //!
-//! ## Asserting each item of a collection or an iterator
+//! ## Asserting some elements of a collection or an iterator
+//!
+//! Asserting some elements of a collection or an iterator:
 //!
 //! ```
 //! use asserting::prelude::*;
@@ -136,6 +138,21 @@
 //!     e.is_greater_than(1)
 //!         .is_at_most(10)
 //! );
+//! ```
+//!
+//! Assert some elements of a collection or an iterator to satisfy a predicate:
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let subject = [1, 41, 43, 42, 5];
+//! assert_that!(subject).any_satisfies(|e| *e == 42);
+//!
+//! let subject = [43, 44, 45, 46, 47];
+//! assert_that!(subject).all_satisfy(|e| *e > 42);
+//!
+//! let subject = [42, 43, 44, 45, 46];
+//! assert_that!(subject).none_satisfies(|e| *e < 42);
 //! ```
 //!
 //! For more details see [`Spec::each_item()`].
@@ -196,21 +213,6 @@
 //! assert_that!(subject)
 //!     .elements_at([0, 2, 4])
 //!     .contains_exactly(["one", "three", "five"]);
-//! ```
-//!
-//! Assert some elements of a collection or an iterator match a predicate:
-//!
-//! ```
-//! use asserting::prelude::*;
-//!
-//! let subject = [1, 41, 43, 42, 5];
-//! assert_that!(subject).any_match(|e| *e == 42);
-//!
-//! let subject = [43, 44, 45, 46, 47];
-//! assert_that!(subject).all_match(|e| *e > 42);
-//!
-//! let subject = [42, 43, 44, 45, 46];
-//! assert_that!(subject).none_match(|e| *e < 42);
 //! ```
 //!
 //! ## Soft assertions

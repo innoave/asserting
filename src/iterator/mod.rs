@@ -9,15 +9,15 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
 };
 use crate::expectations::{
-    all_match, any_match, has_at_least_number_of_elements, has_single_element, iterator_contains,
-    iterator_contains_all_in_order, iterator_contains_all_of, iterator_contains_any_of,
-    iterator_contains_exactly, iterator_contains_exactly_in_any_order, iterator_contains_only,
-    iterator_contains_only_once, iterator_contains_sequence, iterator_ends_with,
-    iterator_starts_with, none_match, not, AllMatch, AnyMatch, HasAtLeastNumberOfElements,
-    HasSingleElement, IteratorContains, IteratorContainsAllInOrder, IteratorContainsAllOf,
-    IteratorContainsAnyOf, IteratorContainsExactly, IteratorContainsExactlyInAnyOrder,
-    IteratorContainsOnly, IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith,
-    IteratorStartsWith, NoneMatch,
+    all_satisfy, any_satisfies, has_at_least_number_of_elements, has_single_element,
+    iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
+    iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
+    iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
+    iterator_ends_with, iterator_starts_with, none_satisfies, not, AllSatisfy, AnySatisfies,
+    HasAtLeastNumberOfElements, HasSingleElement, IteratorContains, IteratorContainsAllInOrder,
+    IteratorContainsAllOf, IteratorContainsAnyOf, IteratorContainsExactly,
+    IteratorContainsExactlyInAnyOrder, IteratorContainsOnly, IteratorContainsOnlyOnce,
+    IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith, NoneSatisfies,
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{
@@ -802,26 +802,28 @@ where
         self.mapping(|subject| subject.into_iter().filter(condition).collect())
     }
 
-    fn any_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
-    where
-        P: FnMut(&T) -> bool,
-    {
-        self.mapping(Vec::from_iter).expecting(any_match(predicate))
-    }
-
-    fn all_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
-    where
-        P: FnMut(&T) -> bool,
-    {
-        self.mapping(Vec::from_iter).expecting(all_match(predicate))
-    }
-
-    fn none_match<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn any_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
     where
         P: FnMut(&T) -> bool,
     {
         self.mapping(Vec::from_iter)
-            .expecting(none_match(predicate))
+            .expecting(any_satisfies(predicate))
+    }
+
+    fn all_satisfy<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        self.mapping(Vec::from_iter)
+            .expecting(all_satisfy(predicate))
+    }
+
+    fn none_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        self.mapping(Vec::from_iter)
+            .expecting(none_satisfies(predicate))
     }
 }
 
@@ -854,7 +856,7 @@ where
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for AnyMatch<P>
+impl<T, P> Expectation<Vec<T>> for AnySatisfies<P>
 where
     T: Debug,
     P: FnMut(&T) -> bool,
@@ -871,13 +873,13 @@ where
         _format: &DiffFormat,
     ) -> String {
         format!(
-            r"expected any element of {expression} to match the predicate, but none did match
+            r"expected any element of {expression} to satisfy the predicate, but none did
   actual: {actual:?}"
         )
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for AllMatch<P>
+impl<T, P> Expectation<Vec<T>> for AllSatisfy<P>
 where
     T: Debug,
     P: FnMut(&T) -> bool,
@@ -885,10 +887,10 @@ where
     fn test(&mut self, subject: &Vec<T>) -> bool {
         for (i, e) in subject.iter().enumerate() {
             if !(self.predicate)(e) {
-                self.not_matching.insert(i);
+                self.failing.insert(i);
             }
         }
-        self.not_matching.is_empty()
+        self.failing.is_empty()
     }
 
     fn message(
@@ -898,19 +900,19 @@ where
         _inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let number_not_matching = self.not_matching.len();
-        let not_matching = collect_selected_values(&self.not_matching, actual);
+        let number_of_failing = self.failing.len();
+        let failing = collect_selected_values(&self.failing, actual);
         let marked_actual =
-            mark_selected_items_in_collection(actual, &self.not_matching, format, mark_unexpected);
+            mark_selected_items_in_collection(actual, &self.failing, format, mark_unexpected);
         format!(
-            r"expected all elements of {expression} to match the predicate, but {number_not_matching} did not match
-        actual: {marked_actual}
-  not matching: {not_matching:?}"
+            r"expected all elements of {expression} to satisfy the predicate, but {number_of_failing} did not
+   actual: {marked_actual}
+  failing: {failing:?}"
         )
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for NoneMatch<P>
+impl<T, P> Expectation<Vec<T>> for NoneSatisfies<P>
 where
     T: Debug,
     P: FnMut(&T) -> bool,
@@ -918,10 +920,10 @@ where
     fn test(&mut self, subject: &Vec<T>) -> bool {
         for (i, e) in subject.iter().enumerate() {
             if (self.predicate)(e) {
-                self.matching.insert(i);
+                self.failing.insert(i);
             }
         }
-        self.matching.is_empty()
+        self.failing.is_empty()
     }
 
     fn message(
@@ -931,14 +933,14 @@ where
         _inverted: bool,
         format: &DiffFormat,
     ) -> String {
-        let number_of_matches = self.matching.len();
-        let matching = collect_selected_values(&self.matching, actual);
+        let number_of_failing = self.failing.len();
+        let failing = collect_selected_values(&self.failing, actual);
         let marked_actual =
-            mark_selected_items_in_collection(actual, &self.matching, format, mark_unexpected);
+            mark_selected_items_in_collection(actual, &self.failing, format, mark_unexpected);
         format!(
-            r"expected none of the elements of {expression} to match the predicate, but {number_of_matches} did match
-    actual: {marked_actual}
-  matching: {matching:?}"
+            r"expected none of the elements of {expression} to satisfy the predicate, but {number_of_failing} did
+   actual: {marked_actual}
+  failing: {failing:?}"
         )
     }
 }
