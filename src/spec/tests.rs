@@ -3,6 +3,7 @@ use crate::spec::{AssertFailure, Expression, OwnedLocation};
 use crate::std::{
     format,
     string::{String, ToString},
+    vec,
 };
 
 #[test]
@@ -229,8 +230,14 @@ fn soft_assertions_panic_once_with_multiple_failure_messages() {
         .soft_panic();
 }
 
+#[derive(Debug)]
+struct TestPerson {
+    name: String,
+    age: u8,
+}
+
 #[test]
-fn assert_each_element_of_an_iterator() {
+fn assert_each_element_of_an_iterator_of_integer() {
     let subject = [2, 4, 6, 8, 10];
 
     assert_that(subject)
@@ -239,12 +246,48 @@ fn assert_each_element_of_an_iterator() {
 }
 
 #[test]
-fn assert_each_element_of_a_borrowed_iterator() {
-    let subject = [2, 4, 6, 8, 10];
+fn assert_each_element_of_an_iterator_of_person() {
+    let subject = vec![
+        TestPerson {
+            name: "John".into(),
+            age: 42,
+        },
+        TestPerson {
+            name: "Jane".into(),
+            age: 20,
+        },
+    ];
+
+    assert_that(subject)
+        .is_not_empty()
+        .each_element(|person| person.extracting(|p| p.age).is_at_most(42));
+}
+
+#[test]
+fn assert_each_element_of_a_borrowed_iterator_of_integer() {
+    let subject = vec![2, 4, 6, 8, 10];
 
     assert_that(&subject)
         .is_not_empty()
         .each_element(|e| e.is_positive().is_at_most(&20));
+}
+
+#[test]
+fn assert_each_element_of_a_borrowed_iterator_of_person() {
+    let subject = vec![
+        TestPerson {
+            name: "John".into(),
+            age: 42,
+        },
+        TestPerson {
+            name: "Jane".into(),
+            age: 20,
+        },
+    ];
+
+    assert_that(&subject)
+        .is_not_empty()
+        .each_element(|person| person.extracting(|p| &p.name).starts_with('J'));
 }
 
 #[test]
@@ -282,6 +325,96 @@ fn verify_assert_each_element_of_an_iterator_fails() {
    but was: 10
   expected: <= 7
 ",
+        ]
+    );
+}
+
+#[test]
+fn assert_any_element_of_an_iterator_of_str() {
+    let subject = ["one", "two", "three", "four", "five"];
+
+    assert_that(subject)
+        .is_not_empty()
+        .any_element(|e| e.contains("ee"));
+}
+
+#[test]
+fn assert_any_element_of_an_iterator_of_person() {
+    let subject = vec![
+        TestPerson {
+            name: "John".into(),
+            age: 42,
+        },
+        TestPerson {
+            name: "Jane".into(),
+            age: 20,
+        },
+    ];
+
+    assert_that(subject)
+        .is_not_empty()
+        .any_element(|person| person.extracting(|p| p.age).is_at_most(20));
+}
+
+#[test]
+fn assert_any_element_of_a_borrowed_iterator_of_str() {
+    let subject = vec!["one", "two", "three", "four", "five"];
+
+    assert_that(&subject)
+        .is_not_empty()
+        .any_element(|e| e.starts_with("fi"));
+}
+
+#[test]
+fn assert_any_element_of_a_borrowed_iterator_of_person() {
+    let subject = vec![
+        TestPerson {
+            name: "John".into(),
+            age: 42,
+        },
+        TestPerson {
+            name: "Jane".into(),
+            age: 20,
+        },
+    ];
+
+    assert_that(&subject)
+        .is_not_empty()
+        .any_element(|person| person.extracting(|p| &p.name).ends_with('n'));
+}
+
+#[test]
+fn verify_assert_any_element_of_an_iterator_fails() {
+    let subject = ["one", "two", "three", "four", "five"];
+
+    let failures = verify_that(subject)
+        .named("words")
+        .any_element(|e| e.starts_with("fu"))
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected words [0] to start with "fu"
+   but was: "one"
+  expected: "fu"
+"#,
+            r#"expected words [1] to start with "fu"
+   but was: "two"
+  expected: "fu"
+"#,
+            r#"expected words [2] to start with "fu"
+   but was: "three"
+  expected: "fu"
+"#,
+            r#"expected words [3] to start with "fu"
+   but was: "four"
+  expected: "fu"
+"#,
+            r#"expected words [4] to start with "fu"
+   but was: "five"
+  expected: "fu"
+"#,
         ]
     );
 }

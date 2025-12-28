@@ -138,6 +138,10 @@
 //!     e.is_greater_than(1)
 //!         .is_at_most(10)
 //! );
+//!
+//! assert_that!(numbers).any_element(|e|
+//!     e.is_equal_to(4)
+//! );
 //! ```
 //!
 //! See [`Spec::each_element()`] for more details.
