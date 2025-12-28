@@ -1056,7 +1056,8 @@ impl<S> Spec<'_, S, CollectFailures> {
 
 impl<'a, I, R> Spec<'a, I, R> {
     /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements.
+    /// the given assertions for each of those elements. If all elements are
+    /// asserted successfully, the whole assertion succeeds.
     ///
     /// It iterates over all elements of the collection or iterator and collects
     /// the failure messages for those elements where the assertion fails. In
@@ -1098,6 +1099,7 @@ impl<'a, I, R> Spec<'a, I, R> {
     ///   expected: <= 7
     /// ```
     #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
     pub fn each_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
         I: IntoIterator<Item = T>,
@@ -1177,6 +1179,7 @@ impl<'a, I, R> Spec<'a, I, R> {
     ///    but was: "three"
     ///   expected: 'x'
     /// ```
+    #[track_caller]
     pub fn any_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
         I: IntoIterator<Item = T>,
