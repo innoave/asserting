@@ -1055,8 +1055,8 @@ impl<S> Spec<'_, S, CollectFailures> {
 }
 
 impl<'a, I, R> Spec<'a, I, R> {
-    /// Iterates over the elements of a collection or iterator and executes the
-    /// given assertions for each of those elements.
+    /// Iterates over the elements of a collection or an iterator and executes
+    /// the given assertions for each of those elements.
     ///
     /// It iterates over all elements of the collection or iterator and collects
     /// the failure messages for those elements where the assertion fails. In
@@ -1101,7 +1101,7 @@ impl<'a, I, R> Spec<'a, I, R> {
     pub fn each_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
         I: IntoIterator<Item = T>,
-        for<'c> A: Fn(Spec<'c, T, CollectFailures>) -> Spec<'c, B, CollectFailures>,
+        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
         let default_expression = &Expression::default();
         let root_expression = self.expression.as_ref().unwrap_or(default_expression);
@@ -1121,6 +1121,90 @@ impl<'a, I, R> Spec<'a, I, R> {
             self.failures.extend(failures);
         }
         if !self.failures.is_empty()
+            && any::type_name_of_val(&self.failing_strategy) == any::type_name::<PanicOnFail>()
+        {
+            PanicOnFail.do_fail_with(&self.failures);
+        }
+        Spec {
+            subject: (),
+            expression: self.expression,
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
+        }
+    }
+
+    /// Iterates over the elements of a collection or an iterator and executes
+    /// the given assertions for each of those elements. If the assertion of any
+    /// element is successful, the iteration stops and the whole assertion
+    /// succeeds.
+    ///
+    /// If the assertion fails for all elements, the failures of the assertion
+    /// for all elements are collected.
+    ///
+    /// The failure messages contain the position of the element within the
+    /// collection or iterator. The position is 0-based. So a failure message
+    /// for the first element contains `[0]`, the second `[1]`, and so on.
+    ///
+    /// # Example
+    ///
+    /// The following assertion:
+    ///
+    /// ```should_panic
+    /// use asserting::prelude::*;
+    ///
+    /// let digit_names = ["one", "two", "three"];
+    ///
+    /// assert_that!(digit_names).any_element(|e|
+    ///     e.contains('x')
+    /// );
+    /// ```
+    ///
+    /// will print:
+    ///
+    /// ```console
+    /// expected digit_names [0] to contain 'x'
+    ///    but was: "one"
+    ///   expected: 'x'
+    ///
+    /// expected digit_names [1] to contain 'x'
+    ///    but was: "two"
+    ///   expected: 'x'
+    ///
+    /// expected digit_names [2] to contain 'x'
+    ///    but was: "three"
+    ///   expected: 'x'
+    /// ```
+    pub fn any_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    where
+        I: IntoIterator<Item = T>,
+        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+    {
+        let default_expression = &Expression::default();
+        let root_expression = self.expression.as_ref().unwrap_or(default_expression);
+        let mut any_success = false;
+        let mut position = -1;
+        for item in self.subject {
+            position += 1;
+            let element_spec = Spec {
+                subject: item,
+                expression: Some(format!("{root_expression} [{position}]").into()),
+                description: None,
+                location: self.location,
+                failures: vec![],
+                diff_format: self.diff_format.clone(),
+                failing_strategy: CollectFailures,
+            };
+            let failures = assert(element_spec).failures;
+            if failures.is_empty() {
+                any_success = true;
+                break;
+            }
+            self.failures.extend(failures);
+        }
+        if !any_success
             && any::type_name_of_val(&self.failing_strategy) == any::type_name::<PanicOnFail>()
         {
             PanicOnFail.do_fail_with(&self.failures);
