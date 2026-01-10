@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.12.0 - 2026-01-10
+
+_Asserting some elements in a collection or an iterator_
+
+### Added
+
+* verify that at least one element of an iterator or collection satisfies assertions
+  [(PR #73)](https://github.com/innoave/asserting/pull/73)
+* assert some elements of an iterator against a predicate
+  [(PR #71)](https://github.com/innoave/asserting/pull/71)
+
+### Changed
+
+* **Breaking:** rename method `each_item()` to `each_element()`
+  [(PR #72)](https://github.com/innoave/asserting/pull/72)
+
 ## 0.11.0 - 2025-12-27
 
 _Pick elements of collections or iterators for assertion_
