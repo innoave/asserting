@@ -19,7 +19,7 @@ use crate::std::{cell::RefCell, rc::Rc};
 ///
 /// It wraps the subject into a [`Spec`] and sets the name of the expression and
 /// the code location of the assertion in the [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for the subject's type can be called.
+/// assertion method implemented for the subject's type can be called.
 ///
 /// Assertions started with `assert_that!` will panic on the first failing
 /// assertion.
@@ -59,7 +59,7 @@ macro_rules! assert_that {
 ///
 /// It wraps the subject into a [`Spec`] and sets the name of the expression and
 /// the code location of the assertion in the [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for the subject's type can be called.
+/// assertion method implemented for the subject's type can be called.
 ///
 /// Assertions started with `verify_that!` will collect [`AssertFailure`]s for
 /// all failing assertions. The collected failures can be queried by calling one
@@ -107,7 +107,7 @@ macro_rules! verify_that {
 /// Starts an assertion for some piece of code in the [`PanicOnFail`] mode.
 ///
 /// It takes a closure and wraps it into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for closures can be called.
+/// assertion method implemented for closures can be called.
 ///
 /// Assertions started with `assert_that_code!` will panic on the first failing
 /// assertion.
@@ -146,7 +146,7 @@ macro_rules! assert_that_code {
 /// Starts an assertion for some piece of code in the [`CollectFailures`] mode.
 ///
 /// It takes a closure and wraps it into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for closures can be called.
+/// assertion method implemented for closures can be called.
 ///
 /// Assertions started with `verify_that_code!` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
@@ -208,12 +208,12 @@ macro_rules! verify_that_code {
 /// [`PanicOnFail`] mode.
 ///
 /// It wraps the subject into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for the subject's type can be called.
+/// assertion method implemented for the subject's type can be called.
 ///
 /// Assertions started with `assert_that()` will panic on the first failing
 /// assertion.
 ///
-/// In comparison to using the macro [`assert_that!`](crate::assert_that)
+/// In comparison to using the macro [`assert_that!`](crate::assert_that),
 /// calling this function does not set a name for the expression and does not
 /// set the code location of the assertion. In failure messages, the generic word
 /// "subject" is used. To set a specific text for the expression, the method
@@ -255,7 +255,7 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// [`CollectFailures`] mode.
 ///
 /// It wraps the subject into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for the subject's type can be called.
+/// assertion method implemented for the subject's type can be called.
 ///
 /// Assertions started with `verify_that()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
@@ -314,7 +314,7 @@ pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
 /// Starts an assertion for some piece of code in the [`PanicOnFail`] mode.
 ///
 /// It takes a closure and wraps it into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for closures can be called.
+/// assertion method implemented for closures can be called.
 ///
 /// Assertions started with `assert_that_code()` will panic on the first failing
 /// assertion.
@@ -360,7 +360,7 @@ where
 /// Starts an assertion for some piece of code in the [`CollectFailures`] mode.
 ///
 /// It takes a closure and wraps it into a [`Spec`]. On the [`Spec`] any
-/// assertion method that is implemented for closures can be called.
+/// assertion method implemented for closures can be called.
 ///
 /// Assertions started with `verify_that_code()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
@@ -620,7 +620,7 @@ impl OwnedLocation {
 ///
 /// It holds the data needed to execute an assertion such as the subject,
 /// the name of the subject or expression, an optional description of the
-/// current assertion and the location of the assertion in the source code
+/// current assertion, and the location of the assertion in the source code
 /// respectively test code.
 ///
 /// It also holds the concrete [`FailingStrategy`] on how to behave in case
@@ -726,8 +726,8 @@ impl<'a, S, R> Spec<'a, S, R> {
         self
     }
 
-    /// Sets the diff format that is used to highlight differences between
-    /// the actual value and the expected value.
+    /// Sets the diff format used to highlight differences between the actual
+    /// value and the expected value.
     ///
     /// Note: This method must be called before an assertion method is called to
     /// have an effect on the failure message of the assertion as failure
@@ -739,9 +739,9 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 
     /// Sets the diff format used to highlight differences between the actual
-    /// value and the expected value according the configured mode.
+    /// value and the expected value according to the configured mode.
     ///
-    /// The mode is configured via environment variables like described in the
+    /// The mode is configured via environment variables as described in the
     /// module [colored].
     #[cfg(feature = "colored")]
     #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
@@ -766,10 +766,10 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// It takes a closure that maps the current subject to a new subject and
     /// returns a new `Spec` with the value returned by the closure as the new
     /// subject. The new subject may have a different type than the original
-    /// subject. All other data like expression, description and location are
+    /// subject. All other data like expression, description, and location are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful when having a custom type and some specific
+    /// This function is useful when having a custom type, and a specific
     /// property of this type shall be asserted only.
     ///
     /// This is an alias function to the [`mapping()`](Spec::mapping) function.
@@ -809,10 +809,10 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// It takes a closure that maps the current subject to a new subject and
     /// returns a new `Spec` with the value returned by the closure as the new
     /// subject. The new subject may have a different type than the original
-    /// subject. All other data like expression, description and location are
+    /// subject. All other data like expression, description, and location are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful if some type does not implement a trait that is
+    /// This function is useful if some type does not implement a trait
     /// required for an assertion.
     ///
     /// `Spec` also provides the [`extracting()`](Spec::extracting) function,
@@ -862,8 +862,8 @@ where
 {
     /// Asserts the given expectation.
     ///
-    /// In case the expectation is not meet, it does fail according the current
-    /// failing strategy of this `Spec`.
+    /// In case the expectation is not meet, the assertion fails according to
+    /// the current failing strategy of this `Spec`.
     ///
     /// This method is called from the implementations of the assertion traits
     /// defined in the [`assertions`](crate::assertions) module. Implementations
@@ -972,7 +972,7 @@ where
         self.expecting(satisfies(predicate).with_message(message))
     }
 
-    /// Fails the assertion according the current failing strategy of this
+    /// Fails the assertion according to the current failing strategy of this
     /// `Spec`.
     #[track_caller]
     pub fn do_fail_with_message(&mut self, message: impl Into<String>) {
@@ -1342,8 +1342,8 @@ impl FailingStrategy for CollectFailures {
 /// * [`IsOk`](crate::expectations::IsOk)
 /// * [`IsErr`](crate::expectations::IsErr)
 ///
-/// For example for implementing the function [`Expectation::message()`] for the
-/// [`IsOk`](crate::expectations::IsOk) expectation for `Result<T, E>` the
+/// For example, for implementing the function [`Expectation::message()`] for
+/// the [`IsOk`](crate::expectations::IsOk) expectation for `Result<T, E>` the
 /// concrete types for `T` and `E` are not relevant. The implementation of the
 /// trait looks like this:
 ///
