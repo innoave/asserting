@@ -975,7 +975,7 @@ where
     /// Fails the assertion according the current failing strategy of this
     /// `Spec`.
     #[track_caller]
-    fn do_fail_with_message(&mut self, message: impl Into<String>) {
+    pub fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
             description: self.description.clone().map(String::from),
