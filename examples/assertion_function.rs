@@ -8,7 +8,7 @@
 //! Running the example will print a failed assertion to the console:
 //!
 //! ```console
-//! thread 'main' (5388) panicked at examples\assertion_function.rs:64:5:
+//! thread 'main' (5388) panicked at examples\assertion_function.rs:107:5:
 //! assertion of snake body failed:
 //!
 //! expected snake.length to be equal to 3
@@ -27,7 +27,13 @@
 //!   expected: Coord { x: 2, y: 1 }
 //! ```
 //!
-//! [image of colored output in the console](assets/assertion_function.png)
+//! [image of colored output in the console](assertion_function.png)
+//!
+//! Since version 0.13.0 of `asserting` it is possible to write a custom
+//! assertion method with reusing the built-in assertions. This is demonstrated
+//! in the example
+//! [custom_assertion_reusing_existing.rs](custom_assertion_reusing_existing.rs)
+//! which uses the same `Snake` struct and same assertions as this example.
 
 // just to prevent some linter warnings
 mod fixture;

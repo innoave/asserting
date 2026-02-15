@@ -100,3 +100,8 @@ required-features = ["colored"]
 name = "assertion_function"
 path = "examples/assertion_function.rs"
 required-features = ["colored"]
+
+[[example]]
+name = "custom_assertion_reusing_existing"
+path = "examples/custom_assertion_reusing_existing.rs"
+required-features = ["colored"]
