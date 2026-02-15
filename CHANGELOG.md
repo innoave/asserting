@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.13.1 - 2026-02-15
+
+### Added
+
+* doc: provide an example on how to write a custom assertion method with reusing existing assertions
+
+### Changed
+
+* doc: custom assertion in example `AssertOver18` is implemented for generic `S: Borrow<Person>`
+
 ## 0.13.0 - 2026-02-15
 
 _Custom assertion methods without expectations_
