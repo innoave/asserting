@@ -708,6 +708,7 @@
 //! ```
 //! use asserting::prelude::*;
 //! use asserting::spec::{FailingStrategy, Spec};
+//! use std::borrow::Borrow;
 //!
 //! struct Person {
 //!     name: String,
@@ -718,12 +719,15 @@
 //!     fn is_over_18(self) -> Self;
 //! }
 //!
-//! impl<'a, R> AssertOver18 for Spec<'a, Person, R>
+//! // we implement the trait for a generic `S: Borrow<Person>` so that the
+//! // assertion method can be called on an owned or borrowed `Person` instance
+//! impl<'a, S, R> AssertOver18 for Spec<'a, S, R>
 //! where
+//!     S: Borrow<Person>,
 //!     R: FailingStrategy,
 //! {
 //!     fn is_over_18(mut self) -> Self {
-//!         let actual = self.subject().age;
+//!         let actual = self.subject().borrow().age;
 //!         if actual < 18 {
 //!             let expression = self.expression();
 //!             self.do_fail_with_message(
