@@ -70,7 +70,8 @@ Easy-to-extend means that we can write assertions for custom types with minimal 
 1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
 2. property-based assertions can be used with any type that implements the related property
    (see "[property-based assertions]")
-3. write custom assertions by implementing two simple traits (see "[custom assertions]")
+3. write custom assertion methods by defining and implementing an extension trait
+   (see "[custom assertions]")
 
 The mentioned references link to a chapter in the crate's documentation that describes the
 possibilities for custom assertions, including examples.

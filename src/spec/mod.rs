@@ -630,7 +630,7 @@ impl OwnedLocation {
 /// are collected in this struct.
 pub struct Spec<'a, S, R> {
     subject: S,
-    expression: Option<Expression<'a>>,
+    expression: Expression<'a>,
     description: Option<Cow<'a, str>>,
     location: Option<Location<'a>>,
     failures: Vec<AssertFailure>,
@@ -645,8 +645,8 @@ impl<S, R> Spec<'_, S, R> {
     }
 
     /// Returns the expression (or subject name) if one has been set.
-    pub fn expression(&self) -> Option<&Expression<'_>> {
-        self.expression.as_ref()
+    pub fn expression(&self) -> &Expression<'_> {
+        &self.expression
     }
 
     /// Returns the location in source code or test code if it has been set.
@@ -692,10 +692,10 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// The diff format is set to "no highlighting". Failure messages will not
     /// highlight differences between the actual and the expected value.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub const fn new(subject: S, failing_strategy: R) -> Self {
+    pub fn new(subject: S, failing_strategy: R) -> Self {
         Self {
             subject,
-            expression: None,
+            expression: Expression::default(),
             description: None,
             location: None,
             failures: vec![],
@@ -707,7 +707,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub fn named(mut self, subject_name: impl Into<Cow<'a, str>>) -> Self {
-        self.expression = Some(Expression(subject_name.into()));
+        self.expression = Expression(subject_name.into());
         self
     }
 
@@ -883,9 +883,8 @@ where
     #[track_caller]
     pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
-            let default_expression = Expression::default();
-            let expression = self.expression.as_ref().unwrap_or(&default_expression);
-            let message = expectation.message(expression, &self.subject, false, &self.diff_format);
+            let message =
+                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
             self.do_fail_with_message(message);
         }
         self
@@ -976,7 +975,7 @@ where
     /// Fails the assertion according the current failing strategy of this
     /// `Spec`.
     #[track_caller]
-    fn do_fail_with_message(&mut self, message: impl Into<String>) {
+    pub fn do_fail_with_message(&mut self, message: impl Into<String>) {
         let message = message.into();
         let failure = AssertFailure {
             description: self.description.clone().map(String::from),
@@ -1105,14 +1104,13 @@ impl<'a, I, R> Spec<'a, I, R> {
         I: IntoIterator<Item = T>,
         A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
-        let default_expression = &Expression::default();
-        let root_expression = self.expression.as_ref().unwrap_or(default_expression);
+        let root_expression = &self.expression;
         let mut position = -1;
         for item in self.subject {
             position += 1;
             let element_spec = Spec {
                 subject: item,
-                expression: Some(format!("{root_expression} [{position}]").into()),
+                expression: format!("{root_expression} [{position}]").into(),
                 description: None,
                 location: self.location,
                 failures: vec![],
@@ -1185,15 +1183,14 @@ impl<'a, I, R> Spec<'a, I, R> {
         I: IntoIterator<Item = T>,
         A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
-        let default_expression = &Expression::default();
-        let root_expression = self.expression.as_ref().unwrap_or(default_expression);
+        let root_expression = &self.expression;
         let mut any_success = false;
         let mut position = -1;
         for item in self.subject {
             position += 1;
             let element_spec = Spec {
                 subject: item,
-                expression: Some(format!("{root_expression} [{position}]").into()),
+                expression: format!("{root_expression} [{position}]").into(),
                 description: None,
                 location: self.location,
                 failures: vec![],

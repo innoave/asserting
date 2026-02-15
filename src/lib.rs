@@ -415,12 +415,13 @@
 //!
 //! # Custom assertions
 //!
-//! `asserting` provides 4 ways to do custom assertions:
+//! `asserting` provides 5 ways to do custom assertions:
 //!
 //! 1. Predicate functions as custom assertions used with the [`Spec::satisfies()`] method
 //! 2. Property base assertions for any type that implements a property trait
 //! 3. Custom expectations used with the [`Spec::expecting()`] method
 //! 4. Custom assertions methods
+//! 5. Custom assertions without writing an expectation
 //!
 //! > &#x1F4A1;
 //! > Often the easiest way to assert a custom type is to write a helper
@@ -431,7 +432,15 @@
 //!
 //! How to use predicate functions as custom assertions is described on the
 //! [`Spec::satisfies()`] method and in the [Examples](#predicate-as-custom-assertion)
-//! chapter above. The other 3 ways are described in the following subchapters.
+//! chapter above. The other 4 ways are described in the following subchapters.
+//!
+//! [`Expectation`]s enable us to write specialized assertions by combining
+//! several basic expectations. In case a custom assertion cannot be composed
+//! out of the provided expectations but writing a custom [`Expectation`] is too
+//! cumbersome, we can write a custom assertion method directly without any
+//! custom [`Expectation`]. See the
+//! [Writing custom assertions without writing an expectation](#writing-custom-assertions-without-writing-an-expectation)
+//! chapter below for an example.
 //!
 //! ## Property-based assertions
 //!
@@ -685,6 +694,49 @@
 //! let subject: Either<String, i64> = Either::Left("left value".to_string());
 //!
 //! assert_that!(subject).is_left();
+//! ```
+//!
+//! ## Writing custom assertions without writing an expectation
+//!
+//! In real world projects custom assertions are often very specific, and custom
+//! expectations will not be reusable anyway. Writing a custom assertion without
+//! having to provide a custom [`Expectation`] is most likely the preferred way.
+//!
+//! Here is a simple assertion that checks whether a person is over 18 years
+//! old:
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use asserting::spec::{FailingStrategy, Spec};
+//!
+//! struct Person {
+//!     name: String,
+//!     age: u8,
+//! }
+//!
+//! trait AssertOver18 {
+//!     fn is_over_18(self) -> Self;
+//! }
+//!
+//! impl<'a, R> AssertOver18 for Spec<'a, Person, R>
+//! where
+//!     R: FailingStrategy,
+//! {
+//!     fn is_over_18(mut self) -> Self {
+//!         let actual = self.subject().age;
+//!         if actual < 18 {
+//!             let expression = self.expression();
+//!             self.do_fail_with_message(
+//!                 "expected {expression} to be over 18\n   but was: {actual}\n  expected: >= 18",
+//!             );
+//!         }
+//!         self
+//!     }
+//! }
+//!
+//! let person = Person { name: "Silvia".to_string(), age: 18 };
+//!
+//! assert_that!(person).is_over_18();
 //! ```
 //!
 //! [`AssertElements`]: assertions::AssertElements
