@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.13.0 - 2026-02-15
+
+_Custom assertion methods without expectations_
+
+### Added
+
+* write custom assertion methods without the need to implement a custom expectation as well
+  [(PR #74)](https://github.com/innoave/asserting/pull/74)
+
 ## 0.12.0 - 2026-01-10
 
 _Asserting some elements in a collection or an iterator_
