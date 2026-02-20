@@ -1,12 +1,12 @@
 //! Implementation of the equality assertions.
 
 use crate::assertions::{
-    AssertEquality, AssertHasDebugString, AssertHasDisplayMessage, AssertSameAs,
+    AssertEquality, AssertHasDebugString, AssertHasDisplayString, AssertSameAs,
 };
 use crate::colored::{mark_diff, mark_diff_str};
 use crate::expectations::{
-    has_debug_string, has_display_message, is_equal_to, is_same_as, not, HasDebugString,
-    HasDisplayMessage, IsEqualTo, IsSameAs,
+    has_debug_string, has_display_string, is_equal_to, is_same_as, not, HasDebugString,
+    HasDisplayString, IsEqualTo, IsSameAs,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::{Debug, Display};
@@ -138,22 +138,22 @@ where
 
 impl<E> Invertible for HasDebugString<E> {}
 
-impl<S, E, R> AssertHasDisplayMessage<E> for Spec<'_, S, R>
+impl<S, E, R> AssertHasDisplayString<E> for Spec<'_, S, R>
 where
     S: Display,
     E: AsRef<str>,
     R: FailingStrategy,
 {
-    fn has_display_message(self, expected: E) -> Self {
-        self.expecting(has_display_message(expected))
+    fn has_display_string(self, expected: E) -> Self {
+        self.expecting(has_display_string(expected))
     }
 
-    fn does_not_have_display_message(self, expected: E) -> Self {
-        self.expecting(not(has_display_message(expected)))
+    fn does_not_have_display_string(self, expected: E) -> Self {
+        self.expecting(not(has_display_string(expected)))
     }
 }
 
-impl<S, E> Expectation<S> for HasDisplayMessage<E>
+impl<S, E> Expectation<S> for HasDisplayString<E>
 where
     S: Display,
     E: AsRef<str>,
@@ -173,9 +173,9 @@ where
         let expected = self.expected.as_ref();
         let (marked_actual, marked_expected) = mark_diff_str(&actual.to_string(), expected, format);
         format!(
-            "expected {expression} to {not}have display message {expected:?}\n   but was: \"{marked_actual}\"\n  expected: {not}\"{marked_expected}\"",
+            "expected {expression} to {not}have a display string equal to {expected:?}\n   but was: \"{marked_actual}\"\n  expected: {not}\"{marked_expected}\"",
         )
     }
 }
 
-impl<E> Invertible for HasDisplayMessage<E> {}
+impl<E> Invertible for HasDisplayString<E> {}

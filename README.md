@@ -371,10 +371,10 @@ for types that implement `core::fmt::Debug`:
 
 for types that implement `core::fmt::Display`:
 
-| assertion                     | description                                                                  |
-|-------------------------------|------------------------------------------------------------------------------|
-| has_display_message           | verify that a type formatted for display is equal to the expected string     |                                                 
-| does_not_have_display_message | verify that a type formatted for display is not equal to the expected string |
+| assertion                    | description                                                                  |
+|------------------------------|------------------------------------------------------------------------------|
+| has_display_string           | verify that a type formatted for display is equal to the expected string     |                                                 
+| does_not_have_display_string | verify that a type formatted for display is not equal to the expected string |
 
 ### Emptiness
 

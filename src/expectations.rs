@@ -646,12 +646,12 @@ pub struct HasDebugString<E> {
     pub expected: E,
 }
 
-/// Creates a [`HasDisplayMessage`] expectation.
-pub fn has_display_message<E>(expected: E) -> HasDisplayMessage<E> {
-    HasDisplayMessage { expected }
+/// Creates a [`HasDisplayString`] expectation.
+pub fn has_display_string<E>(expected: E) -> HasDisplayString<E> {
+    HasDisplayString { expected }
 }
 
-pub struct HasDisplayMessage<E> {
+pub struct HasDisplayString<E> {
     pub expected: E,
 }
 
