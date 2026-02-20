@@ -637,12 +637,12 @@ pub struct ErrorHasSourceMessage {
     pub expected_source_message: String,
 }
 
-/// Creates a [`HasDebugMessage`] expectation.
-pub fn has_debug_message<E>(expected: E) -> HasDebugMessage<E> {
-    HasDebugMessage { expected }
+/// Creates a [`HasDebugString`] expectation.
+pub fn has_debug_string<E>(expected: E) -> HasDebugString<E> {
+    HasDebugString { expected }
 }
 
-pub struct HasDebugMessage<E> {
+pub struct HasDebugString<E> {
     pub expected: E,
 }
 

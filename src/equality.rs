@@ -1,11 +1,11 @@
 //! Implementation of the equality assertions.
 
 use crate::assertions::{
-    AssertEquality, AssertHasDebugMessage, AssertHasDisplayString, AssertSameAs,
+    AssertEquality, AssertHasDebugString, AssertHasDisplayString, AssertSameAs,
 };
 use crate::colored::{mark_diff, mark_diff_str};
 use crate::expectations::{
-    has_debug_message, has_display_string, is_equal_to, is_same_as, not, HasDebugMessage,
+    has_debug_string, has_display_string, is_equal_to, is_same_as, not, HasDebugString,
     HasDisplayString, IsEqualTo, IsSameAs,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -95,22 +95,22 @@ where
 
 impl<E> Invertible for IsSameAs<E> {}
 
-impl<S, E, R> AssertHasDebugMessage<E> for Spec<'_, S, R>
+impl<S, E, R> AssertHasDebugString<E> for Spec<'_, S, R>
 where
     S: Debug,
     E: AsRef<str>,
     R: FailingStrategy,
 {
-    fn has_debug_message(self, expected: E) -> Self {
-        self.expecting(has_debug_message(expected))
+    fn has_debug_string(self, expected: E) -> Self {
+        self.expecting(has_debug_string(expected))
     }
 
-    fn does_not_have_debug_message(self, expected: E) -> Self {
-        self.expecting(not(has_debug_message(expected)))
+    fn does_not_have_debug_string(self, expected: E) -> Self {
+        self.expecting(not(has_debug_string(expected)))
     }
 }
 
-impl<S, E> Expectation<S> for HasDebugMessage<E>
+impl<S, E> Expectation<S> for HasDebugString<E>
 where
     S: Debug,
     E: AsRef<str>,
@@ -131,12 +131,12 @@ where
         let (marked_actual, marked_expected) =
             mark_diff_str(&format!("{actual:?}"), expected, format);
         format!(
-            "expected {expression} to {not}have debug message {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to {not}have a debug string equal to {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
         )
     }
 }
 
-impl<E> Invertible for HasDebugMessage<E> {}
+impl<E> Invertible for HasDebugString<E> {}
 
 impl<S, E, R> AssertHasDisplayString<E> for Spec<'_, S, R>
 where
