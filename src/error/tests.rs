@@ -38,28 +38,28 @@ impl Display for SourceError {
 impl Error for SourceError {}
 
 #[test]
-fn error_has_debug_message() {
+fn error_has_debug_string() {
     let error = SuperError {
         source: SourceError::Bar,
     };
 
-    assert_that(error).has_debug_message("SuperError { source: Bar }");
+    assert_that(error).has_debug_string("SuperError { source: Bar }");
 }
 
 #[test]
-fn verify_error_has_debug_message_fails() {
+fn verify_error_has_debug_string_fails() {
     let error = SuperError {
         source: SourceError::Foo,
     };
 
     let failures = verify_that(error)
-        .has_debug_message("SuperError { source: Bar }")
+        .has_debug_string("SuperError { source: Bar }")
         .display_failures();
 
     assert_eq!(
         failures,
         &[
-            r#"expected subject to have debug message "SuperError { source: Bar }"
+            r#"expected subject to have a debug string equal to "SuperError { source: Bar }"
    but was: SuperError { source: Foo }
   expected: SuperError { source: Bar }
 "#
@@ -68,28 +68,28 @@ fn verify_error_has_debug_message_fails() {
 }
 
 #[test]
-fn error_does_not_have_debug_message() {
+fn error_does_not_have_debug_string() {
     let error = SuperError {
         source: SourceError::Bar,
     };
 
-    assert_that(error).does_not_have_debug_message("SuperError { source: Foo }");
+    assert_that(error).does_not_have_debug_string("SuperError { source: Foo }");
 }
 
 #[test]
-fn verify_error_does_not_have_debug_message_fails() {
+fn verify_error_does_not_have_debug_string_fails() {
     let error = SuperError {
         source: SourceError::Bar,
     };
 
     let failures = verify_that(error)
-        .does_not_have_debug_message("SuperError { source: Bar }")
+        .does_not_have_debug_string("SuperError { source: Bar }")
         .display_failures();
 
     assert_eq!(
         failures,
         &[
-            r#"expected subject to not have debug message "SuperError { source: Bar }"
+            r#"expected subject to not have a debug string equal to "SuperError { source: Bar }"
    but was: SuperError { source: Bar }
   expected: not SuperError { source: Bar }
 "#

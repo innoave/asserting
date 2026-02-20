@@ -364,10 +364,10 @@ for types that implement `std::error::Error`.
 
 for types that implement `core::fmt::Debug`:
 
-| assertion                   | description                                                                |
-|-----------------------------|----------------------------------------------------------------------------|
-| has_debug_message           | verify that a type formatted for debug is equal to the expected string     |                                                 
-| does_not_have_debug_message | verify that a type formatted for debug is not equal to the expected string |
+| assertion                  | description                                                                |
+|----------------------------|----------------------------------------------------------------------------|
+| has_debug_string           | verify that a type formatted for debug is equal to the expected string     |                                                 
+| does_not_have_debug_string | verify that a type formatted for debug is not equal to the expected string |
 
 for types that implement `core::fmt::Display`:
 

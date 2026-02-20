@@ -2287,10 +2287,10 @@ pub trait AssertErrorHasSource<'a, R> {
 ///
 /// let subject = Foo { hello: "World".into() };
 ///
-/// assert_that!(&subject).has_debug_message("Foo { hello: \"World\" }");
-/// assert_that!(&subject).does_not_have_debug_message("Bar { hello: \"World\" }");
+/// assert_that!(&subject).has_debug_string("Foo { hello: \"World\" }");
+/// assert_that!(&subject).does_not_have_debug_string("Bar { hello: \"World\" }");
 /// ```
-pub trait AssertHasDebugMessage<E> {
+pub trait AssertHasDebugString<E> {
     /// Verifies that a subject formatted for debugging results in the expected
     /// string.
     ///
@@ -2306,10 +2306,10 @@ pub trait AssertHasDebugMessage<E> {
     ///
     /// let subject = Foo { hello: "World".into() };
     ///
-    /// assert_that!(subject).has_debug_message("Foo { hello: \"World\" }");
+    /// assert_that!(subject).has_debug_string("Foo { hello: \"World\" }");
     /// ```
     #[track_caller]
-    fn has_debug_message(self, expected: E) -> Self;
+    fn has_debug_string(self, expected: E) -> Self;
 
     /// Verifies that a subject formatted for debugging does not result in the
     /// expected string.
@@ -2326,10 +2326,10 @@ pub trait AssertHasDebugMessage<E> {
     ///
     /// let subject = Foo { hello: "World".into() };
     ///
-    /// assert_that!(subject).does_not_have_debug_message("Hello World");
+    /// assert_that!(subject).does_not_have_debug_string("Hello World");
     /// ```
     #[track_caller]
-    fn does_not_have_debug_message(self, expected: E) -> Self;
+    fn does_not_have_debug_string(self, expected: E) -> Self;
 }
 
 /// Assert a type formatted into a display string.
