@@ -368,6 +368,7 @@ for types that implement `core::fmt::Debug`:
 |----------------------------|----------------------------------------------------------------------------|
 | has_debug_string           | verify that a type formatted for debug is equal to the expected string     |                                                 
 | does_not_have_debug_string | verify that a type formatted for debug is not equal to the expected string |
+| debug_string               | map the subject to its debug string representation                         |
 
 for types that implement `core::fmt::Display`:
 
@@ -375,6 +376,7 @@ for types that implement `core::fmt::Display`:
 |------------------------------|------------------------------------------------------------------------------|
 | has_display_string           | verify that a type formatted for display is equal to the expected string     |                                                 
 | does_not_have_display_string | verify that a type formatted for display is not equal to the expected string |
+| display_string               | map the subject to its display string representation                         |
 
 ### Emptiness
 

@@ -359,3 +359,70 @@ mod colored {
         );
     }
 }
+
+#[cfg(feature = "regex")]
+mod with_regex {
+    use super::*;
+
+    #[test]
+    fn error_has_debug_string_matching_regex() {
+        let error = SuperError {
+            source: SourceError::Bar,
+        };
+
+        assert_that(error).debug_string().matches(r"SuperError.*");
+    }
+
+    #[test]
+    fn verify_error_has_debug_string_matching_regex_fails() {
+        let error = SuperError {
+            source: SourceError::Bar,
+        };
+
+        let failures = verify_that(error)
+            .debug_string()
+            .matches(r"SuperError \{ (source|target): Foo \}")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"expected subject's debug string to match the regex SuperError \{ (source|target): Foo \}
+               but was: SuperError { source: Bar }
+  does not match regex: SuperError \{ (source|target): Foo \}
+"
+            ]
+        );
+    }
+
+    #[test]
+    fn error_has_display_string_matching_regex() {
+        let error = SuperError {
+            source: SourceError::Bar,
+        };
+
+        assert_that(error).display_string().matches(r".*-error .*");
+    }
+
+    #[test]
+    fn verify_error_has_display_string_matching_regex_fails() {
+        let error = SuperError {
+            source: SourceError::Bar,
+        };
+
+        let failures = verify_that(error)
+            .display_string()
+            .matches(r".*-error-caused.*")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"expected subject's display string to match the regex .*-error-caused.*
+               but was: super-error caused by bar error
+  does not match regex: .*-error-caused.*
+"
+            ]
+        );
+    }
+}
