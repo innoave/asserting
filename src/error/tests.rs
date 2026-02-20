@@ -98,28 +98,28 @@ fn verify_error_does_not_have_debug_message_fails() {
 }
 
 #[test]
-fn error_has_display_message() {
+fn error_has_display_string() {
     let error = SuperError {
         source: SourceError::Bar,
     };
 
-    assert_that(error).has_display_message("super-error caused by bar error");
+    assert_that(error).has_display_string("super-error caused by bar error");
 }
 
 #[test]
-fn verify_error_has_display_message_fails() {
+fn verify_error_has_display_string_fails() {
     let error = SuperError {
         source: SourceError::Foo,
     };
 
     let failures = verify_that(error)
-        .has_display_message("super-error caused by bar error")
+        .has_display_string("super-error caused by bar error")
         .display_failures();
 
     assert_eq!(
         failures,
         &[
-            r#"expected subject to have display message "super-error caused by bar error"
+            r#"expected subject to have a display string equal to "super-error caused by bar error"
    but was: "super-error caused by foo error"
   expected: "super-error caused by bar error"
 "#
@@ -128,28 +128,28 @@ fn verify_error_has_display_message_fails() {
 }
 
 #[test]
-fn error_does_not_have_display_message() {
+fn error_does_not_have_display_string() {
     let error = SuperError {
         source: SourceError::Bar,
     };
 
-    assert_that(error).does_not_have_display_message("super-error caused by foo error");
+    assert_that(error).does_not_have_display_string("super-error caused by foo error");
 }
 
 #[test]
-fn verify_error_does_not_have_display_message_fails() {
+fn verify_error_does_not_have_display_string_fails() {
     let error = SuperError {
         source: SourceError::Foo,
     };
 
     let failures = verify_that(error)
-        .does_not_have_display_message("super-error caused by foo error")
+        .does_not_have_display_string("super-error caused by foo error")
         .display_failures();
 
     assert_eq!(
         failures,
         &[
-            r#"expected subject to not have display message "super-error caused by foo error"
+            r#"expected subject to not have a display string equal to "super-error caused by foo error"
    but was: "super-error caused by foo error"
   expected: not "super-error caused by foo error"
 "#

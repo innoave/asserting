@@ -2354,10 +2354,10 @@ pub trait AssertHasDebugMessage<E> {
 ///
 /// let subject = Foo { hello: "World".into() };
 ///
-/// assert_that!(&subject).has_display_message("Hello World");
-/// assert_that!(&subject).does_not_have_display_message("Foo { hello: \"World\" }");
+/// assert_that!(&subject).has_display_string("Hello World");
+/// assert_that!(&subject).does_not_have_display_string("Foo { hello: \"World\" }");
 /// ```
-pub trait AssertHasDisplayMessage<E> {
+pub trait AssertHasDisplayString<E> {
     /// Verifies that a subject formatted for display results in the expected
     /// string.
     ///
@@ -2378,10 +2378,10 @@ pub trait AssertHasDisplayMessage<E> {
     ///
     /// let subject = Foo { hello: "World".into() };
     ///
-    /// assert_that!(&subject).has_display_message("Hello World");
+    /// assert_that!(&subject).has_display_string("Hello World");
     /// ```
     #[track_caller]
-    fn has_display_message(self, expected: E) -> Self;
+    fn has_display_string(self, expected: E) -> Self;
 
     /// Verifies that a subject formatted for display does not result in the
     /// expected string.
@@ -2403,10 +2403,10 @@ pub trait AssertHasDisplayMessage<E> {
     ///
     /// let subject = Foo { hello: "World".into() };
     ///
-    /// assert_that!(&subject).does_not_have_display_message("Foo { hello: \"World\" }");
+    /// assert_that!(&subject).does_not_have_display_string("Foo { hello: \"World\" }");
     /// ```
     #[track_caller]
-    fn does_not_have_display_message(self, expected: E) -> Self;
+    fn does_not_have_display_string(self, expected: E) -> Self;
 }
 
 /// Assert that a string contains a substring or character.
