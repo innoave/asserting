@@ -839,6 +839,7 @@ mod integer;
 mod iterator;
 mod length;
 mod map;
+mod mapping;
 #[cfg(feature = "num-bigint")]
 mod num_bigint;
 mod number;

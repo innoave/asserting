@@ -2332,6 +2332,47 @@ pub trait AssertHasDebugString<E> {
     fn does_not_have_debug_string(self, expected: E) -> Self;
 }
 
+/// Mapping the subject into its debug string representation to do assertions on
+/// its debug string.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// #[derive(Debug)]
+/// struct Foo {
+///     hello: String,
+/// }
+///
+/// let subject = Foo { hello: "World".into() };
+///
+/// assert_that!(&subject).debug_string().contains("World");
+/// assert_that!(&subject).debug_string().does_not_start_with("Bar");
+/// ```
+pub trait AssertDebugString<'a, R> {
+    /// Maps the subject into its debug string representation to do assertions
+    /// on its debug string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug)]
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(&subject).debug_string().contains("World");
+    /// assert_that!(&subject).debug_string().does_not_start_with("Bar");
+    /// ```
+    #[track_caller]
+    fn debug_string(self) -> Spec<'a, String, R>;
+}
+
 /// Assert a type formatted into a display string.
 ///
 /// The subject's type must implement `Display` and the expected type must
@@ -2407,6 +2448,57 @@ pub trait AssertHasDisplayString<E> {
     /// ```
     #[track_caller]
     fn does_not_have_display_string(self, expected: E) -> Self;
+}
+
+/// Mapping the subject into its display string representation to do assertions
+/// on its display string.
+///
+/// # Examples
+///
+/// ```
+/// use core::fmt::{self, Display};
+/// use asserting::prelude::*;
+///
+/// struct Foo {
+///     hello: String,
+/// }
+///
+/// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+///         write!(f, "Hello, {}", self.hello)
+///     }
+/// }
+///
+/// let subject = Foo { hello: "World".into() };
+///
+/// assert_that!(&subject).display_string().is_equal_to("Hello, World");
+/// assert_that!(&subject).display_string().does_not_end_with('!');
+/// ```
+pub trait AssertDisplayString<'a, R> {
+    /// Maps the subject into its display string representation to do assertions
+    /// on its display string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use core::fmt::{self, Display};
+    /// use asserting::prelude::*;
+    ///
+    /// struct Foo {
+    ///     hello: String,
+    /// }
+    ///
+    /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    ///         write!(f, "Hello, {}", self.hello)
+    ///     }
+    /// }
+    ///
+    /// let subject = Foo { hello: "World".into() };
+    ///
+    /// assert_that!(&subject).display_string().is_equal_to("Hello, World");
+    /// assert_that!(&subject).display_string().does_not_end_with('!');
+    /// ```
+    #[track_caller]
+    fn display_string(self) -> Spec<'a, String, R>;
 }
 
 /// Assert that a string contains a substring or character.
