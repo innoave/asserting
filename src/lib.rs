@@ -245,7 +245,7 @@
 //!   expected: <= 41
 //! ```
 //!
-//! For more details see [`Spec::soft_panic()`].
+//! For more details see [`SoftPanic::soft_panic()`].
 //!
 //! ## Asserting custom types
 //!
@@ -751,7 +751,7 @@
 //! [`Spec::each_element()`]: spec::Spec::each_element
 //! [`Spec::expecting()`]: spec::Spec::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies
-//! [`Spec::soft_panic()`]: spec::Spec::soft_panic
+//! [`SoftPanic::soft_panic()`]: spec::SoftPanic::soft_panic
 //! [`assert_that`]: spec::assert_that
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
