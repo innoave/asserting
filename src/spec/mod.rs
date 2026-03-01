@@ -63,8 +63,8 @@ macro_rules! assert_that {
 ///
 /// Assertions started with `verify_that!` will collect [`AssertFailure`]s for
 /// all failing assertions. The collected failures can be queried by calling one
-/// of the methods [`failures`](Spec::failures) or
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// of the methods [`failures`](GetFailures::failures) or
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// # Example
 ///
@@ -150,8 +150,8 @@ macro_rules! assert_that_code {
 ///
 /// Assertions started with `verify_that_code!` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// one of the methods [`failures`](GetFailures::failures) or
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// # Examples
 ///
@@ -259,8 +259,8 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 ///
 /// Assertions started with `verify_that()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or the
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// one of the methods [`failures`](GetFailures::failures) or the
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// In comparison to using the macro [`verify_that!`](crate::verify_that) calling
 /// this function does not set a name for the expression and does not set the
@@ -364,7 +364,7 @@ where
 ///
 /// Assertions started with `verify_that_code()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or
+/// one of the methods [`failures`](GetFailures::failures) or
 /// [`display_failures`](Spec::display_failures) on the [`Spec`].
 ///
 /// In comparison to using the macro [`verify_that_code!`](crate::verify_that_code)
@@ -667,21 +667,6 @@ impl<S, R> Spec<'_, S, R> {
     /// Returns the failing strategy that is used in case an assertion fails.
     pub fn failing_strategy(&self) -> &R {
         &self.failing_strategy
-    }
-
-    /// Returns whether there are assertion failures collected so far.
-    pub fn has_failures(&self) -> bool {
-        !self.failures.is_empty()
-    }
-
-    /// Returns the assertion failures that have been collected so far.
-    pub fn failures(&self) -> Vec<AssertFailure> {
-        self.failures.clone()
-    }
-
-    /// Returns the assertion failures collected so far as formatted text.
-    pub fn display_failures(&self) -> Vec<String> {
-        self.failures.iter().map(ToString::to_string).collect()
     }
 }
 
@@ -1226,6 +1211,32 @@ impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
         if !self.failures.is_empty() {
             PanicOnFail.do_fail_with(&self.failures);
         }
+    }
+}
+
+/// Access the assertion-failures collected by a `Spec` or spec-like struct.
+pub trait GetFailures {
+    /// Returns whether there are assertion failures collected so far.
+    fn has_failures(&self) -> bool;
+
+    /// Returns the assertion failures that have been collected so far.
+    fn failures(&self) -> Vec<AssertFailure>;
+
+    /// Returns the assertion failures collected so far as formatted text.
+    fn display_failures(&self) -> Vec<String>;
+}
+
+impl<S, R> GetFailures for Spec<'_, S, R> {
+    fn has_failures(&self) -> bool {
+        !self.failures.is_empty()
+    }
+
+    fn failures(&self) -> Vec<AssertFailure> {
+        self.failures.clone()
+    }
+
+    fn display_failures(&self) -> Vec<String> {
+        self.failures.iter().map(ToString::to_string).collect()
     }
 }
 

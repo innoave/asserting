@@ -19,7 +19,9 @@ pub use super::{
     assertions::*,
     colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
     properties::*,
-    spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail, SoftPanic},
+    spec::{
+        assert_that, verify_that, CollectFailures, GetFailures, Location, PanicOnFail, SoftPanic,
+    },
     verify_that,
 };
 

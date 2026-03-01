@@ -757,7 +757,7 @@
 //! [`verify_that`]: spec::verify_that
 //! [`verify_that_code`]: spec::verify_that_code
 //! [`display_failures()`]: spec::Spec::display_failures
-//! [`failures()`]: spec::Spec::failures
+//! [`failures()`]: spec::GetFailures::failures
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at
 
