@@ -63,8 +63,8 @@ macro_rules! assert_that {
 ///
 /// Assertions started with `verify_that!` will collect [`AssertFailure`]s for
 /// all failing assertions. The collected failures can be queried by calling one
-/// of the methods [`failures`](Spec::failures) or
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// of the methods [`failures`](GetFailures::failures) or
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// # Example
 ///
@@ -150,8 +150,8 @@ macro_rules! assert_that_code {
 ///
 /// Assertions started with `verify_that_code!` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// one of the methods [`failures`](GetFailures::failures) or
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// # Examples
 ///
@@ -259,8 +259,8 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 ///
 /// Assertions started with `verify_that()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or the
-/// [`display_failures`](Spec::display_failures) on the [`Spec`].
+/// one of the methods [`failures`](GetFailures::failures) or the
+/// [`display_failures`](GetFailures::display_failures) on the [`Spec`].
 ///
 /// In comparison to using the macro [`verify_that!`](crate::verify_that) calling
 /// this function does not set a name for the expression and does not set the
@@ -364,7 +364,7 @@ where
 ///
 /// Assertions started with `verify_that_code()` will collect [`AssertFailure`]s
 /// for all failing assertions. The collected failures can be queried by calling
-/// one of the methods [`failures`](Spec::failures) or
+/// one of the methods [`failures`](GetFailures::failures) or
 /// [`display_failures`](Spec::display_failures) on the [`Spec`].
 ///
 /// In comparison to using the macro [`verify_that_code!`](crate::verify_that_code)
@@ -664,24 +664,9 @@ impl<S, R> Spec<'_, S, R> {
         &self.diff_format
     }
 
-    /// Returns the failing strategy that is used in case an assertion fails.
+    /// Returns the failing strategy used in case an assertion fails.
     pub fn failing_strategy(&self) -> &R {
         &self.failing_strategy
-    }
-
-    /// Returns whether there are assertion failures collected so far.
-    pub fn has_failures(&self) -> bool {
-        !self.failures.is_empty()
-    }
-
-    /// Returns the assertion failures that have been collected so far.
-    pub fn failures(&self) -> Vec<AssertFailure> {
-        self.failures.clone()
-    }
-
-    /// Returns the assertion failures collected so far as formatted text.
-    pub fn display_failures(&self) -> Vec<String> {
-        self.failures.iter().map(ToString::to_string).collect()
     }
 }
 
@@ -971,86 +956,6 @@ where
     {
         self.expecting(satisfies(predicate).with_message(message))
     }
-
-    /// Fails the assertion according to the current failing strategy of this
-    /// `Spec`.
-    #[track_caller]
-    pub fn do_fail_with_message(&mut self, message: impl Into<String>) {
-        let message = message.into();
-        let failure = AssertFailure {
-            description: self.description.clone().map(String::from),
-            message,
-            location: self.location.map(OwnedLocation::from),
-        };
-        self.failures.push(failure);
-        self.failing_strategy.do_fail_with(&self.failures);
-    }
-}
-
-impl<S> Spec<'_, S, CollectFailures> {
-    /// Turns assertions into "soft assertions".
-    ///
-    /// It executes all specified assertions on a `Spec` and if at least one
-    /// assertion fails, it panics. The panic message contains the messages of
-    /// all assertions that have failed.
-    ///
-    /// This method is only available on `Spec`s with the
-    /// [`CollectFailures`]-[`FailingStrategy`]. That is any `Spec` contructed
-    /// by the macros [`verify_that!`] and [`verify_that_code!`] or by the
-    /// functions [`verify_that()`] and [`verify_that_code()`].
-    ///
-    /// On a `Spec` with the [`PanicOnFail`]-[`FailingStrategy`] it would not
-    /// work as the very first failing assertion panics immediately, and later
-    /// assertions never get executed.
-    ///
-    /// # Examples
-    ///
-    /// Running the following two assertions in "soft" mode:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// verify_that!("the answer to all important questions is 42")
-    ///     .contains("unimportant")
-    ///     .has_at_most_length(41)
-    ///     .soft_panic();
-    /// ```
-    ///
-    /// executes both assertions and prints the messages of both failing
-    /// assertions in the panic message:
-    ///
-    /// ```console
-    /// expected subject to contain "unimportant"
-    ///    but was: "the answer to all important questions is 42"
-    ///   expected: "unimportant"
-    ///
-    /// expected subject to have at most a length of 41
-    ///    but was: 43
-    ///   expected: <= 41
-    /// ```
-    ///
-    /// To highlight differences in failure messages of soft assertions use
-    /// the `with_configured_diff_format()` method, like so:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "colored"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "colored")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    ///
-    /// verify_that!("the answer to all important questions is 42")
-    ///     .with_configured_diff_format()
-    ///     .contains("important")
-    ///     .has_at_most_length(43)
-    ///     .soft_panic();
-    /// # }
-    /// ```
-    pub fn soft_panic(&self) {
-        if !self.failures.is_empty() {
-            PanicOnFail.do_fail_with(&self.failures);
-        }
-    }
 }
 
 impl<'a, I, R> Spec<'a, I, R> {
@@ -1218,6 +1123,141 @@ impl<'a, I, R> Spec<'a, I, R> {
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
         }
+    }
+}
+
+/// Trigger failing of an assertion according to the failing strategy of its
+/// implementing spec-like struct.
+pub trait DoFail {
+    /// Fails the assertion with the given [`AssertFailure`]s according to the
+    /// current failing strategy of the `Spec` or other implementing
+    /// spec-like struct.
+    fn do_fail_with(&mut self, failures: impl IntoIterator<Item = AssertFailure>);
+
+    /// Fails the assertion with the given failure message according to the
+    /// current failing strategy of the `Spec` or other implementing
+    /// spec-like struct.
+    fn do_fail_with_message(&mut self, message: impl Into<String>);
+}
+
+impl<S, R> DoFail for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn do_fail_with(&mut self, failures: impl IntoIterator<Item = AssertFailure>) {
+        self.failures.extend(failures);
+        self.failing_strategy.do_fail_with(&self.failures);
+    }
+
+    fn do_fail_with_message(&mut self, message: impl Into<String>) {
+        let message = message.into();
+        let failure = AssertFailure {
+            description: self.description.clone().map(String::from),
+            message,
+            location: self.location.map(OwnedLocation::from),
+        };
+        self.failures.push(failure);
+        self.failing_strategy.do_fail_with(&self.failures);
+    }
+}
+
+/// Turns assertions into "soft assertions".
+///
+/// See method [`soft_panic()`](SoftPanic::soft_panic) for details and how to
+/// use it.
+pub trait SoftPanic {
+    /// Turns assertions into "soft assertions".
+    ///
+    /// It executes all specified assertions on a `Spec` and if at least one
+    /// assertion fails, it panics. The panic message contains the messages of
+    /// all assertions that have failed.
+    ///
+    /// This method is only available on `Spec`s with the
+    /// [`CollectFailures`]-[`FailingStrategy`]. That is any `Spec` contructed
+    /// by the macros [`verify_that!`] and [`verify_that_code!`] or by the
+    /// functions [`verify_that()`] and [`verify_that_code()`].
+    ///
+    /// On a `Spec` with the [`PanicOnFail`]-[`FailingStrategy`] it would not
+    /// work as the very first failing assertion panics immediately, and later
+    /// assertions never get executed.
+    ///
+    /// # Examples
+    ///
+    /// Running the following two assertions in "soft" mode:
+    ///
+    /// ```should_panic
+    /// use asserting::prelude::*;
+    ///
+    /// verify_that!("the answer to all important questions is 42")
+    ///     .contains("unimportant")
+    ///     .has_at_most_length(41)
+    ///     .soft_panic();
+    /// ```
+    ///
+    /// executes both assertions and prints the messages of both failing
+    /// assertions in the panic message:
+    ///
+    /// ```console
+    /// expected subject to contain "unimportant"
+    ///    but was: "the answer to all important questions is 42"
+    ///   expected: "unimportant"
+    ///
+    /// expected subject to have at most a length of 41
+    ///    but was: 43
+    ///   expected: <= 41
+    /// ```
+    ///
+    /// To highlight differences in failure messages of soft assertions use
+    /// the `with_configured_diff_format()` method, like so:
+    ///
+    /// ```
+    /// # #[cfg(not(feature = "colored"))]
+    /// # fn main() {}
+    /// # #[cfg(feature = "colored")]
+    /// # fn main() {
+    /// use asserting::prelude::*;
+    ///
+    /// verify_that!("the answer to all important questions is 42")
+    ///     .with_configured_diff_format()
+    ///     .contains("important")
+    ///     .has_at_most_length(43)
+    ///     .soft_panic();
+    /// # }
+    /// ```
+    fn soft_panic(&self);
+}
+
+impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
+    fn soft_panic(&self) {
+        if !self.failures.is_empty() {
+            PanicOnFail.do_fail_with(&self.failures);
+        }
+    }
+}
+
+/// Access the assertion-failures collected by a `Spec` or spec-like struct.
+pub trait GetFailures {
+    /// Returns whether there are assertion failures collected so far.
+    fn has_failures(&self) -> bool;
+
+    /// Returns the assertion failures that have been collected so far.
+    fn failures(&self) -> Vec<AssertFailure>;
+
+    /// Returns the assertion failures collected so far as formatted text.
+    fn display_failures(&self) -> Vec<String>;
+}
+
+impl<S, R> GetFailures for Spec<'_, S, R> {
+    fn has_failures(&self) -> bool {
+        !self.failures.is_empty()
+    }
+
+    fn failures(&self) -> Vec<AssertFailure> {
+        self.failures.clone()
+    }
+
+    fn display_failures(&self) -> Vec<String> {
+        self.failures.iter().map(ToString::to_string).collect()
     }
 }
 

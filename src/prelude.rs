@@ -19,7 +19,10 @@ pub use super::{
     assertions::*,
     colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
     properties::*,
-    spec::{assert_that, verify_that, CollectFailures, Location, PanicOnFail},
+    spec::{
+        assert_that, verify_that, CollectFailures, DoFail, GetFailures, Location, PanicOnFail,
+        SoftPanic,
+    },
     verify_that,
 };
 
