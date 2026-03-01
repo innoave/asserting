@@ -117,6 +117,16 @@ pub trait AssertSameAs<E> {
     fn is_not_same_as(self, expected: E) -> Self;
 }
 
+#[cfg(feature = "recursive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+pub trait AssertEquivalence<E> {
+    #[track_caller]
+    fn is_equivalent_to(self, expected: E) -> Self;
+
+    #[track_caller]
+    fn is_not_equivalent_to(self, expected: E) -> Self;
+}
+
 /// Assert approximate equality for floating point numbers.
 ///
 /// # Examples

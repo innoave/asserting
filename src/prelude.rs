@@ -1,7 +1,7 @@
-//! Re-export of all types, traits, functions and macros that are needed to
+//! Re-export of all types, traits, functions, and macros that are needed to
 //! write assertions in tests.
 //!
-//! When writing assertions in tests importing this prelude is all that should
+//! When writing assertions in tests, importing this prelude is all that should
 //! be needed.
 //!
 //! # Example

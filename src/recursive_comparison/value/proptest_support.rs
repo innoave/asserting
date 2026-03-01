@@ -1,0 +1,36 @@
+use crate::recursive_comparison::value::{Number, Value, F32, F64};
+use proptest::prelude::*;
+
+pub fn any_value() -> impl Strategy<Value = Value> {
+    prop_oneof![
+        any::<bool>().prop_map(Value::Bool),
+        any::<char>().prop_map(Value::Char),
+        any_number().prop_map(Value::Number),
+        any::<String>().prop_map(Value::String),
+    ]
+}
+
+pub fn any_number() -> impl Strategy<Value = Number> {
+    prop_oneof![
+        any::<i8>().prop_map(Number::from),
+        any::<i16>().prop_map(Number::from),
+        any::<i32>().prop_map(Number::from),
+        any::<i64>().prop_map(Number::from),
+        any::<i128>().prop_map(Number::from),
+        any::<u8>().prop_map(Number::from),
+        any::<u16>().prop_map(Number::from),
+        any::<u32>().prop_map(Number::from),
+        any::<u64>().prop_map(Number::from),
+        any::<u128>().prop_map(Number::from),
+        any::<f32>().prop_map(Number::from),
+        any::<f64>().prop_map(Number::from),
+    ]
+}
+
+pub fn any_f32_newtype() -> impl Strategy<Value = F32> {
+    any::<f32>().prop_map(F32)
+}
+
+pub fn any_f64_newtype() -> impl Strategy<Value = F64> {
+    any::<f64>().prop_map(F64)
+}

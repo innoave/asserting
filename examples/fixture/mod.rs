@@ -8,6 +8,8 @@ mod dummy_extern_uses {
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
     use hashbrown as _;
+    #[cfg(feature = "recursive")]
+    use indexmap as _;
     #[cfg(feature = "num-bigint")]
     use lazy_static as _;
     #[cfg(feature = "num-bigint")]
@@ -19,6 +21,10 @@ mod dummy_extern_uses {
     use rust_decimal as _;
     #[cfg(feature = "colored")]
     use sdiff as _;
+    use serde as _;
+    use serde_bytes as _;
+    #[cfg(feature = "recursive")]
+    use serde_core as _;
     use time as _;
     use version_sync as _;
 }

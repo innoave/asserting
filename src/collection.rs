@@ -98,7 +98,7 @@ impl<T, const N: usize> IsEmptyProperty for [T; N] {
 #[cfg(feature = "std")]
 mod std {
     use crate::properties::{IsEmptyProperty, LengthProperty};
-    use std::collections::{HashMap, HashSet};
+    use crate::std::collections::{HashMap, HashSet};
 
     impl<K, V, S> IsEmptyProperty for HashMap<K, V, S> {
         fn is_empty_property(&self) -> bool {

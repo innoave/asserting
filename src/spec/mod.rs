@@ -3,6 +3,7 @@
 use crate::colored;
 use crate::expectations::satisfies;
 use crate::std::any;
+use crate::std::borrow::Borrow;
 use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
@@ -466,6 +467,12 @@ impl Default for Expression<'_> {
 impl Display for Expression<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl Borrow<str> for Expression<'_> {
+    fn borrow(&self) -> &str {
+        &self.0
     }
 }
 
@@ -1432,8 +1439,8 @@ pub struct Code<F>(Rc<RefCell<Option<F>>>);
 #[cfg(feature = "panic")]
 mod code {
     use super::Code;
-    use std::cell::RefCell;
-    use std::rc::Rc;
+    use crate::std::cell::RefCell;
+    use crate::std::rc::Rc;
 
     impl<F> From<F> for Code<F>
     where

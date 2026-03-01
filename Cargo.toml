@@ -19,15 +19,16 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-default = ["std", "colored", "float-cmp", "panic", "regex"]
+default = ["std", "colored", "float-cmp", "panic", "recursive", "regex"]
 bigdecimal = ["dep:bigdecimal", "dep:lazy_static"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
 num-bigint = ["dep:num-bigint", "dep:lazy_static"]
+recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde"]
 rust-decimal = ["dep:rust_decimal"]
 panic = ["std"]
 regex = ["dep:regex"]
-std = []
+std = ["serde_core/std", "indexmap/std"]
 
 [dependencies]
 hashbrown = "0.16"
@@ -35,17 +36,21 @@ hashbrown = "0.16"
 # optional
 bigdecimal = { version = "0.4", optional = true, default-features = false }
 float-cmp = { version = "0.10", optional = true }
+indexmap = { version = "2", optional = true, default-features = false }
 lazy_static = { version = "1", optional = true }
 num-bigint = { version = "0.4", optional = true, default-features = false }
 regex = { version = "1", optional = true }
 rust_decimal = { version = "1", optional = true, default-features = false }
 sdiff = { version = "0.1", optional = true }
+serde_core = { version = "1", optional = true, default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 anyhow = "1"
 fakeenv = { version = "0.1", default-features = false, features = ["fake"] }
 proptest = "1"
 time = { version = "0.3", default-features = false, features = ["macros"] }
+serde = { version = "1", default-features = false, features = ["alloc", "derive"] }
+serde_bytes = { version = "0.11", default-features = false, features = ["alloc"] }
 version-sync = "0.9"
 
 [profile.dev.package]
@@ -74,7 +79,7 @@ unused_import_braces = "warn"
 unused_lifetimes = "warn"
 unused_qualifications = "warn"
 dead_code = "warn"
-missing_docs = "warn"  # uncomment when working on docs
+#missing_docs = "warn"  # uncomment when working on docs
 variant_size_differences = "warn"  # enable when working on performance
 
 [lints.clippy]

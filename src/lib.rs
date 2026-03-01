@@ -820,6 +820,9 @@ pub mod colored;
 pub mod expectations;
 pub mod prelude;
 pub mod properties;
+#[cfg(feature = "recursive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+pub mod recursive_comparison;
 pub mod spec;
 
 #[cfg(feature = "bigdecimal")]
@@ -870,6 +873,8 @@ type TestCodeSnippetsInReadme = ();
 mod dummy_extern_uses {
     use fakeenv as _;
     use proptest as _;
+    use serde as _;
+    use serde_bytes as _;
     use time as _;
     use version_sync as _;
 }
