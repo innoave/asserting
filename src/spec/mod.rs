@@ -664,7 +664,7 @@ impl<S, R> Spec<'_, S, R> {
         &self.diff_format
     }
 
-    /// Returns the failing strategy that is used in case an assertion fails.
+    /// Returns the failing strategy used in case an assertion fails.
     pub fn failing_strategy(&self) -> &R {
         &self.failing_strategy
     }
@@ -956,20 +956,6 @@ where
     {
         self.expecting(satisfies(predicate).with_message(message))
     }
-
-    /// Fails the assertion according to the current failing strategy of this
-    /// `Spec`.
-    #[track_caller]
-    pub fn do_fail_with_message(&mut self, message: impl Into<String>) {
-        let message = message.into();
-        let failure = AssertFailure {
-            description: self.description.clone().map(String::from),
-            message,
-            location: self.location.map(OwnedLocation::from),
-        };
-        self.failures.push(failure);
-        self.failing_strategy.do_fail_with(&self.failures);
-    }
 }
 
 impl<'a, I, R> Spec<'a, I, R> {
@@ -1140,9 +1126,44 @@ impl<'a, I, R> Spec<'a, I, R> {
     }
 }
 
+/// Trigger failing of an assertion according to the failing strategy of its
+/// implementing spec-like struct.
+pub trait DoFail {
+    /// Fails the assertion with the given [`AssertFailure`]s according to the
+    /// current failing strategy of the `Spec` or other implementing
+    /// spec-like struct.
+    fn do_fail_with(&mut self, failures: impl IntoIterator<Item = AssertFailure>);
+
+    /// Fails the assertion with the given failure message according to the
+    /// current failing strategy of the `Spec` or other implementing
+    /// spec-like struct.
+    fn do_fail_with_message(&mut self, message: impl Into<String>);
+}
+
+impl<S, R> DoFail for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn do_fail_with(&mut self, failures: impl IntoIterator<Item = AssertFailure>) {
+        self.failures.extend(failures);
+        self.failing_strategy.do_fail_with(&self.failures);
+    }
+
+    fn do_fail_with_message(&mut self, message: impl Into<String>) {
+        let message = message.into();
+        let failure = AssertFailure {
+            description: self.description.clone().map(String::from),
+            message,
+            location: self.location.map(OwnedLocation::from),
+        };
+        self.failures.push(failure);
+        self.failing_strategy.do_fail_with(&self.failures);
+    }
+}
+
 /// Turns assertions into "soft assertions".
 ///
-/// see method [`soft_panic()`](SoftPanic::soft_panic) for details and how to
+/// See method [`soft_panic()`](SoftPanic::soft_panic) for details and how to
 /// use it.
 pub trait SoftPanic {
     /// Turns assertions into "soft assertions".
