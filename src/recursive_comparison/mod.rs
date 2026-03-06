@@ -1,37 +1,289 @@
-mod path;
+//! Field-by-field recursive comparison of graphs of structs, enums, and tuples.
+//!
+//! Any type that implements [`serde::Serialize`] can be compared recursively.
+//! This is useful for comparing graphs of structs, enums, and tuples.
+//! The type to be compared does not need to implement `PartialEq` and `Debug`
+//! or any other trait (besides [`serde::Serialize`]).
+//!
+//! There are several scenarios where recursive comparison is useful:
+//!
+//! * comparing types that have similar fields, like an entity and a DTO
+//!   representation of the same type in the application's domain.
+//! * comparing only fields that are relevant for a specific test case and
+//!   ignoring others.
+//! * comparing types field-by-field but ignoring fields, where the actual value
+//!   may vary like for IDs or timestamps.
+//! * comparing types that implement `Serialize` but not `PartialEq` or `Debug`
+//!
+//! Recursive comparison provides detailed failure messages in case of a failing
+//! assertion. The failure details contain a list of fields, for which the
+//! actual value is not equal to the expected one. This is another reason why
+//! recursive comparison might be the preferred way, especially when comparing
+//! structs that have many fields and/or contain sub-structs.
+//!
+//! Recursive comparison is started by calling the `using_recursive_comparison`
+//! method.
+//!
+//! Recursive comparison is not symmetrical since it is limited to the fields
+//! of the subject (actual value). It gathers the actual fields of the subject
+//! and compares them to the corresponding fields haven the same name in the
+//! expected value.
+//!
+//! Structs, enums, and tuples in the subject and expected value do not
+//! have to be of the exact same type. They are compared field-by-field. As
+//! long as the actual and expected fields have the same name and value, they
+//! are considered equal. Though primitive types like char, integer, float, and
+//! bool have to be of the same type. For example, an actual field of an `u8`
+//! value is only equal to the expected field if the names and values are equal
+//! and the expected value is of type `u8` too.
+//!
+//! The recursive comparison is limited down to a max depth of 128 levels,
+//! which is the default max depth of [`serde::Serialize`].
+//!
+//! # Examples
+//!
+//! ## Comparing structs with several fields and containing other structs
+//!
+//! The following example shows how to compare two structs. The structs are
+//! compared field-by-field recursively. The actual and the expected value can
+//! be of the same struct type or different struct types. By default, the
+//! expected struct must have at least all the fields of the actual struct but
+//! can have more fields not present in the actual struct.
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//!
+//! #[derive(Serialize)]
+//! struct Email {
+//!     purpose: String,
+//!     address: String,
+//! }
+//!
+//! #[derive(Serialize)]
+//! struct Person {
+//!     name: String,
+//!     email: Vec<Email>,
+//!     age: u8,
+//! }
+//!
+//! let person = Person {
+//!     name: "Silvia".into(),
+//!     email: vec![
+//!         Email {
+//!             purpose: "main".into(),
+//!             address: "silvia@domain.com".into(),
+//!         },
+//!         Email {
+//!             purpose: "private".into(),
+//!             address: "silvia@mail.com".into(),
+//!         },
+//!     ],
+//!     age: 25,
+//! };
+//!
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .is_equal_to(Person {
+//!         name: "Silvia".into(),
+//!         email: vec![
+//!             Email {
+//!                 purpose: "main".into(),
+//!                 address: "silvia@domain.com".into(),
+//!             },
+//!             Email {
+//!                 purpose: "private".into(),
+//!                 address: "silvia@mail.com".into(),
+//!             },
+//!         ],
+//!         age: 25,
+//!     });
+//! ```
+//!
+//! The field-by-field recursive comparison is started by calling the
+//! `using_recursive_comparison` method.
+//!
+//! ## Ignoring some fields
+//!
+//! We can ignore some fields of the subject, which will be excluded from the
+//! field-by-field recursive comparison. To do so, we add the names of the fields
+//! that shall be ignored to the configuration of the recursive comparison using
+//! either the `ignoring_field` method, which adds one field at a time, or the
+//! `ignoring_fields` methods which adds multiple fields at once.
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//!
+//! #[derive(Serialize)]
+//! struct Address {
+//!     street: String,
+//!     city: String,
+//!     zip: u16,
+//! }
+//!
+//! #[derive(Serialize)]
+//! struct Person {
+//!     name: String,
+//!     age: u8,
+//!     address: Address,
+//! }
+//!
+//! let person = Person {
+//!     name: "Silvia".into(),
+//!     age: 25,
+//!     address: Address {
+//!         street: "Second Street".into(),
+//!         city: "New York".into(),
+//!         zip: 12345,
+//!     }
+//! };
+//!
+//! assert_that!(&person)
+//!     .using_recursive_comparison()
+//!     .ignoring_fields(["age", "address.street"])
+//!     .is_equal_to(Person {
+//!         name: "Silvia".into(),
+//!         age: 27,
+//!         address: Address {
+//!             street: "Main Street".into(),
+//!             city: "New York".into(),
+//!             zip: 12345,
+//!         }
+//!     });
+//!
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .ignoring_field("age")
+//!     .ignoring_field("address.street")
+//!     .is_equal_to(Person {
+//!         name: "Silvia".into(),
+//!         age: 27,
+//!         address: Address {
+//!             street: "Main Street".into(),
+//!             city: "New York".into(),
+//!             zip: 12345,
+//!         }
+//!     });
+//! ```
+//!
+//! Once a field is ignored, its subfields are ignored as well. In the following
+//! example the assertion succeeds because the `address` field is ignored and
+//! therefore also the fields `street`, `city`, and `zip` are ignored.
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//! #
+//! # #[derive(Serialize)]
+//! # struct Address {
+//! #     street: String,
+//! #     city: String,
+//! #     zip: u16,
+//! # }
+//! #
+//! # #[derive(Serialize)]
+//! # struct Person {
+//! #     name: String,
+//! #     age: u8,
+//! #     address: Address,
+//! # }
+//!
+//! let person = Person {
+//!     name: "Silvia".into(),
+//!     age: 25,
+//!     address: Address {
+//!         street: "Second Street".into(),
+//!         city: "Chicago".into(),
+//!         zip: 33333,
+//!     }
+//! };
+//!
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .ignoring_field("address")
+//!     .is_equal_to(Person {
+//!         name: "Silvia".into(),
+//!         age: 25,
+//!         address: Address {
+//!             street: "Main Street".into(),
+//!             city: "New York".into(),
+//!             zip: 12345,
+//!         }
+//!     });
+//! ```
+//!
+//! ## Ignoring not expected fields
+//!
+//! With field-by-field recursive comparison, it is possible to compare similar
+//! structs that share most of their fields but not all, like a domain object,
+//! an entity, and a DTO of the same thing.
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//!
+//! #[derive(Serialize)]
+//! struct PersonEntity {
+//!     id: u64,
+//!     name: String,
+//!     age: u8,
+//! }
+//!
+//! #[derive(Serialize)]
+//! struct PersonDto {
+//!     name: String,
+//!     age: u8,
+//! }
+//!
+//! let person = PersonEntity {
+//!     id: 123,
+//!     name: "Silvia".into(),
+//!     age: 25,
+//! };
+//!
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .ignoring_not_expected_fields()
+//!     .is_equal_to(PersonDto {
+//!         name: "Silvia".into(),
+//!         age: 25,
+//!     });
+//! ```
+//!
+//! Here we are comparing the subject of type `PersonEntity` with a `PersonDto`.
+//! In contrast to the `PersonEntity` the `PersonDto` does not have an `id`
+//! field. So we ignore it by using the `ignoring_not_expected_fields`
+//! option.
+//!
+//! [`serde::Serialize`]: Serialize
+
+pub mod path;
 pub mod serialize;
 pub mod value;
 
 use crate::assertions::{AssertEquality, AssertEquivalence};
 use crate::recursive_comparison::path::Path;
 use crate::recursive_comparison::serialize::to_recursive_values;
-use crate::recursive_comparison::value::{struct_, Field, Value};
+use crate::recursive_comparison::value::Value;
 use crate::spec::{
     AssertFailure, CollectFailures, DoFail, FailingStrategy, GetFailures, SoftPanic, Spec,
 };
 use crate::std::fmt::{self, Display};
 use serde_core::Serialize;
 
-impl<'a, S, R> Spec<'a, S, R> {
-    #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
-    #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
-    pub fn using_recursive_comparison(self) -> RecursiveComparison<'a, S, R> {
-        RecursiveComparison::new(self)
-    }
-}
-
-pub fn struct_with_fields<T>(fields: impl IntoIterator<Item = T>) -> Value
-where
-    T: Into<Field>,
-{
-    struct_("", fields)
-}
-
+/// Data of an actual assertion in field-by-field recursive comparison mode.
+///
+/// It wraps a [`Spec`] and holds additional options for the field-by-field
+/// recursive comparison, such as which fields to compare and which to ignore.
+///
+/// See the [module documentation](crate::recursive_comparison) for details
+/// about field-by-field recursive comparison.
 pub struct RecursiveComparison<'a, S, R> {
     spec: Spec<'a, S, R>,
     compared_fields: Vec<Path<'a>>,
     ignored_fields: Vec<Path<'a>>,
-    ignore_missing_expected_fields: bool,
+    ignore_not_expected_fields: bool,
 }
 
 impl<S, R> GetFailures for RecursiveComparison<'_, S, R> {
@@ -68,21 +320,44 @@ impl<S> SoftPanic for RecursiveComparison<'_, S, CollectFailures> {
 }
 
 impl<'a, S, R> RecursiveComparison<'a, S, R> {
-    fn new(spec: Spec<'a, S, R>) -> Self {
+    pub(crate) fn new(spec: Spec<'a, S, R>) -> Self {
         Self {
             spec,
             compared_fields: vec![],
             ignored_fields: vec![],
-            ignore_missing_expected_fields: false,
+            ignore_not_expected_fields: false,
         }
     }
 
+    /// Adds one field that shall be compared in a field-by-field recursive
+    /// comparison.
+    ///
+    /// This method can be called multiple times to add several paths to the
+    /// list of paths to be compared. Each call of this method adds the given
+    /// field-path to the list of compared paths.
+    ///
+    /// Fields are addressed by their path. To learn how to specify a path and
+    /// its syntax, see the documentation of the [`Path`] struct.
+    ///
+    /// If the same path is added to the list of ignored paths, this path is
+    /// effectively ignored. Ignored paths take precedence over compared ones.
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
     pub fn comparing_only_field(mut self, field_path: impl Into<Path<'a>>) -> Self {
         self.compared_fields.push(field_path.into());
         self
     }
 
+    /// Adds multiple fields to the list of fields to be compared in a
+    /// field-by-field recursive comparison.
+    ///
+    /// This method can be called multiple times. Each call of this method
+    /// extends the list of compared fields with the given paths.
+    ///
+    /// Fields are addressed by their path. To learn how to specify a path and
+    /// its syntax, see the documentation of the [`Path`] struct.
+    ///
+    /// If the same path is added to the list of ignored paths, this path is
+    /// effectively ignored. Ignored paths take precedence over compared ones.
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
     pub fn comparing_only_fields<P>(
         mut self,
@@ -96,12 +371,35 @@ impl<'a, S, R> RecursiveComparison<'a, S, R> {
         self
     }
 
+    /// Adds one field that shall be ignored in a field-by-field recursive
+    /// comparison.
+    ///
+    /// This method can be called multiple times to add several paths to the
+    /// list of paths to be ignored. Each call of this method adds the given
+    /// field-path to the list of ignored paths.
+    ///
+    /// Fields are addressed by their path. To learn how to specify a path and
+    /// its syntax, see the documentation of the [`Path`] struct.
+    ///
+    /// If the same path is added to the list of compared paths, this path is
+    /// effectively ignored. Ignored paths take precedence over compared paths.
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
     pub fn ignoring_field(mut self, field_path: impl Into<Path<'a>>) -> Self {
         self.ignored_fields.push(field_path.into());
         self
     }
 
+    /// Adds multiple fields to the list of fields to be ignored in a
+    /// field-by-field recursive comparison.
+    ///
+    /// This method can be called multiple times. Each call of this method
+    /// extends the list of ignored fields with the given paths.
+    ///
+    /// Fields are addressed by their path. To learn how to specify a path and
+    /// its syntax, see the documentation of the [`Path`] struct.
+    ///
+    /// If the same path is added to the list of compared paths, this path is
+    /// effectively ignored. Ignored paths take precedence over compared paths.
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
     pub fn ignoring_fields<P>(mut self, list_of_field_path: impl IntoIterator<Item = P>) -> Self
     where
@@ -112,9 +410,19 @@ impl<'a, S, R> RecursiveComparison<'a, S, R> {
         self
     }
 
+    /// Specifies that the recursive comparison shall ignore fields that are
+    /// not present in the expected value.
+    ///
+    /// By default, the recursive comparison tries to compare all fields of the
+    /// actual value (subject). If a field of the actual value is not present in
+    /// the expected value, the assertion fails.
+    ///
+    /// With this option, we can tell the recursive comparison to ignore fields
+    /// that are not present in the expected value. This is useful when not all
+    /// fields are relevant to be compared for a specific test case.
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
-    pub fn ignoring_missing_expected_fields(mut self) -> Self {
-        self.ignore_missing_expected_fields = true;
+    pub fn ignoring_not_expected_fields(mut self) -> Self {
+        self.ignore_not_expected_fields = true;
         self
     }
 
@@ -145,7 +453,7 @@ impl<'a, S, R> RecursiveComparison<'a, S, R> {
                         expected_value,
                     });
                 }
-            } else if self.ignore_missing_expected_fields {
+            } else if self.ignore_not_expected_fields {
                 ignored.push(actual_path);
             } else {
                 not_expected.push(NotExpected {

@@ -1,3 +1,6 @@
+//! Defines the [`Map`] type which represents a map in the [`Value`] data
+//! structure used for recursive comparison.
+
 use super::Value;
 use crate::std::borrow::{Borrow, Cow};
 use crate::std::cmp::Ordering;
@@ -5,18 +8,38 @@ use crate::std::fmt::{self, Debug};
 use crate::std::hash::{Hash, Hasher};
 use indexmap::IndexMap;
 
+/// The map type used inside the [`Value`] type.
 #[derive(Default, Clone)]
 pub struct Map(IndexMap<Value, Value>);
 
 impl Map {
+    /// Creates a new empty `Map`.
     pub fn new() -> Self {
         Self(IndexMap::new())
     }
 
+    /// Creates a new `Map` with the given capacity.
     pub fn with_capacity(capacity: usize) -> Self {
         Self(IndexMap::with_capacity(capacity))
     }
 
+    /// Returns the number of elements in the `Map`.
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Returns `true` if the `Map` contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// Returns the type name of this map at runtime.
+    ///
+    /// # Returns
+    ///
+    /// If the map is empty, it returns "Map<Value, Value>". If the map contains
+    /// values, it returns the type Map with the type names of the first key and
+    /// value, e.g., "Map<String, u64>".
     pub fn type_name(&self) -> Cow<'static, str> {
         if let Some((key, value)) = self.0.iter().next() {
             let key_type = key.type_name();
@@ -27,10 +50,21 @@ impl Map {
         }
     }
 
+    /// Inserts a new key-value pair into this map.
+    ///
+    /// If the map already contains an association for the given key, the key
+    /// is associated with the new value and the previous value is returned.
+    ///
+    /// # Returns
+    ///
+    /// If the key is already associated with a value, the previous value is
+    /// returned. If this map does not already contain the given key, `None` is
+    /// returned.
     pub fn insert(&mut self, key: Value, value: Value) -> Option<Value> {
         self.0.insert(key, value)
     }
 
+    /// Get a read-only reference to the value associated with the given key.
     pub fn get<Q>(&self, key: &Q) -> Option<&Value>
     where
         Value: Borrow<Q>,
@@ -39,6 +73,8 @@ impl Map {
         self.0.get(key)
     }
 
+    /// Returns an iterator over the borrowed entries (key-value pairs) of this
+    /// map.
     #[allow(dead_code)]
     pub fn iter(&self) -> Iter<'_> {
         Iter {
@@ -99,6 +135,7 @@ impl IntoIterator for Map {
     }
 }
 
+/// Iterator over the owned entries (key-value pairs) of a [`Map`].
 pub struct IntoIter {
     inner: indexmap::map::IntoIter<Value, Value>,
 }
@@ -130,6 +167,7 @@ impl<'a> IntoIterator for &'a Map {
     }
 }
 
+/// Iterator over the borrowed entries (key-value pairs) of a [`Map`].
 pub struct Iter<'a> {
     inner: indexmap::map::Iter<'a, Value, Value>,
 }

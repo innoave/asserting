@@ -1,6 +1,12 @@
+//! Support for property-based testing with the [`proptest`] crate.
+//!
+//! This module mainly provides methods that provide [`Strategy`]s for
+//! generating arbitrary values of type [`Value`] and [`Number`].
+
 use crate::recursive_comparison::value::{Number, Value, F32, F64};
 use proptest::prelude::*;
 
+/// Returns a [`Strategy`] for generating arbitrary values of type [`Value`].
 pub fn any_value() -> impl Strategy<Value = Value> {
     prop_oneof![
         any::<bool>().prop_map(Value::Bool),
@@ -10,6 +16,7 @@ pub fn any_value() -> impl Strategy<Value = Value> {
     ]
 }
 
+/// Returns a [`Strategy`] for generating arbitrary values of type [`Number`].
 pub fn any_number() -> impl Strategy<Value = Number> {
     prop_oneof![
         any::<i8>().prop_map(Number::from),
@@ -27,10 +34,12 @@ pub fn any_number() -> impl Strategy<Value = Number> {
     ]
 }
 
+/// Returns a [`Strategy`] for generating arbitrary values of type [`F32`].
 pub fn any_f32_newtype() -> impl Strategy<Value = F32> {
     any::<f32>().prop_map(F32)
 }
 
+/// Returns a [`Strategy`] for generating arbitrary values of type [`F64`].
 pub fn any_f64_newtype() -> impl Strategy<Value = F64> {
     any::<f64>().prop_map(F64)
 }

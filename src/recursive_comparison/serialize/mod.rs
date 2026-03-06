@@ -1,3 +1,5 @@
+//! Serialization of any type to a [`Value`] using `serde`.
+
 use crate::recursive_comparison::value::{Field, Number};
 use crate::recursive_comparison::value::{Map, Value};
 use crate::std::borrow::Cow;
@@ -6,15 +8,29 @@ use crate::std::fmt::{self, Display};
 use serde_core::ser::Error as SerdeError;
 use serde_core::{ser, Serialize, Serializer};
 
-pub fn to_recursive_values<T>(value: &T) -> Result<Value, Error>
+/// Serializes the given object of some type into a [`Value`]. The given type
+/// must implement [`serde::Serialize`].
+///
+/// # Errors
+///
+/// This method returns a `Result` as of the API of `serde`. As the given object
+/// is serialized into an in-memory representation, there are practically no
+/// errors that can occur.
+///
+/// [`serde::Serialize`]: Serialize
+pub fn to_recursive_values<T>(object: &T) -> Result<Value, Error>
 where
     T: Serialize + ?Sized,
 {
-    value.serialize(SerializeValue)
+    object.serialize(SerializeValue)
 }
 
+/// The error type used when serializing objects to a [`Value`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
+    /// A custom error (as required by [`serde::Serialize`])
+    ///
+    /// [`serde::Serialize`]: Serialize
     Message(String),
 }
 

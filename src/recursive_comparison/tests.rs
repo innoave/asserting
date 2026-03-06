@@ -1,6 +1,7 @@
 use crate::prelude::*;
-use crate::recursive_comparison::struct_with_fields;
-use crate::recursive_comparison::value::{string, uint16, uint32, unit_variant};
+use crate::recursive_comparison::value::{
+    string, struct_with_fields, uint16, uint32, unit_variant,
+};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -751,7 +752,7 @@ fn struct_is_equal_to_equivalent_type() {
 
     assert_that(&person)
         .using_recursive_comparison()
-        .ignoring_missing_expected_fields()
+        .ignoring_not_expected_fields()
         .is_equal_to(PersonDto {
             name: "Silvia".into(),
             age: 25,
@@ -765,7 +766,7 @@ fn struct_is_equal_to_equivalent_type() {
 }
 
 #[test]
-fn verify_struct_is_equal_to_equivalent_type_do_not_ignore_missing_expected_fields_fails() {
+fn verify_struct_is_equal_to_equivalent_type_do_not_ignore_not_expected_fields_fails() {
     let person = Person {
         id: 456,
         name: "Silvia".into(),
@@ -828,7 +829,7 @@ fn verify_struct_is_equal_to_equivalent_type_fails_all_fields_different() {
     let failures = verify_that(&person)
         .named("person")
         .using_recursive_comparison()
-        .ignoring_missing_expected_fields()
+        .ignoring_not_expected_fields()
         .is_equal_to(PersonDto {
             name: "Silvia".into(),
             age: 25,
@@ -891,7 +892,7 @@ fn verify_struct_is_equal_to_equivalent_type_fails_for_different_type() {
     let failures = verify_that(&person)
         .named("person")
         .using_recursive_comparison()
-        .ignoring_missing_expected_fields()
+        .ignoring_not_expected_fields()
         .is_equal_to(PersonDto {
             name: "Silvia".into(),
             age: 25,
@@ -942,7 +943,7 @@ fn struct_is_equivalent_to_struct_with_relevant_fields() {
 
     assert_that(&person)
         .using_recursive_comparison()
-        .ignoring_missing_expected_fields()
+        .ignoring_not_expected_fields()
         .is_equivalent_to(struct_with_fields([
             ("name", string("Silvia")),
             ("gender", unit_variant("Gender", "Female")),
@@ -954,7 +955,7 @@ fn struct_is_equivalent_to_struct_with_relevant_fields() {
 }
 
 #[test]
-fn verify_struct_is_equivalent_to_struct_with_relevant_fields_do_not_ignore_missing_expected_fields_fails(
+fn verify_struct_is_equivalent_to_struct_with_relevant_fields_do_not_ignore_not_expected_fields_fails(
 ) {
     let person = Person {
         id: 456,
@@ -1018,7 +1019,7 @@ fn verify_struct_is_equivalent_to_struct_with_relevant_fields_fails_for_differen
     let failures = verify_that(&person)
         .named("person")
         .using_recursive_comparison()
-        .ignoring_missing_expected_fields()
+        .ignoring_not_expected_fields()
         .is_equivalent_to(struct_with_fields([
             ("name", string("Silvia")),
             ("gender", unit_variant("Gender", "Female")),

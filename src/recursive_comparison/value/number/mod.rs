@@ -1,23 +1,65 @@
+//! Defines the [`Number`] type which represents numbers in the [`Value`]
+//! data structure used for recursive comparison.
+//!
+//! [`Value`]: crate::recursive_comparison::value::Value
+
 use crate::std::fmt::{self, Debug, Display};
 use std::borrow::Cow;
 
+/// Represents a number in the [`Value`] data structure used for recursive
+/// comparison.
+///
+/// It can hold integer and float values of different sizes.
+///
+/// # Note on `usize` and `isize`
+///
+/// The `serde` crate does not explicitly support `usize` and `isize`, because
+/// the size of those types is platform-dependent and cannot be safely
+/// serialized on one platform and deserialized on another.
+///
+/// For recursive comparison purposes we try to convert `usize` and `isize`
+/// values to `u64` and `i64` values respectively. If the conversion fails, we
+/// try to convert them to `u128` and `i128` values. If both conversions fail,
+/// we panic.
+///
+/// # Note on `f32` and `f64`
+///
+/// The [`Value`] type implements the `Eq`, `Ord` and `Hash` traits. Although
+/// these traits cannot be implemented for `f32` and `f64` in a mathematically
+/// correct way, for the purpose of asserting whether two values are equal,
+/// the naive implementation we are using is perfectly fine.
+///
+/// [`Value`]: crate::recursive_comparison::value::Value
 #[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Number {
+    /// An `i8` signed integer
     I8(i8),
+    /// An `i16` signed integer
     I16(i16),
+    /// An `i32` signed integer
     I32(i32),
+    /// An `i64` signed integer
     I64(i64),
+    /// An `i128` signed integer
     I128(i128),
+    /// An `u8` unsigned integer
     U8(u8),
+    /// An `u16` unsigned integer
     U16(u16),
+    /// An `u32` unsigned integer
     U32(u32),
+    /// An `u64` unsigned integer
     U64(u64),
+    /// An `u128` unsigned integer
     U128(u128),
+    /// A `f32` floating point number
     F32(F32),
+    /// A `f64` floating point number
     F64(F64),
 }
 
 impl Number {
+    /// Returns the type name of the number variant as a string.
     pub fn type_name(&self) -> Cow<'static, str> {
         match self {
             Self::I8(_) => Cow::Borrowed("i8"),
@@ -76,11 +118,15 @@ impl Display for Number {
 
 macro_rules! define_float_type {
     ($ty:ident($float:ty)) => {
+        /// A wrapper around a float value.
+        ///
+        /// This wrapper enables us to provide implementations for the
+        /// `Eq`, `Ord`, and `Hash` traits.
         #[derive(Clone, Copy)]
         pub struct $ty(pub $float);
 
         impl $ty {
-            #[allow(dead_code)]
+            /// Returns the underlying float value.
             pub fn val(self) -> $float {
                 self.0
             }
