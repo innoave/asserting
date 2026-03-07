@@ -39,3 +39,7 @@ pub use super::{
     spec::{assert_that_code, verify_that_code},
     verify_that_code,
 };
+
+#[cfg(feature = "recursive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+pub use super::value;

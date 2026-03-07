@@ -262,6 +262,8 @@ pub mod path;
 pub mod serialize;
 pub mod value;
 
+mod macros;
+
 use crate::assertions::{AssertEquality, AssertEquivalence};
 use crate::recursive_comparison::path::Path;
 use crate::recursive_comparison::serialize::to_recursive_value;
