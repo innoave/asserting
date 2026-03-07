@@ -241,6 +241,13 @@ fn type_name_of_tuple_two_elements() {
 }
 
 #[test]
+fn type_name_of_empty_tuple() {
+    let value = tuple([]);
+
+    assert_eq!(value.type_name(), Cow::Borrowed("()"));
+}
+
+#[test]
 fn type_name_of_unit_value() {
     let value = Value::Unit;
 

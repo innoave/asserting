@@ -233,6 +233,9 @@ impl Value {
             },
             Self::String(_) => Cow::Borrowed("String"),
             Self::Tuple(values) => {
+                if values.is_empty() {
+                    return Cow::Borrowed("()");
+                }
                 let mut type_name = String::from("(");
                 for field in values {
                     type_name.push_str(&field.value.type_name());
@@ -523,16 +526,18 @@ pub fn tuple_struct(
 /// ]);
 /// ```
 pub fn tuple(values: impl IntoIterator<Item = Value>) -> Value {
-    Value::Tuple(
-        values
-            .into_iter()
-            .enumerate()
-            .map(|(index, value)| Field {
-                name: index.to_string().into(),
-                value,
-            })
-            .collect(),
-    )
+    let fields = values
+        .into_iter()
+        .enumerate()
+        .map(|(index, value)| Field {
+            name: index.to_string().into(),
+            value,
+        })
+        .collect::<Vec<_>>();
+    if fields.is_empty() {
+        return Value::Unit;
+    }
+    Value::Tuple(fields)
 }
 
 /// Constructs a [`Value`] representing a tuple-variant of an enum.
