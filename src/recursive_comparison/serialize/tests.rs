@@ -30,105 +30,105 @@ mod error {
 fn serialize_tuple_of_bool() {
     let value = (true, false);
 
-    let serialized = to_recursive_values(&value).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&value).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, tuple([bool(true), bool(false)]));
 }
 
 #[test]
 fn serialize_int8() {
-    let serialized = to_recursive_values(&-42_i8).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-42_i8).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, int8(-42));
 }
 
 #[test]
 fn serialize_int16() {
-    let serialized = to_recursive_values(&-16_i16).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-16_i16).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, int16(-16));
 }
 
 #[test]
 fn serialize_int32() {
-    let serialized = to_recursive_values(&-32_i32).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-32_i32).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, int32(-32));
 }
 
 #[test]
 fn serialize_int64() {
-    let serialized = to_recursive_values(&-64_i64).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-64_i64).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, int64(-64));
 }
 
 #[test]
 fn serialize_int128() {
-    let serialized = to_recursive_values(&-128_i128).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-128_i128).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, int128(-128));
 }
 
 #[test]
 fn serialize_isize() {
-    let serialized = to_recursive_values(&-333_isize).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-333_isize).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, isize(-333));
 }
 
 #[test]
 fn serialize_uint8() {
-    let serialized = to_recursive_values(&42_u8).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&42_u8).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, uint8(42));
 }
 
 #[test]
 fn serialize_uint16() {
-    let serialized = to_recursive_values(&16_u16).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&16_u16).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, uint16(16));
 }
 
 #[test]
 fn serialize_uint32() {
-    let serialized = to_recursive_values(&32_u32).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&32_u32).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, uint32(32));
 }
 
 #[test]
 fn serialize_uint64() {
-    let serialized = to_recursive_values(&64_u64).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&64_u64).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, uint64(64));
 }
 
 #[test]
 fn serialize_uint128() {
-    let serialized = to_recursive_values(&128_u128).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&128_u128).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, uint128(128));
 }
 
 #[test]
 fn serialize_usize() {
-    let serialized = to_recursive_values(&555_usize).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&555_usize).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, usize(555));
 }
 
 #[test]
 fn serialize_float32() {
-    let serialized = to_recursive_values(&-0.5_f32).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&-0.5_f32).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, float32(-0.5));
 }
 
 #[test]
 fn serialize_float64() {
-    let serialized = to_recursive_values(&1.2_f64).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&1.2_f64).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, float64(1.2));
 }
 
 #[test]
 fn serialize_char() {
-    let serialized = to_recursive_values(&'@').unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&'@').unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, char('@'));
 }
 
 #[test]
 fn serialize_string() {
     let serialized =
-        to_recursive_values(&"hello".to_string()).unwrap_or_else(|err| panic!("{err:?}"));
+        to_recursive_value(&"hello".to_string()).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, string("hello"));
 }
 
@@ -136,7 +136,7 @@ fn serialize_string() {
 fn serialize_bytes() {
     let buffer = Bytes::new(&[65, 66, 67]);
 
-    let serialized = to_recursive_values(&buffer).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&buffer).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, seq([uint8(65), uint8(66), uint8(67)]));
 }
@@ -145,7 +145,7 @@ fn serialize_bytes() {
 fn serialize_none() {
     let maybe: Option<i16> = None;
 
-    let serialized = to_recursive_values(&maybe).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&maybe).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, none());
 }
@@ -154,14 +154,14 @@ fn serialize_none() {
 fn serialize_some_i16() {
     let maybe: Option<i16> = Some(-60);
 
-    let serialized = to_recursive_values(&maybe).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&maybe).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, some(int16(-60)));
 }
 
 #[test]
 fn serialize_unit() {
-    let serialized = to_recursive_values(&()).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&()).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, unit());
 }
 
@@ -170,7 +170,7 @@ fn serialize_unit_struct() {
     #[derive(Serialize)]
     struct Noop;
 
-    let serialized = to_recursive_values(&Noop).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&Noop).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, unit_struct("Noop"));
 }
 
@@ -184,7 +184,7 @@ fn serialize_unit_variant() {
     }
 
     let serialized =
-        to_recursive_values(&Opacity::Transparent).unwrap_or_else(|err| panic!("{err:?}"));
+        to_recursive_value(&Opacity::Transparent).unwrap_or_else(|err| panic!("{err:?}"));
     assert_eq!(serialized, unit_variant("Opacity", "Transparent"),);
 }
 
@@ -192,7 +192,7 @@ fn serialize_unit_variant() {
 fn serialize_vec_of_i32() {
     let sequence = vec![-1, -2, -3];
 
-    let serialized = to_recursive_values(&sequence).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&sequence).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, seq([int32(-1), int32(-2), int32(-3)]));
 }
@@ -201,7 +201,7 @@ fn serialize_vec_of_i32() {
 fn serialize_slice_of_i32() {
     let slice = &[-1, -2, -3][..];
 
-    let serialized = to_recursive_values(slice).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(slice).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, seq([int32(-1), int32(-2), int32(-3)]));
 }
@@ -210,7 +210,7 @@ fn serialize_slice_of_i32() {
 fn serialize_array_of_i32() {
     let array = [-1, -2, -3];
 
-    let serialized = to_recursive_values(&array).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&array).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(serialized, value::array([int32(-1), int32(-2), int32(-3)]));
 }
@@ -219,7 +219,7 @@ fn serialize_array_of_i32() {
 fn serialize_tuple_of_string_and_bool_and_u64() {
     let tuple = ("foo".to_string(), true, 42_u64);
 
-    let serialized = to_recursive_values(&tuple).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&tuple).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,
@@ -234,7 +234,7 @@ fn serialize_tuple_struct() {
 
     let point = Point3D(16, -7, 0);
 
-    let serialized = to_recursive_values(&point).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&point).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,
@@ -253,7 +253,7 @@ fn serialize_tuple_variant() {
 
     let color = Color::Rgb(128, 64, 32);
 
-    let serialized = to_recursive_values(&color).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&color).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,
@@ -269,7 +269,7 @@ fn serialize_map_of_string_u64() {
         ("three".to_string(), 3),
     ]);
 
-    let serialized = to_recursive_values(&mapping).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&mapping).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,
@@ -291,7 +291,7 @@ fn serialize_struct() {
 
     let point = Point { x: 10, y: -8 };
 
-    let serialized = to_recursive_values(&point).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&point).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,
@@ -322,7 +322,7 @@ fn serialize_stuct_variant() {
         blue: 32,
     };
 
-    let serialized = to_recursive_values(&color).unwrap_or_else(|err| panic!("{err:?}"));
+    let serialized = to_recursive_value(&color).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(
         serialized,

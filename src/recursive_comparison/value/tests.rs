@@ -1,5 +1,5 @@
 use super::*;
-use crate::recursive_comparison::serialize::to_recursive_values;
+use crate::recursive_comparison::serialize::to_recursive_value;
 use indexmap::IndexMap;
 use serde::Serialize;
 
@@ -110,7 +110,7 @@ fn debug_string_of_field() {
 fn debug_string_of_value() {
     let foo = Foo::default();
 
-    let value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(format!("{value:?}"), format!("{foo:?}"));
 }
@@ -122,7 +122,7 @@ fn debug_string_of_empty_struct() {
 
     let data = AnEmptyStruct {};
 
-    let value = to_recursive_values(&data).unwrap_or_else(|err| panic!("{err:?}"));
+    let value = to_recursive_value(&data).unwrap_or_else(|err| panic!("{err:?}"));
 
     assert_eq!(format!("{value:?}"), format!("{data:?}"));
 }
@@ -277,7 +277,7 @@ fn depth_first_iterator_visits_fields_in_correct_order() {
         ],
     };
 
-    let value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let visited = value
         .depth_first_iter()
@@ -318,7 +318,7 @@ fn depth_first_iterator_visits_fields_in_correct_order() {
 #[test]
 fn get_path_foo_empty_path() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from(""));
 
@@ -328,7 +328,7 @@ fn get_path_foo_empty_path() {
 #[test]
 fn get_path_foo_one_level_deep_not_existing() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("not_existing"));
 
@@ -338,7 +338,7 @@ fn get_path_foo_one_level_deep_not_existing() {
 #[test]
 fn get_path_foo_text() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("text"));
 
@@ -348,7 +348,7 @@ fn get_path_foo_text() {
 #[test]
 fn get_path_foo_age() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("age"));
 
@@ -358,7 +358,7 @@ fn get_path_foo_age() {
 #[test]
 fn get_path_foo_qux() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux"));
 
@@ -415,7 +415,7 @@ fn get_path_foo_qux() {
 #[test]
 fn get_path_foo_bytes() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("bytes"));
 
@@ -433,7 +433,7 @@ fn get_path_foo_bytes() {
 #[test]
 fn get_path_foo_precision() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("precision"));
 
@@ -453,7 +453,7 @@ fn get_path_foo_precision() {
 #[test]
 fn get_path_foo_grouped() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("grouped"));
 
@@ -482,7 +482,7 @@ fn get_path_foo_grouped() {
 #[test]
 fn get_path_foo_pair() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("pair"));
 
@@ -504,7 +504,7 @@ fn get_path_foo_pair() {
 #[test]
 fn get_path_foo_baz() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("baz"));
 
@@ -536,7 +536,7 @@ fn get_path_foo_baz() {
 #[test]
 fn get_path_foo_samples() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("samples"));
 
@@ -590,7 +590,7 @@ fn get_path_foo_samples() {
 #[test]
 fn get_path_foo_two_levels_deep_not_existing() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.not_existing"));
 
@@ -600,7 +600,7 @@ fn get_path_foo_two_levels_deep_not_existing() {
 #[test]
 fn get_path_foo_qux_name() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.name"));
 
@@ -610,7 +610,7 @@ fn get_path_foo_qux_name() {
 #[test]
 fn get_path_foo_qux_corge() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.corge"));
 
@@ -635,7 +635,7 @@ fn get_path_foo_qux_corge() {
 #[test]
 fn get_path_foo_qux_baz() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.baz"));
 
@@ -664,7 +664,7 @@ fn get_path_foo_qux_baz() {
 #[test]
 fn get_path_foo_three_levels_deep_not_existing() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.corge.not_existing"));
 
@@ -674,7 +674,7 @@ fn get_path_foo_three_levels_deep_not_existing() {
 #[test]
 fn get_path_foo_qux_corge_grault() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.corge.grault"));
 
@@ -684,7 +684,7 @@ fn get_path_foo_qux_corge_grault() {
 #[test]
 fn get_path_foo_qux_corge_tinu() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("qux.corge.tinu"));
 
@@ -694,7 +694,7 @@ fn get_path_foo_qux_corge_tinu() {
 #[test]
 fn get_path_foo_indexing_into_tuple_0() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("pair.0"));
 
@@ -704,7 +704,7 @@ fn get_path_foo_indexing_into_tuple_0() {
 #[test]
 fn get_path_foo_indexing_into_tuple_1() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("pair.1"));
 
@@ -714,7 +714,7 @@ fn get_path_foo_indexing_into_tuple_1() {
 #[test]
 fn get_path_foo_indexing_into_tuple_struct_0() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("baz.0"));
 
@@ -724,7 +724,7 @@ fn get_path_foo_indexing_into_tuple_struct_0() {
 #[test]
 fn get_path_foo_indexing_into_tuple_struct_1() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("baz.1"));
 
@@ -744,7 +744,7 @@ fn get_path_foo_indexing_into_tuple_struct_1() {
 #[test]
 fn get_path_foo_indexing_into_tuple_struct_out_of_bounds() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("baz.2"));
 
@@ -754,7 +754,7 @@ fn get_path_foo_indexing_into_tuple_struct_out_of_bounds() {
 #[test]
 fn get_path_foo_indexing_into_sequence_0() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("array.0"));
 
@@ -764,7 +764,7 @@ fn get_path_foo_indexing_into_sequence_0() {
 #[test]
 fn get_path_foo_indexing_into_sequence_1() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("array.1"));
 
@@ -774,7 +774,7 @@ fn get_path_foo_indexing_into_sequence_1() {
 #[test]
 fn get_path_foo_indexing_into_sequence_4() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("array.4"));
 
@@ -784,7 +784,7 @@ fn get_path_foo_indexing_into_sequence_4() {
 #[test]
 fn get_path_foo_indexing_into_sequence_out_of_bounds() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("array.5"));
 
@@ -794,7 +794,7 @@ fn get_path_foo_indexing_into_sequence_out_of_bounds() {
 #[test]
 fn get_path_foo_get_key_from_map_old() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("grouped.old"));
 
@@ -810,7 +810,7 @@ fn get_path_foo_get_key_from_map_old() {
 #[test]
 fn get_path_foo_get_key_from_map_new() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("grouped.new"));
 
@@ -827,7 +827,7 @@ fn get_path_foo_get_key_from_map_new() {
 #[test]
 fn get_path_foo_get_key_from_map_no_mapping() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("grouped.not_existing"));
 
@@ -837,7 +837,7 @@ fn get_path_foo_get_key_from_map_no_mapping() {
 #[test]
 fn get_path_foo_path_to_tuple_variant_field_0() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("samples.2.0"));
 
@@ -847,7 +847,7 @@ fn get_path_foo_path_to_tuple_variant_field_0() {
 #[test]
 fn get_path_foo_path_to_tuple_variant_field_1() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("samples.2.1"));
 
@@ -857,7 +857,7 @@ fn get_path_foo_path_to_tuple_variant_field_1() {
 #[test]
 fn get_path_foo_path_to_struct_variant_field_left() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("samples.3.left"));
 
@@ -867,7 +867,7 @@ fn get_path_foo_path_to_struct_variant_field_left() {
 #[test]
 fn get_path_foo_path_to_struct_variant_field_right() {
     let foo = Foo::default();
-    let foo_value = to_recursive_values(&foo).unwrap_or_else(|err| panic!("{err:?}"));
+    let foo_value = to_recursive_value(&foo).unwrap_or_else(|err| panic!("{err:?}"));
 
     let value = foo_value.get_path(&Path::from("samples.3.right"));
 

@@ -571,12 +571,12 @@ pub fn tuple_variant(
 ///
 /// ```
 /// # use serde::Serialize;
-/// # use asserting::recursive_comparison::serialize::to_recursive_values;
+/// # use asserting::recursive_comparison::serialize::to_recursive_value;
 /// # use asserting::recursive_comparison::value::unit_struct;
 /// #[derive(Serialize)]
 /// struct Foo;
 ///
-/// assert_eq!(to_recursive_values(&Foo), Ok(unit_struct("Foo")));
+/// assert_eq!(to_recursive_value(&Foo), Ok(unit_struct("Foo")));
 /// ```
 pub fn unit_struct(type_name: impl Into<Cow<'static, str>>) -> Value {
     Value::Struct {
@@ -591,10 +591,10 @@ pub fn unit_struct(type_name: impl Into<Cow<'static, str>>) -> Value {
 ///
 /// ```
 /// # use asserting::recursive_comparison::value::unit_variant;
-/// # use asserting::recursive_comparison::serialize::to_recursive_values;
+/// # use asserting::recursive_comparison::serialize::to_recursive_value;
 /// let maybe: Option<u8> = None;
 ///
-/// assert_eq!(to_recursive_values(&maybe), Ok(unit_variant("Option", "None")));
+/// assert_eq!(to_recursive_value(&maybe), Ok(unit_variant("Option", "None")));
 /// ```
 pub fn unit_variant(
     type_name: impl Into<Cow<'static, str>>,

@@ -18,7 +18,7 @@ use serde_core::{ser, Serialize, Serializer};
 /// errors that can occur.
 ///
 /// [`serde::Serialize`]: Serialize
-pub fn to_recursive_values<T>(object: &T) -> Result<Value, Error>
+pub fn to_recursive_value<T>(object: &T) -> Result<Value, Error>
 where
     T: Serialize + ?Sized,
 {

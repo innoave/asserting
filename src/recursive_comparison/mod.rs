@@ -264,7 +264,7 @@ pub mod value;
 
 use crate::assertions::{AssertEquality, AssertEquivalence};
 use crate::recursive_comparison::path::Path;
-use crate::recursive_comparison::serialize::to_recursive_values;
+use crate::recursive_comparison::serialize::to_recursive_value;
 use crate::recursive_comparison::value::Value;
 use crate::spec::{
     AssertFailure, CollectFailures, DoFail, FailingStrategy, GetFailures, SoftPanic, Spec,
@@ -555,9 +555,9 @@ where
 {
     fn is_equal_to(mut self, expected: E) -> Self {
         let expression = self.spec.expression();
-        let actual = to_recursive_values(self.spec.subject())
+        let actual = to_recursive_value(self.spec.subject())
             .unwrap_or_else(|err| panic!("failed to serialize the subject, reason: {err}"));
-        let expected = to_recursive_values(&expected)
+        let expected = to_recursive_value(&expected)
             .unwrap_or_else(|err| panic!("failed to serialize the expected value, reason: {err}"));
 
         let compared = self.compare(&actual, &expected);
@@ -585,7 +585,7 @@ where
 {
     fn is_equivalent_to(mut self, expected: Value) -> Self {
         let expression = self.spec.expression();
-        let actual = to_recursive_values(self.spec.subject())
+        let actual = to_recursive_value(self.spec.subject())
             .unwrap_or_else(|err| panic!("failed to serialize the subject, reason: {err}"));
 
         let compared = self.compare(&actual, &expected);
