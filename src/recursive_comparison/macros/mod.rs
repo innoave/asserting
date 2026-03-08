@@ -4,6 +4,13 @@
 /// structure as actual types like structs, enums, tuples, or even primitive
 /// types. It is not necessary to declare the type in advance.
 ///
+/// # Limitations
+///
+/// This macro does not support unit structs. Unit structs interfere with
+/// identifiers captured from the environment. We decided that capturing
+/// variables from the environment of the macro is more valuable than unit
+/// structs.
+///
 /// [`Value`]: crate::recursive_comparison::value::Value
 #[macro_export]
 macro_rules! value {
@@ -22,6 +29,46 @@ macro_rules! value {
     // Done without a trailing comma.
     (@seq [$($elems:expr),*] ()) => {
         $crate::std::vec![$($elems),*]
+    };
+
+    // Ignore leading commas.
+    (@seq [$($elems:expr,)*] (, $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)*] ($($rest)*))
+    };
+
+    // The next element is a seq.
+    (@seq [$($elems:expr,)*] ([ $($val:tt)* ] $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!([$($val)*]),] ($($rest)*))
+    };
+
+    // The next element is an anonymous struct.
+    (@seq [$($elems:expr,)*] ({ $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!({$($val)*}),] ($($rest)*))
+    };
+
+    // The next element is a named struct.
+    (@seq [$($elems:expr,)*] ($name:ident { $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!($name {$($val)*}),] ($($rest)*))
+    };
+
+    // The next element is a tuple struct.
+    (@seq [$($elems:expr,)*] ($name:ident ( $($val:tt)* ) $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!($name ($($val)*)),] ($($rest)*))
+    };
+
+    // The next element is a struct variant.
+    (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident { $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant {$($val)*}),] ($($rest)*))
+    };
+
+    // The next element is a tuple variant.
+    (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident ( $($val:tt)* ) $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant ($($val)*)),] ($($rest)*))
+    };
+
+    // The next element is a unit variant.
+    (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant),] ($($rest)*))
     };
 
     // The next element is an expression followed by a comma.
@@ -56,7 +103,7 @@ macro_rules! value {
         $crate::value!(@fields [$($fields,)*] ($($rest)*))
     };
 
-    // The next value is a seq
+    // The next value is a seq.
     (@fields [$($fields:expr,)*] ($key:ident : [ $($val:tt)* ] $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -66,7 +113,7 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The nex value is a named struct
+    // The nex value is a named struct.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident { $($val:tt)* } $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -76,7 +123,7 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The next value is a struct
+    // The next value is an anonymous struct.
     (@fields [$($fields:expr,)*] ($key:ident : { $($val:tt)* } $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -86,7 +133,7 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The next value is a tuple struct
+    // The next value is a tuple struct.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident ( $($val:tt)* ) $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -96,7 +143,7 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The next value is a struct variant
+    // The next value is a struct variant.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident { $($val:tt)* } $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -106,7 +153,17 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The next value is a unit variant
+    // The next value is a tuple variant.
+    (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident ( $($val:tt)* ) $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!($name :: $variant ($($val)*)),
+            }
+        ] ($($rest)*))
+    };
+
+    // The next value is a unit variant.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {

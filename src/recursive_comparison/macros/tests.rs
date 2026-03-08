@@ -546,3 +546,208 @@ fn anonymous_struct_with_nested_tuple_struct() {
         struct_with_fields([("foo", tuple_struct("Bar", [float32(4.6), int32(12)]))])
     );
 }
+
+#[test]
+fn anonymous_struct_with_nested_tuple_variant() {
+    let value = value!({
+        foo: Foo::Bar("alpha", 4.6_f32)
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([(
+            "foo",
+            tuple_variant("Foo", "Bar", [string("alpha"), float32(4.6)])
+        )])
+    );
+}
+
+#[test]
+fn tuple_with_nested_anonymous_struct() {
+    let value = value!((1.2_f32, { foo: Foo::Bar("alpha") }, 33_u64));
+
+    assert_eq!(
+        value,
+        tuple([
+            float32(1.2),
+            struct_with_fields([("foo", tuple_variant("Foo", "Bar", [string("alpha")]))]),
+            uint64(33)
+        ])
+    );
+}
+
+#[test]
+fn tuple_with_nested_named_struct() {
+    let value = value!((
+        'X',
+        Foo {
+            bar: "alpha",
+            baz: 42_i64
+        }
+    ));
+
+    assert_eq!(
+        value,
+        tuple([
+            char('X'),
+            struct_("Foo", [("bar", string("alpha")), ("baz", int64(42))])
+        ])
+    );
+}
+
+#[test]
+fn tuple_with_nested_tuple_struct() {
+    let value = value!((Foo("alpha", 1.83_f64), -33_i8,));
+
+    assert_eq!(
+        value,
+        tuple([
+            tuple_struct("Foo", [string("alpha"), float64(1.83)]),
+            int8(-33)
+        ])
+    );
+}
+
+#[test]
+fn tuple_with_nested_struct_variant() {
+    let value = value!(("alpha", Foo::Bar { qux: 2.7_f32 }));
+
+    assert_eq!(
+        value,
+        tuple([
+            string("alpha"),
+            struct_variant("Foo", "Bar", [("qux", float32(2.7))])
+        ])
+    );
+}
+
+#[test]
+fn tuple_with_nested_tuple_variant() {
+    let value = value!((Bar::Baz('a', "alpha"), "epsilon"));
+
+    assert_eq!(
+        value,
+        tuple([
+            tuple_variant("Bar", "Baz", [char('a'), string("alpha")]),
+            string("epsilon")
+        ])
+    );
+}
+
+#[test]
+fn tuple_with_nested_unit_variant() {
+    let value = value!((Foo::Bar, Baz::Qux));
+
+    assert_eq!(
+        value,
+        tuple([unit_variant("Foo", "Bar"), unit_variant("Baz", "Qux")])
+    );
+}
+
+#[test]
+fn tuple_with_nested_seq() {
+    let value = value!(("alpha", [1.2_f32, 3.4_f32, 5.6_f32]));
+
+    assert_eq!(
+        value,
+        tuple([
+            string("alpha"),
+            seq([float32(1.2), float32(3.4), float32(5.6)])
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_anonymous_struct() {
+    let value = value!([1.2_f32, { foo: Foo::Bar("alpha") }, 33_u64]);
+
+    assert_eq!(
+        value,
+        seq([
+            float32(1.2),
+            struct_with_fields([("foo", tuple_variant("Foo", "Bar", [string("alpha")]))]),
+            uint64(33)
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_named_struct() {
+    let value = value!([
+        'X',
+        Foo {
+            bar: "alpha",
+            baz: 42_i64
+        }
+    ]);
+
+    assert_eq!(
+        value,
+        seq([
+            char('X'),
+            struct_("Foo", [("bar", string("alpha")), ("baz", int64(42))])
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_tuple_struct() {
+    let value = value!([Foo("alpha", 1.83_f64), -33_i8,]);
+
+    assert_eq!(
+        value,
+        seq([
+            tuple_struct("Foo", [string("alpha"), float64(1.83)]),
+            int8(-33)
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_struct_variant() {
+    let value = value!(["alpha", Foo::Bar { qux: 2.7_f32 }]);
+
+    assert_eq!(
+        value,
+        seq([
+            string("alpha"),
+            struct_variant("Foo", "Bar", [("qux", float32(2.7))])
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_tuple_variant() {
+    let value = value!([Bar::Baz('a', "alpha"), "epsilon"]);
+
+    assert_eq!(
+        value,
+        seq([
+            tuple_variant("Bar", "Baz", [char('a'), string("alpha")]),
+            string("epsilon")
+        ])
+    );
+}
+
+#[test]
+fn seq_with_nested_unit_variant() {
+    let value = value!([Foo::Bar, Baz::Qux]);
+
+    assert_eq!(
+        value,
+        seq([unit_variant("Foo", "Bar"), unit_variant("Baz", "Qux")])
+    );
+}
+
+#[test]
+fn seq_with_nested_seq() {
+    let value = value!([["alpha", "beta", "gamma"], [1.2_f32, 3.4_f32]]);
+
+    assert_eq!(
+        value,
+        seq([
+            seq([string("alpha"), string("beta"), string("gamma")]),
+            seq([float32(1.2), float32(3.4)])
+        ])
+    );
+}
