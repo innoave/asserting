@@ -141,7 +141,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --no-default-features --features "colored, float-cmp, num-bigint, rust-decimal, bigdecimal"
+          args: --no-default-features --features "colored, float-cmp, num-bigint, recursive, regex, rust-decimal, bigdecimal"
       - uses: Swatinem/rust-cache@v2
 
   msrv:
