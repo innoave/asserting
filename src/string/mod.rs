@@ -705,6 +705,8 @@ mod regex {
     use crate::expectations::{not, string_matches, StringMatches};
     use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::fmt::Debug;
+    use crate::std::format;
+    use crate::std::string::String;
 
     impl<S, R> AssertStringMatches for Spec<'_, S, R>
     where

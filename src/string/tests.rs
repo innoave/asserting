@@ -1376,6 +1376,7 @@ fn verify_string_does_not_end_with_char_fails() {
 #[cfg(feature = "regex")]
 mod regex {
     use crate::prelude::*;
+    use crate::std::string::{String, ToString};
 
     #[test]
     fn string_matches_regex() {
@@ -2045,7 +2046,7 @@ mod colored {
 #[cfg(all(feature = "colored", feature = "regex"))]
 mod colored_regex {
     use crate::prelude::*;
-    use crate::std::string::ToString;
+    use crate::std::string::{String, ToString};
 
     #[test]
     fn highlight_diffs_string_matches_regex() {
