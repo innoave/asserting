@@ -2,6 +2,7 @@ use crate::prelude::*;
 use crate::recursive_comparison::value::{
     string, struct_with_fields, uint16, uint32, unit_variant,
 };
+use crate::std::string::{String, ToString};
 use serde::Serialize;
 
 #[derive(Serialize)]

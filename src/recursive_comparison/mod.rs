@@ -270,6 +270,9 @@ use crate::spec::{
     AssertFailure, CollectFailures, DoFail, FailingStrategy, GetFailures, SoftPanic, Spec,
 };
 use crate::std::fmt::{self, Display};
+use crate::std::string::String;
+use crate::std::vec::Vec;
+use crate::std::{format, vec};
 use serde_core::Serialize;
 
 /// Data of an actual assertion in field-by-field recursive comparison mode.

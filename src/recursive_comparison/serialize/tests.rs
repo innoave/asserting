@@ -4,6 +4,7 @@ use crate::recursive_comparison::value::{
     seq, some, string, struct_, struct_variant, tuple, tuple_struct, tuple_variant, uint128,
     uint16, uint32, uint64, uint8, unit, unit_struct, unit_variant, usize,
 };
+use crate::std::string::ToString;
 use indexmap::IndexMap;
 use serde::Serialize;
 use serde_bytes::Bytes;

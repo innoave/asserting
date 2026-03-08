@@ -15,6 +15,8 @@ mod dummy_extern_uses {
     #[cfg(feature = "num-bigint")]
     use num_bigint as _;
     use proptest as _;
+    #[cfg(feature = "recursive")]
+    use rapidhash as _;
     #[cfg(feature = "regex")]
     use regex as _;
     #[cfg(feature = "rust-decimal")]

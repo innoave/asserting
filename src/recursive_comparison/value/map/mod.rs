@@ -5,22 +5,27 @@ use super::Value;
 use crate::std::borrow::{Borrow, Cow};
 use crate::std::cmp::Ordering;
 use crate::std::fmt::{self, Debug};
+use crate::std::format;
 use crate::std::hash::{Hash, Hasher};
 use indexmap::IndexMap;
+use rapidhash::quality::RandomState;
 
 /// The map type used inside the [`Value`] type.
 #[derive(Default, Clone)]
-pub struct Map(IndexMap<Value, Value>);
+pub struct Map(IndexMap<Value, Value, RandomState>);
 
 impl Map {
     /// Creates a new empty `Map`.
     pub fn new() -> Self {
-        Self(IndexMap::new())
+        Self(IndexMap::with_hasher(RandomState::new()))
     }
 
     /// Creates a new `Map` with the given capacity.
     pub fn with_capacity(capacity: usize) -> Self {
-        Self(IndexMap::with_capacity(capacity))
+        Self(IndexMap::with_capacity_and_hasher(
+            capacity,
+            RandomState::new(),
+        ))
     }
 
     /// Returns the number of elements in the `Map`.

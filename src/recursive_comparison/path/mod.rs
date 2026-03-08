@@ -3,8 +3,12 @@
 //! [`Value`]: crate::recursive_comparison::value::Value
 
 use crate::std::borrow::Cow;
+use crate::std::borrow::ToOwned;
 use crate::std::fmt;
 use crate::std::fmt::{Debug, Display};
+use crate::std::string::String;
+use crate::std::vec;
+use crate::std::vec::Vec;
 
 /// Defines a path to a field in a struct, tuple, or enum variant.
 ///

@@ -3,8 +3,8 @@
 //!
 //! [`Value`]: crate::recursive_comparison::value::Value
 
+use crate::std::borrow::Cow;
 use crate::std::fmt::{self, Debug, Display};
-use std::borrow::Cow;
 
 /// Represents a number in the [`Value`] data structure used for recursive
 /// comparison.

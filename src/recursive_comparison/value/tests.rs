@@ -1,5 +1,6 @@
 use super::*;
 use crate::recursive_comparison::serialize::to_recursive_value;
+use crate::std::string::ToString;
 use indexmap::IndexMap;
 use serde::Serialize;
 

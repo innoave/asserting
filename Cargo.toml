@@ -24,7 +24,7 @@ bigdecimal = ["dep:bigdecimal", "dep:lazy_static"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
 num-bigint = ["dep:num-bigint", "dep:lazy_static"]
-recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde"]
+recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde", "dep:rapidhash"]
 rust-decimal = ["dep:rust_decimal"]
 panic = ["std"]
 regex = ["dep:regex"]
@@ -40,6 +40,7 @@ indexmap = { version = "2", optional = true, default-features = false }
 lazy_static = { version = "1", optional = true }
 num-bigint = { version = "0.4", optional = true, default-features = false }
 regex = { version = "1", optional = true }
+rapidhash = { version = "4", optional = true, default-features = false }
 rust_decimal = { version = "1", optional = true, default-features = false }
 sdiff = { version = "0.1", optional = true }
 serde_core = { version = "1", optional = true, default-features = false, features = ["alloc"] }
