@@ -381,3 +381,25 @@ fn seq_value_with_three_elements() {
         seq([string("alpha"), string("beta"), string("gamma")])
     );
 }
+
+#[test]
+fn seq_value_with_expression() {
+    let value = value!([25, 3 + 7, 55]);
+
+    assert_eq!(value, seq([int32(25), int32(10), int32(55)]));
+}
+
+#[test]
+fn struct_value_with_captured_variable() {
+    let name = "Alice".to_string();
+
+    let value = value!({
+        name: name,
+        age: 25_u8,
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([("name", string("Alice")), ("age", uint8(25))])
+    );
+}
