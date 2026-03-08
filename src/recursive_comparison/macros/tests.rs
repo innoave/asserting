@@ -403,3 +403,144 @@ fn struct_value_with_captured_variable() {
         struct_with_fields([("name", string("Alice")), ("age", uint8(25))])
     );
 }
+
+#[test]
+fn anonymous_struct_with_nested_anonymous_struct_value_and_unit_variant() {
+    let value = value!({
+        name: "Silvia",
+        gender: Gender::Female,
+        age: 25_u8,
+        address: {
+            street: "123 Main St",
+            city: "New York",
+            state: "NY",
+            zip: 10001_u32,
+            home: true,
+        }
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([
+            ("name", string("Silvia")),
+            ("gender", unit_variant("Gender", "Female")),
+            ("age", uint8(25)),
+            (
+                "address",
+                struct_with_fields([
+                    ("street", string("123 Main St")),
+                    ("city", string("New York")),
+                    ("state", string("NY")),
+                    ("zip", uint32(10001)),
+                    ("home", bool(true)),
+                ])
+            )
+        ])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_unit_variant() {
+    let value = value!({
+        foo: Foo::Bar
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([("foo", unit_variant("Foo", "Bar"))])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_struct_variant() {
+    let value = value!({
+        foo: Foo::Bar {
+            gender: Gender::Male,
+            count: 3472_u64,
+        },
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([(
+            "foo",
+            struct_variant(
+                "Foo",
+                "Bar",
+                [
+                    ("gender", unit_variant("Gender", "Male")),
+                    ("count", uint64(3472))
+                ]
+            )
+        )])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_seq() {
+    let value = value!({
+        names: [
+            "Alice",
+            "Bob",
+            "Charlie",
+        ],
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([(
+            "names",
+            seq([string("Alice"), string("Bob"), string("Charlie")])
+        )])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_tuple() {
+    let value = value!({
+        foo: ("Silvia", false, -2.3_f32),
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([(
+            "foo",
+            tuple([string("Silvia"), bool(false), float32(-2.3_f32)])
+        )])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_named_struct() {
+    let value = value!({
+        foo: Foo {
+            bar: "xyz",
+            baz: 42_i16,
+        },
+        qux: "abc"
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([
+            (
+                "foo",
+                struct_("Foo", [("bar", string("xyz")), ("baz", int16(42))])
+            ),
+            ("qux", string("abc"))
+        ])
+    );
+}
+
+#[test]
+fn anonymous_struct_with_nested_tuple_struct() {
+    let value = value!({
+        foo: Bar(4.6_f32, 12)
+    }
+    );
+
+    assert_eq!(
+        value,
+        struct_with_fields([("foo", tuple_struct("Bar", [float32(4.6), int32(12)]))])
+    );
+}

@@ -34,11 +34,6 @@ macro_rules! value {
         $crate::value!(@seq [$($elems,)* $crate::value!($last),] ())
     };
 
-    // Parse details of elements.
-    (@seq [$($elems:expr,)*] ($rest:tt)+) => {
-        $crate::value!(@seq [$($elems,)*] ($($rest)+))
-    };
-
     ////////////////////////////////////////////////////////////////////////
     // TT muncher for parsing the fields of a struct {...}.
     //
@@ -54,6 +49,71 @@ macro_rules! value {
     // Done without a trailing comma.
     (@fields [$($fields:expr),*] ()) => {
         $crate::std::vec![$($fields),*]
+    };
+
+    // Ignore leading commas.
+    (@fields [$($fields:expr,)*] (, $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*] ($($rest)*))
+    };
+
+    // The next value is a seq
+    (@fields [$($fields:expr,)*] ($key:ident : [ $($val:tt)* ] $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!([$($val)*]),
+            },
+        ] ($($rest)*))
+    };
+
+    // The nex value is a named struct
+    (@fields [$($fields:expr,)*] ($key:ident : $name:ident { $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!($name { $($val)* }),
+            },
+        ] ($($rest)*))
+    };
+
+    // The next value is a struct
+    (@fields [$($fields:expr,)*] ($key:ident : { $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!({$($val)*}),
+            },
+        ] ($($rest)*))
+    };
+
+    // The next value is a tuple struct
+    (@fields [$($fields:expr,)*] ($key:ident : $name:ident ( $($val:tt)* ) $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!($name ($($val)*)),
+            },
+        ] ($($rest)*))
+    };
+
+    // The next value is a struct variant
+    (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident { $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!($name :: $variant {$($val)*}),
+            },
+        ] ($($rest)*))
+    };
+
+    // The next value is a unit variant
+    (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!($name :: $variant),
+            },
+        ] ($($rest)*))
     };
 
     // The next field followed by a comma.
@@ -74,11 +134,6 @@ macro_rules! value {
                 value: $crate::value!($val),
             },
         ] ())
-    };
-
-    // Parse (key : value) pairs.
-    (@fields [$($fields:expr,)*] ($key:ident : $($val:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*] ($key : $($val)*))
     };
 
     ////////////////////////////////////////////////////////////////////////
