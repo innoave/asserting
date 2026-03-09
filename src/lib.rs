@@ -815,6 +815,14 @@ mod std {
     pub use std::*;
 }
 
+// Not public API. Used from macro-generated code.
+#[doc(hidden)]
+pub mod __private {
+    extern crate alloc;
+    #[doc(hidden)]
+    pub use alloc::vec;
+}
+
 pub mod assertions;
 pub mod colored;
 pub mod expectations;

@@ -563,6 +563,28 @@ fn anonymous_struct_with_nested_tuple_variant() {
 }
 
 #[test]
+fn anonymous_struct_with_nested_tuple_variant_with_trailing_comma() {
+    let value = value!({
+        bar: Foo::Bar("alpha", 4.6_f32),
+        baz: Foo::Baz('b', "beta", false),
+    });
+
+    assert_eq!(
+        value,
+        struct_with_fields([
+            (
+                "bar",
+                tuple_variant("Foo", "Bar", [string("alpha"), float32(4.6)])
+            ),
+            (
+                "baz",
+                tuple_variant("Foo", "Baz", [char('b'), string("beta"), bool(false)])
+            )
+        ])
+    );
+}
+
+#[test]
 fn tuple_with_nested_anonymous_struct() {
     let value = value!((1.2_f32, { foo: Foo::Bar("alpha") }, 33_u64));
 
@@ -652,7 +674,7 @@ fn tuple_with_nested_seq() {
         value,
         tuple([
             string("alpha"),
-            seq([float32(1.2), float32(3.4), float32(5.6)])
+            seq([float32(1.2), float32(3.4), float32(5.6)]),
         ])
     );
 }
@@ -750,4 +772,11 @@ fn seq_with_nested_seq() {
             seq([float32(1.2), float32(3.4)])
         ])
     );
+}
+
+#[test]
+fn empty_map_value() {
+    let value = value!({});
+
+    assert_eq!(value, map([]));
 }

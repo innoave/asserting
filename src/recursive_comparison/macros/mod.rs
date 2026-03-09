@@ -2,9 +2,72 @@
 ///
 /// With this macro it is possible to construct values that have the same
 /// structure as actual types like structs, enums, tuples, or even primitive
-/// types. It is not necessary to declare the type in advance.
+/// types. It is not necessary to declare the types in advance.
+///
+/// # Syntax
+///
+/// The syntax is more or less the same as Rust's constructor expressions for
+/// structs, enums, and tuples. The name of structs can be omitted. Enum
+/// variants must be written in the form `Foo::Bar` (specifying only the
+/// variant is not supported, even if the variant is imported).
+///
+/// Literals for bool, char, number, and strings can
+/// be written similar to Rust literals with some minor differences: a `&str`
+/// does not have to be converted to a `String` (this is done automatically),
+/// and brackets are used for sequences, not arrays. Each number literal should
+/// contain the type, e.g., `42_u64`, `1.2_f32`, etc. This is necessary because the
+/// macro cannot infer the type of number literals.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let value = value!({
+///     foo: 2.3_f64,
+///     bar: {
+///         baz: "alpha"
+///         qux: 123_i16,
+///         corge: true,
+///     },
+///     grault: Sample::Two("beta", 456_u32, 'b'),
+///     waldo: (123_u8, 234_u8, 56_u8)
+///     fred: ['a', 'b', 'c'],
+///     thud: Named(0.8_f32),
+/// });
+/// ```
 ///
 /// # Limitations
+///
+/// ## No Field Init Shorthand
+///
+/// When initializing a struct field with the value of a variable, the field
+/// init shorthand is not supported. Even if the field has the same name as the
+/// variable, the variable must be repeated after the colon.
+///
+/// Instead of using the field init shorthand, which does not compile:
+///
+/// ```compile_fail
+/// use asserting::prelude::*;
+///
+/// let bar = "alpha";
+///
+/// let _value = value!(Foo { bar });
+/// ```
+///
+/// use the normal (verbose) syntax:
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let bar = "alpha";
+///
+/// let value = value!(Foo { bar: bar });
+///
+/// assert_eq!(value, value!(Foo { bar: "alpha" }));
+/// ```
+///
+/// ## No Unit Structs
 ///
 /// This macro does not support unit structs. Unit structs interfere with
 /// identifiers captured from the environment. We decided that capturing
@@ -23,17 +86,12 @@ macro_rules! value {
 
     // Done with a trailing comma.
     (@seq [$($elems:expr,)*] ()) => {
-        $crate::std::vec![$($elems,)*]
+        $crate::__private::vec![$($elems,)*]
     };
 
     // Done without a trailing comma.
     (@seq [$($elems:expr),*] ()) => {
-        $crate::std::vec![$($elems),*]
-    };
-
-    // Ignore leading commas.
-    (@seq [$($elems:expr,)*] (, $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)*] ($($rest)*))
+        $crate::__private::vec![$($elems),*]
     };
 
     // The next element is a seq.
@@ -81,6 +139,16 @@ macro_rules! value {
         $crate::value!(@seq [$($elems,)* $crate::value!($last),] ())
     };
 
+    // Comma after the most recent element.
+    (@seq [$($elems:expr),*] (, $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems),*] ($($rest)*))
+    };
+
+    // Comma after the most recent element.
+    (@seq [$($elems:expr,)*] (, $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)*] ($($rest)*))
+    };
+
     ////////////////////////////////////////////////////////////////////////
     // TT muncher for parsing the fields of a struct {...}.
     //
@@ -96,11 +164,6 @@ macro_rules! value {
     // Done without a trailing comma.
     (@fields [$($fields:expr),*] ()) => {
         $crate::std::vec![$($fields),*]
-    };
-
-    // Ignore leading commas.
-    (@fields [$($fields:expr,)*] (, $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*] ($($rest)*))
     };
 
     // The next value is a seq.
@@ -193,10 +256,20 @@ macro_rules! value {
         ] ())
     };
 
+    // Comma after the most recent field.
+    (@fields [$($fields:expr),*] (, $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields),*] ($($rest)*))
+    };
+
+    // Comma after the most recent field.
+    (@fields [$($fields:expr,)*] (, $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*] ($($rest)*))
+    };
+
     ////////////////////////////////////////////////////////////////////////
     // The main implementation.
     //
-    // Must be invoked as: value!($($json)+)
+    // Must be invoked as: value!($($tt)+)
     ////////////////////////////////////////////////////////////////////////
 
     // Booleans
@@ -209,7 +282,7 @@ macro_rules! value {
 
     // Empty Seq: [ ]
     ([ ]) => {
-        $crate::recursive_comparison::value::Value::Seq($crate::std::vec![])
+        $crate::recursive_comparison::value::Value::Seq($crate::__private::vec![])
     };
 
     // Seq: [ 1, 2, 3 ]
@@ -221,7 +294,7 @@ macro_rules! value {
     ($name:ident { }) => {
         $crate::recursive_comparison::value::Value::Struct {
             type_name: stringify!($name).into(),
-            fields: $crate::std::vec![],
+            fields: $crate::__private::vec![],
         }
     };
 
@@ -237,7 +310,7 @@ macro_rules! value {
     ({ }) => {
         $crate::recursive_comparison::value::Value::Struct {
             type_name: "".into(),
-            fields: $crate::std::vec![],
+            fields: $crate::__private::vec![],
         }
     };
 
@@ -254,7 +327,7 @@ macro_rules! value {
         $crate::recursive_comparison::value::Value::StructVariant {
             type_name: stringify!($name).into(),
             variant: stringify!($variant).into(),
-            fields: $crate::std::vec![],
+            fields: $crate::__private::vec![],
         }
     };
 
@@ -265,22 +338,6 @@ macro_rules! value {
             variant: stringify!($variant).into(),
             fields: $crate::value!(@fields [] ($($tt)+)),
         }
-    };
-
-    // Empty tuple struct: Foo()
-    ($name:ident ( )) => {
-        $crate::recursive_comparison::value::Value::Struct {
-            type_name: stringify!($name).into(),
-            fields: $crate::std::vec![],
-        }
-    };
-
-    // Tuple struct: Foo(1, 2)
-    ($name:ident ( $($tt:tt)+ )) => {
-        $crate::recursive_comparison::value::tuple_struct(
-            stringify!($name),
-            $crate::value!(@seq [] ($($tt)+))
-        )
     };
 
     // Tuple Variant: Foo::Bar(1, 2)
@@ -300,11 +357,27 @@ macro_rules! value {
         }
     };
 
+    // Empty tuple struct: Foo()
+    ($name:ident ( )) => {
+        $crate::recursive_comparison::value::Value::Struct {
+            type_name: stringify!($name).into(),
+            fields: $crate::__private::vec![],
+        }
+    };
+
+    // Tuple struct: Foo(1, 2)
+    ($name:ident ( $($tt:tt)+ )) => {
+        $crate::recursive_comparison::value::tuple_struct(
+            stringify!($name),
+            $crate::value!(@seq [] ($($tt)+))
+        )
+    };
+
     // Unit Struct: Foo
     ($name:ident) => {
         $crate::recursive_comparison::value::Value::Struct {
             type_name: stringify!($name).into(),
-            fields: $crate::std::vec![],
+            fields: $crate::__private::vec![],
         }
     };
 
