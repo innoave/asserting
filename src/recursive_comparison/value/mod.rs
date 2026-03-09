@@ -143,15 +143,19 @@ impl Debug for Value {
             Self::String(value) => write!(f, "{value:?}"),
             Self::Struct { type_name, fields } => {
                 if type_name.is_empty() {
-                    let mut prefix = "{ ";
-                    for Field { name, value } in fields {
-                        f.write_str(prefix)?;
-                        f.write_str(name)?;
-                        f.write_str(": ")?;
-                        value.fmt(f)?;
-                        prefix = ", ";
+                    if fields.is_empty() {
+                        f.write_str("{}")
+                    } else {
+                        let mut prefix = "{ ";
+                        for Field { name, value } in fields {
+                            f.write_str(prefix)?;
+                            f.write_str(name)?;
+                            f.write_str(": ")?;
+                            value.fmt(f)?;
+                            prefix = ", ";
+                        }
+                        f.write_str(" }")
                     }
-                    f.write_str(" }")
                 } else {
                     let mut debug_struct = f.debug_struct(type_name);
                     for field in fields {

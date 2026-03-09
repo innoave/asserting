@@ -148,6 +148,13 @@ fn debug_string_of_anonymous_struct() {
 }
 
 #[test]
+fn debug_string_of_empty_anonymous_struct() {
+    let value = struct_("", Vec::<Field>::new());
+
+    assert_eq!(format!("{value:?}"), "{}");
+}
+
+#[test]
 fn debug_string_of_tuple() {
     let value = tuple(vec![Value::Bool(true), Value::Number(Number::I64(42))]);
 
