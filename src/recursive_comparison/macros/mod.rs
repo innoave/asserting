@@ -140,11 +140,6 @@ macro_rules! value {
     };
 
     // Comma after the most recent element.
-    (@seq [$($elems:expr),*] (, $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems),*] ($($rest)*))
-    };
-
-    // Comma after the most recent element.
     (@seq [$($elems:expr,)*] (, $($rest:tt)*)) => {
         $crate::value!(@seq [$($elems,)*] ($($rest)*))
     };
@@ -222,7 +217,7 @@ macro_rules! value {
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
                 value: $crate::value!($name :: $variant ($($val)*)),
-            }
+            },
         ] ($($rest)*))
     };
 
@@ -254,11 +249,6 @@ macro_rules! value {
                 value: $crate::value!($val),
             },
         ] ())
-    };
-
-    // Comma after the most recent field.
-    (@fields [$($fields:expr),*] (, $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields),*] ($($rest)*))
     };
 
     // Comma after the most recent field.
