@@ -11,14 +11,17 @@
 /// variants must be written in the form `Foo::Bar` (specifying only the
 /// variant is not supported, even if the variant is imported).
 ///
-/// Literals for bool, char, number, and strings can
-/// be written similar to Rust literals with some minor differences: a `&str`
-/// does not have to be converted to a `String` (this is done automatically),
-/// and brackets are used for sequences, not arrays. Each number literal should
-/// contain the type, e.g., `42_u64`, `1.2_f32`, etc. This is necessary because the
-/// macro cannot infer the type of number literals.
+/// Literals for bool, char, number, and strings can be written similar to Rust
+/// literals with some minor differences: a `&str` does not have to be converted
+/// to a `String` (this is done automatically), and brackets are used for
+/// sequences, not arrays. Each number literal should contain the type, e.g.,
+/// `42_u64`, `1.2_f32`, etc. This is necessary because the macro cannot infer
+/// the type of number literals.
 ///
-/// # Examples
+/// ## Example
+///
+/// This example gives an overview of the syntax, with elements of various
+/// types.
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -26,16 +29,134 @@
 /// let value = value!({
 ///     foo: 2.3_f64,
 ///     bar: {
-///         baz: "alpha"
+///         baz: "alpha",
 ///         qux: 123_i16,
 ///         corge: true,
 ///     },
-///     grault: Sample::Two("beta", 456_u32, 'b'),
-///     waldo: (123_u8, 234_u8, 56_u8)
-///     fred: ['a', 'b', 'c'],
+///     grault: Sample::Two("beta", -456_i64),
+///     waldo: (123_u8, 234_u8, 56_u8),
+///     fred: ["alpha", "beta", "gamma"],
+///     corge: #{ 'a' => 1, 'b' => 2, 'c' => 3},
 ///     thud: Named(0.8_f32),
 /// });
 /// ```
+///
+/// ## Structs
+///
+/// Structs can be constructed on the fly, without prior declaration of a type.
+/// In `asserting` they are called "anonymous structs". The name of a struct
+/// can be omitted.
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!({
+///     name: "Silvia",
+///     age: 25_u8,
+/// });
+/// ```
+///
+/// The name of a struct to be constructed can be specified as by the usual
+/// syntax in Rust.
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(Person {
+///     name: "Silvia",
+///     age: 25_u8,
+/// });
+/// ```
+///
+/// Note: The name of a struct is not compared in the field-by-field recursive
+/// comparison mode.
+///
+/// ## Tuples
+///
+/// A tuple is constructed using parenthesis as in plain Rust.
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!((42_u64, "alpha", true));
+/// ```
+///
+/// ## Enums-Variants
+///
+/// Example for constructing a value of unit variant:
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(Foo::Bar);
+/// ```
+///
+/// Example for constructing a value of tuple variant:
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(Foo::Bar(-1.3_f32));
+/// ```
+///
+/// Example for constructing a value of struct variant:
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(Foo::Bar { left: "alpha", right: -123_i16 });
+/// ```
+///
+/// ## Sequences
+///
+/// A sequence is constructed by enclosing a list of values inside brackets.
+/// In the following example we construct a sequence of chars.
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(['a', 'b', 'c']);
+/// ```
+///
+/// ## Maps
+///
+/// A map starts with `#{` and ends with `}`. An association between a key and
+/// a value is separated by `=>`. Multiple key/value-pairs are separated by `,`.
+///
+/// ```
+/// # use asserting::prelude::*;
+/// #
+/// let value = value!(#{
+///     'a' => 1,
+///     'b' => 2,
+///     'c' => 3,
+/// });
+/// ```
+///
+/// ## Primitive types
+///
+/// | Type     | Example           |
+/// |----------|-------------------|
+/// | `bool`   | `true` or `false` |
+/// | `char`   | `'a'`             |
+/// | `f32`    | `1.2_f32`         |
+/// | `f64`    | `1.2_f64`         |
+/// | `str`    | `"alpha"`         |
+/// | `String` | `"alpha"`         |
+/// | `i8`     | `-12_i8`          |
+/// | `i16`    | `-12_i16`         |
+/// | `i32`    | `-12_i32`         |
+/// | `i64`    | `-12_i64`         |
+/// | `i128`   | `-12_i128`        |
+/// | `u8`     | `12_i8`           |
+/// | `u16`    | `12_i16`          |
+/// | `u32`    | `12_i32`          |
+/// | `u64`    | `12_i64`          |
+/// | `u128`   | `12_i128`         |
+///
+/// Note: `isize` and `usize` are not supported by `serde`. Therefore, `isize`
+/// values are converted to i64 or i128 and `usize` values are converted to
+/// `u64` or `u128`.
 ///
 /// # Limitations
 ///
@@ -55,7 +176,7 @@
 /// let _value = value!(Foo { bar });
 /// ```
 ///
-/// use the normal (verbose) syntax:
+/// using the normal (verbose) syntax works:
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -97,6 +218,11 @@ macro_rules! value {
     // The next element is a seq.
     (@seq [$($elems:expr,)*] ([ $($val:tt)* ] $($rest:tt)*)) => {
         $crate::value!(@seq [$($elems,)* $crate::value!([$($val)*]),] ($($rest)*))
+    };
+
+    // The next element is a map.
+    (@seq [$($elems:expr,)*] (#{ $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@seq [$($elems,)* $crate::value!(#{$($val)*}),] ($($rest)*))
     };
 
     // The next element is an anonymous struct.
@@ -153,12 +279,12 @@ macro_rules! value {
 
     // Done with a trailing comma.
     (@fields [$($fields:expr,)*] ()) => {
-        $crate::std::vec![$($fields,)*]
+        $crate::__private::vec![$($fields,)*]
     };
 
     // Done without a trailing comma.
     (@fields [$($fields:expr),*] ()) => {
-        $crate::std::vec![$($fields),*]
+        $crate::__private::vec![$($fields),*]
     };
 
     // The next value is a seq.
@@ -171,7 +297,17 @@ macro_rules! value {
         ] ($($rest)*))
     };
 
-    // The nex value is a named struct.
+    // The next value is a map.
+    (@fields [$($fields:expr,)*] ($key:ident : #{ $($val:tt)* } $($rest:tt)*)) => {
+        $crate::value!(@fields [$($fields,)*
+            $crate::recursive_comparison::value::Field {
+                name: stringify!($key).into(),
+                value: $crate::value!(#{$($val)*}),
+            },
+        ] ($($rest)*))
+    };
+
+    // The next value is a named struct.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident { $($val:tt)* } $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
@@ -254,6 +390,43 @@ macro_rules! value {
     // Comma after the most recent field.
     (@fields [$($fields:expr,)*] (, $($rest:tt)*)) => {
         $crate::value!(@fields [$($fields,)*] ($($rest)*))
+    };
+
+    ////////////////////////////////////////////////////////////////////////
+    // TT muncher for parsing the values of a map #{...}.
+    //
+    // Must be invoked as: value!(@map [] () ($($tt)*))
+    // It returns a 'Vec<(Value, Value)>`.
+    ////////////////////////////////////////////////////////////////////////
+
+    // Done
+    (@map [$($pairs:expr,)*] () ()) => {
+        $crate::__private::vec![$($pairs,)*]
+    };
+
+    // The key is finished, start parsing the value.
+    (@map [$($pairs:expr,)*] ($($key:tt)+) (=> $($rest:tt)*)) => {
+        $crate::value!(@map_val [$($pairs,)*] ($($key)+) () ($($rest)*))
+    };
+
+    // Munch the next token for the key.
+    (@map [$($pairs:expr,)*] ($($key:tt)*) ($next:tt $($rest:tt)*)) => {
+        $crate::value!(@map [$($pairs,)*] ($($key)* $next) ($($rest)*))
+    };
+
+    // The value is finished by a comma, start parsing the next entry.
+    (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)+) (, $($rest:tt)*)) => {
+        $crate::value!(@map [$($pairs,)* ($crate::value!($($key)+), $crate::value!($($val)+)),] () ($($rest)*))
+    };
+
+    // The value is finished (end of tokens).
+    (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)+) ()) => {
+        $crate::value!(@map [$($pairs,)* ($crate::value!($($key)+), $crate::value!($($val)+)),] () ())
+    };
+
+    // Munch the next token for the value.
+    (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)*) ($next:tt $($rest:tt)*)) => {
+        $crate::value!(@map_val [$($pairs,)*] ($($key)+) ($($val)* $next) ($($rest)*))
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -360,6 +533,22 @@ macro_rules! value {
         $crate::recursive_comparison::value::tuple_struct(
             stringify!($name),
             $crate::value!(@seq [] ($($tt)+))
+        )
+    };
+
+    // Empty Map: #{ }
+    (#{ }) => {
+        $crate::recursive_comparison::value::Value::Map(
+            $crate::recursive_comparison::value::Map::new()
+        )
+    };
+
+    // Map: #{ a => 1, b => 2 }
+    (#{ $($tt:tt)+ }) => {
+        $crate::recursive_comparison::value::Value::Map(
+            $crate::recursive_comparison::value::Map::from_iter(
+                $crate::value!(@map [] () ($($tt)+))
+            )
         )
     };
 

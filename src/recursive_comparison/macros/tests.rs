@@ -776,7 +776,362 @@ fn seq_with_nested_seq() {
 
 #[test]
 fn empty_map_value() {
-    let value = value!({});
+    let value = value!(#{});
 
     assert_eq!(value, map([]));
+}
+
+#[test]
+fn map_value_with_one_association_no_trailing_comma() {
+    let value = value!(#{'a' => "alpha"});
+
+    assert_eq!(value, map([(char('a'), string("alpha"))]));
+}
+
+#[test]
+fn map_value_with_one_association_and_trailing_comma() {
+    let value = value!(#{
+        'a' => "alpha",
+    });
+
+    assert_eq!(value, map([(char('a'), string("alpha"))]));
+}
+
+#[test]
+fn map_value_with_two_associations_no_trailing_comma() {
+    let value = value!(#{'a' => "alpha", "beta" => -555_i16});
+
+    assert_eq!(
+        value,
+        map([(char('a'), string("alpha")), (string("beta"), int16(-555))])
+    );
+}
+
+#[test]
+fn map_value_with_three_associations_and_trailing_comma() {
+    let value = value!(#{
+        "alpha" => 33_u64,
+        65_u32 => 'A',
+        -808 => "beta",
+    });
+
+    assert_eq!(
+        value,
+        map([
+            (string("alpha"), uint64(33)),
+            (uint32(65), char('A')),
+            (int32(-808), string("beta")),
+        ])
+    );
+}
+
+#[test]
+fn map_with_anonymous_struct_as_key() {
+    let value = value!(#{
+        {
+            foo: Foo::Bar,
+            bar: "alpha",
+        } => 33_u64,
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            struct_with_fields([
+                ("foo", unit_variant("Foo", "Bar")),
+                ("bar", string("alpha"))
+            ]),
+            uint64(33)
+        )])
+    );
+}
+
+#[test]
+fn map_with_named_struct_as_key() {
+    let value = value!(#{
+        Qux {
+            foo: Foo::Bar,
+            bar: "alpha",
+        } => 33_u64,
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            struct_(
+                "Qux",
+                [
+                    ("foo", unit_variant("Foo", "Bar")),
+                    ("bar", string("alpha"))
+                ]
+            ),
+            uint64(33)
+        )])
+    );
+}
+
+#[test]
+fn map_with_tuple_as_key() {
+    let value = value!(#{
+        ('a', "alpha") => true,
+    });
+
+    assert_eq!(
+        value,
+        map([(tuple([char('a'), string("alpha")]), bool(true))])
+    );
+}
+
+#[test]
+fn map_with_tuple_variant_as_key() {
+    let value = value!(#{
+        Foo::Bar('a', -2.5_f64) => false,
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            tuple_variant("Foo", "Bar", [char('a'), float64(-2.5)]),
+            bool(false)
+        )])
+    );
+}
+
+#[test]
+fn map_with_struct_variant_as_key() {
+    let value = value!(#{
+        Foo::Bar {
+            baz: ('a', "alpha"),
+            qux: Sample::One,
+        } => 'X',
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            struct_variant(
+                "Foo",
+                "Bar",
+                [
+                    ("baz", tuple([char('a'), string("alpha")])),
+                    ("qux", unit_variant("Sample", "One"))
+                ]
+            ),
+            char('X')
+        )])
+    );
+}
+
+#[test]
+fn map_with_unit_variant_as_key() {
+    let value = value!(#{
+        Foo::Bar => -32.98_f64,
+    });
+
+    assert_eq!(value, map([(unit_variant("Foo", "Bar"), float64(-32.98))]));
+}
+
+#[test]
+fn map_with_anonymous_struct_as_value() {
+    let value = value!(#{
+        33_u64 =>
+        {
+            foo: Foo::Bar,
+            bar: "alpha",
+        }
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            uint64(33),
+            struct_with_fields([
+                ("foo", unit_variant("Foo", "Bar")),
+                ("bar", string("alpha"))
+            ])
+        )])
+    );
+}
+
+#[test]
+fn map_with_named_struct_as_value() {
+    let value = value!(#{
+        -32_i16 =>
+        Qux {
+            foo: Foo::Bar,
+            bar: "alpha",
+        },
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            int16(-32),
+            struct_(
+                "Qux",
+                [
+                    ("foo", unit_variant("Foo", "Bar")),
+                    ("bar", string("alpha"))
+                ]
+            )
+        )])
+    );
+}
+
+#[test]
+fn map_with_tuple_as_value() {
+    let value = value!(#{
+        true => ('a', "alpha"),
+    });
+
+    assert_eq!(
+        value,
+        map([(bool(true), tuple([char('a'), string("alpha")]))])
+    );
+}
+
+#[test]
+fn map_with_tuple_variant_as_value() {
+    let value = value!(#{
+        false => Foo::Bar('a', -2.5_f64)
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            bool(false),
+            tuple_variant("Foo", "Bar", [char('a'), float64(-2.5)])
+        )])
+    );
+}
+
+#[test]
+fn map_with_struct_variant_as_value() {
+    let value = value!(#{
+        'X' =>
+        Foo::Bar {
+            baz: ('a', "alpha"),
+            qux: Sample::One,
+        },
+    });
+
+    assert_eq!(
+        value,
+        map([(
+            char('X'),
+            struct_variant(
+                "Foo",
+                "Bar",
+                [
+                    ("baz", tuple([char('a'), string("alpha")])),
+                    ("qux", unit_variant("Sample", "One"))
+                ]
+            )
+        )])
+    );
+}
+
+#[test]
+fn map_with_unit_variant_as_value() {
+    let value = value!(#{
+        -32.98_f64 => Foo::Bar,
+    });
+
+    assert_eq!(value, map([(float64(-32.98), unit_variant("Foo", "Bar"))]));
+}
+
+#[test]
+fn map_with_another_map_as_value() {
+    let value = value!(#{
+        "alpha" => #{
+            'a' => 1_u32,
+            'b' => 2_u32,
+            'c' => 3_u32,
+        },
+        "beta" => #{
+            'd' => 4_u32,
+            'e' => 5_u32,
+            'f' => 6_u32,
+        }
+    });
+
+    assert_eq!(
+        value,
+        map([
+            (
+                string("alpha"),
+                map([
+                    (char('a'), uint32(1)),
+                    (char('b'), uint32(2)),
+                    (char('c'), uint32(3))
+                ])
+            ),
+            (
+                string("beta"),
+                map([
+                    (char('d'), uint32(4)),
+                    (char('e'), uint32(5)),
+                    (char('f'), uint32(6))
+                ])
+            ),
+        ])
+    );
+}
+
+#[test]
+fn seq_value_with_nested_map() {
+    let value = value!([
+        #{
+            "alpha" => [1_u32, 2_u32, 3_u32],
+            "beta" => [4_u32, 5_u32, 6_u32],
+        },
+        #{
+            "gamma" => [7_u32, 8_u32, 9_u32],
+            "delta" => [10_u32, 11_u32, 12_u32],
+    }]);
+
+    assert_eq!(
+        value,
+        seq([
+            map([
+                (string("alpha"), seq([uint32(1), uint32(2), uint32(3)])),
+                (string("beta"), seq([uint32(4), uint32(5), uint32(6)])),
+            ]),
+            map([
+                (string("gamma"), seq([uint32(7), uint32(8), uint32(9)])),
+                (string("delta"), seq([uint32(10), uint32(11), uint32(12)])),
+            ])
+        ])
+    );
+}
+
+#[test]
+fn tuple_value_with_nested_map() {
+    let value = value!((
+        -123_i32,
+        #{
+            "alpha" => [1_u32, 2_u32, 3_u32],
+            "beta" => [4_u32, 5_u32, 6_u32],
+        },
+        true,
+        #{
+            "gamma" => [7_u32, 8_u32, 9_u32],
+            "delta" => [10_u32, 11_u32, 12_u32],
+    }));
+
+    assert_eq!(
+        value,
+        tuple([
+            int32(-123),
+            map([
+                (string("alpha"), seq([uint32(1), uint32(2), uint32(3)])),
+                (string("beta"), seq([uint32(4), uint32(5), uint32(6)])),
+            ]),
+            bool(true),
+            map([
+                (string("gamma"), seq([uint32(7), uint32(8), uint32(9)])),
+                (string("delta"), seq([uint32(10), uint32(11), uint32(12)])),
+            ])
+        ])
+    );
 }
