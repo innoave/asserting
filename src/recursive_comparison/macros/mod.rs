@@ -24,18 +24,18 @@
 /// ```
 /// use asserting::prelude::*;
 ///
-/// let value = value!({
-///     foo: 2.3_f64,
-///     bar: {
-///         baz: "alpha",
-///         qux: 123_i16,
-///         corge: true,
+/// let value = value!({                          // a struct
+///     foo: 2.3_f64,                             // a float literal
+///     bar: {                                    // an embedded struct
+///         baz: "alpha",                         // a string literal
+///         qux: 123_i16,                         // an integer literal
+///         corge: true,                          // a boolean literal
 ///     },
-///     grault: Sample::Two("beta", -456_i64),
-///     waldo: (123_u8, 234_u8, 56_u8),
-///     fred: ["alpha", "beta", "gamma"],
-///     corge: #{ 'a' => 1, 'b' => 2, 'c' => 3},
-///     thud: Named(0.8_f32),
+///     grault: Sample::Two("beta", -456_i64),    // a tuple variant
+///     waldo: (123_u8, 234_u8, 56_u8),           // a tuple
+///     fred: ["alpha", "beta", "gamma"],         // a sequence
+///     corge: #{ 'a' => 1, 'b' => 2, 'c' => 3},  // a map
+///     thud: Named(0.8_f32),                     // a tuple struct
 /// });
 /// ```
 ///
@@ -220,6 +220,16 @@
 /// [`Value`]: crate::recursive_comparison::value::Value
 #[macro_export]
 macro_rules! value {
+    // hide distracting implementation details from the generated rustdoc.
+    ($($value:tt)+) => {
+        $crate::value_impl!($($value)+)
+    };
+}
+
+/// DO NOT RELY ON THIS MACRO AS IT MAY CHANGE WITHOUT NOTICE!
+#[macro_export]
+#[doc(hidden)]
+macro_rules! value_impl {
     ////////////////////////////////////////////////////////////////////////
     // TT muncher for parsing the values of a seq [...].
     //
@@ -239,57 +249,57 @@ macro_rules! value {
 
     // The next element is a seq.
     (@seq [$($elems:expr,)*] ([ $($val:tt)* ] $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!([$($val)*]),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!([$($val)*]),] ($($rest)*))
     };
 
     // The next element is a map.
     (@seq [$($elems:expr,)*] (#{ $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!(#{$($val)*}),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!(#{$($val)*}),] ($($rest)*))
     };
 
     // The next element is an anonymous struct.
     (@seq [$($elems:expr,)*] ({ $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!({$($val)*}),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!({$($val)*}),] ($($rest)*))
     };
 
     // The next element is a named struct.
     (@seq [$($elems:expr,)*] ($name:ident { $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($name {$($val)*}),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($name {$($val)*}),] ($($rest)*))
     };
 
     // The next element is a tuple struct.
     (@seq [$($elems:expr,)*] ($name:ident ( $($val:tt)* ) $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($name ($($val)*)),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($name ($($val)*)),] ($($rest)*))
     };
 
     // The next element is a struct variant.
     (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident { $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant {$($val)*}),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($name :: $variant {$($val)*}),] ($($rest)*))
     };
 
     // The next element is a tuple variant.
     (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident ( $($val:tt)* ) $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant ($($val)*)),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($name :: $variant ($($val)*)),] ($($rest)*))
     };
 
     // The next element is a unit variant.
     (@seq [$($elems:expr,)*] ($name:ident :: $variant:ident $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($name :: $variant),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($name :: $variant),] ($($rest)*))
     };
 
     // The next element is an expression followed by a comma.
     (@seq [$($elems:expr,)*] ($next:expr , $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($next),] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($next),] ($($rest)*))
     };
 
     // The last element is an expression with no trailing comma.
     (@seq [$($elems:expr,)*] ($last:expr)) => {
-        $crate::value!(@seq [$($elems,)* $crate::value!($last),] ())
+        $crate::value_impl!(@seq [$($elems,)* $crate::value_impl!($last),] ())
     };
 
     // Comma after the most recent element.
     (@seq [$($elems:expr,)*] (, $($rest:tt)*)) => {
-        $crate::value!(@seq [$($elems,)*] ($($rest)*))
+        $crate::value_impl!(@seq [$($elems,)*] ($($rest)*))
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -311,107 +321,107 @@ macro_rules! value {
 
     // The next value is a seq.
     (@fields [$($fields:expr,)*] ($key:ident : [ $($val:tt)* ] $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!([$($val)*]),
+                value: $crate::value_impl!([$($val)*]),
             },
         ] ($($rest)*))
     };
 
     // The next value is a map.
     (@fields [$($fields:expr,)*] ($key:ident : #{ $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!(#{$($val)*}),
+                value: $crate::value_impl!(#{$($val)*}),
             },
         ] ($($rest)*))
     };
 
     // The next value is a named struct.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident { $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($name { $($val)* }),
+                value: $crate::value_impl!($name { $($val)* }),
             },
         ] ($($rest)*))
     };
 
     // The next value is an anonymous struct.
     (@fields [$($fields:expr,)*] ($key:ident : { $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!({$($val)*}),
+                value: $crate::value_impl!({$($val)*}),
             },
         ] ($($rest)*))
     };
 
     // The next value is a tuple struct.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident ( $($val:tt)* ) $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($name ($($val)*)),
+                value: $crate::value_impl!($name ($($val)*)),
             },
         ] ($($rest)*))
     };
 
     // The next value is a struct variant.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident { $($val:tt)* } $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($name :: $variant {$($val)*}),
+                value: $crate::value_impl!($name :: $variant {$($val)*}),
             },
         ] ($($rest)*))
     };
 
     // The next value is a tuple variant.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident ( $($val:tt)* ) $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($name :: $variant ($($val)*)),
+                value: $crate::value_impl!($name :: $variant ($($val)*)),
             },
         ] ($($rest)*))
     };
 
     // The next value is a unit variant.
     (@fields [$($fields:expr,)*] ($key:ident : $name:ident :: $variant:ident $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($name :: $variant),
+                value: $crate::value_impl!($name :: $variant),
             },
         ] ($($rest)*))
     };
 
     // The next field followed by a comma.
     (@fields [$($fields:expr,)*] ($key:ident : $val:expr , $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($val)
+                value: $crate::value_impl!($val)
             },
         ] ($($rest)*))
     };
 
     // The last field without a trailing comma.
     (@fields [$($fields:expr,)*] ($key:ident : $val:expr)) => {
-        $crate::value!(@fields [$($fields,)*
+        $crate::value_impl!(@fields [$($fields,)*
             $crate::recursive_comparison::value::Field {
                 name: stringify!($key).into(),
-                value: $crate::value!($val),
+                value: $crate::value_impl!($val),
             },
         ] ())
     };
 
     // Comma after the most recent field.
     (@fields [$($fields:expr,)*] (, $($rest:tt)*)) => {
-        $crate::value!(@fields [$($fields,)*] ($($rest)*))
+        $crate::value_impl!(@fields [$($fields,)*] ($($rest)*))
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -428,27 +438,27 @@ macro_rules! value {
 
     // The key is finished, start parsing the value.
     (@map [$($pairs:expr,)*] ($($key:tt)+) (=> $($rest:tt)*)) => {
-        $crate::value!(@map_val [$($pairs,)*] ($($key)+) () ($($rest)*))
+        $crate::value_impl!(@map_val [$($pairs,)*] ($($key)+) () ($($rest)*))
     };
 
     // Munch the next token for the key.
     (@map [$($pairs:expr,)*] ($($key:tt)*) ($next:tt $($rest:tt)*)) => {
-        $crate::value!(@map [$($pairs,)*] ($($key)* $next) ($($rest)*))
+        $crate::value_impl!(@map [$($pairs,)*] ($($key)* $next) ($($rest)*))
     };
 
     // The value is finished by a comma, start parsing the next entry.
     (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)+) (, $($rest:tt)*)) => {
-        $crate::value!(@map [$($pairs,)* ($crate::value!($($key)+), $crate::value!($($val)+)),] () ($($rest)*))
+        $crate::value_impl!(@map [$($pairs,)* ($crate::value_impl!($($key)+), $crate::value_impl!($($val)+)),] () ($($rest)*))
     };
 
     // The value is finished (end of tokens).
     (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)+) ()) => {
-        $crate::value!(@map [$($pairs,)* ($crate::value!($($key)+), $crate::value!($($val)+)),] () ())
+        $crate::value_impl!(@map [$($pairs,)* ($crate::value_impl!($($key)+), $crate::value_impl!($($val)+)),] () ())
     };
 
     // Munch the next token for the value.
     (@map_val [$($pairs:expr,)*] ($($key:tt)+) ($($val:tt)*) ($next:tt $($rest:tt)*)) => {
-        $crate::value!(@map_val [$($pairs,)*] ($($key)+) ($($val)* $next) ($($rest)*))
+        $crate::value_impl!(@map_val [$($pairs,)*] ($($key)+) ($($val)* $next) ($($rest)*))
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -472,7 +482,7 @@ macro_rules! value {
 
     // Seq: [ 1, 2, 3 ]
     ([ $($tt:tt)+ ]) => {
-        $crate::recursive_comparison::value::Value::Seq($crate::value!(@seq [] ($($tt)+)))
+        $crate::recursive_comparison::value::Value::Seq($crate::value_impl!(@seq [] ($($tt)+)))
     };
 
     // Empty named struct: Foo {}
@@ -487,7 +497,7 @@ macro_rules! value {
     ($name:ident { $($tt:tt)+ }) => {
         $crate::recursive_comparison::value::Value::Struct {
             type_name: stringify!($name).into(),
-            fields: $crate::value!(@fields [] ($($tt)+)),
+            fields: $crate::value_impl!(@fields [] ($($tt)+)),
         }
     };
 
@@ -503,7 +513,7 @@ macro_rules! value {
     ({ $($tt:tt)+ }) => {
         $crate::recursive_comparison::value::Value::Struct {
             type_name: "".into(),
-            fields: $crate::value!(@fields [] ($($tt)+)),
+            fields: $crate::value_impl!(@fields [] ($($tt)+)),
         }
     };
 
@@ -521,7 +531,7 @@ macro_rules! value {
         $crate::recursive_comparison::value::Value::StructVariant {
             type_name: stringify!($name).into(),
             variant: stringify!($variant).into(),
-            fields: $crate::value!(@fields [] ($($tt)+)),
+            fields: $crate::value_impl!(@fields [] ($($tt)+)),
         }
     };
 
@@ -530,7 +540,7 @@ macro_rules! value {
         $crate::recursive_comparison::value::tuple_variant(
             stringify!($name),
             stringify!($variant),
-            $crate::value!(@seq [] ($($tt)+))
+            $crate::value_impl!(@seq [] ($($tt)+))
         )
     };
 
@@ -554,7 +564,7 @@ macro_rules! value {
     ($name:ident ( $($tt:tt)+ )) => {
         $crate::recursive_comparison::value::tuple_struct(
             stringify!($name),
-            $crate::value!(@seq [] ($($tt)+))
+            $crate::value_impl!(@seq [] ($($tt)+))
         )
     };
 
@@ -569,7 +579,7 @@ macro_rules! value {
     (#{ $($tt:tt)+ }) => {
         $crate::recursive_comparison::value::Value::Map(
             $crate::recursive_comparison::value::Map::from_iter(
-                $crate::value!(@map [] () ($($tt)+))
+                $crate::value_impl!(@map [] () ($($tt)+))
             )
         )
     };
@@ -589,7 +599,7 @@ macro_rules! value {
 
     // Tuple: (1, 2)
     (( $($tt:tt)+ )) => {
-        $crate::recursive_comparison::value::tuple($crate::value!(@seq [] ($($tt)+)))
+        $crate::recursive_comparison::value::tuple($crate::value_impl!(@seq [] ($($tt)+)))
     };
 
     // Any Serialize type: numbers, strings, chars, variables, etc.
