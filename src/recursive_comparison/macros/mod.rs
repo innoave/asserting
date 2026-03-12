@@ -18,10 +18,8 @@
 /// `42_u64`, `1.2_f32`, etc. This is necessary because the macro cannot infer
 /// the type of number literals.
 ///
-/// ## Example
-///
-/// This example gives an overview of the syntax, with elements of various
-/// types.
+/// The following example gives an overview of the syntax, with elements of
+/// various types.
 ///
 /// ```
 /// use asserting::prelude::*;
@@ -39,6 +37,30 @@
 ///     corge: #{ 'a' => 1, 'b' => 2, 'c' => 3},
 ///     thud: Named(0.8_f32),
 /// });
+/// ```
+///
+/// Variables in scope can be referenced inside the `value!`-macro.
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let one = 1;
+/// let two = 2;
+/// let three = 3;
+///
+/// let value = value!([one, two, three]);
+///
+/// assert_eq!(format!("{value:?}"), "[1, 2, 3]");
+/// ```
+///
+/// Expressions can be used inside the `value!`-macro as well:
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let value = value!(Sum(13_i16 + 17_i16));
+///
+/// assert_eq!(format!("{value:?}"), "Sum(30)");
 /// ```
 ///
 /// ## Structs
