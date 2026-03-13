@@ -195,7 +195,7 @@
 ///
 /// let bar = "alpha";
 ///
-/// let _value = value!(Foo { bar });
+/// let value = value!(Foo { bar });
 /// ```
 ///
 /// using the normal (verbose) syntax works:
