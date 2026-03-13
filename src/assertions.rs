@@ -99,6 +99,7 @@ pub trait AssertSameAs<E> {
     ///
     /// assert_that!(42).is_same_as(42);
     /// ```
+    #[track_caller]
     fn is_same_as(self, expected: E) -> Self;
 
     /// Verifies that the subject is of the same type but has a different value
@@ -114,12 +115,97 @@ pub trait AssertSameAs<E> {
     ///
     /// assert_that!(41).is_not_same_as(42);
     /// ```
+    #[track_caller]
     fn is_not_same_as(self, expected: E) -> Self;
 }
 
+/// Assert whether a value is equivalent to a value of type [`Value`] using
+/// field-by-field recursive comparison.
+///
+/// These assertions are intended for the field-by-field recursive comparison
+/// mode and are implemented for all types that implement [`serde::Serialize`].
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+/// use serde::Serialize;
+///
+/// #[derive(Serialize)]
+/// struct Person {
+///     id: u64,
+///     name: String,
+///     age: u8,
+///     email: Vec<String>,
+/// }
+///
+/// let person = Person {
+///     id: 456,
+///     name: "Silvia".into(),
+///     age: 25,
+///     email: vec!["silvia@domain.com".to_string()],
+/// };
+///
+/// assert_that!(person)
+///     .using_recursive_comparison()
+///     .ignoring_not_expected_fields()
+///     .is_equivalent_to(value!({
+///         name: "Silvia",
+///         age: 25_u8,
+///     }));
+/// ```
+///
+/// [`Value`]: crate::recursive_comparison::value::Value
+/// [`serde::Serialize`]: serde_core::Serialize
 #[cfg(feature = "recursive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub trait AssertEquivalence<E> {
+    /// Verifies that the subject is equivalent to the expected value of type
+    /// [`Value`].
+    ///
+    /// The actual value (subject) and the expected value (parameter) are
+    /// compared field-by-field recursively.
+    ///
+    /// The intended and most convenient way to construct a [`Value`] instance
+    /// is using the [`value!`] macro.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use serde::Serialize;
+    ///
+    /// #[derive(Serialize)]
+    /// struct Person {
+    ///     id: u64,
+    ///     name: String,
+    ///     age: u8,
+    ///     email: Vec<String>,
+    /// }
+    ///
+    /// let person = Person {
+    ///     id: 456,
+    ///     name: "Silvia".into(),
+    ///     age: 25,
+    ///     email: vec!["silvia@domain.com".to_string()],
+    /// };
+    ///
+    /// assert_that!(person)
+    ///     .using_recursive_comparison()
+    ///     .ignoring_not_expected_fields()
+    ///     .is_equivalent_to(value!({
+    ///         name: "Silvia",
+    ///         age: 25_u8,
+    ///     }));
+    /// ```
+    ///
+    /// See the documentation of the [`recursive_comparison`] module for more
+    /// details.
+    ///
+    /// [`value!`]: crate::prelude::value
+    /// [`Value`]: crate::recursive_comparison::value::Value
+    /// [`recursive_comparison`]: crate::recursive_comparison
+    /// [`serde::Serialize`]: serde_core::Serialize
     #[track_caller]
     fn is_equivalent_to(self, expected: E) -> Self;
 

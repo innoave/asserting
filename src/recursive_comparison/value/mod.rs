@@ -47,6 +47,21 @@ where
 /// The [`Value`] is a data structure that can represent a value of any type in
 /// Rust, including structs, tuples, and enums.
 ///
+/// A [`Value`] can mimic any type. The type does not have to be declared
+/// beforehand and does not have to be in scope when constructing a [`Value`].
+/// It is possible to specify an expected value with only those fields that are
+/// of interest in a specific test case without having to declare a custom type
+/// for it. This type would be used only in test cases. Not having to declare
+/// several types just to use them as expected values in test cases avoids
+/// some boilerplate code.
+///
+/// In `asserting` we call a [`Value`] that represents an undeclared type as
+/// "ad-hoc type" or "anonymous struct" in case it represents a struct without
+/// a type-name.
+///
+/// The most convenient way to construct a [`Value`] is by using the [`value!`]
+/// macro.
+///
 /// ## Note on `usize` and `isize`
 ///
 /// The `serde` crate does not explicitly support `usize` and `isize`, because
@@ -64,6 +79,8 @@ where
 /// these traits cannot be implemented for `f32` and `f64` in a mathematically
 /// correct way, for the purpose of asserting whether two values are equal,
 /// the naive implementation we are using is perfectly fine.
+///
+/// [`value!`]: crate::prelude::value
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Value {
     /// A boolean (`bool`)
@@ -267,14 +284,14 @@ impl Value {
     /// at any level can be addressed by a [`Path`]. A path describes the
     /// field names that have to be traversed to reach the desired value.
     ///
-    /// A path may look like "order.id" or "customer.address.city".
+    /// A path may look like `"order.id"` or `"customer.address.city"`.
     ///
     /// The values of a tuple can be addressed by their index. E.g., the path
-    /// "foo.0" returns the first value of the tuple in the foo field, the
-    /// path "foo.1" returns the second value, and so on.
+    /// `"foo.0"` returns the first value of the tuple in the foo field, the
+    /// path `"foo.1"` returns the second value, and so on.
     ///
     /// A path may also be used to index into a sequence. E.g., the path
-    /// "order.items.1.amount" returns the amount of the second item in an
+    /// `"order.items.1.amount"` returns the amount of the second item in an
     /// order.
     pub fn get_path(&self, path: &Path<'_>) -> Option<&Self> {
         path.segments()

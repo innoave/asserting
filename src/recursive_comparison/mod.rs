@@ -42,7 +42,7 @@
 //!
 //! # Examples
 //!
-//! ## Comparing structs with several fields and containing other structs
+//! ## Comparing structs with several fields and nested structs
 //!
 //! The following example shows how to compare two structs. The structs are
 //! compared field-by-field recursively. The actual and the expected value can
@@ -256,6 +256,51 @@
 //! field. So we ignore it by using the `ignoring_not_expected_fields`
 //! option.
 //!
+//! ## Comparing only relevant fields
+//!
+//! In real-world applications, we often have complex types. We might want to
+//! write several tests where only some fields or parts of the complex type are
+//! of interest. In this case, it can be annoying having to specify all fields
+//! of a struct for the expected value. Declaring an additional struct having
+//! only the relevant fields is additional boilerplate code.
+//!
+//! The solution is the [`value!`] macro. It allows us to construct expected
+//! values with only the relevant fields. The [`value!`] macro is a convenient
+//! way to construct a [`Value`] that serves as the expected value without
+//! having to declare a custom type beforehand.
+//!
+//! If the expected value shall be a [`Value`], we use the `is_equivalent_to`
+//! assertion method instead of `is_equal_to`.
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//!
+//! #[derive(Serialize)]
+//! struct Person {
+//!     id: u64,
+//!     name: String,
+//!     age: u8,
+//!     email: Vec<String>,
+//! }
+//!
+//! let person = Person {
+//!     id: 456,
+//!     name: "Silvia".into(),
+//!     age: 25,
+//!     email: vec!["silvia@domain.com".to_string()],
+//! };
+//!
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .ignoring_not_expected_fields()
+//!     .is_equivalent_to(value!({
+//!         name: "Silvia",
+//!         age: 25_u8,
+//!     }));
+//! ```
+//!
+//! [`value!`]: crate::prelude::value
 //! [`serde::Serialize`]: Serialize
 
 pub mod path;
