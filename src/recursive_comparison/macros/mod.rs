@@ -34,7 +34,7 @@
 ///     grault: Sample::Two("beta", -456_i64),    // a tuple variant
 ///     waldo: (123_u8, 234_u8, 56_u8),           // a tuple
 ///     fred: ["alpha", "beta", "gamma"],         // a sequence
-///     corge: #{ 'a' => 1, 'b' => 2, 'c' => 3},  // a map
+///     quux: #{ 'a' => 1, 'b' => 2, 'c' => 3},   // a map
 ///     thud: Named(0.8_f32),                     // a tuple struct
 /// });
 /// ```
