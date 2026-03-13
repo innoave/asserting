@@ -1051,3 +1051,61 @@ fn verify_struct_is_equivalent_to_struct_with_relevant_fields_fails_for_differen
         ]
     );
 }
+
+#[test]
+fn struct_is_equivalent_to_value_from_macro() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .ignoring_not_expected_fields()
+        .is_equivalent_to(value!({
+            name: "Silvia",
+            gender: Gender::Female,
+            address: {
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }));
+}
+
+#[test]
+fn struct_is_equivalent_to_value_with_additional_field_from_macro() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .ignoring_not_expected_fields()
+        .is_equivalent_to(value!({
+            name: "Silvia",
+            gender: Gender::Female,
+            other_field: ("present in actual value", false),
+            address: {
+                zip: 12345_u16,
+                city: "New York",
+                state: "not present in actual value",
+            },
+        }));
+}
