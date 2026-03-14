@@ -2,7 +2,10 @@
 
 use crate::colored;
 use crate::expectations::satisfies;
+#[cfg(feature = "recursive")]
+use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
+use crate::std::borrow::Borrow;
 use crate::std::borrow::Cow;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
@@ -469,6 +472,12 @@ impl Display for Expression<'_> {
     }
 }
 
+impl Borrow<str> for Expression<'_> {
+    fn borrow(&self) -> &str {
+        &self.0
+    }
+}
+
 impl Deref for Expression<'_> {
     type Target = str;
 
@@ -744,6 +753,26 @@ impl<'a, S, R> Spec<'a, S, R> {
             let diff_format = DIFF_FORMAT.get_or_init(configured_diff_format);
             self.with_diff_format(diff_format.clone())
         }
+    }
+
+    /// Switches this [`Spec`] to the "field-by-field recursive comparison
+    /// mode".
+    ///
+    /// It returns a [`RecursiveComparison`] which is a specialized `Spec` that
+    /// provides extra configuration options for the recursive comparison and
+    /// the special `is_equivalent_to`/`is_not_equivalent_to` assertions of the
+    /// [`AssertEquivalence`] trait.
+    ///
+    /// See the documentation of the [`recursive_comparison`] module for details
+    /// about field-by-field recursive comparison.
+    ///
+    /// [`AssertEquivalence`]: crate::assertions::AssertEquivalence
+    /// [`recursive_comparison`]: crate::recursive_comparison
+    #[cfg(feature = "recursive")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+    #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
+    pub fn using_recursive_comparison(self) -> RecursiveComparison<'a, S, R> {
+        RecursiveComparison::new(self)
     }
 
     /// Maps the current subject to some other value.
@@ -1432,8 +1461,8 @@ pub struct Code<F>(Rc<RefCell<Option<F>>>);
 #[cfg(feature = "panic")]
 mod code {
     use super::Code;
-    use std::cell::RefCell;
-    use std::rc::Rc;
+    use crate::std::cell::RefCell;
+    use crate::std::rc::Rc;
 
     impl<F> From<F> for Code<F>
     where

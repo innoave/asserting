@@ -503,8 +503,8 @@ mod hashbrown_impls {
 #[cfg(feature = "std")]
 mod std_hashmap_impls {
     use crate::properties::MapProperties;
+    use crate::std::collections::HashMap;
     use crate::std::iter::Iterator;
-    use std::collections::HashMap;
 
     impl<K, V, H> MapProperties for HashMap<K, V, H> {
         type Key = K;

@@ -5,7 +5,7 @@
 //! particularly as provided by this crate:
 //!
 //! * express the intent of an assertion
-//! * an assertion reads more like natural english
+//! * an assertion reads more like natural English
 //! * concise and expressive assertions for more complex types like collections
 //! * distinct and more helpful error messages for specific assertions
 //! * easy spotting the difference between the expected and the actual value
@@ -320,6 +320,85 @@
 //! # }
 //! ```
 //!
+//! ## Field-by-field recursive comparison
+//!
+//! Requires crate feature `recursive`.
+//!
+//! The recursive comparison mode compares the subject and the expected value
+//! field-by-field recursively. The recursive comparison mode is available for
+//! all types that implement [`serde::Serialize`].
+//!
+//! Basic usage:
+//!
+//! ```
+//! # #[cfg(not(feature = "recursive"))]
+//! # fn main() {}
+//! # #[cfg(feature = "recursive")]
+//! # fn main() {
+//! use asserting::prelude::*;
+//! use serde::Serialize;
+//!
+//! #[derive(Serialize)]
+//! struct Address {
+//!     id: u64,
+//!     street: String,
+//!     city: String,
+//!     zip: u16,
+//! }
+//!
+//! #[derive(Serialize)]
+//! struct Person {
+//!     id: u64,
+//!     name: String,
+//!     age: u8,
+//!     address: Address,
+//! }
+//!
+//! let person = Person {
+//!     id: 123,
+//!     name: "Silvia".into(),
+//!     age: 25,
+//!     address: Address {
+//!         id: 92,
+//!         street: "Second Street".into(),
+//!         city: "New York".into(),
+//!         zip: 12345,
+//!     }
+//! };
+//!
+//! // ignore some fields
+//! assert_that!(&person)
+//!     .using_recursive_comparison()
+//!     .ignoring_fields(["id", "address.id", "address.street"])
+//!     .is_equal_to(Person {
+//!         id: 0,
+//!         name: "Silvia".into(),
+//!         age: 25,
+//!         address: Address {
+//!             id: 0,
+//!             street: "Main Street".into(),
+//!             city: "New York".into(),
+//!             zip: 12345,
+//!         }
+//!     });
+//!
+//! // assert only fields relevant for a testcase
+//! assert_that!(person)
+//!     .using_recursive_comparison()
+//!     .ignoring_not_expected_fields()
+//!     .is_equivalent_to(value!({
+//!         name: "Silvia",
+//!         age: 25_u8,
+//!         address: {
+//!             zip: 12345_u16,
+//!         }
+//!     }));
+//! # }
+//! ```
+//!
+//! A more in-depth description of the recursive comparison mode is given in the
+//! [`recursive_comparison`] module.
+//!
 //! # The `assert_that` and `verify_that` functions and macros
 //!
 //! Assertions can be written in two ways. The standard way that panics when
@@ -341,7 +420,7 @@
 //!   failures from assertions, which can be read later.
 //!
 //! The [`Spec`] can hold additional information about the subject, such as the
-//! expression we are asserting, the code location of the assert statement and
+//! expression we are asserting, the code location of the assert statement, and
 //! an optional description of what we are going to assert. These attributes are
 //! all optional and must be set explicitly by the user.
 //!
@@ -756,10 +835,11 @@
 //! [`assert_that_code`]: spec::assert_that_code
 //! [`verify_that`]: spec::verify_that
 //! [`verify_that_code`]: spec::verify_that_code
-//! [`display_failures()`]: spec::Spec::display_failures
+//! [`display_failures()`]: spec::GetFailures::display_failures
 //! [`failures()`]: spec::GetFailures::failures
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at
+//! [`serde::Serialize`]: serde_core::Serialize
 
 #![doc(html_root_url = "https://docs.rs/asserting/0.13.1")]
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -815,11 +895,22 @@ mod std {
     pub use std::*;
 }
 
+// Not public API. Used from macro-generated code.
+#[doc(hidden)]
+pub mod __private {
+    extern crate alloc;
+    #[doc(hidden)]
+    pub use alloc::vec;
+}
+
 pub mod assertions;
 pub mod colored;
 pub mod expectations;
 pub mod prelude;
 pub mod properties;
+#[cfg(feature = "recursive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+pub mod recursive_comparison;
 pub mod spec;
 
 #[cfg(feature = "bigdecimal")]
@@ -829,7 +920,7 @@ mod c_string;
 mod char;
 mod char_count;
 mod collection;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", feature = "colored"))]
 mod env;
 mod equality;
 mod error;
@@ -870,6 +961,8 @@ type TestCodeSnippetsInReadme = ();
 mod dummy_extern_uses {
     use fakeenv as _;
     use proptest as _;
+    use serde as _;
+    use serde_bytes as _;
     use time as _;
     use version_sync as _;
 }

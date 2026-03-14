@@ -14,9 +14,9 @@ pub use fake_env::*;
 
 #[cfg(test)]
 mod fake_env {
+    use crate::std::cell::RefCell;
+    use crate::std::env::VarError;
     use fakeenv::EnvStore;
-    use std::cell::RefCell;
-    use std::env::VarError;
 
     thread_local! {
         static ENV_STORE: RefCell<EnvStore> = RefCell::new({

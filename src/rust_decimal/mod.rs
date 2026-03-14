@@ -1,5 +1,6 @@
-use crate::prelude::DecimalProperties;
-use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
+use crate::properties::{
+    AdditiveIdentityProperty, DecimalProperties, MultiplicativeIdentityProperty, SignumProperty,
+};
 use rust_decimal::Decimal;
 
 impl SignumProperty for Decimal {
