@@ -1109,3 +1109,159 @@ fn struct_is_equivalent_to_value_with_additional_field_from_macro() {
             },
         }));
 }
+
+#[test]
+fn struct_is_not_equal_to_using_recursive_comparison_all_fields() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .is_not_equal_to(Person {
+            id: 456,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::Female,
+            address: Address {
+                id: 123,
+                street: "Main Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        });
+}
+
+#[test]
+fn verify_struct_is_not_equal_using_recursive_comparison_all_fields_fails() {
+    let person = Person {
+        id: 123,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 91,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    let failures = verify_that(&person)
+        .named("person")
+        .using_recursive_comparison()
+        .is_not_equal_to(Person {
+            id: 123,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::Female,
+            address: Address {
+                id: 91,
+                street: "Main Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        })
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected person to be not equal to Person { id: 123, name: "Silvia", age: 25, gender: Female, address: Address { id: 91, street: "Main Street", zip: 12345, city: "New York" } } (using recursive comparison)
+   but was: Person { id: 123, name: "Silvia", age: 25, gender: Female, address: Address { id: 91, street: "Main Street", zip: 12345, city: "New York" } }
+  expected: Person { id: 123, name: "Silvia", age: 25, gender: Female, address: Address { id: 91, street: "Main Street", zip: 12345, city: "New York" } }
+
+"#
+        ]
+    );
+}
+
+#[test]
+fn struct_is_not_equal_to_using_recursive_comparison_ignoring_id_fields() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Second Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .ignoring_fields(["id", "address.id"])
+        .is_not_equal_to(Person {
+            id: 0,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::Female,
+            address: Address {
+                id: 0,
+                street: "Main Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        });
+}
+
+#[test]
+fn verify_struct_is_not_equal_to_using_recursive_comparison_ignoring_id_fields_fails() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    let failures = verify_that(&person)
+        .named("person")
+        .using_recursive_comparison()
+        .ignoring_fields(["id", "address.id"])
+        .is_not_equal_to(Person {
+            id: 0,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::Female,
+            address: Address {
+                id: 0,
+                street: "Main Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        })
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected person to be not equal to Person { id: 0, name: "Silvia", age: 25, gender: Female, address: Address { id: 0, street: "Main Street", zip: 12345, city: "New York" } } (using recursive comparison)
+   but was: Person { id: 456, name: "Silvia", age: 25, gender: Female, address: Address { id: 291, street: "Main Street", zip: 12345, city: "New York" } }
+  expected: Person { id: 0, name: "Silvia", age: 25, gender: Female, address: Address { id: 0, street: "Main Street", zip: 12345, city: "New York" } }
+
+  the following fields were ignored:
+    id
+    address.id
+
+"#
+        ]
+    );
+}

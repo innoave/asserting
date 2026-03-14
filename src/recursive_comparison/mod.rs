@@ -623,8 +623,24 @@ where
         self
     }
 
-    fn is_not_equal_to(self, expected: E) -> Self {
-        todo!()
+    fn is_not_equal_to(mut self, expected: E) -> Self {
+        let expression = self.spec.expression();
+        let actual = to_recursive_value(self.spec.subject())
+            .unwrap_or_else(|err| panic!("failed to serialize the subject, reason: {err}"));
+        let expected = to_recursive_value(&expected)
+            .unwrap_or_else(|err| panic!("failed to serialize the expected value, reason: {err}"));
+
+        let compared = self.compare(&actual, &expected);
+
+        if !compared.has_failure() {
+            self.do_fail_with_message(format!(
+                r"expected {expression} to be not equal to {expected:?} (using recursive comparison)
+   but was: {actual:?}
+  expected: {expected:?}
+{compared}"
+            ));
+        }
+        self
     }
 }
 
