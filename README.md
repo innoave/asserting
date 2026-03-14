@@ -12,13 +12,14 @@ Features of `asserting`:
 1. assertions are convenient to write and easy to read
 2. helpful error messages in case of failing assertions
 3. colored diffs between expected and actual values
-4. provide a reasonable number of assertions out of the box
-5. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
+4. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
+5. field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
 6. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
-7. do not require that asserted types have to implement traits if it is not absolutely necessary
-8. support for asserting custom types with provided assertions
-9. writing custom assertions requires minimal effort
-10. support no-std environments
+7. provide a reasonable number of assertions out of the box
+8. do not require that asserted types have to implement traits if it is not absolutely necessary
+9. support for asserting custom types with provided assertions
+10. writing custom assertions requires minimal effort
+11. support no-std environments
 
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
@@ -83,10 +84,28 @@ require std can still be added.
 
 ```toml
 [dev-dependencies]
-asserting = { version = "0.13", default-features = false, features = ["colored", "float-cmp", "regex"] }
+asserting = { version = "0.13", default-features = false, features = ["colored", "float-cmp", "recursive", "regex"] }
 ```
 
 An allocator is still needed for no-std.
+
+## Crate Features
+
+Overview of the crate features of `asserting`. The column "no-std" specifies if this feature is
+available in no-std environments. The column "default" specifies if this feature is enabled by
+default.
+
+| Feature        | Description                                                                   | no-std | default |
+|----------------|-------------------------------------------------------------------------------|:------:|:-------:|
+| `std`          | Use the `std` library                                                         |   no   |   yes   |
+| `colored`      | Colored highlighting of differences in failure reports in the terminal        |  yes   |   yes   |
+| `recursive`    | Field-by-field recursive comparison mode                                      |  yes   |   yes   |
+| `float-cmp`    | Floating point comparison (`ìs_close_to`)                                     |  yes   |   yes   |
+| `regex`        | String matches Regex assertions (`matching`)                                  |  yes   |   yes   |
+| `panic`        | Assert that code panics (with the expected message)                           |   no   |   yes   |
+| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                                     |  yes   |   no    |
+| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal` and `bigdecimal::BigDecimalRef` |  yes   |   no    |
+| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                                  |  yes   |   no    |
 
 ## Highlighted differences
 
@@ -492,6 +511,8 @@ To start assertions on code, use the `assert_that_code!()` macro.
 <!-- External Links -->
 
 ["Chaining assertions"]: https://docs.rs/asserting/latest/asserting/#chaining-assertions-on-the-same-subject
+
+["Field-by-field recursive comparison"]: https://docs.rs/asserting/latest/asserting/#field-by-field-recursive-comparison
 
 ["soft assertions"]: https://docs.rs/asserting/#soft-assertions
 
