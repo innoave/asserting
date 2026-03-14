@@ -209,6 +209,52 @@ pub trait AssertEquivalence<E> {
     #[track_caller]
     fn is_equivalent_to(self, expected: E) -> Self;
 
+    /// Verifies that the subject is not equivalent to the expected value of
+    /// type [`Value`].
+    ///
+    /// The actual value (subject) and the expected value (parameter) are
+    /// compared field-by-field recursively. Fields of the actual value that
+    /// are not present in the actual value are always ignored.
+    ///
+    /// The intended and most convenient way to construct a [`Value`] instance
+    /// is using the [`value!`] macro.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// use serde::Serialize;
+    ///
+    /// #[derive(Serialize)]
+    /// struct Person {
+    ///     id: u64,
+    ///     name: String,
+    ///     age: u8,
+    ///     email: Vec<String>,
+    /// }
+    ///
+    /// let person = Person {
+    ///     id: 456,
+    ///     name: "Silvia".into(),
+    ///     age: 25,
+    ///     email: vec!["silvia@domain.com".to_string()],
+    /// };
+    ///
+    /// assert_that!(person)
+    ///     .using_recursive_comparison()
+    ///     .is_not_equivalent_to(value!({
+    ///         name: "Silvia",
+    ///         age: 21_u8,
+    ///     }));
+    /// ```
+    ///
+    /// See the documentation of the [`recursive_comparison`] module for more
+    /// details.
+    ///
+    /// [`value!`]: crate::prelude::value
+    /// [`Value`]: crate::recursive_comparison::value::Value
+    /// [`recursive_comparison`]: crate::recursive_comparison
+    /// [`serde::Serialize`]: serde_core::Serialize
     #[track_caller]
     fn is_not_equivalent_to(self, expected: E) -> Self;
 }

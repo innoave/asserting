@@ -667,8 +667,23 @@ where
         self
     }
 
-    fn is_not_equivalent_to(self, expected: Value) -> Self {
-        todo!()
+    fn is_not_equivalent_to(mut self, expected: Value) -> Self {
+        let expression = self.spec.expression();
+        let actual = to_recursive_value(self.spec.subject())
+            .unwrap_or_else(|err| panic!("failed to serialize the subject, reason: {err}"));
+
+        self.ignore_not_expected_fields = true;
+        let compared = self.compare(&actual, &expected);
+
+        if !compared.has_failure() {
+            self.do_fail_with_message(format!(
+                r"expected {expression} to be not equivalent to {expected:?} (using recursive comparison)
+   but was: {actual:?}
+  expected: {expected:?}
+{compared}"
+            ));
+        }
+        self
     }
 }
 

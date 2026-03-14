@@ -1265,3 +1265,199 @@ fn verify_struct_is_not_equal_to_using_recursive_comparison_ignoring_id_fields_f
         ]
     );
 }
+
+#[test]
+fn struct_is_not_equivalent_to_value_from_macro_all_fields() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .is_not_equivalent_to(value!({
+            id: 456_u64,
+            name: "Silvia",
+            age: 21_u8,
+            gender: Gender::Female,
+            address: {
+                id: 291_u64,
+                street: "Main Street",
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }));
+}
+
+#[test]
+fn verify_struct_is_not_equivalent_to_value_from_macro_all_fields_fails() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    let failures = verify_that(&person)
+        .named("person")
+        .using_recursive_comparison()
+        .is_not_equivalent_to(value!({
+            id: 456_u64,
+            name: "Silvia",
+            age: 25_u8,
+            gender: Gender::Female,
+            address: {
+                id: 291_u64,
+                street: "Main Street",
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }))
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected person to be not equivalent to { id: 456, name: "Silvia", age: 25, gender: Female, address: { id: 291, street: "Main Street", zip: 12345, city: "New York" } } (using recursive comparison)
+   but was: Person { id: 456, name: "Silvia", age: 25, gender: Female, address: Address { id: 291, street: "Main Street", zip: 12345, city: "New York" } }
+  expected: { id: 456, name: "Silvia", age: 25, gender: Female, address: { id: 291, street: "Main Street", zip: 12345, city: "New York" } }
+
+"#
+        ]
+    );
+}
+
+#[test]
+fn struct_is_not_equivalent_to_value_from_macro() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "Chicago".into(),
+        },
+    };
+
+    assert_that(&person)
+        .using_recursive_comparison()
+        .ignoring_not_expected_fields()
+        .is_not_equivalent_to(value!({
+            name: "Silvia",
+            gender: Gender::Female,
+            address: {
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }));
+}
+
+#[test]
+fn verify_struct_id_not_equivalent_to_value_from_macro_fails() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    let failures = verify_that(&person)
+        .named("person")
+        .using_recursive_comparison()
+        .ignoring_not_expected_fields()
+        .is_not_equivalent_to(value!({
+            name: "Silvia",
+            gender: Gender::Female,
+            address: {
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }))
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected person to be not equivalent to { name: "Silvia", gender: Female, address: { zip: 12345, city: "New York" } } (using recursive comparison)
+   but was: Person { id: 456, name: "Silvia", age: 25, gender: Female, address: Address { id: 291, street: "Main Street", zip: 12345, city: "New York" } }
+  expected: { name: "Silvia", gender: Female, address: { zip: 12345, city: "New York" } }
+
+  the following fields were ignored:
+    id
+    age
+    address.id
+    address.street
+
+"#
+        ]
+    );
+}
+
+#[test]
+fn verify_struct_id_not_equivalent_to_value_from_macro_fails_always_ignoring_not_expected_fields() {
+    let person = Person {
+        id: 456,
+        name: "Silvia".into(),
+        age: 25,
+        gender: Gender::Female,
+        address: Address {
+            id: 291,
+            street: "Main Street".into(),
+            zip: 12345,
+            city: "New York".into(),
+        },
+    };
+
+    let failures = verify_that(&person)
+        .named("person")
+        .using_recursive_comparison()
+        .is_not_equivalent_to(value!({
+            name: "Silvia",
+            gender: Gender::Female,
+            address: {
+                zip: 12345_u16,
+                city: "New York",
+            },
+        }))
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &[
+            r#"expected person to be not equivalent to { name: "Silvia", gender: Female, address: { zip: 12345, city: "New York" } } (using recursive comparison)
+   but was: Person { id: 456, name: "Silvia", age: 25, gender: Female, address: Address { id: 291, street: "Main Street", zip: 12345, city: "New York" } }
+  expected: { name: "Silvia", gender: Female, address: { zip: 12345, city: "New York" } }
+
+  the following fields were ignored:
+    id
+    age
+    address.id
+    address.street
+
+"#
+        ]
+    );
+}
