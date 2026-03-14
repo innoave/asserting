@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.14.0 - 2026-03-15
+
+_we now have field-by-field recursive comparison_
+
+### Added
+
+* add a field-by-field recursive comparison feature
+  [(PR #79)](https://github.com/innoave/asserting/pull/79)
+
+* add the ability to map a subject to its debug- or display-string representation
+  [(PR #77)](https://github.com/innoave/asserting/pull/77)
+
+### Changed
+
+* **Breaking:** rename assertions `has_debug_message` to `has_debug_string`
+  [(PR #75)](https://github.com/innoave/asserting/pull/75)
+* **Breaking:** rename assertions `has_display_message` to `has_display_string`
+  [(PR #76)](https://github.com/innoave/asserting/pull/76)
+
 ## 0.13.1 - 2026-02-15
 
 ### Added

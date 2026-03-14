@@ -841,7 +841,7 @@
 //! [`located_at()`]: spec::Spec::located_at
 //! [`serde::Serialize`]: serde_core::Serialize
 
-#![doc(html_root_url = "https://docs.rs/asserting/0.13.1")]
+#![doc(html_root_url = "https://docs.rs/asserting/0.14.0")]
 #![cfg_attr(not(feature = "std"), no_std)]
 // Render feature requirements in docs.rs
 #![cfg_attr(docsrs, feature(doc_cfg))]
