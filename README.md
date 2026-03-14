@@ -12,6 +12,7 @@ Features of `asserting`:
 1. assertions are convenient to write and easy to read
 2. helpful error messages in case of failing assertions
 3. colored diffs between expected and actual values
+   (see ["Highlighted differences"](#highlighted-differences))
 4. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
 5. field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
 6. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
@@ -95,17 +96,17 @@ Overview of the crate features of `asserting`. The column "no-std" specifies if 
 available in no-std environments. The column "default" specifies if this feature is enabled by
 default.
 
-| Feature        | Description                                                                   | no-std | default |
-|----------------|-------------------------------------------------------------------------------|:------:|:-------:|
-| `std`          | Use the `std` library                                                         |   no   |   yes   |
-| `colored`      | Colored highlighting of differences in failure reports in the terminal        |  yes   |   yes   |
-| `recursive`    | Field-by-field recursive comparison mode                                      |  yes   |   yes   |
-| `float-cmp`    | Floating point comparison (`ìs_close_to`)                                     |  yes   |   yes   |
-| `regex`        | String matches Regex assertions (`matching`)                                  |  yes   |   yes   |
-| `panic`        | Assert that code panics (with the expected message)                           |   no   |   yes   |
-| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                                     |  yes   |   no    |
-| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal` and `bigdecimal::BigDecimalRef` |  yes   |   no    |
-| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                                  |  yes   |   no    |
+| Feature        | Description                                                           | no-std | default |
+|----------------|-----------------------------------------------------------------------|:------:|:-------:|
+| `std`          | Use the `std` library                                                 |   no   |   yes   |
+| `colored`      | Colored highlighting of differences between actual and expected value |  yes   |   yes   |
+| `recursive`    | Field-by-field recursive comparison mode                              |  yes   |   yes   |
+| `float-cmp`    | Floating point comparison (`ìs_close_to`)                             |  yes   |   yes   |
+| `regex`        | String matches Regex assertions (`matching`)                          |  yes   |   yes   |
+| `panic`        | Assert that code panics (with the expected message)                   |   no   |   yes   |
+| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                             |  yes   |   no    |
+| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal`                         |  yes   |   no    |
+| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                          |  yes   |   no    |
 
 ## Highlighted differences
 
