@@ -522,6 +522,7 @@ mod with_colored_and_std_features {
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_NO_HIGHLIGHT);
     }
 
+    #[cfg(feature = "panic")]
     #[test]
     fn assert_that_code_sets_the_diff_format_to_red_green() {
         env::set_var(ENV_VAR_HIGHLIGHT_DIFFS, "red-green");
@@ -531,6 +532,7 @@ mod with_colored_and_std_features {
         assert_that(assertion.diff_format()).is_equal_to(&DIFF_FORMAT_RED_GREEN);
     }
 
+    #[cfg(feature = "panic")]
     #[test]
     fn verify_that_code_sets_the_diff_format_to_no_highlighting() {
         let assertion = verify_that_code(|| {});

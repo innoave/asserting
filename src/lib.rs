@@ -920,7 +920,7 @@ mod c_string;
 mod char;
 mod char_count;
 mod collection;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", feature = "colored"))]
 mod env;
 mod equality;
 mod error;

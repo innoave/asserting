@@ -28,7 +28,18 @@ recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde", "dep:rapidhash"
 rust-decimal = ["dep:rust_decimal"]
 panic = ["std"]
 regex = ["dep:regex"]
-std = ["serde_core/std", "indexmap/std"]
+std = [
+    "bigdecimal?/std",
+    "float-cmp?/std",
+    "indexmap?/std",
+    "num-bigint?/std",
+    "once_cell?/std",
+    "rapidhash?/std",
+    "regex?/std",
+    "rust_decimal?/std",
+    "sdiff?/std",
+    "serde_core?/std"
+]
 
 [dependencies]
 hashbrown = "0.16"
