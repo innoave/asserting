@@ -8,25 +8,25 @@
 //! There are several scenarios where recursive comparison is useful:
 //!
 //! * comparing types that have similar fields, like an entity and a DTO
-//!   representation of the same type in the application's domain.
+//!   representation of the same thing in the application's domain.
 //! * comparing only fields that are relevant for a specific test case and
 //!   ignoring others.
 //! * comparing types field-by-field but ignoring fields, where the actual value
 //!   may vary like for IDs or timestamps.
 //! * comparing types that implement `Serialize` but not `PartialEq` or `Debug`
 //!
-//! Recursive comparison provides detailed failure messages in case of a failing
+//! Recursive comparison provides detailed failure reports in case of a failing
 //! assertion. The failure details contain a list of fields, for which the
 //! actual value is not equal to the expected one. This is another reason why
 //! recursive comparison might be the preferred way, especially when comparing
-//! structs that have many fields and/or contain sub-structs.
+//! structs that have many fields and/or contain nested structs.
 //!
-//! Recursive comparison is started by calling the `using_recursive_comparison`
-//! method.
+//! The recursive comparison mode starts after calling the
+//! `using_recursive_comparison` method.
 //!
 //! Recursive comparison is not symmetrical since it is limited to the fields
 //! of the subject (actual value). It gathers the actual fields of the subject
-//! and compares them to the corresponding fields haven the same name in the
+//! and compares them to the corresponding fields having the same name in the
 //! expected value.
 //!
 //! Structs, enums, and tuples in the subject and expected value do not
@@ -37,8 +37,15 @@
 //! value is only equal to the expected field if the names and values are equal
 //! and the expected value is of type `u8` too.
 //!
-//! The recursive comparison is limited down to a max depth of 128 levels,
+//! Recursive comparison is limited down to a max depth of 128 levels,
 //! which is the default max depth of [`serde::Serialize`].
+//!
+//! The recursive comparison mode provides the following capabilities:
+//!
+//! * [Ignoring fields in the comparison](#ignoring-some-fields)
+//! * [Comparing only specified fields](RecursiveComparison::comparing_only_fields)
+//! * [Ignoring all fields that are not present in the expected value](#ignoring-not-expected-fields)
+//! * [Comparing only relevant fields](#comparing-only-relevant-fields)
 //!
 //! # Examples
 //!
