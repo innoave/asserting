@@ -1461,3 +1461,108 @@ fn verify_struct_id_not_equivalent_to_value_from_macro_fails_always_ignoring_not
         ]
     );
 }
+
+#[cfg(feature = "colored")]
+mod colored {
+    use super::*;
+
+    #[test]
+    fn highlight_diffs_struct_is_equal_to_using_recursive_comparison_all_fields() {
+        let person = Person {
+            id: 123,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::NonBinary,
+            address: Address {
+                id: 91,
+                street: "Second Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        };
+
+        let failures = verify_that(&person)
+            .named("person")
+            .with_configured_diff_format()
+            .using_recursive_comparison()
+            .is_equal_to(Person {
+                id: 123,
+                name: "Silvia".to_string(),
+                age: 21,
+                gender: Gender::Female,
+                address: Address {
+                    id: 91,
+                    street: "Main Street".into(),
+                    zip: 12345,
+                    city: "New York".into(),
+                },
+            })
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "expected person to be equal to Person { id: 123, name: \"Silvia\", age: 21, gender: Female, address: Address { id: 91, street: \"Main Street\", zip: 12345, city: \"New York\" } } (using recursive comparison)\n   \
+                    but was: Person { id: 123, name: \"Silvia\", age: 25, gender: NonBinary, address: Address { id: 91, street: \"Second Street\", zip: 12345, city: \"New York\" } }\n  \
+                   expected: Person { id: 123, name: \"Silvia\", age: 21, gender: Female, address: Address { id: 91, street: \"Main Street\", zip: 12345, city: \"New York\" } }\n\
+                 \n  \
+                   non equal fields:\n    \
+                     age: expected <2\u{1b}[32m1\u{1b}[0m> but was <2\u{1b}[31m5\u{1b}[0m>\n    \
+                     gender: expected <\u{1b}[32mFem\u{1b}[0ma\u{1b}[32mle\u{1b}[0m> but was <\u{1b}[31mNonBin\u{1b}[0ma\u{1b}[31mry\u{1b}[0m>\n    \
+                     address.street: expected <\"\u{1b}[32mMai\u{1b}[0mn Street\"> but was <\"\u{1b}[31mSeco\u{1b}[0mn\u{1b}[31md\u{1b}[0m Street\">\n\
+                 \n"
+            ]
+        );
+    }
+
+    #[test]
+    fn highlight_diffs_struct_is_equivalent_to_struct_with_relevant_fields() {
+        let person = Person {
+            id: 123,
+            name: "Silvia".into(),
+            age: 25,
+            gender: Gender::Female,
+            address: Address {
+                id: 91,
+                street: "Second Street".into(),
+                zip: 12345,
+                city: "New York".into(),
+            },
+        };
+
+        let failures = verify_that(&person)
+            .named("person")
+            .with_configured_diff_format()
+            .using_recursive_comparison()
+            .ignoring_not_expected_fields()
+            .is_equivalent_to(value!({
+                name: "Silvia",
+                age: 21_u8,
+                gender: Gender::Female,
+                address: {
+                    zip: 12345_u32,
+                    city: "New York",
+                }
+            }))
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                "expected person to be equivalent to { name: \"Silvia\", age: 21, gender: Female, address: { zip: 12345, city: \"New York\" } } (using recursive comparison)\n   \
+                    but was: Person { id: 123, name: \"Silvia\", age: 25, gender: Female, address: Address { id: 91, street: \"Second Street\", zip: 12345, city: \"New York\" } }\n  \
+                   expected: { name: \"Silvia\", age: 21, gender: Female, address: { zip: 12345, city: \"New York\" } }\n\
+                 \n  \
+                   non equal fields:\n    \
+                     age: expected <2\u{1b}[32m1\u{1b}[0m> but was <2\u{1b}[31m5\u{1b}[0m>\n    \
+                     address.zip: value <12345> was equal, but type was <u\u{1b}[31m16\u{1b}[0m> and expected type is <u\u{1b}[32m32\u{1b}[0m>\n\
+                 \n  \
+                   the following fields were ignored:\n    \
+                     id\n    \
+                     address.id\n    \
+                     address.street\n\
+                 \n"
+            ]
+        );
+    }
+}

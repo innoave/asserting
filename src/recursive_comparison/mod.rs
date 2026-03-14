@@ -310,14 +310,16 @@ pub mod value;
 mod macros;
 
 use crate::assertions::{AssertEquality, AssertEquivalence};
+use crate::colored::mark_diff_str;
 use crate::recursive_comparison::path::Path;
 use crate::recursive_comparison::serialize::to_recursive_value;
 use crate::recursive_comparison::value::Value;
 use crate::spec::{
-    AssertFailure, CollectFailures, DoFail, FailingStrategy, GetFailures, SoftPanic, Spec,
+    AssertFailure, CollectFailures, DiffFormat, DoFail, FailingStrategy, GetFailures, SoftPanic,
+    Spec,
 };
 use crate::std::fmt::{self, Display};
-use crate::std::string::String;
+use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
 use crate::std::{format, vec};
 use serde_core::Serialize;
@@ -539,28 +541,6 @@ struct NonEqual<'a> {
     expected_value: &'a Value,
 }
 
-impl Display for NonEqual<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let NonEqual {
-            path,
-            actual_value,
-            expected_value,
-        } = self;
-        let debug_actual = format!("{actual_value:?}");
-        let debug_expected = format!("{expected_value:?}");
-        if debug_actual == debug_expected {
-            let actual_type = actual_value.type_name();
-            let expected_type = expected_value.type_name();
-            write!(f, "{path}: value <{actual_value:?}> was equal, but type was <{actual_type}> and expected type is <{expected_type}>")
-        } else {
-            write!(
-                f,
-                "{path}: expected <{expected_value:?}> but was <{actual_value:?}>",
-            )
-        }
-    }
-}
-
 struct ComparisonResult<'a> {
     ignored: Vec<Path<'a>>,
     non_equal: Vec<NonEqual<'a>>,
@@ -573,28 +553,67 @@ impl ComparisonResult<'_> {
     }
 }
 
-impl Display for ComparisonResult<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if !self.non_equal.is_empty() {
-            writeln!(f, "\n  non equal fields:")?;
-            for a_non_equal in &self.non_equal {
-                writeln!(f, "    {a_non_equal}")?;
-            }
-        }
-        if !self.not_expected.is_empty() {
-            writeln!(f, "\n  the following fields were not expected:")?;
-            for a_not_expected in &self.not_expected {
-                writeln!(f, "    {a_not_expected}")?;
-            }
-        }
-        if !self.ignored.is_empty() {
-            writeln!(f, "\n  the following fields were ignored:")?;
-            for an_ignored in &self.ignored {
-                writeln!(f, "    {an_ignored}")?;
-            }
-        }
-        Ok(())
+fn display_non_equal(non_equal: &NonEqual<'_>, diff_format: &DiffFormat) -> String {
+    let NonEqual {
+        path,
+        actual_value,
+        expected_value,
+    } = non_equal;
+    let mut display_details = String::new();
+    let debug_actual = format!("{actual_value:?}");
+    let debug_expected = format!("{expected_value:?}");
+    display_details.push_str(&path.to_string());
+    if debug_actual == debug_expected {
+        let (marked_actual_type, marked_expected_type) = mark_diff_str(
+            &actual_value.type_name(),
+            &expected_value.type_name(),
+            diff_format,
+        );
+        display_details.push_str(": value <");
+        display_details.push_str(&debug_actual);
+        display_details.push_str("> was equal, but type was <");
+        display_details.push_str(&marked_actual_type);
+        display_details.push_str("> and expected type is <");
+        display_details.push_str(&marked_expected_type);
+    } else {
+        let (marked_actual, marked_expected) =
+            mark_diff_str(&debug_actual, &debug_expected, diff_format);
+        display_details.push_str(": expected <");
+        display_details.push_str(&marked_expected);
+        display_details.push_str("> but was <");
+        display_details.push_str(&marked_actual);
     }
+    display_details.push('>');
+    display_details
+}
+
+fn display_compare_details(compared: &ComparisonResult<'_>, diff_format: &DiffFormat) -> String {
+    let mut display_details = String::new();
+    if !compared.non_equal.is_empty() {
+        display_details.push_str("\n  non equal fields:\n");
+        for a_non_equal in &compared.non_equal {
+            display_details.push_str("    ");
+            display_details.push_str(&display_non_equal(a_non_equal, diff_format));
+            display_details.push('\n');
+        }
+    }
+    if !compared.not_expected.is_empty() {
+        display_details.push_str("\n  the following fields were not expected:\n");
+        for a_not_expected in &compared.not_expected {
+            display_details.push_str("    ");
+            display_details.push_str(&a_not_expected.to_string());
+            display_details.push('\n');
+        }
+    }
+    if !compared.ignored.is_empty() {
+        display_details.push_str("\n  the following fields were ignored:\n");
+        for an_ignored in &compared.ignored {
+            display_details.push_str("    ");
+            display_details.push_str(&an_ignored.to_string());
+            display_details.push('\n');
+        }
+    }
+    display_details
 }
 
 impl<S, E, R> AssertEquality<E> for RecursiveComparison<'_, S, R>
@@ -613,11 +632,13 @@ where
         let compared = self.compare(&actual, &expected);
 
         if compared.has_failure() {
+            let compare_details = display_compare_details(&compared, self.spec.diff_format());
+
             self.do_fail_with_message(format!(
                 r"expected {expression} to be equal to {expected:?} (using recursive comparison)
    but was: {actual:?}
   expected: {expected:?}
-{compared}"
+{compare_details}"
             ));
         }
         self
@@ -633,11 +654,13 @@ where
         let compared = self.compare(&actual, &expected);
 
         if !compared.has_failure() {
+            let compare_details = display_compare_details(&compared, self.spec.diff_format());
+
             self.do_fail_with_message(format!(
                 r"expected {expression} to be not equal to {expected:?} (using recursive comparison)
    but was: {actual:?}
   expected: {expected:?}
-{compared}"
+{compare_details}"
             ));
         }
         self
@@ -657,11 +680,13 @@ where
         let compared = self.compare(&actual, &expected);
 
         if compared.has_failure() {
+            let compare_details = display_compare_details(&compared, self.spec.diff_format());
+
             self.do_fail_with_message(format!(
                 r"expected {expression} to be equivalent to {expected:?} (using recursive comparison)
    but was: {actual:?}
   expected: {expected:?}
-{compared}"
+{compare_details}"
             ));
         }
         self
@@ -676,11 +701,13 @@ where
         let compared = self.compare(&actual, &expected);
 
         if !compared.has_failure() {
+            let compare_details = display_compare_details(&compared, self.spec.diff_format());
+
             self.do_fail_with_message(format!(
                 r"expected {expression} to be not equivalent to {expected:?} (using recursive comparison)
    but was: {actual:?}
   expected: {expected:?}
-{compared}"
+{compare_details}"
             ));
         }
         self
