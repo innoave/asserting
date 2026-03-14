@@ -1,15 +1,15 @@
 use crate::properties::{AdditiveIdentityProperty, MultiplicativeIdentityProperty, SignumProperty};
 use crate::std::vec;
-use lazy_static::lazy_static;
 use num_bigint::{BigInt, BigUint, Sign};
+use once_cell::sync::Lazy;
 
 static BIGINT_ZERO: BigInt = BigInt::ZERO;
 static BIGUINT_ZERO: BigUint = BigUint::ZERO;
 
-lazy_static! {
-    static ref BIGINT_ONE: BigInt = bigint_one();
-    static ref BIGUINT_ONE: BigUint = biguint_one();
-}
+#[allow(clippy::non_std_lazy_statics)]
+static BIGINT_ONE: Lazy<BigInt> = Lazy::new(bigint_one);
+#[allow(clippy::non_std_lazy_statics)]
+static BIGUINT_ONE: Lazy<BigUint> = Lazy::new(biguint_one);
 
 #[inline]
 fn bigint_one() -> BigInt {

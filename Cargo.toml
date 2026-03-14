@@ -20,10 +20,10 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 default = ["std", "colored", "float-cmp", "panic", "recursive", "regex"]
-bigdecimal = ["dep:bigdecimal", "dep:lazy_static"]
+bigdecimal = ["dep:bigdecimal", "dep:once_cell"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
-num-bigint = ["dep:num-bigint", "dep:lazy_static"]
+num-bigint = ["dep:num-bigint", "dep:once_cell"]
 recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde", "dep:rapidhash"]
 rust-decimal = ["dep:rust_decimal"]
 panic = ["std"]
@@ -37,12 +37,12 @@ hashbrown = "0.16"
 bigdecimal = { version = "0.4", optional = true, default-features = false }
 float-cmp = { version = "0.10", optional = true }
 indexmap = { version = "2", optional = true, default-features = false }
-lazy_static = { version = "1", optional = true }
 num-bigint = { version = "0.4", optional = true, default-features = false }
-regex = { version = "1", optional = true }
+once_cell = { version = "1", optional = true, default-features = false, features = ["alloc", "critical-section"] }
 rapidhash = { version = "4", optional = true, default-features = false }
+regex = { version = "1", optional = true }
 rust_decimal = { version = "1", optional = true, default-features = false }
-sdiff = { version = "0.1", optional = true }
+sdiff = { version = "0.1", optional = true, default-features = false }
 serde_core = { version = "1", optional = true, default-features = false, features = ["alloc"] }
 
 [dev-dependencies]

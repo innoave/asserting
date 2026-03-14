@@ -11,9 +11,9 @@ mod dummy_extern_uses {
     #[cfg(feature = "recursive")]
     use indexmap as _;
     #[cfg(feature = "num-bigint")]
-    use lazy_static as _;
-    #[cfg(feature = "num-bigint")]
     use num_bigint as _;
+    #[cfg(any(feature = "bigdecimal", feature = "num-bigint"))]
+    use once_cell as _;
     use proptest as _;
     #[cfg(feature = "recursive")]
     use rapidhash as _;

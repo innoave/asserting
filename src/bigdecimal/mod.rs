@@ -3,12 +3,12 @@ use crate::properties::{
 };
 use bigdecimal::num_bigint::Sign;
 use bigdecimal::{BigDecimal, BigDecimalRef, One, Zero};
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 
-lazy_static! {
-    static ref BIGDECIMAL_ZERO: BigDecimal = bigdecimal_zero();
-    static ref BIGDECIMAL_ONE: BigDecimal = bigdecimal_one();
-}
+#[allow(clippy::non_std_lazy_statics)]
+static BIGDECIMAL_ZERO: Lazy<BigDecimal> = Lazy::new(bigdecimal_zero);
+#[allow(clippy::non_std_lazy_statics)]
+static BIGDECIMAL_ONE: Lazy<BigDecimal> = Lazy::new(bigdecimal_one);
 
 #[inline]
 fn bigdecimal_zero() -> BigDecimal {
