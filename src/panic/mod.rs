@@ -10,20 +10,22 @@ use crate::std::panic;
 const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";
 const UNKNOWN_PANIC_MESSAGE: &str = "<unknown panic message>";
 
-impl<'a, S, R> AssertCodePanics<'a, R> for Spec<'a, Code<S>, R>
+impl<'a, S, R> AssertCodePanics for Spec<'a, Code<S>, R>
 where
     S: FnOnce(),
     R: FailingStrategy,
 {
-    fn does_not_panic(self) -> Spec<'a, (), R> {
+    type Mapped = Spec<'a, (), R>;
+
+    fn does_not_panic(self) -> Self::Mapped {
         self.expecting(does_not_panic()).mapping(|_| ())
     }
 
-    fn panics(self) -> Spec<'a, (), R> {
+    fn panics(self) -> Self::Mapped {
         self.expecting(does_panic()).mapping(|_| ())
     }
 
-    fn panics_with_message(self, message: impl Into<String>) -> Spec<'a, (), R> {
+    fn panics_with_message(self, message: impl Into<String>) -> Self::Mapped {
         self.expecting(does_panic().with_message(message))
             .mapping(|_| ())
     }
