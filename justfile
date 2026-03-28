@@ -2,6 +2,10 @@
 
 set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 
+# MSRV of the project
+
+msrv := "1.82.0"
+
 alias b := build
 alias c := check
 alias cc := code-coverage
@@ -14,6 +18,7 @@ alias t := test
 alias ta := test-all-features
 alias td := test-default
 alias tn := test-no-std
+alias msrv := check-msrv
 
 # list recipies
 default:
@@ -90,3 +95,11 @@ clean:
 # generate and open docs locally
 doc $RUSTDOCFLAGS="--cfg docsrs":
     cargo +nightly doc --all-features --no-deps --open
+
+# installs the MSRV toolchain
+setup-msrv:
+    rustup toolchain install {{ msrv }} --profile minimal
+
+# check the production code with MSRV (without tests or dev-dependencies)
+check-msrv: setup-msrv
+    rustup run {{ msrv }} cargo check --lib
