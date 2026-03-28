@@ -39,11 +39,13 @@ where
     }
 }
 
-impl<'a, T, R> AssertOptionValue<'a, T, R> for Spec<'a, Option<T>, R>
+impl<'a, T, R> AssertOptionValue for Spec<'a, Option<T>, R>
 where
     R: FailingStrategy,
 {
-    fn some(self) -> Spec<'a, T, R> {
+    type Some = Spec<'a, T, R>;
+
+    fn some(self) -> Self::Some {
         self.mapping(|subject| match subject {
             None => {
                 panic!("expected the subject to be `Some(_)`, but was `None`")
@@ -53,11 +55,13 @@ where
     }
 }
 
-impl<'a, T, R> AssertBorrowedOptionValue<'a, T, R> for Spec<'a, &'a Option<T>, R>
+impl<'a, T, R> AssertBorrowedOptionValue for Spec<'a, &'a Option<T>, R>
 where
     R: FailingStrategy,
 {
-    fn some(self) -> Spec<'a, &'a T, R> {
+    type Some = Spec<'a, &'a T, R>;
+
+    fn some(self) -> Self::Some {
         self.mapping(|subject| match subject {
             None => {
                 panic!("expected the subject to be `Some(_)`, but was `None`")

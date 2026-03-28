@@ -8,11 +8,13 @@ use crate::std::error::Error;
 use crate::std::format;
 use crate::std::string::{String, ToString};
 
-impl<'a, S, R> AssertErrorHasSource<'a, R> for Spec<'a, S, R>
+impl<'a, S, R> AssertErrorHasSource for Spec<'a, S, R>
 where
     S: Error,
     R: FailingStrategy,
 {
+    type SourceMessage = Spec<'a, Option<String>, R>;
+
     fn has_no_source(self) -> Self {
         self.expecting(not(error_has_source()))
     }
@@ -21,10 +23,7 @@ where
         self.expecting(error_has_source())
     }
 
-    fn has_source_message(
-        self,
-        expected_source_message: impl Into<String>,
-    ) -> Spec<'a, Option<String>, R> {
+    fn has_source_message(self, expected_source_message: impl Into<String>) -> Self::SourceMessage {
         let expected_source_message = expected_source_message.into();
         self.expecting(error_has_source_message(expected_source_message))
             .mapping(|err| err.source().map(ToString::to_string))

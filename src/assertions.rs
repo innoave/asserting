@@ -10,11 +10,9 @@
 //! assertions.
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
-use crate::spec::Spec;
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeBounds;
 use crate::std::string::String;
-use crate::std::vec::Vec;
 
 /// Assert whether two values are equal or not.
 ///
@@ -1883,7 +1881,13 @@ pub trait AssertOption {
 /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
 /// assert_that!(subject).some().is_not_empty();
 /// ```
-pub trait AssertOptionValue<'a, T, R> {
+pub trait AssertOptionValue {
+    /// A spec-like type that contains the option's value as the subject, which
+    /// is returned by the mapping assertion method.
+    ///
+    /// If the subject is an `Option<T>`, this is usually `Spec<'a, T, R>`.
+    type Some;
+
     /// Maps the subject to the option's value if it has some. Otherwise, this
     /// assertion fails.
     ///
@@ -1899,7 +1903,7 @@ pub trait AssertOptionValue<'a, T, R> {
     /// assert_that!(subject).some().is_not_empty();
     /// ```
     #[track_caller]
-    fn some(self) -> Spec<'a, T, R>;
+    fn some(self) -> Self::Some;
 }
 
 /// Assert the value of a borrowed option by mapping the subject.
@@ -1917,7 +1921,13 @@ pub trait AssertOptionValue<'a, T, R> {
 /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
 /// assert_that!(&subject).some().is_not_empty();
 /// ```
-pub trait AssertBorrowedOptionValue<'a, T, R> {
+pub trait AssertBorrowedOptionValue {
+    /// A spec-like type that contains the option's borrowed value as the
+    /// subject, which is returned by the mapping assertion method.
+    ///
+    /// If the subject is an `Option<&T>`, this is usually `Spec<'a, &'a T, R>`.
+    type Some;
+
     /// Maps the subject to the option's value if it has some. Otherwise, this
     /// assertion fails.
     ///
@@ -1933,7 +1943,7 @@ pub trait AssertBorrowedOptionValue<'a, T, R> {
     /// assert_that!(&subject).some().is_not_empty();
     /// ```
     #[track_caller]
-    fn some(self) -> Spec<'a, &'a T, R>;
+    fn some(self) -> Self::Some;
 }
 
 /// Assert whether a subject of the `Result` type holds some value or an error.
@@ -1990,7 +2000,18 @@ pub trait AssertResult {
 /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
 /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
 /// ```
-pub trait AssertResultValue<'a, T, E, R> {
+pub trait AssertResultValue {
+    /// A spec-like type that contains the result's ok value as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, T, R>`.
+    type Ok;
+    /// A spec-like type that contains the result's error value as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, E, R>`.
+    type Err;
+
     /// Maps the subject to the result's ok value.
     ///
     /// If the result is an error, this method panics.
@@ -2004,7 +2025,7 @@ pub trait AssertResultValue<'a, T, E, R> {
     /// assert_that!(subject).ok().is_not_empty();
     /// ```
     #[track_caller]
-    fn ok(self) -> Spec<'a, T, R>;
+    fn ok(self) -> Self::Ok;
 
     /// Maps the subject to the result's err value.
     ///
@@ -2019,7 +2040,7 @@ pub trait AssertResultValue<'a, T, E, R> {
     /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
     /// ```
     #[track_caller]
-    fn err(self) -> Spec<'a, E, R>;
+    fn err(self) -> Self::Err;
 }
 
 /// Assert the ok-value or error of a borrowed result by mapping the subject.
@@ -2035,7 +2056,18 @@ pub trait AssertResultValue<'a, T, E, R> {
 /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
 /// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
 /// ```
-pub trait AssertBorrowedResultValue<'a, T, E, R> {
+pub trait AssertBorrowedResultValue {
+    /// A spec-like type that contains the result's borrowed ok value as the
+    /// subject, which is returned by the mapping assertion method.
+    ///
+    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, &'a T, R>`.
+    type Ok;
+    /// A spec-like type that contains the result's borrowed error value as the
+    /// subject, which is returned by the mapping assertion method.
+    ///
+    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, &'a E, R>`.
+    type Err;
+
     /// Maps the subject to the result's ok value.
     ///
     /// If the result is an error, this method panics.
@@ -2049,7 +2081,7 @@ pub trait AssertBorrowedResultValue<'a, T, E, R> {
     /// assert_that!(&subject).ok().contains_exactly(&[1, 2, 3]);
     /// ```
     #[track_caller]
-    fn ok(self) -> Spec<'a, &'a T, R>;
+    fn ok(self) -> Self::Ok;
 
     /// Maps the subject to the result's err value.
     ///
@@ -2064,7 +2096,7 @@ pub trait AssertBorrowedResultValue<'a, T, E, R> {
     /// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
     /// ```
     #[track_caller]
-    fn err(self) -> Spec<'a, &'a E, R>;
+    fn err(self) -> Self::Err;
 }
 
 /// Assert that a subject of some container type holds a value that is equal to
@@ -2172,7 +2204,13 @@ pub trait AssertHasError<E> {
 /// let subject: Result<(), anyhow::Error> = Err(anyhow!("mollit in ullamcorper no".to_string()));
 /// assert_that!(subject).has_error_message("mollit in ullamcorper no");
 /// ```
-pub trait AssertHasErrorMessage<'a, E, R> {
+pub trait AssertHasErrorMessage<E> {
+    /// A spec-like type that contains the error message as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// This is usually a `Spec<'a, String, R>`.
+    type ErrorMessage;
+
     /// Verifies that the subject is an error value with the expected message.
     ///
     /// This is useful for opaque error types that do not implement
@@ -2192,7 +2230,7 @@ pub trait AssertHasErrorMessage<'a, E, R> {
     /// assert_that!(subject).has_error_message("mollit in ullamcorper no");
     /// ```
     #[track_caller]
-    fn has_error_message(self, expected_message: E) -> Spec<'a, String, R>;
+    fn has_error_message(self, expected_message: E) -> Self::ErrorMessage;
 }
 
 /// Assert the source of any type that implements `std::error::Error`.
@@ -2247,7 +2285,13 @@ pub trait AssertHasErrorMessage<'a, E, R> {
 /// assert_that!(&error).has_source();
 /// assert_that!(&error).has_source_message("foo error");
 /// ```
-pub trait AssertErrorHasSource<'a, R> {
+pub trait AssertErrorHasSource {
+    /// A spec-like type that contains the source message as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// This is usually a `Spec<'a, String, R>`.
+    type SourceMessage;
+
     /// Verifies that an error has no source.
     ///
     /// # Example
@@ -2406,10 +2450,7 @@ pub trait AssertErrorHasSource<'a, R> {
     /// assert_that!(result).err().has_source_message("foo error");
     /// ```
     #[track_caller]
-    fn has_source_message(
-        self,
-        expected_source_message: impl Into<String>,
-    ) -> Spec<'a, Option<String>, R>;
+    fn has_source_message(self, expected_source_message: impl Into<String>) -> Self::SourceMessage;
 }
 
 /// Assert a type formatted into a debug string.
@@ -2492,7 +2533,13 @@ pub trait AssertHasDebugString<E> {
 /// assert_that!(&subject).debug_string().contains("World");
 /// assert_that!(&subject).debug_string().does_not_start_with("Bar");
 /// ```
-pub trait AssertDebugString<'a, R> {
+pub trait AssertDebugString {
+    /// A spec-like type that contains the debug string as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// This is usually a `Spec<'a, String, R>`.
+    type DebugString;
+
     /// Maps the subject into its debug string representation to do assertions
     /// on its debug string.
     ///
@@ -2512,7 +2559,7 @@ pub trait AssertDebugString<'a, R> {
     /// assert_that!(&subject).debug_string().does_not_start_with("Bar");
     /// ```
     #[track_caller]
-    fn debug_string(self) -> Spec<'a, String, R>;
+    fn debug_string(self) -> Self::DebugString;
 }
 
 /// Assert a type formatted into a display string.
@@ -2615,7 +2662,13 @@ pub trait AssertHasDisplayString<E> {
 /// assert_that!(&subject).display_string().is_equal_to("Hello, World");
 /// assert_that!(&subject).display_string().does_not_end_with('!');
 /// ```
-pub trait AssertDisplayString<'a, R> {
+pub trait AssertDisplayString {
+    /// A spec-like type that contains the display string as the subject,
+    /// which is returned by the mapping assertion method.
+    ///
+    /// This is usually a `Spec<'a, String, R>`.
+    type DisplayString;
+
     /// Maps the subject into its display string representation to do assertions
     /// on its display string.
     ///
@@ -2640,7 +2693,7 @@ pub trait AssertDisplayString<'a, R> {
     /// assert_that!(&subject).display_string().does_not_end_with('!');
     /// ```
     #[track_caller]
-    fn display_string(self) -> Spec<'a, String, R>;
+    fn display_string(self) -> Self::DisplayString;
 }
 
 /// Assert that a string contains a substring or character.
@@ -2895,7 +2948,14 @@ pub trait AssertStringMatches {
 /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
 /// assert_that!(some_btree_map).contains(('b', 0));
 /// ```
-pub trait AssertIteratorContains<'a, U, E, R> {
+pub trait AssertIteratorContains<E> {
+    /// A spec-like type that contains the collected values from the iterator as
+    /// the subject, which is returned by the mapping assertion methods.
+    ///
+    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+    /// yielded by the iterator.
+    type Sequence;
+
     /// Verifies that the actual collection/iterator contains at least one
     /// element that is equal to the expected value.
     ///
@@ -2918,7 +2978,7 @@ pub trait AssertIteratorContains<'a, U, E, R> {
     /// assert_that!(some_btree_map).contains(('b', 0));
     /// ```
     #[track_caller]
-    fn contains(self, element: E) -> Spec<'a, U, R>;
+    fn contains(self, element: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator does not contain an element
     /// that is equal to the expected value.
@@ -2942,7 +3002,7 @@ pub trait AssertIteratorContains<'a, U, E, R> {
     /// assert_that!(some_btree_map).does_not_contain(('d', 5));
     /// ```
     #[track_caller]
-    fn does_not_contain(self, element: E) -> Spec<'a, U, R>;
+    fn does_not_contain(self, element: E) -> Self::Sequence;
 }
 
 /// Assert values in a collection.
@@ -2951,7 +3011,14 @@ pub trait AssertIteratorContains<'a, U, E, R> {
 /// over its values. They are implemented for any iterator over items that
 /// implement `PartialEq<E>` with `E` being the type of the items in the
 /// expected collection or iterator.
-pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
+pub trait AssertIteratorContainsInAnyOrder<E> {
+    /// A spec-like type that contains the collected values from the iterator as
+    /// the subject, which is returned by the mapping assertion methods.
+    ///
+    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+    /// yielded by the iterator.
+    type Sequence;
+
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in any order.
     ///
@@ -2974,7 +3041,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_exactly_in_any_order([('b', 0), ('a', 3), ('c', 8)]);
     /// ```
     #[track_caller]
-    fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains at least one of
     /// the specified values.
@@ -2998,7 +3065,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_any_of([('x', 2), ('a', 3), ('y', 7)]);
     /// ```
     #[track_caller]
-    fn contains_any_of(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_any_of(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator does not contain any of
     /// the specified values.
@@ -3022,7 +3089,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).does_not_contain_any_of([('x', 2), ('z', 3), ('y', 7)]);
     /// ```
     #[track_caller]
-    fn does_not_contain_any_of(self, expected: E) -> Spec<'a, S, R>;
+    fn does_not_contain_any_of(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// in any order.
@@ -3049,7 +3116,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_all_of([('a', 3), ('b', 0)]);
     /// ```
     #[track_caller]
-    fn contains_all_of(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_all_of(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains only the given
     /// values and nothing else in any order and ignoring duplicates.
@@ -3075,7 +3142,7 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_only([('a', 3), ('b', 0), ('c', 8), ('d', 4)]);
     /// ```
     #[track_caller]
-    fn contains_only(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_only(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains only the given
     /// values in any order and each of them only once.
@@ -3098,14 +3165,21 @@ pub trait AssertIteratorContainsInAnyOrder<'a, S, E, R> {
     /// assert_that!(some_vec).contains_only_once([4, 6, 8, 10, 12, 15, 20]);
     /// ```
     #[track_caller]
-    fn contains_only_once(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_only_once(self, expected: E) -> Self::Sequence;
 }
 
 /// Assert values in an ordered collection.
 ///
 /// These assertions are applicable to collections which iterate over their
 /// values in a defined order.
-pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
+pub trait AssertIteratorContainsInOrder<E> {
+    /// A spec-like type that contains the collected values from the iterator as
+    /// the subject, which is returned by the mapping assertion methods.
+    ///
+    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+    /// yielded by the iterator.
+    type Sequence;
+
     /// Verifies that the actual collection/iterator contains exactly the given
     /// values and nothing else in the given order.
     ///
@@ -3128,7 +3202,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_exactly([('a', 3), ('b', 0), ('c', 8)]);
     /// ```
     #[track_caller]
-    fn contains_exactly(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_exactly(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains the given sequence
     /// of values in the given order and without extra values between the
@@ -3156,7 +3230,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_sequence([('a', 3), ('b', 0), ('c', 8)]);
     /// ```
     #[track_caller]
-    fn contains_sequence(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_sequence(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains all the given
     /// values and in the given order, possibly with other values between them.
@@ -3180,7 +3254,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).contains_all_in_order([('a', 3), ('c', 8)]);
     /// ```
     #[track_caller]
-    fn contains_all_in_order(self, expected: E) -> Spec<'a, S, R>;
+    fn contains_all_in_order(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// as the first elements in order.
@@ -3204,7 +3278,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).starts_with([('a', 3), ('b', 0)]);
     /// ```
     #[track_caller]
-    fn starts_with(self, expected: E) -> Spec<'a, S, R>;
+    fn starts_with(self, expected: E) -> Self::Sequence;
 
     /// Verifies that the actual collection/iterator contains the given values
     /// as the last elements in order.
@@ -3228,7 +3302,7 @@ pub trait AssertIteratorContainsInOrder<'a, S, E, R> {
     /// assert_that!(some_btree_map).ends_with([('b', 0), ('c', 8)]);
     /// ```
     #[track_caller]
-    fn ends_with(self, expected: E) -> Spec<'a, S, R>;
+    fn ends_with(self, expected: E) -> Self::Sequence;
 }
 
 /// Assert the order of the values within a collection.
@@ -3272,7 +3346,15 @@ pub trait AssertIsSorted {
 /// ```
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
-pub trait AssertCodePanics<'a, R> {
+pub trait AssertCodePanics {
+    /// A spec-like type that contains the mapped type as subject, which is
+    /// returned by mapping assertion methods.
+    ///
+    /// For closures only one assertion method can be called. Therefore, the
+    /// spec-like type contains unit, to prevent calling more assertions.
+    /// Usually the mapped type is a `Spec<'a, (), R>`.
+    type Mapped;
+
     /// Verifies that the actual code under test does not panic.
     ///
     /// # Example
@@ -3291,7 +3373,7 @@ pub trait AssertCodePanics<'a, R> {
     /// }).does_not_panic();
     /// ```
     #[track_caller]
-    fn does_not_panic(self) -> Spec<'a, (), R>;
+    fn does_not_panic(self) -> Self::Mapped;
 
     /// Verifies that the actual code under test panics with any message.
     ///
@@ -3311,7 +3393,7 @@ pub trait AssertCodePanics<'a, R> {
     /// }).panics();
     /// ```
     #[track_caller]
-    fn panics(self) -> Spec<'a, (), R>;
+    fn panics(self) -> Self::Mapped;
 
     /// Verifies that the actual code under test panics with the given
     /// message.
@@ -3332,7 +3414,7 @@ pub trait AssertCodePanics<'a, R> {
     /// }).panics_with_message("input is empty");
     /// ```
     #[track_caller]
-    fn panics_with_message(self, message: impl Into<String>) -> Spec<'a, (), R>;
+    fn panics_with_message(self, message: impl Into<String>) -> Self::Mapped;
 }
 
 /// Assertions for the keys of a map.
@@ -3921,7 +4003,18 @@ pub trait AssertMapContainsValue<E> {
 /// let subject = [42, 43, 44, 45, 46];
 /// assert_that!(subject).none_satisfies(|e| *e < 42);
 /// ```
-pub trait AssertElements<'a, T, R> {
+pub trait AssertElements<T> {
+    /// A spec-like type that contains a single element as the subject that is
+    /// extracted from the iterator.
+    ///
+    /// Usually this is a `Spec<'a, T, R>`.
+    type SingleElement;
+    /// A spec-like type that contains multiple or all elements of an iterator
+    /// as the subject.
+    ///
+    /// Usually this is a `Spec<'a, Vec<T>, R>`.
+    type MultipleElements;
+
     /// Verify that the iterator contains exactly one element and return a
     /// [`Spec`] for that single element.
     ///
@@ -3935,7 +4028,7 @@ pub trait AssertElements<'a, T, R> {
     /// assert_that!(subject).single_element().is_equal_to("single");
     /// ```
     #[track_caller]
-    fn single_element(self) -> Spec<'a, T, R>;
+    fn single_element(self) -> Self::SingleElement;
 
     /// Filter the elements of a collection or an iterator on a condition and
     /// return a [`Spec`] only containing the elements that match the condition.
@@ -3957,7 +4050,7 @@ pub trait AssertElements<'a, T, R> {
     ///     .is_equal_to("three");
     /// ```
     #[track_caller]
-    fn filtered_on<C>(self, condition: C) -> Spec<'a, Vec<T>, R>
+    fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
     where
         C: FnMut(&T) -> bool;
 
@@ -3973,7 +4066,7 @@ pub trait AssertElements<'a, T, R> {
     /// assert_that!(subject).any_satisfies(|e| *e == 42);
     /// ```
     #[track_caller]
-    fn any_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn any_satisfies<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool;
 
@@ -3989,7 +4082,7 @@ pub trait AssertElements<'a, T, R> {
     /// assert_that!(subject).all_satisfy(|e| *e > 42);
     /// ```
     #[track_caller]
-    fn all_satisfy<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn all_satisfy<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool;
 
@@ -4005,7 +4098,7 @@ pub trait AssertElements<'a, T, R> {
     /// assert_that!(subject).none_satisfies(|e| *e < 42);
     /// ```
     #[track_caller]
-    fn none_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn none_satisfies<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool;
 }
@@ -4033,7 +4126,18 @@ pub trait AssertElements<'a, T, R> {
 ///     .elements_at([0, 2, 4])
 ///     .contains_exactly(["one", "three", "five"]);
 /// ```
-pub trait AssertOrderedElements<'a, T, R> {
+pub trait AssertOrderedElements {
+    /// A spec-like type that contains a single element as the subject that is
+    /// extracted from the iterator.
+    ///
+    /// Usually this is a `Spec<'a, T, R>`.
+    type SingleElement;
+    /// A spec-like type that contains multiple or all elements of an iterator
+    /// as the subject.
+    ///
+    /// Usually this is a `Spec<'a, Vec<T>, R>`.
+    type MultipleElements;
+
     /// Verify that a collection or an iterator contains at least one element
     /// and return a [`Spec`] for the first element.
     ///
@@ -4047,7 +4151,7 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// assert_that!(subject).first_element().is_equal_to("first");
     /// ```
     #[track_caller]
-    fn first_element(self) -> Spec<'a, T, R>;
+    fn first_element(self) -> Self::SingleElement;
 
     /// Verify that a collection or an iterator contains at least one element
     /// and return a [`Spec`] for the last element.
@@ -4062,7 +4166,7 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// assert_that!(subject).last_element().is_equal_to("third");
     /// ```
     #[track_caller]
-    fn last_element(self) -> Spec<'a, T, R>;
+    fn last_element(self) -> Self::SingleElement;
 
     /// Verify that a collection or an iterator contains at least n + 1 elements
     /// and return a [`Spec`] for the nth element.
@@ -4081,7 +4185,7 @@ pub trait AssertOrderedElements<'a, T, R> {
     /// assert_that!(subject).nth_element(2).is_equal_to("third");
     /// ```
     #[track_caller]
-    fn nth_element(self, n: usize) -> Spec<'a, T, R>;
+    fn nth_element(self, n: usize) -> Self::SingleElement;
 
     /// Pick the elements of a collection or an iterator at the given positions
     /// and return a [`Spec`] only containing the selected elements.
@@ -4098,5 +4202,5 @@ pub trait AssertOrderedElements<'a, T, R> {
     ///     .contains_exactly(["one", "three", "five"]);
     /// ```
     #[track_caller]
-    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Spec<'a, Vec<T>, R>;
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
 }

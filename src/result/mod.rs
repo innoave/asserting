@@ -47,12 +47,15 @@ where
     }
 }
 
-impl<'a, T, E, R> AssertResultValue<'a, T, E, R> for Spec<'a, Result<T, E>, R>
+impl<'a, T, E, R> AssertResultValue for Spec<'a, Result<T, E>, R>
 where
     T: Debug,
     E: Debug,
 {
-    fn ok(self) -> Spec<'a, T, R> {
+    type Ok = Spec<'a, T, R>;
+    type Err = Spec<'a, E, R>;
+
+    fn ok(self) -> Self::Ok {
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
@@ -61,7 +64,7 @@ where
         })
     }
 
-    fn err(self) -> Spec<'a, E, R> {
+    fn err(self) -> Self::Err {
         self.mapping(|subject| match subject {
             Ok(value) => {
                 panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
@@ -71,12 +74,15 @@ where
     }
 }
 
-impl<'a, T, E, R> AssertBorrowedResultValue<'a, T, E, R> for Spec<'a, &'a Result<T, E>, R>
+impl<'a, T, E, R> AssertBorrowedResultValue for Spec<'a, &'a Result<T, E>, R>
 where
     T: Debug,
     E: Debug,
 {
-    fn ok(self) -> Spec<'a, &'a T, R> {
+    type Ok = Spec<'a, &'a T, R>;
+    type Err = Spec<'a, &'a E, R>;
+
+    fn ok(self) -> Self::Ok {
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
@@ -85,7 +91,7 @@ where
         })
     }
 
-    fn err(self) -> Spec<'a, &'a E, R> {
+    fn err(self) -> Self::Err {
         self.mapping(|subject| match subject {
             Ok(value) => {
                 panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
@@ -143,7 +149,7 @@ where
     }
 }
 
-impl<'a, T, E, X, R> AssertHasErrorMessage<'a, X, R> for Spec<'a, Result<T, E>, R>
+impl<'a, T, E, X, R> AssertHasErrorMessage<X> for Spec<'a, Result<T, E>, R>
 where
     T: Debug,
     E: Display,
@@ -151,7 +157,9 @@ where
     String: PartialEq<X>,
     R: FailingStrategy,
 {
-    fn has_error_message(self, expected: X) -> Spec<'a, String, R> {
+    type ErrorMessage = Spec<'a, String, R>;
+
+    fn has_error_message(self, expected: X) -> Self::ErrorMessage {
         self.mapping(|result| match result {
             Ok(value) => panic!(
                 r"expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"
@@ -163,7 +171,7 @@ where
     }
 }
 
-impl<'a, T, E, X, R> AssertHasErrorMessage<'a, X, R> for Spec<'a, &Result<T, E>, R>
+impl<'a, T, E, X, R> AssertHasErrorMessage<X> for Spec<'a, &Result<T, E>, R>
 where
     T: Debug,
     E: Display,
@@ -171,7 +179,9 @@ where
     String: PartialEq<X>,
     R: FailingStrategy,
 {
-    fn has_error_message(self, expected: X) -> Spec<'a, String, R> {
+    type ErrorMessage = Spec<'a, String, R>;
+
+    fn has_error_message(self, expected: X) -> Self::ErrorMessage {
         self.mapping(|result| match result {
             Ok(value) => panic!(
                 r"expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"

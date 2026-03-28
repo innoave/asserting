@@ -30,19 +30,21 @@ use crate::std::mem;
 use crate::std::{format, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 
-impl<'a, S, T, E, R> AssertIteratorContains<'a, Vec<T>, E, R> for Spec<'a, S, R>
+impl<'a, S, T, E, R> AssertIteratorContains<E> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     T: PartialEq<E> + Debug,
     E: Debug,
     R: FailingStrategy,
 {
-    fn contains(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    type Sequence = Spec<'a, Vec<T>, R>;
+
+    fn contains(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains(expected))
     }
 
-    fn does_not_contain(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn does_not_contain(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(not(iterator_contains(expected)))
     }
@@ -97,7 +99,7 @@ where
 
 impl<E> Invertible for IteratorContains<E> {}
 
-impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
+impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<E> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     T: PartialEq<<E as IntoIterator>::Item> + Debug,
@@ -105,7 +107,9 @@ where
     <E as IntoIterator>::Item: Debug,
     R: FailingStrategy,
 {
-    fn contains_exactly_in_any_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    type Sequence = Spec<'a, Vec<T>, R>;
+
+    fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains_exactly_in_any_order(expected))
     }
@@ -414,7 +418,7 @@ where
     }
 }
 
-impl<'a, S, T, E, R> AssertIteratorContainsInOrder<'a, Vec<T>, E, R> for Spec<'a, S, R>
+impl<'a, S, T, E, R> AssertIteratorContainsInOrder<E> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
@@ -424,27 +428,29 @@ where
     T: PartialEq<<E as IntoIterator>::Item> + Debug,
     R: FailingStrategy,
 {
-    fn contains_exactly(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    type Sequence = Spec<'a, Vec<T>, R>;
+
+    fn contains_exactly(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains_exactly(expected))
     }
 
-    fn contains_sequence(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_sequence(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains_sequence(expected))
     }
 
-    fn contains_all_in_order(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_all_in_order(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_contains_all_in_order(expected))
     }
 
-    fn starts_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn starts_with(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_starts_with(expected))
     }
 
-    fn ends_with(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn ends_with(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_ends_with(expected))
     }
@@ -777,13 +783,16 @@ where
     }
 }
 
-impl<'a, S, T, R> AssertElements<'a, T, R> for Spec<'a, S, R>
+impl<'a, S, T, R> AssertElements<T> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     T: Debug,
     R: FailingStrategy,
 {
-    fn single_element(self) -> Spec<'a, T, R> {
+    type SingleElement = Spec<'a, T, R>;
+    type MultipleElements = Spec<'a, Vec<T>, R>;
+
+    fn single_element(self) -> Self::SingleElement {
         let spec = self.mapping(Vec::from_iter).expecting(has_single_element());
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -796,14 +805,14 @@ where
         })
     }
 
-    fn filtered_on<C>(self, condition: C) -> Spec<'a, Vec<T>, R>
+    fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
     where
         C: FnMut(&T) -> bool,
     {
         self.mapping(|subject| subject.into_iter().filter(condition).collect())
     }
 
-    fn any_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn any_satisfies<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool,
     {
@@ -811,7 +820,7 @@ where
             .expecting(any_satisfies(predicate))
     }
 
-    fn all_satisfy<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn all_satisfy<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool,
     {
@@ -819,7 +828,7 @@ where
             .expecting(all_satisfy(predicate))
     }
 
-    fn none_satisfies<P>(self, predicate: P) -> Spec<'a, Vec<T>, R>
+    fn none_satisfies<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool,
     {
@@ -946,14 +955,17 @@ where
     }
 }
 
-impl<'a, S, T, R> AssertOrderedElements<'a, T, R> for Spec<'a, S, R>
+impl<'a, S, T, R> AssertOrderedElements for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     T: Debug,
     R: FailingStrategy,
 {
-    fn first_element(self) -> Spec<'a, T, R> {
+    type SingleElement = Spec<'a, T, R>;
+    type MultipleElements = Spec<'a, Vec<T>, R>;
+
+    fn first_element(self) -> Self::SingleElement {
         let spec = self
             .mapping(Vec::from_iter)
             .expecting(has_at_least_number_of_elements(1));
@@ -964,7 +976,7 @@ where
         spec.extracting(|mut collection| collection.remove(0))
     }
 
-    fn last_element(self) -> Spec<'a, T, R> {
+    fn last_element(self) -> Self::SingleElement {
         let spec = self
             .mapping(Vec::from_iter)
             .expecting(has_at_least_number_of_elements(1));
@@ -979,7 +991,7 @@ where
         })
     }
 
-    fn nth_element(self, n: usize) -> Spec<'a, T, R> {
+    fn nth_element(self, n: usize) -> Self::SingleElement {
         let min_len = n + 1;
         let spec = self
             .mapping(Vec::from_iter)
@@ -991,7 +1003,7 @@ where
         spec.extracting(|mut collection| collection.remove(n))
     }
 
-    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Spec<'a, Vec<T>, R> {
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
         let indices = HashSet::<_>::from_iter(indices);
         self.mapping(|subject| {
             subject
