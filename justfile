@@ -4,7 +4,7 @@ set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 
 # MSRV of the project
 
-msrv := "1.82.0"
+msrv := "1.85.1"
 
 alias b := build
 alias c := check
