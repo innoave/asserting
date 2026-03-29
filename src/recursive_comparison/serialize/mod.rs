@@ -9,7 +9,7 @@ use crate::std::string::{String, ToString};
 use crate::std::vec;
 use crate::std::vec::Vec;
 use serde_core::ser::Error as SerdeError;
-use serde_core::{ser, Serialize, Serializer};
+use serde_core::{Serialize, Serializer, ser};
 
 /// Serializes the given object of some type into a [`Value`]. The given type
 /// must implement [`serde::Serialize`].

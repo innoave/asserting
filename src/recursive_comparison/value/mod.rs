@@ -13,7 +13,7 @@ use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
 use crate::std::{format, vec};
 pub use map::Map;
-pub use number::{Number, F32, F64};
+pub use number::{F32, F64, Number};
 
 /// Represents a field in a struct, tuple, or enum.
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]

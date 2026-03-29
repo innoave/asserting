@@ -47,8 +47,8 @@
 #[cfg(feature = "colored")]
 #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
 pub use with_colored_feature::{
-    diff_format_for_mode, DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN,
-    DIFF_FORMAT_RED_YELLOW,
+    DIFF_FORMAT_BOLD, DIFF_FORMAT_RED_BLUE, DIFF_FORMAT_RED_GREEN, DIFF_FORMAT_RED_YELLOW,
+    diff_format_for_mode,
 };
 
 use crate::spec::{DiffFormat, Highlight};
