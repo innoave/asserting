@@ -9,6 +9,7 @@ msrv := "1.85.1"
 alias b := build
 alias c := check
 alias cc := code-coverage
+alias ci := continues-integration
 alias d := doc
 alias l := lint
 alias la := lint-all-features
@@ -92,9 +93,15 @@ build-release:
 clean:
     cargo clean
 
+# generate docs (but don't open it)
+
+[env("RUSTDOCFLAGS", "--cfg docsrs")]
+build-docs *options:
+    cargo +nightly doc --all-features --no-deps {{ options }}
+
 # generate and open docs locally
-doc $RUSTDOCFLAGS="--cfg docsrs":
-    cargo +nightly doc --all-features --no-deps --open
+doc:
+    just build-docs --open
 
 # installs the MSRV toolchain
 setup-msrv:
@@ -103,3 +110,11 @@ setup-msrv:
 # check the production code with MSRV (without tests or dev-dependencies)
 check-msrv: setup-msrv
     rustup run {{ msrv }} cargo check --lib
+
+# performs continues integration (CI) like tasks on the local machine
+[env("RUSTFLAGS", "-D warnings")]
+continues-integration:
+    just check-msrv
+    just lint
+    just test
+    just build-docs
