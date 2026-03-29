@@ -3,9 +3,9 @@
 use crate::assertions::{AssertEmptiness, AssertHasLength};
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
-    has_at_least_length, has_at_most_length, has_length, has_length_greater_than,
-    has_length_in_range, has_length_less_than, is_empty, not, HasAtLeastLength, HasAtMostLength,
-    HasLength, HasLengthGreaterThan, HasLengthInRange, HasLengthLessThan, IsEmpty,
+    HasAtLeastLength, HasAtMostLength, HasLength, HasLengthGreaterThan, HasLengthInRange,
+    HasLengthLessThan, IsEmpty, has_at_least_length, has_at_most_length, has_length,
+    has_length_greater_than, has_length_in_range, has_length_less_than, is_empty, not,
 };
 use crate::properties::{IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -48,7 +48,9 @@ where
             ("", "<empty>")
         };
         let marked_actual = mark_unexpected(actual, format);
-        format!("expected {expression} to be {not}empty\n   but was: {marked_actual}\n  expected: {expected}")
+        format!(
+            "expected {expression} to be {not}empty\n   but was: {marked_actual}\n  expected: {expected}"
+        )
     }
 }
 

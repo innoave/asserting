@@ -933,14 +933,17 @@ mod colored {
             .contains_exactly_in_any_order(&[1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to contain exactly in any order [1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31]\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to contain exactly in any order [1, 2, 3, 13, 8, 7, 12, 15, 31, 19, 20, 11, 31]\n   \
                 but was: [13, \u{1b}[31m5\u{1b}[0m, 7, 19, 1, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, 31, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: [1, \u{1b}[34m2\u{1b}[0m, 3, 13, \u{1b}[34m8\u{1b}[0m, 7, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, 31, 19, \u{1b}[34m20\u{1b}[0m, 11, \u{1b}[34m31\u{1b}[0m]\n   \
                 missing: [2, 8, 12, 15, 20, 31]\n     \
                   extra: [5, 29, 23, 37]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -952,12 +955,15 @@ mod colored {
             .contains_any_of(&[2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to contain any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to contain any of [2, 4, 6, 8, 9, 10, 12, 15, 32, 20, 18]\n   \
                 but was: [\u{1b}[31m13\u{1b}[0m, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, \u{1b}[31m19\u{1b}[0m, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, \u{1b}[31m37\u{1b}[0m]\n  \
                expected: [\u{1b}[34m2\u{1b}[0m, \u{1b}[34m4\u{1b}[0m, \u{1b}[34m6\u{1b}[0m, \u{1b}[34m8\u{1b}[0m, \u{1b}[34m9\u{1b}[0m, \u{1b}[34m10\u{1b}[0m, \u{1b}[34m12\u{1b}[0m, \u{1b}[34m15\u{1b}[0m, \u{1b}[34m32\u{1b}[0m, \u{1b}[34m20\u{1b}[0m, \u{1b}[34m18\u{1b}[0m]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -969,12 +975,15 @@ mod colored {
             .does_not_contain_any_of(&[2, 4, 6, 8, 9, 10, 11, 15, 32, 20, 18])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to not contain any of [2, 4, 6, 8, 9, 10, 11, 15, 32, 20, 18]\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to not contain any of [2, 4, 6, 8, 9, 10, 11, 15, 32, 20, 18]\n   \
                 but was: [13, 5, 7, 19, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, 3, \u{1b}[31m11\u{1b}[0m, 29, 23, 31, 37]\n  \
                expected: not [2, 4, 6, 8, 9, 10, \u{1b}[34m11\u{1b}[0m, 15, 32, 20, 18]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -986,13 +995,16 @@ mod colored {
             .contains_all_of(&[2, 3, 5, 20, 11, 13, 19, 37, 22])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to contain all of [2, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to contain all of [2, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [\u{1b}[34m2\u{1b}[0m, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n   \
                 missing: [2, 20, 22]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -1004,13 +1016,16 @@ mod colored {
             .contains_only(&[13, 3, 5, 20, 11, 13, 19, 37, 22])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to contain only [13, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to contain only [13, 3, 5, 20, 11, 13, 19, 37, 22]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [13, 3, 5, \u{1b}[34m20\u{1b}[0m, 11, 13, 19, 37, \u{1b}[34m22\u{1b}[0m]\n     \
                   extra: [7, 1, 29, 23, 31]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -1044,15 +1059,18 @@ mod colored {
             .contains_exactly(&[13, 20, 5, 19, 11, 29, 8, 1, 23, 31, 41])
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to contain exactly in order [13, 20, 5, 19, 11, 29, 8, 1, 23, 31, 41]\n       \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to contain exactly in order [13, 20, 5, 19, 11, 29, 8, 1, 23, 31, 41]\n       \
                     but was: [13, \u{1b}[31m5\u{1b}[0m, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m11\u{1b}[0m, \u{1b}[31m29\u{1b}[0m, 23, 31, \u{1b}[31m37\u{1b}[0m]\n      \
                    expected: [13, \u{1b}[33m20\u{1b}[0m, \u{1b}[33m5\u{1b}[0m, 19, \u{1b}[33m11\u{1b}[0m, \u{1b}[33m29\u{1b}[0m, \u{1b}[33m8\u{1b}[0m, \u{1b}[33m1\u{1b}[0m, 23, 31, \u{1b}[33m41\u{1b}[0m]\n       \
                     missing: [20, 8, 41]\n         \
                       extra: [7, 3, 37]\n  \
                out-of-order: [5, 1, 11, 29]\n\
             "
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -1109,14 +1127,12 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "expected subject to start with [13, 5, 8, 19, 4]\n   \
+            &["expected subject to start with [13, 5, 8, 19, 4]\n   \
                 but was: [13, 5, \u{1b}[31m7\u{1b}[0m, 19, \u{1b}[31m1\u{1b}[0m, 3, 11, 29, 23, 31, 37]\n  \
                expected: [13, 5, \u{1b}[33m8\u{1b}[0m, 19, \u{1b}[33m4\u{1b}[0m]\n   \
                 missing: [8, 4]\n     \
                   extra: [7, 1]\n\
-            "
-            ]
+            "]
         );
     }
 
@@ -1131,14 +1147,12 @@ mod colored {
 
         assert_eq!(
             failures,
-            &[
-                "expected subject to end with [3, 11, 28, 29, 30, 37]\n   \
+            &["expected subject to end with [3, 11, 28, 29, 30, 37]\n   \
                 but was: [13, 5, 7, 19, 1, 3, 11, \u{1b}[31m29\u{1b}[0m, \u{1b}[31m23\u{1b}[0m, \u{1b}[31m31\u{1b}[0m, 37]\n  \
                expected: [3, 11, \u{1b}[33m28\u{1b}[0m, \u{1b}[33m29\u{1b}[0m, \u{1b}[33m30\u{1b}[0m, 37]\n   \
                 missing: [28, 29, 30]\n     \
                   extra: [29, 23, 31]\n\
-            "
-            ]
+            "]
         );
     }
 }

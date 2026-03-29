@@ -5,9 +5,9 @@ use crate::assertions::{
 };
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
 use crate::expectations::{
-    has_precision_of, has_scale_of, is_a_number, is_finite, is_infinite, is_integer, is_negative,
-    is_one, is_positive, is_zero, not, HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite,
-    IsInteger, IsNegative, IsOne, IsPositive, IsZero,
+    HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite, IsInteger, IsNegative, IsOne,
+    IsPositive, IsZero, has_precision_of, has_scale_of, is_a_number, is_finite, is_infinite,
+    is_integer, is_negative, is_one, is_positive, is_zero, not,
 };
 use crate::properties::{
     AdditiveIdentityProperty, DecimalProperties, InfinityProperty, IsNanProperty,
@@ -62,7 +62,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}negative\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}negative\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -90,7 +92,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}positive\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}positive\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -128,7 +132,9 @@ where
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected(&actual, format);
         let marked_expected = mark_missing(&S::additive_identity(), format);
-        format!("expected {expression} to be {not}zero\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to be {not}zero\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 
@@ -152,7 +158,9 @@ where
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&S::multiplicative_identity(), format);
-        format!("expected {expression} to be {not}one\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to be {not}one\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 
@@ -194,7 +202,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}finite\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}finite\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -222,7 +232,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}infinite\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}infinite\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -264,7 +276,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}a number\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}a number\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -307,7 +321,9 @@ where
         let expected_scale = self.expected_scale;
         let marked_actual = mark_unexpected(&actual.scale_property(), format);
         let marked_expected = mark_missing(&expected_scale, format);
-        format!("expected {expression} to {not}have a scale of {expected_scale}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to {not}have a scale of {expected_scale}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 
@@ -332,7 +348,9 @@ where
         let expected_precision = self.expected_precision;
         let marked_actual = mark_unexpected(&actual.precision_property(), format);
         let marked_expected = mark_missing(&expected_precision, format);
-        format!("expected {expression} to {not}have a precision of {expected_precision}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to {not}have a precision of {expected_precision}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 
@@ -358,6 +376,8 @@ where
         };
         let marked_actual = mark_unexpected(&actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to be {not}an integer value\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}an integer value\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }

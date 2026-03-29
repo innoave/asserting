@@ -2,7 +2,7 @@
 
 use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{has_value, is_none, is_some, HasValue, IsNone, IsSome};
+use crate::expectations::{HasValue, IsNone, IsSome, has_value, is_none, is_some};
 use crate::spec::{
     DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
@@ -199,7 +199,9 @@ where
         let expected = &self.expected;
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing(&Some(expected), format);
-        format!("expected {expression} to be some {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to be some {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 

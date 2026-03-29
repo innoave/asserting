@@ -1,8 +1,8 @@
 use super::*;
 use crate::recursive_comparison::value::{
-    self, bool, char, field, float32, float64, int128, int16, int32, int64, int8, isize, map, none,
-    seq, some, string, struct_, struct_variant, tuple, tuple_struct, tuple_variant, uint128,
-    uint16, uint32, uint64, uint8, unit, unit_struct, unit_variant, usize,
+    self, bool, char, field, float32, float64, int8, int16, int32, int64, int128, isize, map, none,
+    seq, some, string, struct_, struct_variant, tuple, tuple_struct, tuple_variant, uint8, uint16,
+    uint32, uint64, uint128, unit, unit_struct, unit_variant, usize,
 };
 use crate::std::string::ToString;
 use indexmap::IndexMap;

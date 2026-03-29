@@ -97,7 +97,7 @@ impl IsNanProperty for f64 {
 mod cmp {
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::colored::mark_diff;
-    use crate::expectations::{is_close_to, not, IsCloseTo};
+    use crate::expectations::{IsCloseTo, is_close_to, not};
     use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::{format, string::String};
     use float_cmp::{ApproxEq, F32Margin, F64Margin};
@@ -172,7 +172,8 @@ mod cmp {
         ) -> String {
             let not = if inverted { "not " } else { "" };
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
-            format!("expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            format!(
+                "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 &self.expected, self.margin.epsilon, self.margin.ulps
             )
         }
@@ -194,7 +195,8 @@ mod cmp {
         ) -> String {
             let not = if inverted { "not " } else { "" };
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
-            format!("expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
+            format!(
+                "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 &self.expected, self.margin.epsilon, self.margin.ulps
             )
         }

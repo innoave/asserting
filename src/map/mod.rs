@@ -4,10 +4,10 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected_string,
 };
 use crate::expectations::{
-    map_contains_exactly_keys, map_contains_key, map_contains_keys, map_contains_value,
-    map_contains_values, map_does_not_contain_keys, map_does_not_contain_values, not,
     MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
-    MapDoesNotContainKeys, MapDoesNotContainValues,
+    MapDoesNotContainKeys, MapDoesNotContainValues, map_contains_exactly_keys, map_contains_key,
+    map_contains_keys, map_contains_value, map_contains_values, map_does_not_contain_keys,
+    map_does_not_contain_values, not,
 };
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
@@ -92,7 +92,9 @@ where
             ("", all_entries_marked)
         };
         let marked_expected = mark_missing(&self.expected_key, format);
-        format!("expected {expression} to {not}contain the key {expected_key:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to {not}contain the key {expected_key:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 
@@ -328,7 +330,9 @@ where
         };
         let marked_expected = mark_missing(&self.expected_value, format);
 
-        format!("expected {expression} to {not}contain the value {expected_value:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+        format!(
+            "expected {expression} to {not}contain the value {expected_value:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+        )
     }
 }
 

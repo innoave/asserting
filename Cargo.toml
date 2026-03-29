@@ -3,8 +3,8 @@ name = "asserting"
 version = "0.14.0"
 authors = ["haraldmaida"]
 license = "MIT OR Apache-2.0"
-edition = "2021"
-rust-version = "1.82.0"
+edition = "2024"
+rust-version = "1.85.1"
 repository = "https://github.com/innoave/asserting"
 readme = "README.md"
 
@@ -73,15 +73,19 @@ version-sync.opt-level = 3
 [lints.rust]
 unsafe_code = "forbid"
 unstable_features = "forbid"
+deprecated_safe = { level = "forbid", priority = -1 }
 bare_trait_objects = "warn"
 deprecated = "warn"
 explicit_outlives_requirements = "warn"
+keyword_idents_2024 = "warn"
 noop_method_call = "warn"
 rust_2018_idioms = { level = "warn", priority = -1 }
 rust_2021_incompatible_closure_captures = "warn"
 rust_2021_incompatible_or_patterns = "warn"
 rust_2021_prefixes_incompatible_syntax = "warn"
 rust_2021_prelude_collisions = "warn"
+rust_2024_guarded_string_incompatible_syntax = "warn"
+rust_2024_prelude_collisions = "warn"
 single_use_lifetimes = "warn"
 trivial_casts = "warn"
 trivial_numeric_casts = "warn"

@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertBoolean;
 use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{is_false, is_true, IsFalse, IsTrue};
+use crate::expectations::{IsFalse, IsTrue, is_false, is_true};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::format;
 use crate::std::string::String;

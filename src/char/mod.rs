@@ -1,9 +1,9 @@
 use crate::assertions::AssertChar;
 use crate::colored::{mark_missing_string, mark_unexpected_char};
 use crate::expectations::{
-    is_alphabetic, is_alphanumeric, is_ascii, is_control_char, is_digit, is_lower_case,
-    is_upper_case, is_whitespace, IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit,
-    IsLowerCase, IsUpperCase, IsWhitespace,
+    IsAlphabetic, IsAlphanumeric, IsAscii, IsControlChar, IsDigit, IsLowerCase, IsUpperCase,
+    IsWhitespace, is_alphabetic, is_alphanumeric, is_ascii, is_control_char, is_digit,
+    is_lower_case, is_upper_case, is_whitespace,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::format;
@@ -102,7 +102,9 @@ impl Expectation<char> for IsLowerCase {
         };
         let marked_actual = mark_unexpected_char(*actual, format);
         let marked_expected = mark_missing_string(&expected, format);
-        format!("expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -143,7 +145,9 @@ impl Expectation<char> for IsUpperCase {
         };
         let marked_actual = mark_unexpected_char(*actual, format);
         let marked_expected = mark_missing_string(&expected, format);
-        format!("expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -179,7 +183,9 @@ impl Expectation<char> for IsAscii {
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}an ASCII character\n   but was: {marked_actual}\n  expected: {not}an ASCII character")
+        format!(
+            "expected {expression} to be {not}an ASCII character\n   but was: {marked_actual}\n  expected: {not}an ASCII character"
+        )
     }
 }
 
@@ -215,7 +221,9 @@ impl Expectation<char> for IsAlphabetic {
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}an alphabetic character\n   but was: {marked_actual}\n  expected: {not}an alphabetic character")
+        format!(
+            "expected {expression} to be {not}an alphabetic character\n   but was: {marked_actual}\n  expected: {not}an alphabetic character"
+        )
     }
 }
 
@@ -251,7 +259,9 @@ impl Expectation<char> for IsAlphanumeric {
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}an alphanumeric character\n   but was: {marked_actual}\n  expected: {not}an alphanumeric character")
+        format!(
+            "expected {expression} to be {not}an alphanumeric character\n   but was: {marked_actual}\n  expected: {not}an alphanumeric character"
+        )
     }
 }
 
@@ -287,7 +297,9 @@ impl Expectation<char> for IsControlChar {
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}a control character\n   but was: {marked_actual}\n  expected: {not}a control character")
+        format!(
+            "expected {expression} to be {not}a control character\n   but was: {marked_actual}\n  expected: {not}a control character"
+        )
     }
 }
 
@@ -324,7 +336,9 @@ impl Expectation<char> for IsDigit {
         let not = if inverted { "not " } else { "" };
         let radix = self.radix;
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}a digit in the radix {radix}\n   but was: {marked_actual}\n  expected: {not}a digit in the radix {radix}")
+        format!(
+            "expected {expression} to be {not}a digit in the radix {radix}\n   but was: {marked_actual}\n  expected: {not}a digit in the radix {radix}"
+        )
     }
 }
 
@@ -360,7 +374,9 @@ impl Expectation<char> for IsWhitespace {
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let marked_actual = mark_unexpected_char(*actual, format);
-        format!("expected {expression} to be {not}whitespace\n   but was: {marked_actual}\n  expected: {not}whitespace")
+        format!(
+            "expected {expression} to be {not}whitespace\n   but was: {marked_actual}\n  expected: {not}whitespace"
+        )
     }
 }
 

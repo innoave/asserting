@@ -3,9 +3,9 @@
 use crate::assertions::AssertHasCharCount;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
-    has_at_least_char_count, has_at_most_char_count, has_char_count, has_char_count_greater_than,
-    has_char_count_in_range, has_char_count_less_than, HasAtLeastCharCount, HasAtMostCharCount,
-    HasCharCount, HasCharCountGreaterThan, HasCharCountInRange, HasCharCountLessThan,
+    HasAtLeastCharCount, HasAtMostCharCount, HasCharCount, HasCharCountGreaterThan,
+    HasCharCountInRange, HasCharCountLessThan, has_at_least_char_count, has_at_most_char_count,
+    has_char_count, has_char_count_greater_than, has_char_count_in_range, has_char_count_less_than,
 };
 use crate::properties::CharCountProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};

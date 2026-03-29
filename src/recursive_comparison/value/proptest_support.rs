@@ -3,7 +3,7 @@
 //! This module mainly provides methods that provide [`Strategy`]s for
 //! generating arbitrary values of type [`Value`] and [`Number`].
 
-use crate::recursive_comparison::value::{Number, Value, F32, F64};
+use crate::recursive_comparison::value::{F32, F64, Number, Value};
 use crate::std::string::String;
 use crate::std::vec;
 use proptest::prelude::*;

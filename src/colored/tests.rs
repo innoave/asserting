@@ -59,12 +59,15 @@ mod with_colored_feature {
             }))
             .display_failures();
 
-        assert_eq!(failures, &[
-            "expected subject to be equal to Some(Foo { lorem: \"Hello World!\", ipsum: 42, dolor: Some(\"hey ho!\") })\n   \
+        assert_eq!(
+            failures,
+            &[
+                "expected subject to be equal to Some(Foo { lorem: \"Hello World!\", ipsum: 42, dolor: Some(\"hey ho!\") })\n   \
                  but was: Some(Foo { lorem: \"\u{1b}[31m¡\u{1b}[0mH\u{1b}[31mo\u{1b}[0ml\u{1b}[31ma,\u{1b}[0m W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\") })\n  \
                expected: Some(Foo { lorem: \"H\u{1b}[32me\u{1b}[0ml\u{1b}[32mlo\u{1b}[0m W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\", ipsum: 42, dolor: Some(\"hey\u{1b}[32m ho!\u{1b}[0m\") })\n\
             ",
-        ]);
+            ]
+        );
     }
 
     #[test]
@@ -136,8 +139,8 @@ mod with_colored_feature {
     }
 
     #[test]
-    fn mark_unexpected_substring_in_string_highlights_nothing_if_the_string_does_not_contain_the_substring(
-    ) {
+    fn mark_unexpected_substring_in_string_highlights_nothing_if_the_string_does_not_contain_the_substring()
+     {
         let marked_string = mark_unexpected_substring_in_string(
             "mollit est eu amet",
             "st eux a",
@@ -159,8 +162,8 @@ mod with_colored_feature {
     }
 
     #[test]
-    fn mark_missing_substring_in_string_highlights_nothing_if_the_string_does_not_contain_the_substring(
-    ) {
+    fn mark_missing_substring_in_string_highlights_nothing_if_the_string_does_not_contain_the_substring()
+     {
         let marked_string = mark_missing_substring_in_string(
             "mollit est eu amet",
             "xt est eu",
@@ -171,8 +174,8 @@ mod with_colored_feature {
     }
 
     #[test]
-    fn mark_unexpected_char_in_string_highlights_all_occurences_of_a_char_within_a_string_as_unexpected(
-    ) {
+    fn mark_unexpected_char_in_string_highlights_all_occurences_of_a_char_within_a_string_as_unexpected()
+     {
         let marked_string =
             mark_unexpected_char_in_string("zzril mazim sint", 'z', &DIFF_FORMAT_RED_YELLOW);
 
@@ -181,8 +184,8 @@ mod with_colored_feature {
     }
 
     #[test]
-    fn mark_unexpected_char_in_string_highlights_nothing_if_the_string_does_not_contain_the_character(
-    ) {
+    fn mark_unexpected_char_in_string_highlights_nothing_if_the_string_does_not_contain_the_character()
+     {
         let marked_string =
             mark_unexpected_char_in_string("zzril mazim sint", 'v', &DIFF_FORMAT_RED_YELLOW);
 

@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertCodePanics;
 use crate::colored::{mark_missing_string, mark_unexpected_string};
-use crate::expectations::{does_not_panic, does_panic, DoesNotPanic, DoesPanic};
+use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
 use crate::spec::{Code, DiffFormat, Expectation, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
 use crate::std::panic;
@@ -114,14 +114,18 @@ where
             } else if let Some(expected_message) = &self.expected_message {
                 let marked_expected_message = mark_missing_string(expected_message, format);
                 let marked_actual_message = mark_unexpected_string(actual_message, format);
-                format!("expected {expression} to panic with message {expected_message:?}\n   but was: \"{marked_actual_message}\"\n  expected: \"{marked_expected_message}\"")
+                format!(
+                    "expected {expression} to panic with message {expected_message:?}\n   but was: \"{marked_actual_message}\"\n  expected: \"{marked_expected_message}\""
+                )
             } else {
                 // should be unreachable
                 format!("expected {expression} to panic, but did not panic")
             }
         } else if let Some(expected_message) = &self.expected_message {
             let marked_did_not_panic = mark_unexpected_string("did not panic", format);
-            format!("expected {expression} to panic with message {expected_message:?},\n  but {marked_did_not_panic}")
+            format!(
+                "expected {expression} to panic with message {expected_message:?},\n  but {marked_did_not_panic}"
+            )
         } else {
             let marked_did_not_panic = mark_unexpected_string("did not panic", format);
             format!("expected {expression} to panic, but {marked_did_not_panic}")
