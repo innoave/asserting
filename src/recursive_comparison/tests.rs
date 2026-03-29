@@ -327,8 +327,8 @@ fn struct_is_equal_to_using_recursive_comparison_ignoring_one_field_and_all_its_
 }
 
 #[test]
-fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_one_field_and_all_its_subfields_fails(
-) {
+fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_one_field_and_all_its_subfields_fails()
+ {
     let person = Person {
         id: 123,
         name: "Silvia".into(),
@@ -416,8 +416,8 @@ fn struct_is_equal_to_using_recursive_comparison_ignoring_three_fields_repeated_
 }
 
 #[test]
-fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_three_fields_repeated_method_calls_fails(
-) {
+fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_three_fields_repeated_method_calls_fails()
+ {
     let person = Person {
         id: 123,
         name: "Silvia".into(),
@@ -594,8 +594,8 @@ fn struct_is_equal_to_using_recursive_comparison_ignoring_id_fields_on_different
 }
 
 #[test]
-fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_id_fields_on_different_levels_fails(
-) {
+fn verify_struct_is_equal_to_using_recursive_comparison_ignoring_id_fields_on_different_levels_fails()
+ {
     let person = Person {
         id: 123,
         name: "Silvia".into(),
@@ -956,8 +956,8 @@ fn struct_is_equivalent_to_struct_with_relevant_fields() {
 }
 
 #[test]
-fn verify_struct_is_equivalent_to_struct_with_relevant_fields_do_not_ignore_not_expected_fields_fails(
-) {
+fn verify_struct_is_equivalent_to_struct_with_relevant_fields_do_not_ignore_not_expected_fields_fails()
+ {
     let person = Person {
         id: 456,
         name: "Silvia".into(),

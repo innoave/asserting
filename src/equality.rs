@@ -5,8 +5,8 @@ use crate::assertions::{
 };
 use crate::colored::{mark_diff, mark_diff_str};
 use crate::expectations::{
-    has_debug_string, has_display_string, is_equal_to, is_same_as, not, HasDebugString,
-    HasDisplayString, IsEqualTo, IsSameAs,
+    HasDebugString, HasDisplayString, IsEqualTo, IsSameAs, has_debug_string, has_display_string,
+    is_equal_to, is_same_as, not,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::{Debug, Display};

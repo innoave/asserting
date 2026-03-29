@@ -2,8 +2,8 @@
 
 use crate::properties::{DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::std::collections::{
-    btree_map, btree_set, linked_list, vec_deque, BTreeMap, BTreeSet, BinaryHeap, LinkedList,
-    VecDeque,
+    BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque, btree_map, btree_set, linked_list,
+    vec_deque,
 };
 use crate::std::{array, slice};
 use crate::std::{vec, vec::Vec};

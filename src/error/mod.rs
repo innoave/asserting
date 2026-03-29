@@ -1,7 +1,7 @@
 use crate::assertions::AssertErrorHasSource;
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected, mark_unexpected_string};
 use crate::expectations::{
-    error_has_source, error_has_source_message, not, ErrorHasSource, ErrorHasSourceMessage,
+    ErrorHasSource, ErrorHasSourceMessage, error_has_source, error_has_source_message, not,
 };
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::error::Error;
@@ -52,7 +52,9 @@ where
         };
         let marked_actual = mark_unexpected(actual, format);
         let marked_expected = mark_missing_string(expected, format);
-        format!("expected {expression} to have {a} source\n   but was: {marked_actual}\n  expected: {marked_expected}")
+        format!(
+            "expected {expression} to have {a} source\n   but was: {marked_actual}\n  expected: {marked_expected}"
+        )
     }
 }
 
@@ -80,12 +82,16 @@ where
         if let Some(actual_source) = actual.source() {
             let marked_actual = mark_unexpected_string(&actual_source.to_string(), format);
             let marked_expected = mark_missing_string(expected, format);
-            format!("expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\"")
+            format!(
+                "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\""
+            )
         } else {
             let mut marked_actual = mark_unexpected(actual, format);
             marked_actual.push_str(" - which has no source");
             let marked_expected = mark_missing(expected, format);
-            format!("expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: {marked_actual}\n  expected: {not}{marked_expected}")
+            format!(
+                "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+            )
         }
     }
 }

@@ -6,7 +6,7 @@ use crate::assertions::{
 };
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
-    has_error, has_value, is_equal_to, is_err, is_ok, HasError, HasValue, IsErr, IsOk,
+    HasError, HasValue, IsErr, IsOk, has_error, has_value, is_equal_to, is_err, is_ok,
 };
 use crate::spec::{
     DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,

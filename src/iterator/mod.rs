@@ -9,15 +9,15 @@ use crate::colored::{
     mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
 };
 use crate::expectations::{
-    all_satisfy, any_satisfies, has_at_least_number_of_elements, has_single_element,
+    AllSatisfy, AnySatisfies, HasAtLeastNumberOfElements, HasSingleElement, IteratorContains,
+    IteratorContainsAllInOrder, IteratorContainsAllOf, IteratorContainsAnyOf,
+    IteratorContainsExactly, IteratorContainsExactlyInAnyOrder, IteratorContainsOnly,
+    IteratorContainsOnlyOnce, IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith,
+    NoneSatisfies, all_satisfy, any_satisfies, has_at_least_number_of_elements, has_single_element,
     iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
     iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
     iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
-    iterator_ends_with, iterator_starts_with, none_satisfies, not, AllSatisfy, AnySatisfies,
-    HasAtLeastNumberOfElements, HasSingleElement, IteratorContains, IteratorContainsAllInOrder,
-    IteratorContainsAllOf, IteratorContainsAnyOf, IteratorContainsExactly,
-    IteratorContainsExactlyInAnyOrder, IteratorContainsOnly, IteratorContainsOnlyOnce,
-    IteratorContainsSequence, IteratorEndsWith, IteratorStartsWith, NoneSatisfies,
+    iterator_ends_with, iterator_starts_with, none_satisfies, not,
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{

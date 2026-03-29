@@ -1,6 +1,6 @@
 use crate::expectations::{
-    all, any, not, rec, IsBetween, IsEmpty, IsGreaterThan, IsLessThan, IsNegative, IsOne,
-    IsPositive, IsZero, StringContains, StringContainsAnyOf,
+    IsBetween, IsEmpty, IsGreaterThan, IsLessThan, IsNegative, IsOne, IsPositive, IsZero,
+    StringContains, StringContainsAnyOf, all, any, not, rec,
 };
 use crate::prelude::*;
 use crate::spec::{Expectation, Expression};

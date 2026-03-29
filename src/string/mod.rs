@@ -7,8 +7,8 @@ use crate::colored::{
     mark_unexpected_char_in_string, mark_unexpected_string, mark_unexpected_substring_in_string,
 };
 use crate::expectations::{
-    not, string_contains, string_contains_any_of, string_ends_with, string_starts_with,
-    StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith,
+    StringContains, StringContainsAnyOf, StringEndsWith, StringStartWith, not, string_contains,
+    string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
@@ -702,7 +702,7 @@ impl<const N: usize> Invertible for StringContainsAnyOf<&[char; N]> {}
 mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::colored::{mark_missing_string, mark_unexpected_string};
-    use crate::expectations::{not, string_matches, StringMatches};
+    use crate::expectations::{StringMatches, not, string_matches};
     use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
     use crate::std::fmt::Debug;
     use crate::std::format;
@@ -745,7 +745,9 @@ mod regex {
             let regex = self.regex.as_str();
             let marked_actual = mark_unexpected_string(actual.as_ref(), format);
             let marked_expected = mark_missing_string(regex, format);
-            format!("expected {expression} to {not}match the regex {regex}\n               but was: {marked_actual}\n  {does_not_match} regex: {marked_expected}")
+            format!(
+                "expected {expression} to {not}match the regex {regex}\n               but was: {marked_actual}\n  {does_not_match} regex: {marked_expected}"
+            )
         }
     }
 

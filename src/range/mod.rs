@@ -2,7 +2,7 @@
 
 use crate::assertions::AssertInRange;
 use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
-use crate::expectations::{is_in_range, not, IsInRange};
+use crate::expectations::{IsInRange, is_in_range, not};
 use crate::properties::IsEmptyProperty;
 use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
 use crate::std::fmt::Debug;
