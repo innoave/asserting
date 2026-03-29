@@ -947,7 +947,7 @@ pub trait AssertDecimalNumber {
     /// # }
     /// ```
     ///
-    /// Note: `rust_decimal::Decimal` is fixed precision decimal number. The
+    /// Note: `rust_decimal::Decimal` is a fixed precision decimal number. The
     /// actual precision is always 29.
     #[track_caller]
     fn has_precision_of(self, expected_precision: u64) -> Self;

@@ -1,8 +1,6 @@
 //! Implementation of assertions for `Option` values.
 
-use crate::assertions::{
-    AssertBorrowedOptionValue, AssertHasValue, AssertOption, AssertOptionValue,
-};
+use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{has_value, is_none, is_some, HasValue, IsNone, IsSome};
 use crate::spec::{
@@ -55,7 +53,7 @@ where
     }
 }
 
-impl<'a, T, R> AssertBorrowedOptionValue for Spec<'a, &'a Option<T>, R>
+impl<'a, T, R> AssertOptionValue for Spec<'a, &'a Option<T>, R>
 where
     R: FailingStrategy,
 {

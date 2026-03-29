@@ -2,11 +2,12 @@
 
 use crate::colored;
 use crate::expectations::satisfies;
+use crate::extracting::DerivedSpec;
+
 #[cfg(feature = "recursive")]
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
-use crate::std::borrow::Borrow;
-use crate::std::borrow::Cow;
+use crate::std::borrow::{Borrow, Cow, ToOwned};
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::format;
@@ -724,8 +725,8 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// value and the expected value.
     ///
     /// Note: This method must be called before an assertion method is called to
-    /// have an effect on the failure message of the assertion as failure
-    /// messages are formatted immediately when an assertion is executed.
+    /// affect the failure message of the assertion as failure messages are
+    /// formatted immediately when an assertion is executed.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
         self.diff_format = diff_format;
@@ -811,11 +812,30 @@ impl<'a, S, R> Spec<'a, S, R> {
     ///
     /// ```
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn extracting<F, U>(self, extractor: F) -> Spec<'a, U, R>
+    pub fn extracting<F, U>(self, extract: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {
-        self.mapping(extractor)
+        Spec {
+            subject: extract(self.subject),
+            expression: Expression::default(),
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
+        }
+    }
+
+    pub fn extracting_ref<F, B, U>(self, extract: F) -> DerivedSpec<'a, Self, U>
+    where
+        F: FnOnce(&S) -> &B,
+        B: ToOwned<Owned = U> + ?Sized,
+    {
+        let derived_subject = extract(&self.subject).to_owned();
+        let expression = Expression::default();
+        let diff_format = self.diff_format.clone();
+        DerivedSpec::new(self, derived_subject, expression, diff_format)
     }
 
     /// Maps the current subject to some other value.
@@ -854,12 +874,12 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// assertion. So we map the subject of the type `Point` to a tuple of its
     /// fields.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
+    pub fn mapping<F, U>(self, map: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {
         Spec {
-            subject: mapper(self.subject),
+            subject: map(self.subject),
             expression: self.expression,
             description: self.description,
             location: self.location,
@@ -1262,6 +1282,12 @@ impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
             PanicOnFail.do_fail_with(&self.failures);
         }
     }
+}
+
+pub trait And {
+    type Target;
+
+    fn and(self) -> Self::Target;
 }
 
 /// Access the assertion-failures collected by a `Spec` or spec-like struct.
