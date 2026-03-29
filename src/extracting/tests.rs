@@ -5,9 +5,9 @@ use crate::std::vec::Vec;
 #[cfg(feature = "bigdecimal")]
 use bigdecimal::BigDecimal;
 #[cfg(feature = "float-cmp")]
-use time::macros::datetime;
-#[cfg(feature = "float-cmp")]
 use time::OffsetDateTime;
+#[cfg(feature = "float-cmp")]
+use time::macros::datetime;
 
 #[cfg(feature = "float-cmp")]
 #[derive(Debug, Clone, PartialEq)]
