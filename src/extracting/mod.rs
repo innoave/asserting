@@ -2,35 +2,38 @@ use crate::assertions::{
     AssertBoolean, AssertChar, AssertDebugString, AssertDecimalNumber, AssertDisplayString,
     AssertEmptiness, AssertEquality, AssertErrorHasSource, AssertHasCharCount,
     AssertHasDebugString, AssertHasDisplayString, AssertHasError, AssertHasErrorMessage,
-    AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIsSorted,
-    AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
-    AssertNotANumber, AssertNumericIdentity, AssertOption, AssertOptionValue, AssertOrder,
-    AssertResult, AssertResultValue, AssertSameAs, AssertSignum, AssertStringContainsAnyOf,
-    AssertStringPattern,
+    AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIteratorContains,
+    AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder, AssertMapContainsKey,
+    AssertMapContainsValue, AssertNotANumber, AssertNumericIdentity, AssertOption,
+    AssertOptionValue, AssertOrder, AssertOrderedElements, AssertResult, AssertResultValue,
+    AssertSameAs, AssertSignum, AssertStringContainsAnyOf, AssertStringPattern,
 };
 use crate::expectations::{
     error_has_source, error_has_source_message, has_at_least_char_count, has_at_least_length,
-    has_at_most_char_count, has_at_most_length, has_char_count, has_char_count_greater_than,
-    has_char_count_in_range, has_char_count_less_than, has_debug_string, has_display_string,
-    has_error, has_length, has_length_greater_than, has_length_in_range, has_length_less_than,
-    has_precision_of, has_scale_of, has_value, is_a_number, is_after, is_alphabetic,
-    is_alphanumeric, is_ascii, is_at_least, is_at_most, is_before, is_between, is_control_char,
-    is_digit, is_empty, is_equal_to, is_err, is_false, is_finite, is_greater_than, is_in_range,
-    is_infinite, is_integer, is_less_than, is_lower_case, is_negative, is_none, is_ok, is_one,
-    is_positive, is_same_as, is_some, is_true, is_upper_case, is_whitespace, is_zero,
-    iterator_contains, iterator_contains_all_in_order, iterator_contains_all_of,
-    iterator_contains_any_of, iterator_contains_exactly, iterator_contains_exactly_in_any_order,
-    iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
-    iterator_ends_with, iterator_starts_with, not, string_contains, string_contains_any_of,
-    string_ends_with, string_starts_with,
+    has_at_least_number_of_elements, has_at_most_char_count, has_at_most_length, has_char_count,
+    has_char_count_greater_than, has_char_count_in_range, has_char_count_less_than,
+    has_debug_string, has_display_string, has_error, has_length, has_length_greater_than,
+    has_length_in_range, has_length_less_than, has_precision_of, has_scale_of, has_value,
+    is_a_number, is_after, is_alphabetic, is_alphanumeric, is_ascii, is_at_least, is_at_most,
+    is_before, is_between, is_control_char, is_digit, is_empty, is_equal_to, is_err, is_false,
+    is_finite, is_greater_than, is_in_range, is_infinite, is_integer, is_less_than, is_lower_case,
+    is_negative, is_none, is_ok, is_one, is_positive, is_same_as, is_some, is_true, is_upper_case,
+    is_whitespace, is_zero, iterator_contains, iterator_contains_all_in_order,
+    iterator_contains_all_of, iterator_contains_any_of, iterator_contains_exactly,
+    iterator_contains_exactly_in_any_order, iterator_contains_only, iterator_contains_only_once,
+    iterator_contains_sequence, iterator_ends_with, iterator_starts_with,
+    map_contains_exactly_keys, map_contains_key, map_contains_keys, map_contains_value,
+    map_contains_values, map_does_not_contain_keys, map_does_not_contain_values, not,
+    string_contains, string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{
     AdditiveIdentityProperty, CharCountProperty, DecimalProperties, DefinedOrderProperty,
-    InfinityProperty, IsEmptyProperty, IsNanProperty, LengthProperty,
+    InfinityProperty, IsEmptyProperty, IsNanProperty, LengthProperty, MapProperties,
     MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{
-    And, AssertFailure, DiffFormat, DoFail, Expectation, Expression, GetFailures, SoftPanic,
+    And, AssertFailure, DiffFormat, DoFail, Expectation, Expression, FailingStrategy, GetFailures,
+    PanicOnFail, SoftPanic,
 };
 use crate::std::borrow::{Cow, ToOwned};
 use crate::std::error::Error;
@@ -39,6 +42,7 @@ use crate::std::format;
 use crate::std::ops::RangeBounds;
 use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
+use hashbrown::HashSet;
 
 pub struct DerivedSpec<'a, O, S> {
     original: O,
@@ -1198,6 +1202,120 @@ where
     fn ends_with(self, expected: E) -> Self::Sequence {
         self.mapping(Vec::from_iter)
             .expecting(iterator_ends_with(expected))
+    }
+}
+
+impl<O, S, E> AssertMapContainsKey<E> for DerivedSpec<'_, O, S>
+where
+    S: MapProperties + Debug,
+    <S as MapProperties>::Key: PartialEq<E> + Debug,
+    <S as MapProperties>::Value: Debug,
+    E: Debug,
+    O: DoFail,
+{
+    fn contains_key(self, expected_key: E) -> Self {
+        self.expecting(map_contains_key(expected_key))
+    }
+
+    fn does_not_contain_key(self, expected_key: E) -> Self {
+        self.expecting(not(map_contains_key(expected_key)))
+    }
+
+    fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(map_contains_keys(expected_keys))
+    }
+
+    fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(map_does_not_contain_keys(expected_keys))
+    }
+
+    fn contains_exactly_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(map_contains_exactly_keys(expected_keys))
+    }
+}
+
+impl<O, S, E> AssertMapContainsValue<E> for DerivedSpec<'_, O, S>
+where
+    S: MapProperties + Debug,
+    <S as MapProperties>::Key: Debug,
+    <S as MapProperties>::Value: PartialEq<E> + Debug,
+    E: Debug,
+    O: DoFail,
+{
+    fn contains_value(self, expected_value: E) -> Self {
+        self.expecting(map_contains_value(expected_value))
+    }
+
+    fn does_not_contain_value(self, expected_value: E) -> Self {
+        self.expecting(not(map_contains_value(expected_value)))
+    }
+
+    fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(map_contains_values(expected_values))
+    }
+
+    fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self {
+        self.expecting(map_does_not_contain_values(expected_values))
+    }
+}
+
+impl<'a, O, S, T> AssertOrderedElements for DerivedSpec<'a, O, S>
+where
+    S: IntoIterator<Item = T>,
+    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
+    T: Debug,
+    O: DoFail + GetFailures,
+{
+    type SingleElement = DerivedSpec<'a, O, T>;
+    type MultipleElements = DerivedSpec<'a, O, Vec<T>>;
+
+    fn first_element(self) -> Self::SingleElement {
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| collection.remove(0))
+    }
+
+    fn last_element(self) -> Self::SingleElement {
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| {
+            collection.pop().unwrap_or_else(|| {
+                unreachable!("Assertion failed and should have panicked! Please report a bug.")
+            })
+        })
+    }
+
+    fn nth_element(self, n: usize) -> Self::SingleElement {
+        let min_len = n + 1;
+        let spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(min_len));
+        if spec.has_failures() {
+            PanicOnFail.do_fail_with(&spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        spec.extracting(|mut collection| collection.remove(n))
+    }
+
+    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let indices = HashSet::<_>::from_iter(indices);
+        self.mapping(|subject| {
+            subject
+                .into_iter()
+                .enumerate()
+                .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
+                .collect()
+        })
     }
 }
 
