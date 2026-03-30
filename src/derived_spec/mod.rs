@@ -1063,8 +1063,8 @@ where
 #[cfg(feature = "regex")]
 mod regex {
     use crate::assertions::AssertStringMatches;
+    use crate::derived_spec::DerivedSpec;
     use crate::expectations::{not, string_matches};
-    use crate::extracting::DerivedSpec;
     use crate::spec::DoFail;
     use crate::std::fmt::Debug;
 

@@ -1,9 +1,8 @@
 //! This is the core of the `asserting` crate.
 
 use crate::colored;
+use crate::derived_spec::DerivedSpec;
 use crate::expectations::satisfies;
-use crate::extracting::DerivedSpec;
-
 #[cfg(feature = "recursive")]
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;

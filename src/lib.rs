@@ -905,8 +905,8 @@ pub mod __private {
 
 pub mod assertions;
 pub mod colored;
+pub mod derived_spec;
 pub mod expectations;
-pub mod extracting;
 pub mod prelude;
 pub mod properties;
 #[cfg(feature = "recursive")]
