@@ -114,29 +114,6 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         self.diff_format = diff_format;
         self
     }
-
-    /// Sets the diff format used to highlight differences between the actual
-    /// value and the expected value according to the configured mode.
-    ///
-    /// The mode is configured via environment variables as described in the
-    /// module [colored].
-    #[cfg(feature = "colored")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "colored")))]
-    #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn with_configured_diff_format(self) -> Self {
-        use crate::colored::configured_diff_format;
-        #[cfg(not(feature = "std"))]
-        {
-            self.with_diff_format(configured_diff_format())
-        }
-        #[cfg(feature = "std")]
-        {
-            use crate::std::sync::OnceLock;
-            static DIFF_FORMAT: OnceLock<DiffFormat> = OnceLock::new();
-            let diff_format = DIFF_FORMAT.get_or_init(configured_diff_format);
-            self.with_diff_format(diff_format.clone())
-        }
-    }
 }
 
 impl<O, S> DoFail for DerivedSpec<'_, O, S>
