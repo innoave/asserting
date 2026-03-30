@@ -1290,6 +1290,14 @@ pub trait And {
     fn and(self) -> Self::Target;
 }
 
+impl<S, R> And for Spec<'_, S, R> {
+    type Target = Self;
+
+    fn and(self) -> Self::Target {
+        self
+    }
+}
+
 /// Access the assertion-failures collected by a `Spec` or spec-like struct.
 pub trait GetFailures {
     /// Returns whether there are assertion failures collected so far.

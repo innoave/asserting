@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
+use crate::std::any::type_name_of_val;
 use crate::std::{
     format,
     string::{String, ToString},
@@ -228,6 +229,29 @@ fn soft_assertions_panic_once_with_multiple_failure_messages() {
         .contains("unimportant")
         .has_at_most_length(41)
         .soft_panic();
+}
+
+#[cfg(feature = "colored")]
+#[test]
+fn and_called_on_spec_does_nothing() {
+    let subject = "the answer to all important questions is 42".to_string();
+
+    let original_spec = verify_that(subject)
+        .named("answer")
+        .with_diff_format(DIFF_FORMAT_RED_BLUE)
+        .is_empty();
+    let original_spec_type = type_name_of_val(&original_spec);
+    let original_subject = original_spec.subject().clone();
+    let original_diff_format = original_spec.diff_format().clone();
+    let original_failures = original_spec.failures();
+    assert!(!original_failures.is_empty());
+
+    let returned_spec = original_spec.and();
+
+    assert_eq!(type_name_of_val(&returned_spec), original_spec_type);
+    assert_eq!(returned_spec.subject(), &original_subject);
+    assert_eq!(returned_spec.diff_format(), &original_diff_format);
+    assert_eq!(returned_spec.failures(), original_failures);
 }
 
 #[derive(Debug)]
