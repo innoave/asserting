@@ -789,7 +789,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// This method is similar to the [`mapping()`](Spec::mapping) method. In
     /// contrast to [`mapping()`](Spec::mapping), this method does not copy the
     /// subject's name (or expression) but resets it to the default "subject".
-    /// The idea is that the "extracted" property is definitely a different
+    /// The idea is that the "extracted" property is most likely a different
     /// subject than the original one.
     ///
     /// It is recommended to give the extracted property a specific name by
