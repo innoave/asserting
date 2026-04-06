@@ -1,3 +1,6 @@
+//! Defines the [`DerivedSpec`], which keeps track of the original subject while doing assertions
+//! on a derived subject.
+
 use crate::assertions::{
     AssertBoolean, AssertChar, AssertDebugString, AssertDecimalNumber, AssertDisplayString,
     AssertEmptiness, AssertEquality, AssertErrorHasSource, AssertHasCharCount,
@@ -44,6 +47,15 @@ use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
 use hashbrown::HashSet;
 
+/// A `DerivedSpec` does assertions on a derived subject while keeping track
+/// of the original subject.
+///
+/// It has similar functionality as a `Spec`, but additionally holds the
+/// original subject. Calling the `and` method switches the subject back to the
+/// original subject.
+///
+/// The derived subject can have its own name and diff format in failure
+/// reports.
 pub struct DerivedSpec<'a, O, S> {
     original: O,
     subject: S,

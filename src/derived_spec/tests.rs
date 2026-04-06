@@ -76,7 +76,7 @@ fn extracting_ref_person_name_via_accessor_contains_via() {
     };
 
     assert_that(person)
-        .extracting_ref(|p| p.name())
+        .extracting_ref(Person::name)
         .contains("via");
 }
 

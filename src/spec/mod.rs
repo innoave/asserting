@@ -1253,9 +1253,98 @@ impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
     }
 }
 
+/// Chaining another assertion.
+///
+/// Both the previous assertion and the next assertion must be met to pass the
+/// overall assertion.
 pub trait And {
-    type Target;
+    /// The return type of the `and()` method.
+    type Output;
 
+    /// Express explicitly that another assertion must be met to pass the
+    /// overall assertion.
+    ///
+    /// Note: assertions can be changed anyway without calling this `and`
+    /// method. So in most cases, this method does nothing and just offers a
+    /// different style of writing assertions.
+    ///
+    /// In combination with the [`Spec::extracting_ref`] the `and` method can be
+    /// used to chain multiple assertions on the original subject, instead of
+    /// the extracted one.
+    ///
+    /// # Examples
+    ///
+    /// Calling the `and` method on the original subject is optional and just
+    /// a question of style how one wants to write assertions.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "the answer to all important questions in the universe is 42";
+    ///
+    /// assert_that(subject).is_not_empty()
+    ///     .and().contains("answer to all important questions")
+    ///     .and().ends_with("42");
+    ///
+    /// // the same assertions can be written without calling `and()`:
+    ///
+    /// assert_that(subject).is_not_empty()
+    ///     .contains("answer to all important questions")
+    ///     .ends_with("42");
+    /// ```
+    ///
+    /// In combination with the [`Spec::extracting_ref`] method, the `and` method
+    /// switches back to the original subject to chain multiple assertions on
+    /// different extracted fields.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone, Copy, PartialEq)]
+    /// enum Gender {
+    ///     Male,
+    ///     Female,
+    ///     NonBinary,
+    ///     PreferNotToSay,
+    /// }
+    ///
+    /// struct Person {
+    ///     name: String,
+    ///     age: u8,
+    ///     gender: Gender,
+    /// }
+    ///
+    /// impl Person {
+    ///     fn name(&self) -> &str {
+    ///         &self.name
+    ///     }
+    /// }
+    ///
+    /// let my_friend = Person {
+    ///     name: "Silvia".into(),
+    ///     age: 27,
+    ///     gender: Gender::Female,
+    /// };
+    ///
+    /// assert_that!(my_friend)
+    ///     .extracting_ref(Person::name)
+    ///     .named("my_friend.name")
+    ///     .is_equal_to("Silvia")
+    ///     .and()
+    ///     .extracting_ref(|p| &p.age)
+    ///     .named("my_friend.age")
+    ///     .is_at_least(18)
+    ///     .and()
+    ///     .extracting_ref(|p| &p.gender)
+    ///     .named("my_friend.gender")
+    ///     .is_equal_to(Gender::Female);
+    /// ```
+    ///
+    /// Calling the `named` method after extracting a field is optional but
+    /// helps in case of a failing assertion as the failure report references
+    /// the more detailed name, such as `my_friend.name` or `my_friend.age`,
+    /// instead of just `my_friend`.
+    #[must_use = "calling the `and` method without calling another assertion method is useless"]
     fn and(self) -> Self::Output;
 }
 
