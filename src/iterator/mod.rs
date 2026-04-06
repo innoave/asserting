@@ -21,8 +21,8 @@ use crate::expectations::{
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{
-    DiffFormat, Expectation, Expression, FailingStrategy, GetFailures, Invertible, PanicOnFail,
-    Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, GetFailures, Invertible,
+    PanicOnFail, Spec,
 };
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;

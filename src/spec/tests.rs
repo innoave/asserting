@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
+#[cfg(feature = "colored")]
 use crate::std::any::type_name_of_val;
 use crate::std::{
     format,

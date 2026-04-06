@@ -8,7 +8,7 @@ use crate::expectations::{
     HasError, HasValue, IsErr, IsOk, has_error, has_value, is_equal_to, is_err, is_ok,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::{

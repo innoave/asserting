@@ -698,7 +698,7 @@
 //! #         )
 //! #      }
 //! # }
-//! use asserting::spec::{FailingStrategy, Spec};
+//! use asserting::spec::{Expecting, FailingStrategy, Spec};
 //! use std::fmt::Debug;
 //!
 //! pub trait AssertEither {

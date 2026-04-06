@@ -32,8 +32,8 @@ use crate::properties::{
     MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{
-    And, AssertFailure, DiffFormat, DoFail, Expectation, Expression, FailingStrategy, GetFailures,
-    PanicOnFail, SoftPanic,
+    And, AssertFailure, DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy,
+    GetFailures, PanicOnFail, SoftPanic,
 };
 use crate::std::borrow::{Cow, ToOwned};
 use crate::std::error::Error;
@@ -49,23 +49,6 @@ pub struct DerivedSpec<'a, O, S> {
     subject: S,
     expression: Expression<'a>,
     diff_format: DiffFormat,
-}
-
-impl<O, S> GetFailures for DerivedSpec<'_, O, S>
-where
-    O: GetFailures,
-{
-    fn has_failures(&self) -> bool {
-        self.original.has_failures()
-    }
-
-    fn failures(&self) -> Vec<AssertFailure> {
-        self.original.failures()
-    }
-
-    fn display_failures(&self) -> Vec<String> {
-        self.original.display_failures()
-    }
 }
 
 impl<O, S> DerivedSpec<'_, O, S> {
@@ -113,6 +96,23 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
         self.diff_format = diff_format;
         self
+    }
+}
+
+impl<O, S> GetFailures for DerivedSpec<'_, O, S>
+where
+    O: GetFailures,
+{
+    fn has_failures(&self) -> bool {
+        self.original.has_failures()
+    }
+
+    fn failures(&self) -> Vec<AssertFailure> {
+        self.original.failures()
+    }
+
+    fn display_failures(&self) -> Vec<String> {
+        self.original.display_failures()
     }
 }
 
@@ -194,13 +194,11 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     }
 }
 
-impl<O, S> DerivedSpec<'_, O, S>
+impl<O, S> Expecting<S> for DerivedSpec<'_, O, S>
 where
     O: DoFail,
 {
-    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
+    fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
         if !expectation.test(&self.subject) {
             let message =
                 expectation.message(&self.expression, &self.subject, false, &self.diff_format);
@@ -244,7 +242,7 @@ mod float_cmp {
     use super::DerivedSpec;
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::expectations::{is_close_to, not};
-    use crate::spec::DoFail;
+    use crate::spec::{DoFail, Expecting};
     use float_cmp::{F32Margin, F64Margin};
 
     impl<O> AssertIsCloseToWithinMargin<f32, F32Margin> for DerivedSpec<'_, O, f32>
@@ -1065,7 +1063,7 @@ mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::derived_spec::DerivedSpec;
     use crate::expectations::{not, string_matches};
-    use crate::spec::DoFail;
+    use crate::spec::{DoFail, Expecting};
     use crate::std::fmt::Debug;
 
     impl<O, S> AssertStringMatches for DerivedSpec<'_, O, S>

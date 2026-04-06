@@ -4,7 +4,7 @@ use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasValue, IsNone, IsSome, has_value, is_none, is_some};
 use crate::spec::{
-    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};

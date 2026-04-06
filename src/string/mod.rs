@@ -11,7 +11,9 @@ use crate::expectations::{
     string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::fmt::Debug;
 use crate::std::str::Chars;
 use crate::std::{
@@ -703,7 +705,9 @@ mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::colored::{mark_missing_string, mark_unexpected_string};
     use crate::expectations::{StringMatches, not, string_matches};
-    use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+    use crate::spec::{
+        DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    };
     use crate::std::fmt::Debug;
     use crate::std::format;
     use crate::std::string::String;

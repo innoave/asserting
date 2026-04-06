@@ -893,36 +893,6 @@ impl<S, R> Spec<'_, S, R>
 where
     R: FailingStrategy,
 {
-    /// Asserts the given expectation.
-    ///
-    /// In case the expectation is not meet, the assertion fails according to
-    /// the current failing strategy of this `Spec`.
-    ///
-    /// This method is called from the implementations of the assertion traits
-    /// defined in the [`assertions`](crate::assertions) module. Implementations
-    /// of custom assertions will call this method with a proper expectation.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::expectations::{IsEmpty, IsEqualTo};
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(7 * 6).expecting(IsEqualTo {expected: 42 });
-    ///
-    /// assert_that!("").expecting(IsEmpty);
-    /// ```
-    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
-        if !expectation.test(&self.subject) {
-            let message =
-                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
-            self.do_fail_with_message(message);
-        }
-        self
-    }
-
     /// Asserts whether the given predicate is meet.
     ///
     /// This method takes a predicate function and calls it as an expectation.
@@ -1293,6 +1263,47 @@ impl<S, R> And for Spec<'_, S, R> {
     type Target = Self;
 
     fn and(self) -> Self::Target {
+        self
+    }
+}
+
+/// Verify whether a subject meets the given expectation (impl of
+/// [`Expectation`]) and record a failure if it is not met.
+pub trait Expecting<S> {
+    /// Asserts the given expectation.
+    ///
+    /// In case the expectation is not meet, the assertion fails, according to
+    /// the current failing strategy of this `Spec`.
+    ///
+    /// This method is called from the implementations of the assertion traits
+    /// defined in the [`assertions`](crate::assertions) module. Implementations
+    /// of custom assertions will call this method with a proper expectation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::expectations::{IsEmpty, IsEqualTo};
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!(7 * 6).expecting(IsEqualTo {expected: 42 });
+    ///
+    /// assert_that!("").expecting(IsEmpty);
+    /// ```
+    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn expecting(self, expectation: impl Expectation<S>) -> Self;
+}
+
+impl<S, R> Expecting<S> for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
+        if !expectation.test(&self.subject) {
+            let message =
+                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
+            self.do_fail_with_message(message);
+        }
         self
     }
 }
