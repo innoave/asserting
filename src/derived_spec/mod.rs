@@ -160,13 +160,17 @@ impl<O, S> And for DerivedSpec<'_, O, S> {
 
 impl<'a, O, S> DerivedSpec<'a, O, S> {
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
-    pub fn extracting_ref<F, B, U>(self, extract: F) -> DerivedSpec<'a, Self, U>
+    pub fn extracting_ref<F, B, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Self, U>
     where
         F: FnOnce(&S) -> &B,
         B: ToOwned<Owned = U> + ?Sized,
     {
         let extracted = extract(&self.subject).to_owned();
-        let expression = Expression::default();
+        let expression = Expression(property_name.into());
         let diff_format = self.diff_format.clone();
         DerivedSpec {
             original: self,

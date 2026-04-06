@@ -76,7 +76,7 @@ fn extracting_ref_person_name_via_accessor_contains_via() {
     };
 
     assert_that(person)
-        .extracting_ref(Person::name)
+        .extracting_ref("person.name", Person::name)
         .contains("via");
 }
 
@@ -89,13 +89,13 @@ fn extracting_ref_to_assert_all_person_fields() {
     };
 
     assert_that(person)
-        .extracting_ref(|p| &p.name)
+        .extracting_ref("person.name", |p| &p.name)
         .is_equal_to("Silvia")
         .and()
-        .extracting_ref(|p| &p.age)
+        .extracting_ref("person.age", |p| &p.age)
         .is_at_least(18)
         .and()
-        .extracting_ref(|p| &p.gender)
+        .extracting_ref("person.gender", |p| &p.gender)
         .is_equal_to(Gender::PreferNotToSay);
 }
 
@@ -108,16 +108,13 @@ fn verify_extracting_ref_to_assert_all_fields_fails_with_all_failures() {
     };
 
     let failures = verify_that(person)
-        .extracting_ref(|p| &p.name)
-        .named("person.name")
+        .extracting_ref("person.name", Person::name)
         .is_equal_to("Silvia")
         .and()
-        .extracting_ref(|p| &p.age)
-        .named("person.age")
+        .extracting_ref("person.age", |p| &p.age)
         .is_at_least(18)
         .and()
-        .extracting_ref(|p| &p.gender)
-        .named("person.gender")
+        .extracting_ref("person.gender", |p| &p.gender)
         .is_equal_to(Gender::PreferNotToSay)
         .display_failures();
 
@@ -162,30 +159,25 @@ fn extracting_ref_to_assert_all_order_item_fields() {
     };
 
     assert_that(order)
-        .extracting_ref(|o| &o.id)
-        .named("order.id")
+        .extracting_ref("order.id", |o| &o.id)
         .is_not_empty()
         .and()
-        .extracting_ref(|o| &o.purchased_at)
+        .extracting_ref("order.purchased_at", |o| &o.purchased_at)
         .is_between(
             datetime!(2026-03-28 14:00 +01:00),
             datetime!(2026-03-28 15:00 +01:00),
         )
         .and()
-        .extracting_ref(|o| &o.items)
-        .named("order.items")
+        .extracting_ref("order.items", |o| &o.items)
         .has_length(2)
-        .extracting_ref(|items| &items[0])
-        .named("order.items[0]")
-        .extracting_ref(|i| &i.name)
-        .named("order.items[0].name")
+        .extracting_ref("order.items[0]", |items| &items[0])
+        .extracting_ref("order.items[0].name", |i| &i.name)
         .is_equal_to("Apple")
         .and()
-        .extracting_ref(|i| &i.price)
-        .named("order.items[0].price")
+        .extracting_ref("order.items[0].price", |i| &i.price)
         .is_close_to(1.99)
         .and()
-        .extracting_ref(|i| &i.quantity)
+        .extracting_ref("order.items[0].quantity", |i| &i.quantity)
         .is_equal_to(6)
         .and()
         .and()
@@ -202,8 +194,7 @@ fn extracting_ref_to_assert_all_order_item_fields() {
             },
         ])
         .and()
-        .extracting_ref(|o| &o.vat)
-        .named("order.vat")
+        .extracting_ref("order.vat", |o| &o.vat)
         .is_close_to(0.15);
 }
 
@@ -214,7 +205,7 @@ fn extracting_ref_string_is_equal_to() {
     let name = Name("Alexander".to_string());
 
     assert_that(name)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("name.0", |n| &n.0)
         .is_equal_to("Alexander");
 }
 
@@ -225,7 +216,7 @@ fn extracting_ref_string_is_same_as() {
     let name = Name("Alexander".to_string());
 
     assert_that(name)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("name.0", |n| &n.0)
         .is_same_as("Alexander".to_string());
 }
 
@@ -235,7 +226,9 @@ fn extracting_ref_i32_is_zero() {
 
     let number = Int(0);
 
-    assert_that(number).extracting_ref(|n| &n.0).is_zero();
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .is_zero();
 }
 
 #[test]
@@ -244,7 +237,9 @@ fn extracting_ref_i32_is_one() {
 
     let number = Int(1);
 
-    assert_that(number).extracting_ref(|n| &n.0).is_one();
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .is_one();
 }
 
 #[test]
@@ -253,7 +248,9 @@ fn extracting_ref_i32_is_positive() {
 
     let number = Int(1);
 
-    assert_that(number).extracting_ref(|n| &n.0).is_positive();
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .is_positive();
 }
 
 #[test]
@@ -262,7 +259,9 @@ fn extracting_ref_i32_is_negative() {
 
     let number = Int(-1);
 
-    assert_that(number).extracting_ref(|n| &n.0).is_negative();
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .is_negative();
 }
 
 #[test]
@@ -272,7 +271,7 @@ fn extracting_ref_i32_is_not_positive_and_is_not_negative() {
     let number = Int(0);
 
     assert_that(number)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("number.0", |n| &n.0)
         .is_not_positive()
         .is_not_negative();
 }
@@ -284,7 +283,7 @@ fn extracting_ref_i32_is_in_range() {
     let number = Int(9);
 
     assert_that(number)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("number.0", |n| &n.0)
         .is_in_range(1..=9);
 }
 
@@ -296,7 +295,7 @@ fn extracting_ref_f32_is_close_to() {
     let value = Float(1.99);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_close_to(1.99);
 }
 
@@ -306,7 +305,9 @@ fn extracting_ref_f32_is_zero() {
 
     let value = Float(0.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_zero();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_zero();
 }
 
 #[test]
@@ -315,7 +316,9 @@ fn extracting_ref_f32_is_one() {
 
     let value = Float(1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_one();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_one();
 }
 
 #[test]
@@ -324,7 +327,9 @@ fn extracting_ref_f32_is_positive() {
 
     let value = Float(1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_positive();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_positive();
 }
 
 #[test]
@@ -333,7 +338,9 @@ fn extracting_ref_f32_is_negative() {
 
     let value = Float(-1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_negative();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_negative();
 }
 
 #[test]
@@ -343,7 +350,7 @@ fn extracting_ref_f32_is_not_positive_and_is_not_negative() {
     let value = Float(0.);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_not_positive()
         .is_not_negative();
 }
@@ -354,7 +361,9 @@ fn extracting_ref_f32_is_infinite() {
 
     let value = Float(f32::INFINITY);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_infinite();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_infinite();
 }
 
 #[test]
@@ -364,7 +373,7 @@ fn extracting_ref_f32_is_not_a_number() {
     let value = Float(f32::NAN);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_not_a_number();
 }
 
@@ -376,7 +385,7 @@ fn extracting_ref_f64_is_close_to_within_margin() {
     let value = Float(1.99);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_close_to_with_margin(1.99, (0.001, 2));
 }
 
@@ -386,7 +395,9 @@ fn extracting_ref_f64_is_zero() {
 
     let value = Float(0.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_zero();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_zero();
 }
 
 #[test]
@@ -395,7 +406,9 @@ fn extracting_ref_f64_is_one() {
 
     let value = Float(1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_one();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_one();
 }
 
 #[test]
@@ -404,7 +417,9 @@ fn extracting_ref_f64_is_positive() {
 
     let value = Float(1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_positive();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_positive();
 }
 
 #[test]
@@ -413,7 +428,9 @@ fn extracting_ref_f64_is_negative() {
 
     let value = Float(-1.);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_negative();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_negative();
 }
 
 #[test]
@@ -423,7 +440,7 @@ fn extracting_ref_f64_is_not_positive_and_is_not_negative() {
     let value = Float(0.);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_not_positive()
         .is_not_negative();
 }
@@ -434,7 +451,9 @@ fn extracting_ref_f64_is_infinite() {
 
     let value = Float(f64::INFINITY);
 
-    assert_that(value).extracting_ref(|f| &f.0).is_infinite();
+    assert_that(value)
+        .extracting_ref("float.0", |f| &f.0)
+        .is_infinite();
 }
 
 #[test]
@@ -444,7 +463,7 @@ fn extracting_ref_f64_is_not_a_number() {
     let value = Float(f64::NAN);
 
     assert_that(value)
-        .extracting_ref(|f| &f.0)
+        .extracting_ref("float.0", |f| &f.0)
         .is_not_a_number();
 }
 
@@ -459,7 +478,9 @@ fn extracting_ref_bigdecimal_has_scale_of() {
             .unwrap_or_else(|err| panic!("{}", err)),
     );
 
-    assert_that(number).extracting_ref(|n| &n.0).has_scale_of(8);
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .has_scale_of(8);
 }
 
 #[cfg(feature = "bigdecimal")]
@@ -474,7 +495,7 @@ fn extracting_ref_bigdecimal_has_precision_of() {
     );
 
     assert_that(number)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("number.0", |n| &n.0)
         .has_precision_of(12);
 }
 
@@ -485,21 +506,27 @@ fn extracting_ref_bigdecimal_is_integer() {
 
     let number = DecimalNumber("123.0".parse().unwrap_or_else(|err| panic!("{}", err)));
 
-    assert_that(number).extracting_ref(|n| &n.0).is_integer();
+    assert_that(number)
+        .extracting_ref("number.0", |n| &n.0)
+        .is_integer();
 }
 
 #[test]
 fn extracting_ref_bool_is_true() {
     struct Flag(bool);
 
-    assert_that(Flag(true)).extracting_ref(|f| &f.0).is_true();
+    assert_that(Flag(true))
+        .extracting_ref("flag.0", |f| &f.0)
+        .is_true();
 }
 
 #[test]
 fn extracting_ref_bool_is_false() {
     struct Flag(bool);
 
-    assert_that(Flag(false)).extracting_ref(|f| &f.0).is_false();
+    assert_that(Flag(false))
+        .extracting_ref("flag.0", |f| &f.0)
+        .is_false();
 }
 
 #[test]
@@ -507,7 +534,7 @@ fn extracting_ref_char_is_lowercase() {
     struct Character(char);
 
     assert_that(Character('r'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_lowercase();
 }
 
@@ -516,7 +543,7 @@ fn extracting_ref_char_is_uppercase() {
     struct Character(char);
 
     assert_that(Character('R'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_uppercase();
 }
 
@@ -525,7 +552,7 @@ fn extracting_ref_char_is_ascii() {
     struct Character(char);
 
     assert_that(Character('@'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_ascii();
 }
 
@@ -533,10 +560,8 @@ fn extracting_ref_char_is_ascii() {
 fn extracting_ref_char_is_alphabetic() {
     struct Character(char);
 
-    let character = Character('Z');
-
-    assert_that(character)
-        .extracting_ref(|c| &c.0)
+    assert_that(Character('Z'))
+        .extracting_ref("character.0", |c| &c.0)
         .is_alphabetic();
 }
 
@@ -545,11 +570,11 @@ fn extracting_ref_char_is_alphanumeric() {
     struct Character(char);
 
     assert_that(Character('Z'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_alphanumeric();
 
     assert_that(Character('5'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_alphanumeric();
 }
 
@@ -558,11 +583,11 @@ fn extracting_ref_char_is_control_char() {
     struct Character(char);
 
     assert_that(Character('\t'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_control_char();
 
     assert_that(Character('\u{1b}'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_control_char();
 }
 
@@ -571,7 +596,7 @@ fn extracting_ref_char_is_digit() {
     struct Character(char);
 
     assert_that(Character('0'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_digit(10);
 }
 
@@ -580,10 +605,10 @@ fn extracting_ref_char_is_whitespace() {
     struct Character(char);
 
     assert_that(Character(' '))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_whitespace();
     assert_that(Character('\n'))
-        .extracting_ref(|c| &c.0)
+        .extracting_ref("character.0", |c| &c.0)
         .is_whitespace();
 }
 
@@ -593,7 +618,9 @@ fn extracting_ref_string_is_empty() {
 
     let name = Name(String::new());
 
-    assert_that(name).extracting_ref(|n| &n.0).is_empty();
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .is_empty();
 }
 
 #[test]
@@ -602,7 +629,9 @@ fn extracting_ref_string_is_not_empty() {
 
     let name = Name(" ".to_string());
 
-    assert_that(name).extracting_ref(|n| &n.0).is_not_empty();
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .is_not_empty();
 }
 
 #[test]
@@ -611,7 +640,9 @@ fn extracting_ref_vec_is_empty() {
 
     let name = Bytes(vec![]);
 
-    assert_that(name).extracting_ref(|n| &n.0).is_empty();
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .is_empty();
 }
 
 #[test]
@@ -620,7 +651,9 @@ fn extracting_ref_vec_is_not_empty() {
 
     let name = Bytes(vec![48, 65]);
 
-    assert_that(name).extracting_ref(|n| &n.0).is_not_empty();
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .is_not_empty();
 }
 
 #[test]
@@ -629,7 +662,9 @@ fn extracting_ref_string_has_length() {
 
     let name = Name("Alex".to_string());
 
-    assert_that(name).extracting_ref(|n| &n.0).has_length(4);
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .has_length(4);
 }
 
 #[test]
@@ -639,7 +674,7 @@ fn extracting_ref_string_has_char_count() {
     let name = Text("imper \u{0180} diet al \u{02AA} \u{01AF} zzril".to_string());
 
     assert_that(name)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("name.0", |n| &n.0)
         .has_char_count(25);
 }
 
@@ -649,7 +684,9 @@ fn extracting_ref_option_some() {
 
     let note = Optional(Some("note".to_string()));
 
-    assert_that(note).extracting_ref(|n| &n.0).is_some();
+    assert_that(note)
+        .extracting_ref("note.0", |n| &n.0)
+        .is_some();
 }
 
 #[test]
@@ -658,7 +695,9 @@ fn extracting_ref_option_none() {
 
     let note = Optional(None);
 
-    assert_that(note).extracting_ref(|n| &n.0).is_none();
+    assert_that(note)
+        .extracting_ref("note.0", |n| &n.0)
+        .is_none();
 }
 
 #[test]
@@ -668,7 +707,7 @@ fn extracting_ref_option_some_is_equal_to() {
     let note = Optional(Some("a note".to_string()));
 
     assert_that(note)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("note.0", |n| &n.0)
         .some()
         .is_equal_to("a note");
 }
@@ -680,7 +719,7 @@ fn extracting_ref_option_has_value() {
     let note = Optional(Some("a note".to_string()));
 
     assert_that(note)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("note.0", |n| &n.0)
         .has_value("a note");
 }
 
@@ -690,7 +729,9 @@ fn extracting_ref_result_is_ok() {
 
     let response = Response(Ok(-123));
 
-    assert_that(response).extracting_ref(|r| &r.0).is_ok();
+    assert_that(response)
+        .extracting_ref("response.0", |r| &r.0)
+        .is_ok();
 }
 
 #[test]
@@ -699,7 +740,9 @@ fn extracting_ref_result_is_err() {
 
     let response = Response(Err("not found".to_string()));
 
-    assert_that(response).extracting_ref(|r| &r.0).is_err();
+    assert_that(response)
+        .extracting_ref("response.0", |r| &r.0)
+        .is_err();
 }
 
 #[test]
@@ -709,7 +752,7 @@ fn extracting_ref_result_ok_is_negative() {
     let response = Response(Ok(-123));
 
     assert_that(response)
-        .extracting_ref(|r| &r.0)
+        .extracting_ref("response.0", |r| &r.0)
         .ok()
         .is_negative();
 }
@@ -721,7 +764,7 @@ fn extracting_ref_result_err_is_equal_to() {
     let response = Response(Err("not found".to_string()));
 
     assert_that(response)
-        .extracting_ref(|r| &r.0)
+        .extracting_ref("response.0", |r| &r.0)
         .err()
         .is_equal_to("not found");
 }
@@ -733,7 +776,7 @@ fn extracting_ref_result_has_value() {
     let response = Response(Ok(-123));
 
     assert_that(response)
-        .extracting_ref(|r| &r.0)
+        .extracting_ref("response.0", |r| &r.0)
         .has_value(-123);
 }
 
@@ -744,7 +787,7 @@ fn extracting_ref_result_has_error() {
     let response = Response(Err("not found".to_string()));
 
     assert_that(response)
-        .extracting_ref(|r| &r.0)
+        .extracting_ref("response.0", |r| &r.0)
         .has_error("not found");
 }
 
@@ -754,7 +797,9 @@ fn extracting_ref_string_contains_char() {
 
     let name = Name("Alexander is here".to_string());
 
-    assert_that(name).extracting_ref(|n| &n.0).contains('x');
+    assert_that(name)
+        .extracting_ref("name.0", |n| &n.0)
+        .contains('x');
 }
 
 #[test]
@@ -764,7 +809,7 @@ fn extracting_ref_string_contains_any_of_chars() {
     let name = Name("Alexander is here".to_string());
 
     assert_that(name)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("name.0", |n| &n.0)
         .contains_any_of(['a', 'e', 'i', 'o', 'u']);
 }
 
@@ -774,7 +819,9 @@ fn extracting_ref_vec_has_length() {
 
     let bytes = Bytes(vec![1, 2, 3, 4, 5]);
 
-    assert_that(bytes).extracting_ref(|b| &b.0).has_length(5);
+    assert_that(bytes)
+        .extracting_ref("bytes.0", |b| &b.0)
+        .has_length(5);
 }
 
 #[test]
@@ -788,7 +835,7 @@ fn extracting_ref_vec_contains() {
     ]);
 
     assert_that(names)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("names.0", |n| &n.0)
         .contains("Alexander");
 }
 
@@ -803,7 +850,7 @@ fn extracting_ref_vec_contains_exactly() {
     ]);
 
     assert_that(names)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("names.0", |n| &n.0)
         .contains_exactly(["Silvia", "Alexander", "Robert"]);
 }
 
@@ -817,12 +864,9 @@ fn extracting_ref_vec_contains_only() {
         "Robert".to_string(),
     ]);
 
-    assert_that(names).extracting_ref(|n| &n.0).contains_only([
-        "Silvia",
-        "Robert",
-        "Philipp",
-        "Alexander",
-    ]);
+    assert_that(names)
+        .extracting_ref("names.0", |n| &n.0)
+        .contains_only(["Silvia", "Robert", "Philipp", "Alexander"]);
 }
 
 #[test]
@@ -836,7 +880,7 @@ fn extracting_ref_vec_contains_any() {
     ]);
 
     assert_that(names)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("names.0", |n| &n.0)
         .contains_any_of(["Robert", "Philipp", "Peter"]);
 }
 
@@ -851,7 +895,7 @@ fn extracting_ref_vec_contains_all() {
     ]);
 
     assert_that(names)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("names.0", |n| &n.0)
         .contains_all_of(["Robert", "Silvia"]);
 }
 
@@ -866,6 +910,6 @@ fn extracting_ref_vec_contains_all_in_order() {
     ]);
 
     assert_that(names)
-        .extracting_ref(|n| &n.0)
+        .extracting_ref("names.0", |n| &n.0)
         .contains_all_in_order(["Silvia", "Robert"]);
 }

@@ -833,13 +833,17 @@ impl<'a, S, R> Spec<'a, S, R> {
         }
     }
 
-    pub fn extracting_ref<F, B, U>(self, extract: F) -> DerivedSpec<'a, Self, U>
+    pub fn extracting_ref<F, B, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Self, U>
     where
         F: FnOnce(&S) -> &B,
         B: ToOwned<Owned = U> + ?Sized,
     {
         let derived_subject = extract(&self.subject).to_owned();
-        let expression = Expression::default();
+        let expression = Expression(property_name.into());
         let diff_format = self.diff_format.clone();
         DerivedSpec::new(self, derived_subject, expression, diff_format)
     }
@@ -1334,23 +1338,19 @@ pub trait And {
     /// };
     ///
     /// assert_that!(my_friend)
-    ///     .extracting_ref(Person::name)
-    ///     .named("my_friend.name")
+    ///     .extracting_ref("my_friend.name", Person::name)
     ///     .is_equal_to("Silvia")
     ///     .and()
-    ///     .extracting_ref(|p| &p.age)
-    ///     .named("my_friend.age")
+    ///     .extracting_ref("my_friend.age", |p| &p.age)
     ///     .is_at_least(18)
     ///     .and()
-    ///     .extracting_ref(|p| &p.gender)
-    ///     .named("my_friend.gender")
+    ///     .extracting_ref("my_friend.gender", |p| &p.gender)
     ///     .is_equal_to(Gender::Female);
     /// ```
     ///
-    /// Calling the `named` method after extracting a field is optional but
-    /// helps in case of a failing assertion as the failure report references
-    /// the more detailed name, such as `my_friend.name` or `my_friend.age`,
-    /// instead of just `subject`.
+    /// The specified property name helps in case of a failing assertion as the
+    /// failure report references the more detailed name, such as
+    /// `my_friend.name` or `my_friend.age`, instead of just `subject`.
     #[must_use = "calling the `and` method without calling another assertion method is useless"]
     fn and(self) -> Self::Output;
 }
