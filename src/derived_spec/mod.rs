@@ -139,9 +139,9 @@ where
 }
 
 impl<O, S> And for DerivedSpec<'_, O, S> {
-    type Target = O;
+    type Output = O;
 
-    fn and(self) -> Self::Target {
+    fn and(self) -> Self::Output {
         self.original
     }
 }

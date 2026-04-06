@@ -1256,13 +1256,13 @@ impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
 pub trait And {
     type Target;
 
-    fn and(self) -> Self::Target;
+    fn and(self) -> Self::Output;
 }
 
 impl<S, R> And for Spec<'_, S, R> {
-    type Target = Self;
+    type Output = Self;
 
-    fn and(self) -> Self::Target {
+    fn and(self) -> Self::Output {
         self
     }
 }
