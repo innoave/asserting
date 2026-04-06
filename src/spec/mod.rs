@@ -780,16 +780,21 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// It takes a closure that maps the current subject to a new subject and
     /// returns a new `Spec` with the value returned by the closure as the new
     /// subject. The new subject may have a different type than the original
-    /// subject. All other data like expression, description, and location are
+    /// subject. All other data like description, location, and diff format are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
     /// This function is useful when having a custom type, and a specific
     /// property of this type shall be asserted only.
     ///
-    /// This is an alias function to the [`mapping()`](Spec::mapping) function.
-    /// Both functions do exactly the same. The idea is to provide different
-    /// names to be able to express the intent more clearly when used in
-    /// assertions.
+    /// This method is similar to the [`mapping()`](Spec::mapping) method. In
+    /// contrast to [`mapping()`](Spec::mapping), this method does not copy the
+    /// subject's name (or expression) but resets it to the default "subject".
+    /// The idea is that the "extracted" property is definitely a different
+    /// subject than the original one.
+    ///
+    /// It is recommended to give the extracted property a specific name by
+    /// calling the `named` method. This helps with spotting the cause of a
+    /// failing assertion.
     ///
     /// # Example
     ///
@@ -806,7 +811,9 @@ impl<'a, S, R> Spec<'a, S, R> {
     ///     other_property: 99.9,
     /// };
     ///
-    /// assert_that!(some_thing).extracting(|s| s.important_property)
+    /// assert_that!(some_thing)
+    ///     .extracting(|s| s.important_property)
+    ///     .named("some_thing.important_property")
     ///     .is_equal_to("imperdiet aliqua zzril eiusmod");
     ///
     /// ```
@@ -1343,7 +1350,7 @@ pub trait And {
     /// Calling the `named` method after extracting a field is optional but
     /// helps in case of a failing assertion as the failure report references
     /// the more detailed name, such as `my_friend.name` or `my_friend.age`,
-    /// instead of just `my_friend`.
+    /// instead of just `subject`.
     #[must_use = "calling the `and` method without calling another assertion method is useless"]
     fn and(self) -> Self::Output;
 }
