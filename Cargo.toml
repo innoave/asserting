@@ -42,7 +42,7 @@ std = [
 ]
 
 [dependencies]
-hashbrown = "0.16"
+hashbrown = "0.17"
 
 # optional
 bigdecimal = { version = "0.4", optional = true, default-features = false }
