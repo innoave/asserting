@@ -50,12 +50,14 @@ use hashbrown::HashSet;
 /// A `DerivedSpec` does assertions on a derived subject while keeping track
 /// of the original subject.
 ///
-/// It has similar functionality as a `Spec`, but additionally holds the
+/// It has similar functionality to a [`Spec`], but additionally holds the
 /// original subject. Calling the `and` method switches the subject back to the
 /// original subject.
 ///
 /// The derived subject can have its own name and diff format in failure
 /// reports.
+///
+/// [`Spec`]: crate::spec::Spec
 pub struct DerivedSpec<'a, O, S> {
     original: O,
     subject: S,
@@ -159,6 +161,124 @@ impl<O, S> And for DerivedSpec<'_, O, S> {
 }
 
 impl<'a, O, S> DerivedSpec<'a, O, S> {
+    /// Extracts a property from the current subject.
+    ///
+    /// The extracting closure gets a reference to the current subject as an
+    /// argument and should return a reference to the extracted property. The
+    /// given property name is used in failure reports for referencing the
+    /// property for which an assertion fails.
+    ///
+    /// Use this method if you want to extract multiple properties from the
+    /// same subject for individual assertions on each of these properties.
+    /// To extract another property from the previous subject, call the `and`
+    /// method to switch back to the previous subject before calling
+    /// `extracting_ref` for the other property.
+    ///
+    /// # Arguments
+    ///
+    /// * `property_name` - A name describing the extracted property used for
+    ///   referencing that property in failure reports.
+    /// * `extract` - A closure that returns a reference to the property to be
+    ///   extracted.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone)]
+    /// struct Item {
+    ///     name: String,
+    ///     price: f32,
+    ///     quantity: u32,
+    /// }
+    ///
+    /// struct Order {
+    ///     id: String,
+    ///     items: Vec<Item>,
+    /// }
+    ///
+    /// let my_order = Order {
+    ///     id: "O261234".into(),
+    ///     items: vec![
+    ///         Item {
+    ///             name: "Apple".into(),
+    ///             price: 0.99,
+    ///             quantity: 6,
+    ///         },
+    ///         Item {
+    ///             name: "Orange".into(),
+    ///             price: 1.99,
+    ///             quantity: 4,
+    ///         },
+    ///     ],
+    /// };
+    ///
+    /// assert_that!(my_order)
+    ///     .extracting_ref("my_order.items", |o| &o.items)
+    ///     .extracting_ref("my_order.items[0].name", |i| &i[0].name)
+    ///     .is_equal_to("Apple")
+    ///     .and()
+    ///     .extracting_ref("my_order.items[1].name", |i| &i[1].name)
+    ///     .is_equal_to("Orange")
+    ///     .and()
+    ///     .extracting_ref("my_order.items[1].quantity", |i| &i[1].quantity)
+    ///     .is_equal_to(4)
+    ///     .and()  // switches back to `my_order.items`
+    ///     .and()  // second call to `and()` switches back to `my_order`
+    ///     .extracting_ref("my_order.id", |o| &o.id)
+    ///     .is_equal_to("O261234");
+    /// ```
+    ///
+    /// Hint: To avoid having to call the `and()` method two or more times, it
+    /// is recommended to first extract all properties from the higher level
+    /// subject and then extract fields from deeper down in the hierarchy.
+    ///
+    /// ```
+    /// # use asserting::prelude::*;
+    /// #
+    /// # #[derive(Debug, Clone)]
+    /// # struct Item {
+    /// #     name: String,
+    /// #     price: f32,
+    /// #     quantity: u32,
+    /// # }
+    /// #
+    /// # struct Order {
+    /// #     id: String,
+    /// #     items: Vec<Item>,
+    /// # }
+    /// #
+    /// # let my_order = Order {
+    /// #     id: "O261234".into(),
+    /// #     items: vec![
+    /// #         Item {
+    /// #             name: "Apple".into(),
+    /// #             price: 0.99,
+    /// #             quantity: 6,
+    /// #         },
+    /// #         Item {
+    /// #             name: "Orange".into(),
+    /// #             price: 1.99,
+    /// #             quantity: 4,
+    /// #         },
+    /// #     ],
+    /// # };
+    /// #
+    /// assert_that!(my_order)
+    ///     .extracting_ref("my_order.id", |o| &o.id)
+    ///     .is_equal_to("O261234")
+    ///     .and()
+    ///     .extracting_ref("my_order.items", |o| &o.items)
+    ///     .extracting_ref("my_order.items[0].name", |i| &i[0].name)
+    ///     .is_equal_to("Apple")
+    ///     .and()
+    ///     .extracting_ref("my_order.items[1].name", |i| &i[1].name)
+    ///     .is_equal_to("Orange")
+    ///     .and()
+    ///     .extracting_ref("my_order.items[1].quantity", |i| &i[1].quantity)
+    ///     .is_equal_to(4);
+    /// ```
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub fn extracting_ref<F, B, U>(
         self,
@@ -180,6 +300,76 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         }
     }
 
+    /// Maps the current subject to some other value.
+    ///
+    /// It takes a closure that maps the current subject to a new subject and
+    /// returns a new `DerivedSpec` with the value returned by the closure as
+    /// the new subject. The new subject may have a different type than the
+    /// original subject. All other data like description, location, and diff
+    /// format are taken over from this `DerivedSpec` into the returned
+    /// `DerivedSpec`.
+    ///
+    /// This method is useful when having a custom type, and one specific
+    /// property of this type shall be asserted only. If you want to assert
+    /// multiple properties of the same subject, use the [`extracting_ref`]
+    /// method instead.
+    ///
+    /// This method is similar to the [`mapping()`](Spec::mapping) method. In
+    /// contrast to [`mapping()`](Spec::mapping), this method does not copy the
+    /// subject's name (or expression) but resets it to the default "subject".
+    /// The idea is that the "extracted" property is most likely a different
+    /// subject than the original one.
+    ///
+    /// It is recommended to give the extracted property a specific name by
+    /// calling the `named` method. This helps with spotting the cause of a
+    /// failing assertion.
+    ///
+    /// This method does not memorize the current subject. Calling `and` on the
+    /// extracted property switches back to the original subject of this
+    /// `DerivedSpec`. The current subject is omitted. So, `and` always switches
+    /// back to the subject before the last `extracting_ref` call.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone)]
+    /// struct Item {
+    ///     name: String,
+    ///     price: f32,
+    ///     quantity: u32,
+    /// }
+    ///
+    /// struct Order {
+    ///     id: String,
+    ///     items: Vec<Item>,
+    /// }
+    ///
+    /// let my_order = Order {
+    ///     id: "O261234".into(),
+    ///     items: vec![
+    ///         Item {
+    ///             name: "Apple".into(),
+    ///             price: 0.99,
+    ///             quantity: 6,
+    ///         },
+    ///         Item {
+    ///             name: "Orange".into(),
+    ///             price: 1.99,
+    ///             quantity: 4,
+    ///         },
+    ///     ],
+    /// };
+    ///
+    /// assert_that!(my_order)
+    ///     .extracting_ref("my_order.items", |o| &o.items)
+    ///     .extracting(|i| i[0].name.clone())
+    ///     .is_equal_to("Apple")
+    ///     .and()  // switches back to `my_order` not `my_order.items`
+    ///     .extracting(|o| o.id)
+    ///     .is_equal_to("O261234");
+    /// ```
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub fn extracting<F, U>(self, extract: F) -> DerivedSpec<'a, O, U>
     where
@@ -195,6 +385,58 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         }
     }
 
+    /// Maps the current subject to some other value.
+    ///
+    /// It takes a closure that maps the current subject to a new subject and
+    /// returns a new `DerivedSpec` with the value returned by the closure as
+    /// the new subject. The new subject may have a different type than the
+    /// original subject. All other data like expression, description, and
+    /// location are taken over from this `DerivedSpec` into the returned
+    /// `DerivedSpec`.
+    ///
+    /// This method is useful if some type does not implement a trait required
+    /// for an assertion.
+    ///
+    /// `DerivedSpec` also provides the [`extracting()`](DerivedSpec::extracting)
+    /// method, which is similar to this method. In contrast to this method,
+    /// [`extracting()`](DerivedSpec::extracting) does not copy the subject's
+    /// name (or expression) but resets it to the default "subject".
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Clone, Copy)]
+    /// struct Point {
+    ///     x: i64,
+    ///     y: i64,
+    /// }
+    ///
+    /// struct Line {
+    ///     a: Point,
+    ///     b: Point,
+    /// }
+    ///
+    /// let line = Line {
+    ///     a: Point { x: 12, y: -64 },
+    ///     b: Point { x: -28, y: 17 },
+    /// };
+    ///
+    /// assert_that!(line)
+    ///     .extracting_ref("line.a", |l| &l.a)
+    ///     .mapping(|p| (p.x, p.y))
+    ///     .is_equal_to((12, -64))
+    ///     .and()
+    ///     .extracting_ref("line.b", |l| &l.b)
+    ///     .mapping(|p| (p.x, p.y))
+    ///     .is_equal_to((-28, 17));
+    /// ```
+    ///
+    /// The custom type `Point` does not implement the `PartialEq` trait nor
+    /// the `Debug` trait, which are both required for an `is_equal_to`
+    /// assertion. So we map the subject of the type `Point` to a tuple of its
+    /// fields.
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub fn mapping<F, U>(self, map: F) -> DerivedSpec<'a, O, U>
     where

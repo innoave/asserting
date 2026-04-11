@@ -775,6 +775,82 @@ impl<'a, S, R> Spec<'a, S, R> {
         RecursiveComparison::new(self)
     }
 
+    /// Extracts a property from the current subject.
+    ///
+    /// The extracting closure gets a reference to the current subject as an
+    /// argument and should return a reference to the extracted property. The
+    /// given property name is used in failure reports for referencing the
+    /// property for which an assertion fails.
+    ///
+    /// Use this method if you want to extract multiple properties from the
+    /// same subject for individual assertions on each of these properties.
+    /// To extract another property from the original subject, call the `and`
+    /// method to switch back to the original subject before calling
+    /// `extracting_ref` for the other property.
+    ///
+    /// # Arguments
+    ///
+    /// * `property_name` - A name describing the extracted property used for
+    ///   referencing that property in failure reports.
+    /// * `extract` - A closure that returns a reference to the property to be
+    ///   extracted.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone, Copy, PartialEq)]
+    /// enum Gender {
+    ///     Male,
+    ///     Female,
+    ///     NonBinary,
+    ///     PreferNotToSay,
+    /// }
+    ///
+    /// struct Person {
+    ///     name: String,
+    ///     age: u8,
+    ///     gender: Gender,
+    /// }
+    ///
+    /// impl Person {
+    ///     fn name(&self) -> &str {
+    ///         &self.name
+    ///     }
+    /// }
+    ///
+    /// let my_friend = Person {
+    ///     name: "Silvia".into(),
+    ///     age: 27,
+    ///     gender: Gender::Female,
+    /// };
+    ///
+    /// assert_that!(my_friend)
+    ///     .extracting_ref("my_friend.name", Person::name)
+    ///     .is_equal_to("Silvia")
+    ///     .and()
+    ///     .extracting_ref("my_friend.age", |p| &p.age)
+    ///     .is_at_least(18)
+    ///     .and()
+    ///     .extracting_ref("my_friend.gender", |p| &p.gender)
+    ///     .is_equal_to(Gender::Female);
+    /// ```
+    pub fn extracting_ref<F, B, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Self, U>
+    where
+        F: FnOnce(&S) -> &B,
+        B: ToOwned<Owned = U> + ?Sized,
+    {
+        let derived_subject = extract(&self.subject).to_owned();
+        let expression = Expression(property_name.into());
+        let diff_format = self.diff_format.clone();
+        DerivedSpec::new(self, derived_subject, expression, diff_format)
+    }
+
     /// Maps the current subject to some other value.
     ///
     /// It takes a closure that maps the current subject to a new subject and
@@ -783,8 +859,10 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// subject. All other data like description, location, and diff format are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful when having a custom type, and a specific
-    /// property of this type shall be asserted only.
+    /// This method is useful when having a custom type, and one specific
+    /// property of this type shall be asserted only. If you want to assert
+    /// multiple properties of the same subject, use the [`extracting_ref`]
+    /// method instead.
     ///
     /// This method is similar to the [`mapping()`](Spec::mapping) method. In
     /// contrast to [`mapping()`](Spec::mapping), this method does not copy the
@@ -833,21 +911,6 @@ impl<'a, S, R> Spec<'a, S, R> {
         }
     }
 
-    pub fn extracting_ref<F, B, U>(
-        self,
-        property_name: impl Into<Cow<'a, str>>,
-        extract: F,
-    ) -> DerivedSpec<'a, Self, U>
-    where
-        F: FnOnce(&S) -> &B,
-        B: ToOwned<Owned = U> + ?Sized,
-    {
-        let derived_subject = extract(&self.subject).to_owned();
-        let expression = Expression(property_name.into());
-        let diff_format = self.diff_format.clone();
-        DerivedSpec::new(self, derived_subject, expression, diff_format)
-    }
-
     /// Maps the current subject to some other value.
     ///
     /// It takes a closure that maps the current subject to a new subject and
@@ -856,13 +919,13 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// subject. All other data like expression, description, and location are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful if some type does not implement a trait
-    /// required for an assertion.
+    /// This method is useful if some type does not implement a trait required
+    /// for an assertion.
     ///
-    /// `Spec` also provides the [`extracting()`](Spec::extracting) function,
-    /// which is an alias to this function. Both functions do exactly the same.
-    /// Choose that function of which its name expresses the intent more
-    /// clearly.
+    /// `Spec` also provides the [`extracting()`](Spec::extracting) method,
+    /// which is similar to this method. In contrast to this method,
+    /// [`extracting()`](Spec::extracting) does not copy the subject's name
+    /// (or expression) but resets it to the default "subject".
     ///
     /// # Example
     ///
