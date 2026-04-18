@@ -464,7 +464,7 @@
 //!     ).is_equal_to(42);
 //! ```
 //!
-//! When using the `verfiy_*` variants of the macros or functions for each
+//! When using the `verify_*` variants of the macros or functions for each
 //! failing assertion, a failure of type [`AssertFailure`] is added to the
 //! [`Spec`]. We can read the failures collected by calling the [`failures()`]
 //! method, like so:
