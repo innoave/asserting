@@ -666,7 +666,7 @@ mod extracted_elements {
     }
 }
 
-mod iterator_extracted_elements_ref {
+mod extracted_elements_ref {
     use super::*;
 
     #[test]
