@@ -4107,25 +4107,27 @@ pub trait AssertElements<T> {
         P: FnMut(&T) -> bool;
 }
 
-/// Filter assertions for elements of a collection or an iterator that yields
-/// its elements in a defined order.
+/// Extract one or multiple elements of a collection or an iterator that yields
+/// its elements in a defined order to call assertions on the extracted
+/// elements.
 ///
-/// Filtering is used to target the assertions on specific elements of a
+/// Extraction is used to target the assertions on specific elements of a
 /// collection or an iterator, such as the first or last element.
+///
+/// See also the [`AssertOrderedElementsRef`] trait for extracting multiple
+/// elements from the same ordered collection or iterator for individual
+/// assertions.
 ///
 /// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
 ///
-/// let subject = ["first", "second", "third", "four", "five"];
-///
-/// assert_that!(subject).first_element().is_equal_to("first");
-/// assert_that!(subject).last_element().is_equal_to("five");
-/// assert_that!(subject).nth_element(3).is_equal_to("four");
-///
 /// let subject = ["one", "two", "three", "four", "five"];
 ///
+/// assert_that!(subject).first_element().is_equal_to("one");
+/// assert_that!(subject).last_element().is_equal_to("five");
+/// assert_that!(subject).nth_element(3).is_equal_to("four");
 /// assert_that!(subject)
 ///     .elements_at([0, 2, 4])
 ///     .contains_exactly(["one", "three", "five"]);
@@ -4150,9 +4152,9 @@ pub trait AssertOrderedElements {
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// let subject = ["first", "second", "third"];
+    /// let subject = ["one", "two", "three"];
     ///
-    /// assert_that!(subject).first_element().is_equal_to("first");
+    /// assert_that!(subject).first_element().is_equal_to("one");
     /// ```
     ///
     /// [`Spec`]: crate::spec::Spec
@@ -4167,9 +4169,9 @@ pub trait AssertOrderedElements {
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// let subject = ["first", "second", "third"];
+    /// let subject = ["one", "two", "three"];
     ///
-    /// assert_that!(subject).last_element().is_equal_to("third");
+    /// assert_that!(subject).last_element().is_equal_to("three");
     /// ```
     ///
     /// [`Spec`]: crate::spec::Spec
@@ -4186,11 +4188,11 @@ pub trait AssertOrderedElements {
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// let subject = ["first", "second", "third"];
+    /// let subject = ["one", "two", "three"];
     ///
-    /// assert_that!(subject).nth_element(0).is_equal_to("first");
-    /// assert_that!(subject).nth_element(1).is_equal_to("second");
-    /// assert_that!(subject).nth_element(2).is_equal_to("third");
+    /// assert_that!(subject).nth_element(0).is_equal_to("one");
+    /// assert_that!(subject).nth_element(1).is_equal_to("two");
+    /// assert_that!(subject).nth_element(2).is_equal_to("three");
     /// ```
     ///
     /// [`Spec`]: crate::spec::Spec
@@ -4215,4 +4217,134 @@ pub trait AssertOrderedElements {
     /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
+}
+
+/// Extract one or multiple elements of a collection or an iterator that yields
+/// its elements in a defined order to call assertions on the extracted
+/// elements.
+///
+/// Extraction is used to target the assertions on specific elements of a
+/// collection or an iterator, such as the first or last element.
+///
+/// The methods of this trait can be used in combination with the `and` method
+/// to extract multiple elements from a collection for individual assertions.
+/// The downside is that the elements of the collection or iterator must
+/// implement the `ToOwned` trait.
+///
+/// If you only want to call a single extraction method on the same collection
+/// or iterator, you can use the methods of the [`AssertOrderedElements`] trait.
+/// These methods do not require that the elements of the collection implement
+/// `ToOwned` or `Clone`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// let subject = ["one", "two", "three", "four", "five"];
+///
+/// assert_that!(subject)
+///     .first_element_ref().is_equal_to("one")
+///     .and()
+///     .last_element_ref().is_equal_to("five")
+///     .and()
+///     .nth_element_ref(3).is_equal_to("four")
+///     .and()
+///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"]);
+/// ```
+pub trait AssertOrderedElementsRef {
+    /// A spec-like type that contains a single element as the subject that is
+    /// extracted from the iterator.
+    ///
+    /// Usually this is a `Spec<'a, T, R>`.
+    type SingleElement;
+    /// A spec-like type that contains multiple or all elements of an iterator
+    /// as the subject.
+    ///
+    /// Usually this is a `Spec<'a, Vec<T>, R>`.
+    type MultipleElements;
+
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the first element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three"];
+    ///
+    /// assert_that!(subject)
+    ///     .first_element_ref().is_equal_to("one")
+    ///     .and()
+    ///     .last_element_ref().is_equal_to("three");
+    /// ```
+    ///
+    /// [`Spec`]: crate::spec::Spec
+    #[track_caller]
+    fn first_element_ref(self) -> Self::SingleElement;
+
+    /// Verify that a collection or an iterator contains at least one element
+    /// and return a [`Spec`] for the last element.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three"];
+    ///
+    /// assert_that!(subject)
+    ///     .last_element_ref().is_equal_to("three")
+    ///     .and()
+    ///     .first_element_ref().is_equal_to("one");
+    /// ```
+    ///
+    /// [`Spec`]: crate::spec::Spec
+    #[track_caller]
+    fn last_element_ref(self) -> Self::SingleElement;
+
+    /// Verify that a collection or an iterator contains at least n + 1 elements
+    /// and return a [`Spec`] for the nth element.
+    ///
+    /// The index n is zero-based (similar to the `nth` method of iterators).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three"];
+    ///
+    /// assert_that!(subject)
+    ///     .nth_element_ref(0).is_equal_to("one")
+    ///     .and()
+    ///     .nth_element_ref(1).is_equal_to("two")
+    ///     .and()
+    ///     .nth_element_ref(2).is_equal_to("three");
+    /// ```
+    ///
+    /// [`Spec`]: crate::spec::Spec
+    #[track_caller]
+    fn nth_element_ref(self, n: usize) -> Self::SingleElement;
+
+    /// Pick the elements of a collection or an iterator at the given positions
+    /// and return a [`Spec`] only containing the selected elements.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = ["one", "two", "three", "four", "five"];
+    ///
+    /// assert_that!(subject)
+    ///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"])
+    ///     .and()
+    ///     .elements_ref_at([1, 3]).contains_exactly(["two", "four"]);
+    /// ```
+    ///
+    /// [`Spec`]: crate::spec::Spec
+    #[track_caller]
+    fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
 }

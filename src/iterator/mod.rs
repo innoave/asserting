@@ -2,12 +2,13 @@
 
 use crate::assertions::{
     AssertElements, AssertIteratorContains, AssertIteratorContainsInAnyOrder,
-    AssertIteratorContainsInOrder, AssertOrderedElements,
+    AssertIteratorContainsInOrder, AssertOrderedElements, AssertOrderedElementsRef,
 };
 use crate::colored::{
     mark_all_items_in_collection, mark_missing, mark_missing_string,
     mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
 };
+use crate::derived_spec::DerivedSpec;
 use crate::expectations::{
     AllSatisfy, AnySatisfies, HasAtLeastNumberOfElements, HasSingleElement, IteratorContains,
     IteratorContainsAllInOrder, IteratorContainsAllOf, IteratorContainsAnyOf,
@@ -24,6 +25,7 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, GetFailures, Invertible,
     PanicOnFail, Spec,
 };
+use crate::std::borrow::ToOwned;
 use crate::std::cmp::Ordering;
 use crate::std::fmt::Debug;
 use crate::std::mem;
@@ -1004,12 +1006,103 @@ where
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let indices = Vec::from_iter(indices);
+        let orig_subject_name = self.expression();
+        let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
         self.mapping(|subject| {
             subject
                 .into_iter()
                 .enumerate()
                 .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
+                .collect()
+        })
+        .named(new_subject_name)
+    }
+}
+
+impl<'a, S, T, U, R> AssertOrderedElementsRef for Spec<'a, S, R>
+where
+    S: IntoIterator<Item = T>,
+    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
+    T: 'a + ToOwned<Owned = U> + Debug,
+    U: Clone,
+    R: FailingStrategy,
+{
+    type SingleElement = DerivedSpec<'a, Spec<'a, Vec<T>, R>, U>;
+    type MultipleElements = DerivedSpec<'a, Spec<'a, Vec<T>, R>, Vec<U>>;
+
+    fn first_element_ref(self) -> Self::SingleElement {
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("the first element of {orig_subject_name}");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.first()
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn last_element_ref(self) -> Self::SingleElement {
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("the last element of {orig_subject_name}");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.last()
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn nth_element_ref(self, n: usize) -> Self::SingleElement {
+        let min_len = n + 1;
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(min_len));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("{orig_subject_name}[{n}]");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.get(n)
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let indices = Vec::from_iter(indices);
+        let orig_subject_name = self.expression();
+        let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
+        let indices = HashSet::<_>::from_iter(indices);
+        let original_spec = self.mapping(Vec::from_iter);
+        original_spec.extracting_ref_iter(new_subject_name, |collection| {
+            collection
+                .enumerate()
+                .filter_map(|(i, e)| {
+                    if indices.contains(&i) {
+                        Some(e.to_owned())
+                    } else {
+                        None
+                    }
+                })
                 .collect()
         })
     }

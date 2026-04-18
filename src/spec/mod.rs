@@ -11,6 +11,7 @@ use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::format;
 use crate::std::ops::Deref;
+use crate::std::slice;
 use crate::std::string::{String, ToString};
 use crate::std::vec;
 use crate::std::vec::Vec;
@@ -1050,7 +1051,10 @@ where
     }
 }
 
-impl<'a, I, R> Spec<'a, I, R> {
+impl<'a, I, R> Spec<'a, I, R>
+where
+    I: IntoIterator,
+{
     /// Iterates over the elements of a collection or an iterator and executes
     /// the given assertions for each of those elements. If all elements are
     /// asserted successfully, the whole assertion succeeds.
@@ -1096,10 +1100,9 @@ impl<'a, I, R> Spec<'a, I, R> {
     /// ```
     #[allow(clippy::return_self_not_must_use)]
     #[track_caller]
-    pub fn each_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    pub fn each_element<A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
-        I: IntoIterator<Item = T>,
-        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
         let root_expression = &self.expression;
         let mut position = -1;
@@ -1175,10 +1178,9 @@ impl<'a, I, R> Spec<'a, I, R> {
     ///   expected: 'x'
     /// ```
     #[track_caller]
-    pub fn any_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    pub fn any_element<A, B>(mut self, assert: A) -> Spec<'a, (), R>
     where
-        I: IntoIterator<Item = T>,
-        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
         let root_expression = &self.expression;
         let mut any_success = false;
@@ -1215,6 +1217,21 @@ impl<'a, I, R> Spec<'a, I, R> {
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
         }
+    }
+
+    pub(crate) fn extracting_ref_iter<F, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Spec<'a, Vec<<I as IntoIterator>::Item>, R>, Vec<U>>
+    where
+        for<'b> F: Fn(slice::Iter<'b, <I as IntoIterator>::Item>) -> Vec<U>,
+    {
+        let property_name = Expression(property_name.into());
+        let diff_format = self.diff_format.clone();
+        let orig_spec = self.mapping(Vec::from_iter);
+        let new_subject = extract(orig_spec.subject.iter());
+        DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
     }
 }
 
