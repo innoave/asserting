@@ -314,11 +314,11 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// multiple properties of the same subject, use the [`extracting_ref`]
     /// method instead.
     ///
-    /// This method is similar to the [`mapping()`](Spec::mapping) method. In
-    /// contrast to [`mapping()`](Spec::mapping), this method does not copy the
-    /// subject's name (or expression) but resets it to the default "subject".
-    /// The idea is that the "extracted" property is most likely a different
-    /// subject than the original one.
+    /// This method is similar to the [`mapping`] method. In contrast to
+    /// [`mapping`], this method does not copy the subject's name
+    /// (or expression) but resets it to the default "subject". The idea is
+    /// that the "extracted" property is most likely a different subject than
+    /// the original one.
     ///
     /// It is recommended to give the extracted property a specific name by
     /// calling the `named` method. This helps with spotting the cause of a
@@ -370,6 +370,9 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     ///     .extracting(|o| o.id)
     ///     .is_equal_to("O261234");
     /// ```
+    ///
+    /// [`extracting_ref`]: Self::extracting_ref
+    /// [`mapping`]: Self::mapping
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub fn extracting<F, U>(self, extract: F) -> DerivedSpec<'a, O, U>
     where

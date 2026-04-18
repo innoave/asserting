@@ -828,7 +828,7 @@
 //! [`LengthProperty`]: properties::LengthProperty
 //! [`Spec`]: spec::Spec
 //! [`Spec::each_element()`]: spec::Spec::each_element
-//! [`Spec::expecting()`]: spec::Spec::expecting
+//! [`Spec::expecting()`]: spec::Expecting::expecting
 //! [`Spec::satisfies()`]: spec::Spec::satisfies
 //! [`SoftPanic::soft_panic()`]: spec::SoftPanic::soft_panic
 //! [`assert_that`]: spec::assert_that
