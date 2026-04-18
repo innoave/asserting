@@ -711,7 +711,7 @@ mod extracted_elements_ref {
     }
 
     #[test]
-    fn verfiy_first_element_of_iterator_assertion_fails() {
+    fn verify_first_element_of_iterator_assertion_fails() {
         let subject = vec!["four", "two", "three"];
 
         let failures = verify_that(subject)
@@ -773,7 +773,7 @@ mod extracted_elements_ref {
     }
 
     #[test]
-    fn verfiy_last_element_of_iterator_assertion_fails() {
+    fn verify_last_element_of_iterator_assertion_fails() {
         let subject = vec!["one", "two", "four"];
 
         let failures = verify_that(subject)
@@ -846,7 +846,7 @@ mod extracted_elements_ref {
     }
 
     #[test]
-    fn verfiy_nth_element_of_iterator_assertion_fails() {
+    fn verify_nth_element_of_iterator_assertion_fails() {
         let subject = vec!["one", "four", "three"];
 
         let failures = verify_that(subject)

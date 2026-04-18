@@ -8,8 +8,8 @@ use crate::assertions::{
     AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIteratorContains,
     AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder, AssertMapContainsKey,
     AssertMapContainsValue, AssertNotANumber, AssertNumericIdentity, AssertOption,
-    AssertOptionValue, AssertOrder, AssertOrderedElements, AssertResult, AssertResultValue,
-    AssertSameAs, AssertSignum, AssertStringContainsAnyOf, AssertStringPattern,
+    AssertOptionValue, AssertOrder, AssertOrderedElements, AssertOrderedElementsRef, AssertResult,
+    AssertResultValue, AssertSameAs, AssertSignum, AssertStringContainsAnyOf, AssertStringPattern,
 };
 use crate::expectations::{
     error_has_source, error_has_source_message, has_at_least_char_count, has_at_least_length,
@@ -43,6 +43,7 @@ use crate::std::error::Error;
 use crate::std::fmt::{Debug, Display};
 use crate::std::format;
 use crate::std::ops::RangeBounds;
+use crate::std::slice;
 use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
 use hashbrown::HashSet;
@@ -452,6 +453,26 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
             expression: self.expression,
             diff_format: self.diff_format,
         }
+    }
+}
+
+impl<'a, O, I> DerivedSpec<'a, O, I>
+where
+    I: IntoIterator,
+{
+    pub(crate) fn extracting_ref_iter<F, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, DerivedSpec<'a, O, Vec<<I as IntoIterator>::Item>>, Vec<U>>
+    where
+        for<'b> F: Fn(slice::Iter<'b, <I as IntoIterator>::Item>) -> Vec<U>,
+    {
+        let property_name = Expression(property_name.into());
+        let diff_format = self.diff_format.clone();
+        let orig_spec = self.mapping(Vec::from_iter);
+        let new_subject = extract(orig_spec.subject.iter());
+        DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
     }
 }
 
@@ -1550,6 +1571,92 @@ where
                 .into_iter()
                 .enumerate()
                 .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
+                .collect()
+        })
+    }
+}
+
+impl<'a, O, S, T, U> AssertOrderedElementsRef for DerivedSpec<'a, O, S>
+where
+    S: IntoIterator<Item = T>,
+    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
+    T: ToOwned<Owned = U> + Debug,
+    O: DoFail + GetFailures,
+{
+    type SingleElement = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>>, U>;
+    type MultipleElements = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>>, Vec<U>>;
+
+    fn first_element_ref(self) -> Self::SingleElement {
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("the first element of {orig_subject_name}");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.first()
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn last_element_ref(self) -> Self::SingleElement {
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(1));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("the last element of {orig_subject_name}");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.last()
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn nth_element_ref(self, n: usize) -> Self::SingleElement {
+        let min_len = n + 1;
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .expecting(has_at_least_number_of_elements(min_len));
+        if original_spec.has_failures() {
+            PanicOnFail.do_fail_with(&original_spec.failures());
+            unreachable!("Assertion failed and should have panicked! Please report a bug.")
+        }
+        let orig_subject_name = original_spec.expression();
+        let new_subject_name = format!("{orig_subject_name}[{n}]");
+        original_spec.extracting_ref(new_subject_name, |collection|
+            collection.get(n)
+                .unwrap_or_else(||
+                    unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
+                )
+        )
+    }
+
+    fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let indices = Vec::from_iter(indices);
+        let orig_subject_name = self.expression();
+        let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
+        let indices = HashSet::<_>::from_iter(indices);
+        let original_spec = self.mapping(Vec::from_iter);
+        original_spec.extracting_ref_iter(new_subject_name, |collection| {
+            collection
+                .enumerate()
+                .filter_map(|(i, e)| {
+                    if indices.contains(&i) {
+                        Some(e.to_owned())
+                    } else {
+                        None
+                    }
+                })
                 .collect()
         })
     }

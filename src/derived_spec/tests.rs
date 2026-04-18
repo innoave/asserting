@@ -913,3 +913,350 @@ fn extracting_ref_vec_contains_all_in_order() {
         .extracting_ref("names.0", |n| &n.0)
         .contains_all_in_order(["Silvia", "Robert"]);
 }
+
+mod iterator_extracted_elements_ref {
+    use super::*;
+
+    #[allow(dead_code)]
+    struct Order {
+        id: u64,
+        items: Vec<&'static str>,
+    }
+
+    #[test]
+    fn first_element_of_iterator_with_one_element() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .first_element_ref()
+            .is_equal_to("Apple")
+            .has_length(5)
+            .starts_with("App")
+            .and()
+            .last_element_ref()
+            .is_equal_to("Apple");
+    }
+
+    #[test]
+    fn first_element_of_iterator_with_several_elements() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .first_element_ref()
+            .is_equal_to("Apple")
+            .has_length(5)
+            .starts_with('A')
+            .and()
+            .last_element_ref()
+            .is_equal_to("Orange");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn first_element_of_iterator_with_no_elements_fails() {
+        let order = Order {
+            id: 55,
+            items: vec![],
+        };
+
+        assert_that_code(|| {
+            assert_that(order)
+                .named("order")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .extracting_ref("order.items", |o| &o.items)
+                .first_element_ref()
+                .is_equal_to("Apple");
+        })
+        .panics_with_message(
+            r"expected order.items to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn verify_first_element_of_iterator_assertion_fails() {
+        let order = Order {
+            id: 55,
+            items: vec!["Melon", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        let failures = verify_that(order)
+            .named("order")
+            .extracting_ref("order.items", |o| &o.items)
+            .first_element_ref()
+            .is_equal_to("Apple")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected the first element of order.items to be equal to "Apple"
+   but was: "Melon"
+  expected: "Apple"
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_one_element() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .last_element_ref()
+            .is_equal_to("Apple")
+            .has_length(5)
+            .starts_with("Ap")
+            .and()
+            .first_element_ref()
+            .is_equal_to("Apple");
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_several_elements() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .last_element_ref()
+            .is_equal_to("Orange")
+            .has_length(6)
+            .starts_with("Oran")
+            .and()
+            .first_element_ref()
+            .is_equal_to("Apple");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn last_element_of_iterator_with_no_elements_fails() {
+        let order = Order {
+            id: 55,
+            items: vec![],
+        };
+
+        assert_that_code(|| {
+            assert_that(order)
+                .named("order")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .extracting_ref("order.items", |o| &o.items)
+                .last_element_ref()
+                .is_equal_to("Grapes");
+        })
+        .panics_with_message(
+            r"expected order.items to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn verify_last_element_of_iterator_assertion_fails() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Melon"],
+        };
+
+        let failures = verify_that(order)
+            .named("order")
+            .extracting_ref("order.items", |o| &o.items)
+            .last_element_ref()
+            .is_equal_to("Cherry")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected the last element of order.items to be equal to "Cherry"
+   but was: "Melon"
+  expected: "Cherry"
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_one_element() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .nth_element_ref(0)
+            .is_equal_to("Apple")
+            .has_length(5)
+            .starts_with("App")
+            .and()
+            .first_element_ref()
+            .is_equal_to("Apple");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_second_element() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .nth_element_ref(1)
+            .is_equal_to("Banana")
+            .has_length(6)
+            .starts_with("Ban")
+            .and()
+            .nth_element_ref(3)
+            .is_equal_to("Grapes");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_fifth_element() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .nth_element_ref(4)
+            .is_equal_to("Orange")
+            .has_length(6)
+            .starts_with("Or")
+            .and()
+            .nth_element_ref(0)
+            .is_equal_to("Apple");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn nth_element_of_iterator_with_five_elements_6th_element_fails() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that_code(|| {
+            assert_that(order)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .extracting_ref("order.items", |o| &o.items)
+                .nth_element_ref(5)
+                .is_equal_to("Melon");
+        })
+        .panics_with_message(
+            r#"expected order.items to have at least 6 elements, but has 5 elements
+  actual: ["Apple", "Banana", "Cherry", "Grapes", "Orange"]
+"#,
+        );
+    }
+
+    #[test]
+    fn verify_nth_element_of_iterator_assertion_fails() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Melon", "Cherry", "Grapes", "Orange"],
+        };
+
+        let failures = verify_that(order)
+            .named("order")
+            .extracting_ref("order.items", |o| &o.items)
+            .nth_element_ref(1)
+            .is_equal_to("Banana")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[r#"expected order.items[1] to be equal to "Banana"
+   but was: "Melon"
+  expected: "Banana"
+"#]
+        );
+    }
+
+    #[test]
+    fn elements_at_positions_of_iterator() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry", "Grapes", "Orange"],
+        };
+
+        assert_that(order)
+            .extracting_ref("order.items", |o| &o.items)
+            .elements_ref_at([0, 2, 4])
+            .contains_exactly(["Apple", "Cherry", "Orange"]);
+    }
+
+    #[test]
+    fn verify_elements_at_positions_of_empty_iterator_fails() {
+        let order = Order {
+            id: 55,
+            items: vec![],
+        };
+
+        let failures = verify_that(order)
+            .named("order")
+            .extracting_ref("order.items", |o| &o.items)
+            .elements_ref_at([0, 1])
+            .contains_exactly(["Apple", "Banana"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected order.items at positions [0, 1] to contain exactly in order ["Apple", "Banana"]
+       but was: []
+      expected: ["Apple", "Banana"]
+       missing: ["Apple", "Banana"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_elements_at_out_of_bounds_position_fails() {
+        let order = Order {
+            id: 55,
+            items: vec!["Apple", "Banana", "Cherry"],
+        };
+
+        let failures = verify_that(order)
+            .named("order")
+            .extracting_ref("order.items", |o| &o.items)
+            .elements_ref_at([0, 3])
+            .contains_exactly(["Apple", "Grapes"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected order.items at positions [0, 3] to contain exactly in order ["Apple", "Grapes"]
+       but was: ["Apple"]
+      expected: ["Apple", "Grapes"]
+       missing: ["Grapes"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
+    }
+}
