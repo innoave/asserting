@@ -45,6 +45,8 @@ impl Person {
     }
 }
 
+struct Answer(i32);
+
 #[test]
 fn mapping_person_name_starts_with_alex() {
     let person = Person {
@@ -196,6 +198,48 @@ fn extracting_ref_to_assert_all_order_item_fields() {
         .and()
         .extracting_ref("order.vat", |o| &o.vat)
         .is_close_to(0.15);
+}
+
+#[test]
+fn assert_that_extracted_ref_satisfies_predicate() {
+    let answer = Answer(42);
+
+    assert_that(answer)
+        .named("answer")
+        .extracting_ref("answer.val", |answer| &answer.0)
+        .satisfies(|actual| *actual == 42)
+        .is_at_least(42);
+}
+
+#[test]
+fn verify_that_subject_satisfies_predicate_fails() {
+    let subject = Answer(51);
+
+    let failures = verify_that(subject)
+        .named("answer")
+        .extracting_ref("answer.val", |answer| &answer.0)
+        .satisfies(|actual| *actual == 42)
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        &["expected answer.val to satisfy the given predicate, but returned false\n"]
+    );
+}
+
+#[test]
+fn verify_that_subject_satisfies_predicate_fails_with_custom_message() {
+    let subject = Answer(51);
+
+    let failures = verify_that(subject)
+        .named("answer")
+        .extracting_ref("answer.val", |answer| &answer.0)
+        .satisfies_with_message("the answer to all important questions is 42", |actual| {
+            *actual == 42
+        })
+        .display_failures();
+
+    assert_eq!(failures, &["the answer to all important questions is 42\n"]);
 }
 
 #[test]

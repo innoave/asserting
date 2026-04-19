@@ -967,93 +967,6 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 }
 
-impl<S, R> Spec<'_, S, R>
-where
-    R: FailingStrategy,
-{
-    /// Asserts whether the given predicate is meet.
-    ///
-    /// This method takes a predicate function and calls it as an expectation.
-    /// In case the predicate function returns false, it does fail with a
-    /// generic failure message and according to the current failing strategy of
-    /// this `Spec`.
-    ///
-    /// This method can be used to do simple custom assertions without
-    /// implementing an [`Expectation`] and an assertion trait.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn is_odd(value: &i32) -> bool {
-    ///     value & 1 == 1
-    /// }
-    ///
-    /// assert_that!(37).satisfies(is_odd);
-    ///
-    /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
-    ///
-    /// assert_that!(failures).contains_exactly([
-    ///     "expected 22 to satisfy the given predicate, but returned false\n"
-    /// ]);
-    /// ```
-    ///
-    /// To assert a predicate with a custom failure message instead of the
-    /// generic one, use the method
-    /// [`satisfies_with_message`](Spec::satisfies_with_message).
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn satisfies<P>(self, predicate: P) -> Self
-    where
-        P: Fn(&S) -> bool,
-    {
-        self.expecting(satisfies(predicate))
-    }
-
-    /// Asserts whether the given predicate is meet.
-    ///
-    /// This method takes a predicate function and calls it as an expectation.
-    /// In case the predicate function returns false, it does fail with the
-    /// provided failure message and according to the current failing strategy
-    /// of this `Spec`.
-    ///
-    /// This method can be used to do simple custom assertions without
-    /// implementing an [`Expectation`] and an assertion trait.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn is_odd(value: &i32) -> bool {
-    ///     value & 1 == 1
-    /// }
-    ///
-    /// assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
-    ///
-    /// let failures = verify_that!(22)
-    ///         .satisfies_with_message("expected my number to be odd", is_odd)
-    ///         .display_failures();
-    ///
-    /// assert_that!(failures).contains_exactly([
-    ///     "expected my number to be odd\n"
-    /// ]);
-    /// ```
-    ///
-    /// To assert a predicate with a generic failure message instead of
-    /// providing one use the method
-    /// [`satisfies`](Spec::satisfies).
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
-    where
-        P: Fn(&S) -> bool,
-    {
-        self.expecting(satisfies(predicate).with_message(message))
-    }
-}
-
 impl<'a, I, R> Spec<'a, I, R>
 where
     I: IntoIterator,
@@ -1443,6 +1356,112 @@ impl<S, R> And for Spec<'_, S, R> {
 
     fn and(self) -> Self::Output {
         self
+    }
+}
+
+/// Verify whether a subject satisfies a given predicate.
+///
+/// A predicate is a function that takes the subject and returns true if the
+/// subject meets certain criteria.
+pub trait Satisfies<S> {
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// A predicate is a function that takes the subject and returns true if the
+    /// subject meets certain criteria.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with a
+    /// generic failure message and according to the current failing strategy of
+    /// this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies(is_odd);
+    ///
+    /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "expected 22 to satisfy the given predicate, but returned false\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a custom failure message instead of the
+    /// generic one, use the method
+    /// [`satisfies_with_message`](Spec::satisfies_with_message).
+    #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool;
+
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// A predicate is a function that takes the subject and returns true if the
+    /// subject meets certain criteria.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with the
+    /// provided failure message and according to the current failing strategy
+    /// of this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
+    ///
+    /// let failures = verify_that!(22)
+    ///         .satisfies_with_message("expected my number to be odd", is_odd)
+    ///         .display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "expected my number to be odd\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a generic failure message instead of
+    /// providing one, use the method [`satisfies`](Satisfies::satisfies).
+    #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool;
+}
+
+impl<S, R> Satisfies<S> for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate))
+    }
+
+    fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate).with_message(message))
     }
 }
 

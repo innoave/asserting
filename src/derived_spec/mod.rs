@@ -26,7 +26,7 @@ use crate::expectations::{
     iterator_contains_exactly_in_any_order, iterator_contains_only, iterator_contains_only_once,
     iterator_contains_sequence, iterator_ends_with, iterator_starts_with,
     map_contains_exactly_keys, map_contains_key, map_contains_keys, map_contains_value,
-    map_contains_values, map_does_not_contain_keys, map_does_not_contain_values, not,
+    map_contains_values, map_does_not_contain_keys, map_does_not_contain_values, not, satisfies,
     string_contains, string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{
@@ -36,7 +36,7 @@ use crate::properties::{
 };
 use crate::spec::{
     And, AssertFailure, DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy,
-    GetFailures, PanicOnFail, SoftPanic,
+    GetFailures, PanicOnFail, Satisfies, SoftPanic,
 };
 use crate::std::borrow::{Cow, ToOwned};
 use crate::std::error::Error;
@@ -473,6 +473,25 @@ where
         let orig_spec = self.mapping(Vec::from_iter);
         let new_subject = extract(orig_spec.subject.iter());
         DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
+    }
+}
+
+impl<O, S> Satisfies<S> for DerivedSpec<'_, O, S>
+where
+    O: DoFail,
+{
+    fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate))
+    }
+
+    fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate).with_message(message))
     }
 }
 

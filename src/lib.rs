@@ -829,7 +829,7 @@
 //! [`Spec`]: spec::Spec
 //! [`Spec::each_element()`]: spec::Spec::each_element
 //! [`Spec::expecting()`]: spec::Expecting::expecting
-//! [`Spec::satisfies()`]: spec::Spec::satisfies
+//! [`Spec::satisfies()`]: spec::Satisfies::satisfies
 //! [`SoftPanic::soft_panic()`]: spec::SoftPanic::soft_panic
 //! [`assert_that`]: spec::assert_that
 //! [`assert_that_code`]: spec::assert_that_code
