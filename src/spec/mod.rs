@@ -1,5 +1,6 @@
 //! This is the core of the `asserting` crate.
 
+use crate::assertions::AssertElements;
 use crate::colored;
 use crate::derived_spec::DerivedSpec;
 use crate::expectations::satisfies;
@@ -967,56 +968,13 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 }
 
-impl<'a, I, R> Spec<'a, I, R>
+impl<'a, I, R> AssertElements<'a, I> for Spec<'a, I, R>
 where
     I: IntoIterator,
 {
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If all elements are
-    /// asserted successfully, the whole assertion succeeds.
-    ///
-    /// It iterates over all elements of the collection or iterator and collects
-    /// the failure messages for those elements where the assertion fails. In
-    /// other words, it does not stop iterating when the assertion for one
-    /// element fails.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let numbers = [2, 4, 6, 8, 10];
-    ///
-    /// assert_that!(numbers).each_element(|e|
-    ///     e.is_greater_than(2)
-    ///         .is_at_most(7)
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected numbers [0] to be greater than 2
-    ///    but was: 2
-    ///   expected: > 2
-    ///
-    /// expected numbers [3] to be at most 7
-    ///    but was: 8
-    ///   expected: <= 7
-    ///
-    /// expected numbers [4] to be at most 7
-    ///    but was: 10
-    ///   expected: <= 7
-    /// ```
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn each_element<A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    type Output = Spec<'a, (), R>;
+
+    fn each_element<A, B>(mut self, assert: A) -> Self::Output
     where
         A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
@@ -1052,49 +1010,7 @@ where
         }
     }
 
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If the assertion of any
-    /// element is successful, the iteration stops and the whole assertion
-    /// succeeds.
-    ///
-    /// If the assertion fails for all elements, the failures of the assertion
-    /// for all elements are collected.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let digit_names = ["one", "two", "three"];
-    ///
-    /// assert_that!(digit_names).any_element(|e|
-    ///     e.contains('x')
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected digit_names [0] to contain 'x'
-    ///    but was: "one"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [1] to contain 'x'
-    ///    but was: "two"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [2] to contain 'x'
-    ///    but was: "three"
-    ///   expected: 'x'
-    /// ```
-    #[track_caller]
-    pub fn any_element<A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    fn any_element<A, B>(mut self, assert: A) -> Self::Output
     where
         A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
     {
@@ -1134,7 +1050,12 @@ where
             failing_strategy: self.failing_strategy,
         }
     }
+}
 
+impl<'a, I, R> Spec<'a, I, R>
+where
+    I: IntoIterator,
+{
     pub(crate) fn extracting_ref_iter<F, U>(
         self,
         property_name: impl Into<Cow<'a, str>>,
