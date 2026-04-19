@@ -1,7 +1,7 @@
 //! Implementations of assertions for `Iterator` values.
 
 use crate::assertions::{
-    AssertElements, AssertIteratorContains, AssertIteratorContainsInAnyOrder,
+    AssertFilteredElements, AssertIteratorContains, AssertIteratorContainsInAnyOrder,
     AssertIteratorContainsInOrder, AssertOrderedElements, AssertOrderedElementsRef,
 };
 use crate::colored::{
@@ -785,7 +785,7 @@ where
     }
 }
 
-impl<'a, S, T, R> AssertElements<T> for Spec<'a, S, R>
+impl<'a, S, T, R> AssertFilteredElements<T> for Spec<'a, S, R>
 where
     S: IntoIterator<Item = T>,
     T: Debug,

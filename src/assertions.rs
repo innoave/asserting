@@ -4003,7 +4003,7 @@ pub trait AssertMapContainsValue<E> {
 /// let subject = [42, 43, 44, 45, 46];
 /// assert_that!(subject).none_satisfies(|e| *e < 42);
 /// ```
-pub trait AssertElements<T> {
+pub trait AssertFilteredElements<T> {
     /// A spec-like type that contains a single element as the subject that is
     /// extracted from the iterator.
     ///
