@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Doc" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value=" doc+nightly --all-features --no-deps" />
+    <option name="command" value="doc --all-features --no-deps" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
     <option name="emulateTerminal" value="false" />
-    <option name="channel" value="DEFAULT" />
+    <option name="channel" value="NIGHTLY" />
     <option name="requiredFeatures" value="true" />
     <option name="allFeatures" value="true" />
     <option name="withSudo" value="false" />
