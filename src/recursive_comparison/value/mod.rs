@@ -28,7 +28,7 @@ impl Debug for Field {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let name = &self.name;
         let value = &self.value;
-        write!(f, "{name}: {value:?}",)
+        write!(f, "{name}: {value:?}")
     }
 }
 

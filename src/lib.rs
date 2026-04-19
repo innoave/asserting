@@ -822,7 +822,7 @@
 //! assert_that!(person).is_over_18();
 //! ```
 //!
-//! [`AssertElements`]: assertions::AssertElements
+//! [`AssertElements`]: assertions::AssertFilteredElements
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
