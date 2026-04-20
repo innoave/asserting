@@ -10,7 +10,7 @@
 //! assertions.
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
-use crate::spec::{CollectFailures, Spec};
+use crate::spec::{CollectFailures, GetFailures, Spec};
 use crate::std::fmt::Debug;
 use crate::std::ops::RangeBounds;
 use crate::std::string::String;
@@ -4030,7 +4030,8 @@ where
     #[track_caller]
     fn each_element<A, B>(self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>;
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures;
 
     /// Iterates over the elements of a collection or an iterator and executes
     /// the given assertions for each of those elements. If the assertion of any
@@ -4077,7 +4078,8 @@ where
     #[track_caller]
     fn any_element<A, B>(self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>;
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures;
 }
 
 /// Filter assertions for elements of a collection or an iterator.

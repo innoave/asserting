@@ -1042,12 +1042,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the first element of {orig_subject_name}");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.first()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn last_element_ref(self) -> Self::SingleElement {
@@ -1060,12 +1060,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the last element of {orig_subject_name}");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.last()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn nth_element_ref(self, n: usize) -> Self::SingleElement {
@@ -1079,12 +1079,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("{orig_subject_name}[{n}]");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.get(n)
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {

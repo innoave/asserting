@@ -660,11 +660,6 @@ impl<S, R> Spec<'_, S, R> {
         &self.expression
     }
 
-    /// Returns the location in source code or test code if it has been set.
-    pub fn location(&self) -> Option<Location<'_>> {
-        self.location
-    }
-
     /// Returns the description or the assertion if it has been set.
     pub fn description(&self) -> Option<&str> {
         self.description.as_deref()
@@ -829,13 +824,13 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// };
     ///
     /// assert_that!(my_friend)
-    ///     .extracting_ref("my_friend.name", Person::name)
+    ///     .extracting_ref("name", Person::name)
     ///     .is_equal_to("Silvia")
     ///     .and()
-    ///     .extracting_ref("my_friend.age", |p| &p.age)
+    ///     .extracting_ref("age", |p| &p.age)
     ///     .is_at_least(18)
     ///     .and()
-    ///     .extracting_ref("my_friend.gender", |p| &p.gender)
+    ///     .extracting_ref("gender", |p| &p.gender)
     ///     .is_equal_to(Gender::Female);
     /// ```
     pub fn extracting_ref<F, B, U>(
@@ -848,7 +843,9 @@ impl<'a, S, R> Spec<'a, S, R> {
         B: ToOwned<Owned = U> + ?Sized,
     {
         let derived_subject = extract(&self.subject).to_owned();
-        let expression = Expression(property_name.into());
+        let orig_subject_name = &self.expression;
+        let property_name = property_name.into();
+        let expression = Expression(format!("{orig_subject_name}.{property_name}").into());
         let diff_format = self.diff_format.clone();
         DerivedSpec::new(self, derived_subject, expression, diff_format)
     }
@@ -976,7 +973,8 @@ where
 
     fn each_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
     {
         let root_expression = &self.expression;
         let mut position = -1;
@@ -991,7 +989,7 @@ where
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
             };
-            let failures = assert(element_spec).failures;
+            let failures = assert(element_spec).failures();
             self.failures.extend(failures);
         }
         if !self.failures.is_empty()
@@ -1012,7 +1010,8 @@ where
 
     fn any_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
     {
         let root_expression = &self.expression;
         let mut any_success = false;
@@ -1028,7 +1027,7 @@ where
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
             };
-            let failures = assert(element_spec).failures;
+            let failures = assert(element_spec).failures();
             if failures.is_empty() {
                 any_success = true;
                 break;
@@ -1255,13 +1254,13 @@ pub trait And {
     /// };
     ///
     /// assert_that!(my_friend)
-    ///     .extracting_ref("my_friend.name", Person::name)
+    ///     .extracting_ref("name", Person::name)
     ///     .is_equal_to("Silvia")
     ///     .and()
-    ///     .extracting_ref("my_friend.age", |p| &p.age)
+    ///     .extracting_ref("age", |p| &p.age)
     ///     .is_at_least(18)
     ///     .and()
-    ///     .extracting_ref("my_friend.gender", |p| &p.gender)
+    ///     .extracting_ref("gender", |p| &p.gender)
     ///     .is_equal_to(Gender::Female);
     /// ```
     ///
@@ -1424,6 +1423,18 @@ where
             self.do_fail_with_message(message);
         }
         self
+    }
+}
+
+/// Access the location of an assertion in the source code or test code.
+pub trait GetLocation<'a> {
+    /// Returns the location in source code or test code if it has been set.
+    fn location(&self) -> Option<Location<'a>>;
+}
+
+impl<'a, S, R> GetLocation<'a> for Spec<'a, S, R> {
+    fn location(&self) -> Option<Location<'a>> {
+        self.location
     }
 }
 

@@ -3,7 +3,7 @@
 
 use crate::assertions::{
     AssertBoolean, AssertChar, AssertDebugString, AssertDecimalNumber, AssertDisplayString,
-    AssertEmptiness, AssertEquality, AssertErrorHasSource, AssertHasCharCount,
+    AssertElements, AssertEmptiness, AssertEquality, AssertErrorHasSource, AssertHasCharCount,
     AssertHasDebugString, AssertHasDisplayString, AssertHasError, AssertHasErrorMessage,
     AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIteratorContains,
     AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder, AssertMapContainsKey,
@@ -35,8 +35,8 @@ use crate::properties::{
     MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{
-    And, AssertFailure, DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy,
-    GetFailures, PanicOnFail, Satisfies, SoftPanic,
+    And, AssertFailure, CollectFailures, DiffFormat, DoFail, Expectation, Expecting, Expression,
+    FailingStrategy, GetFailures, GetLocation, Location, PanicOnFail, Satisfies, SoftPanic, Spec,
 };
 use crate::std::borrow::{Cow, ToOwned};
 use crate::std::error::Error;
@@ -58,7 +58,7 @@ use hashbrown::HashSet;
 /// The derived subject can have its own name and diff format in failure
 /// reports.
 ///
-/// [`Spec`]: crate::spec::Spec
+/// [`Spec`]: Spec
 pub struct DerivedSpec<'a, O, S> {
     original: O,
     subject: S,
@@ -111,6 +111,15 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
         self.diff_format = diff_format;
         self
+    }
+}
+
+impl<'a, O, S> GetLocation<'a> for DerivedSpec<'a, O, S>
+where
+    O: GetLocation<'a>,
+{
+    fn location(&self) -> Option<Location<'a>> {
+        self.original.location()
     }
 }
 
@@ -216,18 +225,18 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// };
     ///
     /// assert_that!(my_order)
-    ///     .extracting_ref("my_order.items", |o| &o.items)
-    ///     .extracting_ref("my_order.items[0].name", |i| &i[0].name)
+    ///     .extracting_ref("items", |o| &o.items)
+    ///     .extracting_ref("[0].name", |i| &i[0].name)
     ///     .is_equal_to("Apple")
     ///     .and()
-    ///     .extracting_ref("my_order.items[1].name", |i| &i[1].name)
+    ///     .extracting_ref("[1].name", |i| &i[1].name)
     ///     .is_equal_to("Orange")
     ///     .and()
-    ///     .extracting_ref("my_order.items[1].quantity", |i| &i[1].quantity)
+    ///     .extracting_ref("[1].quantity", |i| &i[1].quantity)
     ///     .is_equal_to(4)
     ///     .and()  // switches back to `my_order.items`
     ///     .and()  // second call to `and()` switches back to `my_order`
-    ///     .extracting_ref("my_order.id", |o| &o.id)
+    ///     .extracting_ref("id", |o| &o.id)
     ///     .is_equal_to("O261234");
     /// ```
     ///
@@ -267,17 +276,17 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// # };
     /// #
     /// assert_that!(my_order)
-    ///     .extracting_ref("my_order.id", |o| &o.id)
+    ///     .extracting_ref("id", |o| &o.id)
     ///     .is_equal_to("O261234")
     ///     .and()
-    ///     .extracting_ref("my_order.items", |o| &o.items)
-    ///     .extracting_ref("my_order.items[0].name", |i| &i[0].name)
+    ///     .extracting_ref("items", |o| &o.items)
+    ///     .extracting_ref("[0].name", |i| &i[0].name)
     ///     .is_equal_to("Apple")
     ///     .and()
-    ///     .extracting_ref("my_order.items[1].name", |i| &i[1].name)
+    ///     .extracting_ref("[1].name", |i| &i[1].name)
     ///     .is_equal_to("Orange")
     ///     .and()
-    ///     .extracting_ref("my_order.items[1].quantity", |i| &i[1].quantity)
+    ///     .extracting_ref("[1].quantity", |i| &i[1].quantity)
     ///     .is_equal_to(4);
     /// ```
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
@@ -364,7 +373,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// };
     ///
     /// assert_that!(my_order)
-    ///     .extracting_ref("my_order.items", |o| &o.items)
+    ///     .extracting_ref("items", |o| &o.items)
     ///     .extracting(|i| i[0].name.clone())
     ///     .is_equal_to("Apple")
     ///     .and()  // switches back to `my_order` not `my_order.items`
@@ -428,11 +437,11 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// };
     ///
     /// assert_that!(line)
-    ///     .extracting_ref("line.a", |l| &l.a)
+    ///     .extracting_ref("a", |l| &l.a)
     ///     .mapping(|p| (p.x, p.y))
     ///     .is_equal_to((12, -64))
     ///     .and()
-    ///     .extracting_ref("line.b", |l| &l.b)
+    ///     .extracting_ref("b", |l| &l.b)
     ///     .mapping(|p| (p.x, p.y))
     ///     .is_equal_to((-28, 17));
     /// ```
@@ -472,7 +481,12 @@ where
         let diff_format = self.diff_format.clone();
         let orig_spec = self.mapping(Vec::from_iter);
         let new_subject = extract(orig_spec.subject.iter());
-        DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
+        DerivedSpec {
+            original: orig_spec,
+            subject: new_subject,
+            expression: property_name,
+            diff_format,
+        }
     }
 }
 
@@ -1592,6 +1606,83 @@ where
                 .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
                 .collect()
         })
+    }
+}
+
+impl<'a, O, I> AssertElements<'a, I> for DerivedSpec<'a, O, I>
+where
+    I: 'a + IntoIterator,
+    O: DoFail + GetLocation<'a>,
+{
+    type Output = DerivedSpec<'a, O, ()>;
+
+    fn each_element<A, B>(mut self, assert: A) -> Self::Output
+    where
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
+    {
+        let root_expression = &self.expression;
+        let diff_format = self.diff_format().clone();
+        let location = self.location();
+        let mut collected_failures = Vec::new();
+        let mut position = -1;
+        for item in self.subject {
+            position += 1;
+            let mut element_spec = Spec::new(item, CollectFailures)
+                .named(format!("{root_expression}[{position}]"))
+                .with_diff_format(diff_format.clone());
+            if let Some(location) = location {
+                element_spec = element_spec.located_at(location);
+            }
+            let failures = assert(element_spec).failures();
+            collected_failures.extend(failures);
+        }
+        if !collected_failures.is_empty() {
+            self.original.do_fail_with(collected_failures);
+        }
+        DerivedSpec {
+            original: self.original,
+            subject: (),
+            expression: self.expression,
+            diff_format: self.diff_format,
+        }
+    }
+
+    fn any_element<A, B>(mut self, assert: A) -> Self::Output
+    where
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
+    {
+        let root_expression = &self.expression;
+        let diff_format = self.diff_format().clone();
+        let location = self.location();
+        let mut collected_failures = Vec::new();
+        let mut any_success = false;
+        let mut position = -1;
+        for item in self.subject {
+            position += 1;
+            let mut element_spec = Spec::new(item, CollectFailures)
+                .named(format!("{root_expression}[{position}]"))
+                .with_diff_format(diff_format.clone());
+            if let Some(location) = location {
+                element_spec = element_spec.located_at(location);
+            }
+            let failures = assert(element_spec).failures();
+            if failures.is_empty() {
+                any_success = true;
+                break;
+            }
+            collected_failures.extend(failures);
+        }
+        if !any_success {
+            self.original.do_fail_with(collected_failures);
+        }
+        DerivedSpec {
+            original: self.original,
+            subject: (),
+            expression: self.expression,
+            diff_format: self.diff_format,
+        }
     }
 }
 
