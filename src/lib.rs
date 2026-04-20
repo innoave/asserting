@@ -144,7 +144,7 @@
 //! );
 //! ```
 //!
-//! See [`Spec::each_element()`] for more details.
+//! See [`AssertElements`] for more details.
 //!
 //! Assert some elements of a collection or an iterator to satisfy a predicate:
 //!
@@ -161,7 +161,7 @@
 //! assert_that!(subject).none_satisfies(|e| *e < 42);
 //! ```
 //!
-//! See [`AssertElements`] for more details.
+//! See [`AssertFilteredElements`] for more details.
 //!
 //! ## Asserting specific elements of a collection or an iterator
 //!
@@ -822,12 +822,12 @@
 //! assert_that!(person).is_over_18();
 //! ```
 //!
-//! [`AssertElements`]: assertions::AssertFilteredElements
+//! [`AssertElements`]: assertions::AssertElements
+//! [`AssertFilteredElements`]: assertions::AssertFilteredElements
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
 //! [`Spec`]: spec::Spec
-//! [`Spec::each_element()`]: spec::Spec::each_element
 //! [`Spec::expecting()`]: spec::Expecting::expecting
 //! [`Spec::satisfies()`]: spec::Satisfies::satisfies
 //! [`SoftPanic::soft_panic()`]: spec::SoftPanic::soft_panic
