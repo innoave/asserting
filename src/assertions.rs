@@ -1907,46 +1907,6 @@ pub trait AssertOptionValue {
     fn some(self) -> Self::Some;
 }
 
-/// Assert the value of a borrowed option by mapping the subject.
-///
-/// If the option is none, the assertion fails.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
-/// assert_that!(&subject).some().contains_exactly(&[1, 2, 3]);
-///
-/// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
-/// assert_that!(&subject).some().is_not_empty();
-/// ```
-pub trait AssertBorrowedOptionValue {
-    /// A spec-like type that contains the option's borrowed value as the
-    /// subject, which is returned by the mapping assertion method.
-    ///
-    /// If the subject is an `Option<&T>`, this is usually `Spec<'a, &'a T, R>`.
-    type Some;
-
-    /// Maps the subject to the option's value if it has some. Otherwise, this
-    /// assertion fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
-    /// assert_that!(&subject).some().contains_exactly(&[1, 2, 3]);
-    ///
-    /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
-    /// assert_that!(&subject).some().is_not_empty();
-    /// ```
-    #[track_caller]
-    fn some(self) -> Self::Some;
-}
-
 /// Assert whether a subject of the `Result` type holds some value or an error.
 ///
 /// # Examples
@@ -2039,62 +1999,6 @@ pub trait AssertResultValue {
     ///
     /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
     /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
-    /// ```
-    #[track_caller]
-    fn err(self) -> Self::Err;
-}
-
-/// Assert the ok-value or error of a borrowed result by mapping the subject.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
-/// assert_that!(&subject).ok().is_not_empty();
-///
-/// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
-/// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
-/// ```
-pub trait AssertBorrowedResultValue {
-    /// A spec-like type that contains the result's borrowed ok value as the
-    /// subject, which is returned by the mapping assertion method.
-    ///
-    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, &'a T, R>`.
-    type Ok;
-    /// A spec-like type that contains the result's borrowed error value as the
-    /// subject, which is returned by the mapping assertion method.
-    ///
-    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, &'a E, R>`.
-    type Err;
-
-    /// Maps the subject to the result's ok value.
-    ///
-    /// If the result is an error, this method panics.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
-    /// assert_that!(&subject).ok().contains_exactly(&[1, 2, 3]);
-    /// ```
-    #[track_caller]
-    fn ok(self) -> Self::Ok;
-
-    /// Maps the subject to the result's err value.
-    ///
-    /// If the result is an ok value, this method panics.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
-    /// assert_that!(&subject).err().is_equal_to("te anim adipisici mollit");
     /// ```
     #[track_caller]
     fn err(self) -> Self::Err;
