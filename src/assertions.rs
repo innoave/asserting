@@ -4140,8 +4140,6 @@ pub trait AssertFilteredElements<T> {
     ///
     /// assert_that!(subject).single_element().is_equal_to("single");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn single_element(self) -> Self::SingleElement;
 
@@ -4164,8 +4162,6 @@ pub trait AssertFilteredElements<T> {
     ///     .single_element()
     ///     .is_equal_to("three");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
     where
@@ -4269,8 +4265,6 @@ pub trait AssertOrderedElements {
     ///
     /// assert_that!(subject).first_element().is_equal_to("one");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn first_element(self) -> Self::SingleElement;
 
@@ -4286,8 +4280,6 @@ pub trait AssertOrderedElements {
     ///
     /// assert_that!(subject).last_element().is_equal_to("three");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn last_element(self) -> Self::SingleElement;
 
@@ -4307,8 +4299,6 @@ pub trait AssertOrderedElements {
     /// assert_that!(subject).nth_element(1).is_equal_to("two");
     /// assert_that!(subject).nth_element(2).is_equal_to("three");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn nth_element(self, n: usize) -> Self::SingleElement;
 
@@ -4326,8 +4316,6 @@ pub trait AssertOrderedElements {
     ///     .elements_at([0, 2, 4])
     ///     .contains_exactly(["one", "three", "five"]);
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
 }
@@ -4392,8 +4380,6 @@ pub trait AssertOrderedElementsRef {
     ///     .and()
     ///     .last_element_ref().is_equal_to("three");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn first_element_ref(self) -> Self::SingleElement;
 
@@ -4412,8 +4398,6 @@ pub trait AssertOrderedElementsRef {
     ///     .and()
     ///     .first_element_ref().is_equal_to("one");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn last_element_ref(self) -> Self::SingleElement;
 
@@ -4436,8 +4420,6 @@ pub trait AssertOrderedElementsRef {
     ///     .and()
     ///     .nth_element_ref(2).is_equal_to("three");
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn nth_element_ref(self, n: usize) -> Self::SingleElement;
 
@@ -4456,8 +4438,6 @@ pub trait AssertOrderedElementsRef {
     ///     .and()
     ///     .elements_ref_at([1, 3]).contains_exactly(["two", "four"]);
     /// ```
-    ///
-    /// [`Spec`]: crate::spec::Spec
     #[track_caller]
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
 }

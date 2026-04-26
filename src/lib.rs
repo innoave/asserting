@@ -165,8 +165,8 @@
 //!
 //! ## Asserting specific elements of a collection or an iterator
 //!
-//! Filter assertions are handy to assert specific elements of a collection or
-//! an iterator.
+//! We can extract one or multiple elements of a collection or an itertor to
+//! assert specific elements only.
 //!
 //! Assert the only element of a collection or an iterator:
 //!
@@ -178,19 +178,7 @@
 //! assert_that!(subject).single_element().is_equal_to("single");
 //! ```
 //!
-//! Assert the first, the last, or the nth element of a collection or an iterator:
-//!
-//! ```
-//! use asserting::prelude::*;
-//!
-//! let numbers = [1, 2, 3, 4, 5];
-//!
-//! assert_that!(numbers).first_element().is_equal_to(1);
-//! assert_that!(numbers).last_element().is_equal_to(5);
-//! assert_that!(numbers).nth_element(3).is_equal_to(4);
-//! ```
-//!
-//! Filter the elements to be asserted on a condition:
+//! We can filter the elements to be asserted on a condition:
 //!
 //! ```
 //! use asserting::prelude::*;
@@ -207,6 +195,35 @@
 //!     .filtered_on(|e| e.len() == 5)
 //!     .single_element()
 //!     .is_equal_to("three");
+//! ```
+//!
+//! If the collection or iterator yields its elements in a defined order, we can
+//! assert the first, last, or nth element of the iterator:
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let numbers = [1, 2, 3, 4, 5];
+//!
+//! assert_that!(numbers).first_element().is_equal_to(1);
+//! assert_that!(numbers).last_element().is_equal_to(5);
+//! assert_that!(numbers).nth_element(3).is_equal_to(4);
+//! ```
+//!
+//! We can also chain the extraction of several elements each for individual
+//! assertions.
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! let subject = ["one", "two", "three", "four", "five"];
+//!
+//! assert_that!(subject)
+//!     .first_element_ref().is_equal_to("one")
+//!     .and()
+//!     .last_element_ref().is_equal_to("five")
+//!     .and()
+//!     .nth_element_ref(2).is_equal_to("three");
 //! ```
 //!
 //! Pick the elements of a collection or an iterator at given positions:
@@ -252,27 +269,57 @@
 //! We can extract a property of a custom type and assert its value:
 //!
 //! ```
-//! # use asserting::prelude::*;
-//! struct MyStruct {
-//!     important_property: String,
-//!     other_property: f64,
+//! use asserting::prelude::*;
+//!
+//! struct Person {
+//!     name: String,
+//!     age: u8,
 //! }
 //!
-//! let some_thing = MyStruct {
-//!     important_property: "imperdiet aliqua zzril eiusmod".into(),
-//!     other_property: 99.9,
+//! let person = Person {
+//!     name: "Silvia".into(),
+//!     age: 25,
 //! };
 //!
-//! assert_that!(some_thing).extracting(|s| s.important_property)
-//!     .is_equal_to("imperdiet aliqua zzril eiusmod");
-//!
+//! assert_that!(person).extracting(|s| s.name)
+//!     .is_equal_to("Silvia");
 //! ```
 //!
-//! Or we can map a custom type that does not implement a required trait to some
-//! supported type, e.g., a tuple in this example:
+//! We can also chain the extraction of multiple properties of the same subject.
+//! To do so, we use combinations of the methods [`extracting_ref`] and [`and`]:
 //!
 //! ```
-//! # use asserting::prelude::*;
+//! use asserting::prelude::*;
+//!
+//! struct Person {
+//!     name: String,
+//!     age: u8,
+//! }
+//!
+//! let person = Person {
+//!     name: "Silvia".into(),
+//!     age: 25
+//! };
+//!
+//! assert_that!(person)
+//!     .extracting_ref("name", |p| &p.name)
+//!     .is_equal_to("Silvia")
+//!     .and()
+//!     .extracting_ref("age", |p| &p.age)
+//!     .is_at_least(18);
+//! ```
+//!
+//! Note: The [`extracting_ref`] method can only be used if the type of the
+//! extracted value implements `ToOwned`.
+//!
+//! In some cases we might want to map a custom type that does not implement a
+//! required trait to some other type that implements the required traits. For
+//! example, we map a value of custom type `Point` to a tuple of two integers
+//! as `Point` does not implement `PartialEq` and `Debug`:
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
 //! struct Point {
 //!     x: i64,
 //!     y: i64,
@@ -515,8 +562,8 @@
 //!
 //! [`Expectation`]s enable us to write specialized assertions by combining
 //! several basic expectations. In case a custom assertion cannot be composed
-//! out of the provided expectations but writing a custom [`Expectation`] is too
-//! cumbersome, we can write a custom assertion method directly without any
+//! out of the provided expectations, but writing a custom [`Expectation`] is
+//! too cumbersome, we can write a custom assertion method directly without any
 //! custom [`Expectation`]. See the
 //! [Writing custom assertions without writing an expectation](#writing-custom-assertions-without-writing-an-expectation)
 //! chapter below for an example.
@@ -839,6 +886,8 @@
 //! [`failures()`]: spec::GetFailures::failures
 //! [`named()`]: spec::Spec::named
 //! [`located_at()`]: spec::Spec::located_at
+//! [`extracting_ref`]: spec::Spec::extracting_ref
+//! [`and`]: spec::And::and
 //! [`serde::Serialize`]: serde_core::Serialize
 
 #![doc(html_root_url = "https://docs.rs/asserting/0.14.0")]
