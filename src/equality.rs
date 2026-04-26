@@ -8,7 +8,9 @@ use crate::expectations::{
     HasDebugString, HasDisplayString, IsEqualTo, IsSameAs, has_debug_string, has_display_string,
     is_equal_to, is_same_as, not,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::fmt::{Debug, Display};
 use crate::std::format;
 use crate::std::string::{String, ToString};

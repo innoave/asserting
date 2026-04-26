@@ -98,7 +98,9 @@ mod cmp {
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::colored::mark_diff;
     use crate::expectations::{IsCloseTo, is_close_to, not};
-    use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+    use crate::spec::{
+        DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    };
     use crate::std::{format, string::String};
     use float_cmp::{ApproxEq, F32Margin, F64Margin};
 

@@ -3,7 +3,9 @@ use crate::colored::{mark_missing, mark_missing_string, mark_unexpected, mark_un
 use crate::expectations::{
     ErrorHasSource, ErrorHasSourceMessage, error_has_source, error_has_source_message, not,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::error::Error;
 use crate::std::format;
 use crate::std::string::{String, ToString};

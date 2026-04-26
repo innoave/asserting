@@ -1,16 +1,18 @@
 //! This is the core of the `asserting` crate.
 
+use crate::assertions::AssertElements;
 use crate::colored;
+use crate::derived_spec::DerivedSpec;
 use crate::expectations::satisfies;
 #[cfg(feature = "recursive")]
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
-use crate::std::borrow::Borrow;
-use crate::std::borrow::Cow;
+use crate::std::borrow::{Borrow, Cow, ToOwned};
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::format;
 use crate::std::ops::Deref;
+use crate::std::slice;
 use crate::std::string::{String, ToString};
 use crate::std::vec;
 use crate::std::vec::Vec;
@@ -658,11 +660,6 @@ impl<S, R> Spec<'_, S, R> {
         &self.expression
     }
 
-    /// Returns the location in source code or test code if it has been set.
-    pub fn location(&self) -> Option<Location<'_>> {
-        self.location
-    }
-
     /// Returns the description or the assertion if it has been set.
     pub fn description(&self) -> Option<&str> {
         self.description.as_deref()
@@ -724,8 +721,8 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// value and the expected value.
     ///
     /// Note: This method must be called before an assertion method is called to
-    /// have an effect on the failure message of the assertion as failure
-    /// messages are formatted immediately when an assertion is executed.
+    /// affect the failure message of the assertion as failure messages are
+    /// formatted immediately when an assertion is executed.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub const fn with_diff_format(mut self, diff_format: DiffFormat) -> Self {
         self.diff_format = diff_format;
@@ -775,21 +772,106 @@ impl<'a, S, R> Spec<'a, S, R> {
         RecursiveComparison::new(self)
     }
 
+    /// Extracts a property from the current subject.
+    ///
+    /// The extracting closure gets a reference to the current subject as an
+    /// argument and should return a reference to the extracted property. The
+    /// given property name is used in failure reports for referencing the
+    /// property for which an assertion fails.
+    ///
+    /// Use this method if you want to extract multiple properties from the
+    /// same subject for individual assertions on each of these properties.
+    /// To extract another property from the original subject, call the `and`
+    /// method to switch back to the original subject before calling
+    /// `extracting_ref` for the other property.
+    ///
+    /// # Arguments
+    ///
+    /// * `property_name` - A name describing the extracted property used for
+    ///   referencing that property in failure reports.
+    /// * `extract` - A closure that returns a reference to the property to be
+    ///   extracted.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone, Copy, PartialEq)]
+    /// enum Gender {
+    ///     Male,
+    ///     Female,
+    ///     NonBinary,
+    ///     PreferNotToSay,
+    /// }
+    ///
+    /// struct Person {
+    ///     name: String,
+    ///     age: u8,
+    ///     gender: Gender,
+    /// }
+    ///
+    /// impl Person {
+    ///     fn name(&self) -> &str {
+    ///         &self.name
+    ///     }
+    /// }
+    ///
+    /// let my_friend = Person {
+    ///     name: "Silvia".into(),
+    ///     age: 27,
+    ///     gender: Gender::Female,
+    /// };
+    ///
+    /// assert_that!(my_friend)
+    ///     .extracting_ref("name", Person::name)
+    ///     .is_equal_to("Silvia")
+    ///     .and()
+    ///     .extracting_ref("age", |p| &p.age)
+    ///     .is_at_least(18)
+    ///     .and()
+    ///     .extracting_ref("gender", |p| &p.gender)
+    ///     .is_equal_to(Gender::Female);
+    /// ```
+    pub fn extracting_ref<F, B, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Self, U>
+    where
+        F: FnOnce(&S) -> &B,
+        B: ToOwned<Owned = U> + ?Sized,
+    {
+        let derived_subject = extract(&self.subject).to_owned();
+        let orig_subject_name = &self.expression;
+        let property_name = property_name.into();
+        let expression = Expression(format!("{orig_subject_name}.{property_name}").into());
+        let diff_format = self.diff_format.clone();
+        DerivedSpec::new(self, derived_subject, expression, diff_format)
+    }
+
     /// Maps the current subject to some other value.
     ///
     /// It takes a closure that maps the current subject to a new subject and
     /// returns a new `Spec` with the value returned by the closure as the new
     /// subject. The new subject may have a different type than the original
-    /// subject. All other data like expression, description, and location are
+    /// subject. All other data like description, location, and diff format are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful when having a custom type, and a specific
-    /// property of this type shall be asserted only.
+    /// This method is useful when having a custom type, and one specific
+    /// property of this type shall be asserted only. If you want to assert
+    /// multiple properties of the same subject, use the [`extracting_ref`]
+    /// method instead.
     ///
-    /// This is an alias function to the [`mapping()`](Spec::mapping) function.
-    /// Both functions do exactly the same. The idea is to provide different
-    /// names to be able to express the intent more clearly when used in
-    /// assertions.
+    /// This method is similar to the [`mapping`] method. In contrast to
+    /// [`mapping`], this method does not copy the subject's name
+    /// (or expression) but resets it to the default "subject". The idea is
+    /// that the "extracted" property is most likely a different subject than
+    /// the original one.
+    ///
+    /// It is recommended to give the extracted property a specific name by
+    /// calling the `named` method. This helps with spotting the cause of a
+    /// failing assertion.
     ///
     /// # Example
     ///
@@ -806,16 +888,29 @@ impl<'a, S, R> Spec<'a, S, R> {
     ///     other_property: 99.9,
     /// };
     ///
-    /// assert_that!(some_thing).extracting(|s| s.important_property)
+    /// assert_that!(some_thing)
+    ///     .extracting(|s| s.important_property)
+    ///     .named("some_thing.important_property")
     ///     .is_equal_to("imperdiet aliqua zzril eiusmod");
     ///
     /// ```
+    ///
+    /// [`extracting_ref`]: Self::extracting_ref
+    /// [`mapping`]: Self::mapping
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn extracting<F, U>(self, extractor: F) -> Spec<'a, U, R>
+    pub fn extracting<F, U>(self, extract: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {
-        self.mapping(extractor)
+        Spec {
+            subject: extract(self.subject),
+            expression: Expression::default(),
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
+        }
     }
 
     /// Maps the current subject to some other value.
@@ -826,13 +921,13 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// subject. All other data like expression, description, and location are
     /// taken over from this `Spec` into the returned `Spec`.
     ///
-    /// This function is useful if some type does not implement a trait
-    /// required for an assertion.
+    /// This method is useful if some type does not implement a trait required
+    /// for an assertion.
     ///
-    /// `Spec` also provides the [`extracting()`](Spec::extracting) function,
-    /// which is an alias to this function. Both functions do exactly the same.
-    /// Choose that function of which its name expresses the intent more
-    /// clearly.
+    /// `Spec` also provides the [`extracting()`](Spec::extracting) method,
+    /// which is similar to this method. In contrast to this method,
+    /// [`extracting()`](Spec::extracting) does not copy the subject's name
+    /// (or expression) but resets it to the default "subject".
     ///
     /// # Example
     ///
@@ -854,12 +949,12 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// assertion. So we map the subject of the type `Point` to a tuple of its
     /// fields.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn mapping<F, U>(self, mapper: F) -> Spec<'a, U, R>
+    pub fn mapping<F, U>(self, map: F) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {
         Spec {
-            subject: mapper(self.subject),
+            subject: map(self.subject),
             expression: self.expression,
             description: self.description,
             location: self.location,
@@ -870,173 +965,16 @@ impl<'a, S, R> Spec<'a, S, R> {
     }
 }
 
-impl<S, R> Spec<'_, S, R>
+impl<'a, I, R> AssertElements<'a, I> for Spec<'a, I, R>
 where
-    R: FailingStrategy,
+    I: IntoIterator,
 {
-    /// Asserts the given expectation.
-    ///
-    /// In case the expectation is not meet, the assertion fails according to
-    /// the current failing strategy of this `Spec`.
-    ///
-    /// This method is called from the implementations of the assertion traits
-    /// defined in the [`assertions`](crate::assertions) module. Implementations
-    /// of custom assertions will call this method with a proper expectation.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::expectations::{IsEmpty, IsEqualTo};
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(7 * 6).expecting(IsEqualTo {expected: 42 });
-    ///
-    /// assert_that!("").expecting(IsEmpty);
-    /// ```
-    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
-        if !expectation.test(&self.subject) {
-            let message =
-                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
-            self.do_fail_with_message(message);
-        }
-        self
-    }
+    type Output = Spec<'a, (), R>;
 
-    /// Asserts whether the given predicate is meet.
-    ///
-    /// This method takes a predicate function and calls it as an expectation.
-    /// In case the predicate function returns false, it does fail with a
-    /// generic failure message and according to the current failing strategy of
-    /// this `Spec`.
-    ///
-    /// This method can be used to do simple custom assertions without
-    /// implementing an [`Expectation`] and an assertion trait.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn is_odd(value: &i32) -> bool {
-    ///     value & 1 == 1
-    /// }
-    ///
-    /// assert_that!(37).satisfies(is_odd);
-    ///
-    /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
-    ///
-    /// assert_that!(failures).contains_exactly([
-    ///     "expected 22 to satisfy the given predicate, but returned false\n"
-    /// ]);
-    /// ```
-    ///
-    /// To assert a predicate with a custom failure message instead of the
-    /// generic one, use the method
-    /// [`satisfies_with_message`](Spec::satisfies_with_message).
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn satisfies<P>(self, predicate: P) -> Self
+    fn each_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        P: Fn(&S) -> bool,
-    {
-        self.expecting(satisfies(predicate))
-    }
-
-    /// Asserts whether the given predicate is meet.
-    ///
-    /// This method takes a predicate function and calls it as an expectation.
-    /// In case the predicate function returns false, it does fail with the
-    /// provided failure message and according to the current failing strategy
-    /// of this `Spec`.
-    ///
-    /// This method can be used to do simple custom assertions without
-    /// implementing an [`Expectation`] and an assertion trait.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn is_odd(value: &i32) -> bool {
-    ///     value & 1 == 1
-    /// }
-    ///
-    /// assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
-    ///
-    /// let failures = verify_that!(22)
-    ///         .satisfies_with_message("expected my number to be odd", is_odd)
-    ///         .display_failures();
-    ///
-    /// assert_that!(failures).contains_exactly([
-    ///     "expected my number to be odd\n"
-    /// ]);
-    /// ```
-    ///
-    /// To assert a predicate with a generic failure message instead of
-    /// providing one use the method
-    /// [`satisfies`](Spec::satisfies).
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
-    where
-        P: Fn(&S) -> bool,
-    {
-        self.expecting(satisfies(predicate).with_message(message))
-    }
-}
-
-impl<'a, I, R> Spec<'a, I, R> {
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If all elements are
-    /// asserted successfully, the whole assertion succeeds.
-    ///
-    /// It iterates over all elements of the collection or iterator and collects
-    /// the failure messages for those elements where the assertion fails. In
-    /// other words, it does not stop iterating when the assertion for one
-    /// element fails.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let numbers = [2, 4, 6, 8, 10];
-    ///
-    /// assert_that!(numbers).each_element(|e|
-    ///     e.is_greater_than(2)
-    ///         .is_at_most(7)
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected numbers [0] to be greater than 2
-    ///    but was: 2
-    ///   expected: > 2
-    ///
-    /// expected numbers [3] to be at most 7
-    ///    but was: 8
-    ///   expected: <= 7
-    ///
-    /// expected numbers [4] to be at most 7
-    ///    but was: 10
-    ///   expected: <= 7
-    /// ```
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    pub fn each_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
-    where
-        I: IntoIterator<Item = T>,
-        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
     {
         let root_expression = &self.expression;
         let mut position = -1;
@@ -1051,7 +989,7 @@ impl<'a, I, R> Spec<'a, I, R> {
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
             };
-            let failures = assert(element_spec).failures;
+            let failures = assert(element_spec).failures();
             self.failures.extend(failures);
         }
         if !self.failures.is_empty()
@@ -1070,52 +1008,10 @@ impl<'a, I, R> Spec<'a, I, R> {
         }
     }
 
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If the assertion of any
-    /// element is successful, the iteration stops and the whole assertion
-    /// succeeds.
-    ///
-    /// If the assertion fails for all elements, the failures of the assertion
-    /// for all elements are collected.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let digit_names = ["one", "two", "three"];
-    ///
-    /// assert_that!(digit_names).any_element(|e|
-    ///     e.contains('x')
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected digit_names [0] to contain 'x'
-    ///    but was: "one"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [1] to contain 'x'
-    ///    but was: "two"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [2] to contain 'x'
-    ///    but was: "three"
-    ///   expected: 'x'
-    /// ```
-    #[track_caller]
-    pub fn any_element<T, A, B>(mut self, assert: A) -> Spec<'a, (), R>
+    fn any_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        I: IntoIterator<Item = T>,
-        A: Fn(Spec<'a, T, CollectFailures>) -> Spec<'a, B, CollectFailures>,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        B: GetFailures,
     {
         let root_expression = &self.expression;
         let mut any_success = false;
@@ -1131,7 +1027,7 @@ impl<'a, I, R> Spec<'a, I, R> {
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
             };
-            let failures = assert(element_spec).failures;
+            let failures = assert(element_spec).failures();
             if failures.is_empty() {
                 any_success = true;
                 break;
@@ -1152,6 +1048,26 @@ impl<'a, I, R> Spec<'a, I, R> {
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
         }
+    }
+}
+
+impl<'a, I, R> Spec<'a, I, R>
+where
+    I: IntoIterator,
+{
+    pub(crate) fn extracting_ref_iter<F, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, Spec<'a, Vec<<I as IntoIterator>::Item>, R>, Vec<U>>
+    where
+        for<'b> F: Fn(slice::Iter<'b, <I as IntoIterator>::Item>) -> Vec<U>,
+    {
+        let property_name = Expression(property_name.into());
+        let diff_format = self.diff_format.clone();
+        let orig_spec = self.mapping(Vec::from_iter);
+        let new_subject = extract(orig_spec.subject.iter());
+        DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
     }
 }
 
@@ -1261,6 +1177,264 @@ impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
         if !self.failures.is_empty() {
             PanicOnFail.do_fail_with(&self.failures);
         }
+    }
+}
+
+/// Chaining another assertion.
+///
+/// Both the previous assertion and the next assertion must be met to pass the
+/// overall assertion.
+pub trait And {
+    /// The return type of the `and()` method.
+    type Output;
+
+    /// Express explicitly that another assertion must be met to pass the
+    /// overall assertion.
+    ///
+    /// Note: assertions can be changed anyway without calling this `and`
+    /// method. So in most cases, this method does nothing and just offers a
+    /// different style of writing assertions.
+    ///
+    /// In combination with the [`Spec::extracting_ref`] the `and` method can be
+    /// used to chain multiple assertions on the original subject, instead of
+    /// the extracted one.
+    ///
+    /// # Examples
+    ///
+    /// Calling the `and` method on the original subject is optional and just
+    /// a question of style how one wants to write assertions.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// let subject = "the answer to all important questions in the universe is 42";
+    ///
+    /// assert_that(subject).is_not_empty()
+    ///     .and().contains("answer to all important questions")
+    ///     .and().ends_with("42");
+    ///
+    /// // the same assertions can be written without calling `and()`:
+    ///
+    /// assert_that(subject).is_not_empty()
+    ///     .contains("answer to all important questions")
+    ///     .ends_with("42");
+    /// ```
+    ///
+    /// In combination with the [`Spec::extracting_ref`] method, the `and` method
+    /// switches back to the original subject to chain multiple assertions on
+    /// different extracted fields.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// #[derive(Debug, Clone, Copy, PartialEq)]
+    /// enum Gender {
+    ///     Male,
+    ///     Female,
+    ///     NonBinary,
+    ///     PreferNotToSay,
+    /// }
+    ///
+    /// struct Person {
+    ///     name: String,
+    ///     age: u8,
+    ///     gender: Gender,
+    /// }
+    ///
+    /// impl Person {
+    ///     fn name(&self) -> &str {
+    ///         &self.name
+    ///     }
+    /// }
+    ///
+    /// let my_friend = Person {
+    ///     name: "Silvia".into(),
+    ///     age: 27,
+    ///     gender: Gender::Female,
+    /// };
+    ///
+    /// assert_that!(my_friend)
+    ///     .extracting_ref("name", Person::name)
+    ///     .is_equal_to("Silvia")
+    ///     .and()
+    ///     .extracting_ref("age", |p| &p.age)
+    ///     .is_at_least(18)
+    ///     .and()
+    ///     .extracting_ref("gender", |p| &p.gender)
+    ///     .is_equal_to(Gender::Female);
+    /// ```
+    ///
+    /// The specified property name helps in case of a failing assertion as the
+    /// failure report references the more detailed name, such as
+    /// `my_friend.name` or `my_friend.age`, instead of just `subject`.
+    #[must_use = "calling the `and` method without calling another assertion method is useless"]
+    fn and(self) -> Self::Output;
+}
+
+impl<S, R> And for Spec<'_, S, R> {
+    type Output = Self;
+
+    fn and(self) -> Self::Output {
+        self
+    }
+}
+
+/// Verify whether a subject satisfies a given predicate.
+///
+/// A predicate is a function that takes the subject and returns true if the
+/// subject meets certain criteria.
+pub trait Satisfies<S> {
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// A predicate is a function that takes the subject and returns true if the
+    /// subject meets certain criteria.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with a
+    /// generic failure message and according to the current failing strategy of
+    /// this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies(is_odd);
+    ///
+    /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "expected 22 to satisfy the given predicate, but returned false\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a custom failure message instead of the
+    /// generic one, use the method
+    /// [`satisfies_with_message`](Spec::satisfies_with_message).
+    #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool;
+
+    /// Asserts whether the given predicate is meet.
+    ///
+    /// A predicate is a function that takes the subject and returns true if the
+    /// subject meets certain criteria.
+    ///
+    /// This method takes a predicate function and calls it as an expectation.
+    /// In case the predicate function returns false, it does fail with the
+    /// provided failure message and according to the current failing strategy
+    /// of this `Spec`.
+    ///
+    /// This method can be used to do simple custom assertions without
+    /// implementing an [`Expectation`] and an assertion trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// fn is_odd(value: &i32) -> bool {
+    ///     value & 1 == 1
+    /// }
+    ///
+    /// assert_that!(37).satisfies_with_message("expected my number to be odd", is_odd);
+    ///
+    /// let failures = verify_that!(22)
+    ///         .satisfies_with_message("expected my number to be odd", is_odd)
+    ///         .display_failures();
+    ///
+    /// assert_that!(failures).contains_exactly([
+    ///     "expected my number to be odd\n"
+    /// ]);
+    /// ```
+    ///
+    /// To assert a predicate with a generic failure message instead of
+    /// providing one, use the method [`satisfies`](Satisfies::satisfies).
+    #[allow(clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool;
+}
+
+impl<S, R> Satisfies<S> for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn satisfies<P>(self, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate))
+    }
+
+    fn satisfies_with_message<P>(self, message: impl Into<String>, predicate: P) -> Self
+    where
+        P: Fn(&S) -> bool,
+    {
+        self.expecting(satisfies(predicate).with_message(message))
+    }
+}
+
+/// Verify whether a subject meets the given expectation (impl of
+/// [`Expectation`]) and record a failure if it is not met.
+pub trait Expecting<S> {
+    /// Asserts the given expectation.
+    ///
+    /// In case the expectation is not meet, the assertion fails, according to
+    /// the current failing strategy of this `Spec`.
+    ///
+    /// This method is called from the implementations of the assertion traits
+    /// defined in the [`assertions`](crate::assertions) module. Implementations
+    /// of custom assertions will call this method with a proper expectation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::expectations::{IsEmpty, IsEqualTo};
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!(7 * 6).expecting(IsEqualTo {expected: 42 });
+    ///
+    /// assert_that!("").expecting(IsEmpty);
+    /// ```
+    #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
+    #[track_caller]
+    fn expecting(self, expectation: impl Expectation<S>) -> Self;
+}
+
+impl<S, R> Expecting<S> for Spec<'_, S, R>
+where
+    R: FailingStrategy,
+{
+    fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
+        if !expectation.test(&self.subject) {
+            let message =
+                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
+            self.do_fail_with_message(message);
+        }
+        self
+    }
+}
+
+/// Access the location of an assertion in the source code or test code.
+pub trait GetLocation<'a> {
+    /// Returns the location in source code or test code if it has been set.
+    fn location(&self) -> Option<Location<'a>>;
+}
+
+impl<'a, S, R> GetLocation<'a> for Spec<'a, S, R> {
+    fn location(&self) -> Option<Location<'a>> {
+        self.location
     }
 }
 

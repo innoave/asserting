@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::std::string::String;
 use crate::std::{vec, vec::Vec};
 
 #[derive(Debug)]
@@ -231,7 +232,200 @@ fn verify_custom_iterator_does_not_contain_fails() {
     );
 }
 
-mod element_filters {
+mod all_elements {
+    use super::*;
+
+    #[derive(Debug)]
+    struct TestPerson {
+        name: String,
+        age: u8,
+    }
+
+    #[test]
+    fn assert_each_element_of_an_iterator_of_integer() {
+        let subject = [2, 4, 6, 8, 10];
+
+        assert_that(subject)
+            .is_not_empty()
+            .each_element(|e| e.is_positive().is_at_most(20));
+    }
+
+    #[test]
+    fn assert_each_element_of_an_iterator_of_person() {
+        let subject = vec![
+            TestPerson {
+                name: "John".into(),
+                age: 42,
+            },
+            TestPerson {
+                name: "Jane".into(),
+                age: 20,
+            },
+        ];
+
+        assert_that(subject)
+            .is_not_empty()
+            .each_element(|person| person.extracting(|p| p.age).is_at_most(42));
+    }
+
+    #[test]
+    fn assert_each_element_of_a_borrowed_iterator_of_integer() {
+        let subject = vec![2, 4, 6, 8, 10];
+
+        assert_that(&subject)
+            .is_not_empty()
+            .each_element(|e| e.is_positive().is_at_most(&20));
+    }
+
+    #[test]
+    fn assert_each_element_of_a_borrowed_iterator_of_person() {
+        let subject = vec![
+            TestPerson {
+                name: "John".into(),
+                age: 42,
+            },
+            TestPerson {
+                name: "Jane".into(),
+                age: 20,
+            },
+        ];
+
+        assert_that(&subject)
+            .is_not_empty()
+            .each_element(|person| person.extracting(|p| &p.name).starts_with('J'));
+    }
+
+    #[test]
+    #[should_panic = "expected numbers [1] to be not equal to 4\n   but was: 4\n  expected: not 4\n"]
+    fn assert_each_element_of_an_iterator_panics_if_one_assertion_fails() {
+        let subject = [2, 4, 6, 8, 10];
+
+        assert_that(subject)
+            .named("numbers")
+            .is_not_empty()
+            .each_element(|e| e.is_not_equal_to(4));
+    }
+
+    #[test]
+    fn verify_assert_each_element_of_an_iterator_fails() {
+        let subject = [2, 4, 6, 8, 10];
+
+        let failures = verify_that(&subject)
+            .named("numbers")
+            .each_element(|e| e.is_greater_than(&2).is_at_most(&7))
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r"expected numbers [0] to be greater than 2
+   but was: 2
+  expected: > 2
+",
+                r"expected numbers [3] to be at most 7
+   but was: 8
+  expected: <= 7
+",
+                r"expected numbers [4] to be at most 7
+   but was: 10
+  expected: <= 7
+",
+            ]
+        );
+    }
+
+    #[test]
+    fn assert_any_element_of_an_iterator_of_str() {
+        let subject = ["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .is_not_empty()
+            .any_element(|e| e.contains("ee"));
+    }
+
+    #[test]
+    fn assert_any_element_of_an_iterator_of_person() {
+        let subject = vec![
+            TestPerson {
+                name: "John".into(),
+                age: 42,
+            },
+            TestPerson {
+                name: "Jane".into(),
+                age: 20,
+            },
+        ];
+
+        assert_that(subject)
+            .is_not_empty()
+            .any_element(|person| person.extracting(|p| p.age).is_at_most(20));
+    }
+
+    #[test]
+    fn assert_any_element_of_a_borrowed_iterator_of_str() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(&subject)
+            .is_not_empty()
+            .any_element(|e| e.starts_with("fi"));
+    }
+
+    #[test]
+    fn assert_any_element_of_a_borrowed_iterator_of_person() {
+        let subject = vec![
+            TestPerson {
+                name: "John".into(),
+                age: 42,
+            },
+            TestPerson {
+                name: "Jane".into(),
+                age: 20,
+            },
+        ];
+
+        assert_that(&subject)
+            .is_not_empty()
+            .any_element(|person| person.extracting(|p| &p.name).ends_with('n'));
+    }
+
+    #[test]
+    fn verify_assert_any_element_of_an_iterator_fails() {
+        let subject = ["one", "two", "three", "four", "five"];
+
+        let failures = verify_that(subject)
+            .named("words")
+            .any_element(|e| e.starts_with("fu"))
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected words [0] to start with "fu"
+   but was: "one"
+  expected: "fu"
+"#,
+                r#"expected words [1] to start with "fu"
+   but was: "two"
+  expected: "fu"
+"#,
+                r#"expected words [2] to start with "fu"
+   but was: "three"
+  expected: "fu"
+"#,
+                r#"expected words [3] to start with "fu"
+   but was: "four"
+  expected: "fu"
+"#,
+                r#"expected words [4] to start with "fu"
+   but was: "five"
+  expected: "fu"
+"#,
+            ]
+        );
+    }
+}
+
+mod filtered_elements {
     use super::*;
 
     #[test]
@@ -284,156 +478,6 @@ mod element_filters {
             r"expected my_custom_collection to have exactly one element, but has 2 elements
   actual: [42, -1]
 ",
-        );
-    }
-
-    #[test]
-    fn first_element_of_iterator_with_one_element() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["single"],
-        };
-
-        assert_that(subject)
-            .first_element()
-            .is_equal_to("single")
-            .has_length(6)
-            .starts_with("si");
-    }
-
-    #[test]
-    fn first_element_of_iterator_with_several_elements() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["one", "two", "three", "four", "five"],
-        };
-
-        assert_that(subject)
-            .first_element()
-            .is_equal_to("one")
-            .has_length(3)
-            .starts_with('o');
-    }
-
-    #[cfg(feature = "panic")]
-    #[test]
-    fn first_element_of_iterator_with_no_elements_fails() {
-        let subject: CustomOrderedCollection<i32> = CustomOrderedCollection { inner: vec![] };
-
-        assert_that_code(|| {
-            assert_that(subject)
-                .named("my_custom_collection")
-                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-                .first_element()
-                .is_equal_to(42);
-        })
-        .panics_with_message(
-            r"expected my_custom_collection to have at least one element, but has no elements
-  actual: []
-",
-        );
-    }
-
-    #[test]
-    fn last_element_of_iterator_with_one_element() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["single"],
-        };
-
-        assert_that(subject)
-            .last_element()
-            .is_equal_to("single")
-            .has_length(6)
-            .starts_with("si");
-    }
-
-    #[test]
-    fn last_element_of_iterator_with_several_elements() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["one", "two", "three", "four", "five"],
-        };
-
-        assert_that(subject)
-            .last_element()
-            .is_equal_to("five")
-            .has_length(4)
-            .starts_with("fi");
-    }
-
-    #[cfg(feature = "panic")]
-    #[test]
-    fn last_element_of_iterator_with_no_elements_fails() {
-        let subject: CustomOrderedCollection<i32> = CustomOrderedCollection { inner: vec![] };
-
-        assert_that_code(|| {
-            assert_that(subject)
-                .named("my_custom_collection")
-                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-                .last_element()
-                .is_equal_to(42);
-        })
-        .panics_with_message(
-            r"expected my_custom_collection to have at least one element, but has no elements
-  actual: []
-",
-        );
-    }
-
-    #[test]
-    fn nth_element_of_iterator_with_one_element() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["single"],
-        };
-
-        assert_that(subject)
-            .nth_element(0)
-            .is_equal_to("single")
-            .has_length(6)
-            .starts_with("si");
-    }
-
-    #[test]
-    fn nth_element_of_iterator_with_several_elements_second_element() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["one", "two", "three", "four", "five"],
-        };
-
-        assert_that(subject)
-            .nth_element(1)
-            .is_equal_to("two")
-            .has_length(3)
-            .starts_with("tw");
-    }
-
-    #[test]
-    fn nth_element_of_iterator_with_several_elements_fifth_element() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["one", "two", "three", "four", "five"],
-        };
-
-        assert_that(subject)
-            .nth_element(4)
-            .is_equal_to("five")
-            .has_length(4)
-            .starts_with("fi");
-    }
-
-    #[cfg(feature = "panic")]
-    #[test]
-    fn nth_element_of_iterator_with_five_elements_6th_element_fails() {
-        let subject = CustomOrderedCollection {
-            inner: vec!["one", "two", "three", "four", "five"],
-        };
-
-        assert_that_code(|| {
-            assert_that(subject)
-                .named("my_custom_collection")
-                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-                .nth_element(5)
-                .is_equal_to("five");
-        })
-        .panics_with_message(
-            r#"expected my_custom_collection to have at least 6 elements, but has 5 elements
-  actual: ["one", "two", "three", "four", "five"]
-"#,
         );
     }
 
@@ -598,5 +642,476 @@ mod element_filters {
                 ]
             );
         }
+    }
+}
+
+mod extracted_elements {
+    use super::*;
+
+    #[test]
+    fn first_element_of_iterator_with_one_element() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["single"],
+        };
+
+        assert_that(subject)
+            .first_element()
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn first_element_of_iterator_with_several_elements() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .first_element()
+            .is_equal_to("one")
+            .has_length(3)
+            .starts_with('o');
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn first_element_of_iterator_with_no_elements_fails() {
+        let subject: CustomOrderedCollection<i32> = CustomOrderedCollection { inner: vec![] };
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .first_element()
+                .is_equal_to(42);
+        })
+        .panics_with_message(
+            r"expected my_custom_collection to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_one_element() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["single"],
+        };
+
+        assert_that(subject)
+            .last_element()
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_several_elements() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .last_element()
+            .is_equal_to("five")
+            .has_length(4)
+            .starts_with("fi");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn last_element_of_iterator_with_no_elements_fails() {
+        let subject: CustomOrderedCollection<i32> = CustomOrderedCollection { inner: vec![] };
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .last_element()
+                .is_equal_to(42);
+        })
+        .panics_with_message(
+            r"expected my_custom_collection to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_one_element() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["single"],
+        };
+
+        assert_that(subject)
+            .nth_element(0)
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_second_element() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .nth_element(1)
+            .is_equal_to("two")
+            .has_length(3)
+            .starts_with("tw");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_fifth_element() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .nth_element(4)
+            .is_equal_to("five")
+            .has_length(4)
+            .starts_with("fi");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn nth_element_of_iterator_with_five_elements_6th_element_fails() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .nth_element(5)
+                .is_equal_to("five");
+        })
+        .panics_with_message(
+            r#"expected my_custom_collection to have at least 6 elements, but has 5 elements
+  actual: ["one", "two", "three", "four", "five"]
+"#,
+        );
+    }
+
+    #[test]
+    fn elements_at_positions_of_iterator() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three", "four", "five"],
+        };
+
+        assert_that(subject)
+            .elements_at([0, 2, 4])
+            .contains_exactly(["one", "three", "five"]);
+    }
+
+    #[test]
+    fn verify_elements_at_positions_of_empty_iterator_fails() {
+        let subject: CustomOrderedCollection<&str> = CustomOrderedCollection { inner: vec![] };
+
+        let failures = verify_that(subject)
+            .named("my_custom_collection")
+            .elements_at([0, 1])
+            .contains_exactly(["one", "two"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected my_custom_collection at positions [0, 1] to contain exactly in order ["one", "two"]
+       but was: []
+      expected: ["one", "two"]
+       missing: ["one", "two"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_elements_at_out_of_bounds_position_fails() {
+        let subject = CustomOrderedCollection {
+            inner: vec!["one", "two", "three"],
+        };
+
+        let failures = verify_that(subject)
+            .named("my_custom_collection")
+            .elements_at([0, 3])
+            .contains_exactly(["one", "four"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected my_custom_collection at positions [0, 3] to contain exactly in order ["one", "four"]
+       but was: ["one"]
+      expected: ["one", "four"]
+       missing: ["four"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
+    }
+}
+
+mod extracted_elements_ref {
+    use super::*;
+
+    #[test]
+    fn first_element_of_iterator_with_one_element() {
+        let subject = vec!["single"];
+
+        assert_that(subject)
+            .first_element_ref()
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn first_element_of_iterator_with_several_elements() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .first_element_ref()
+            .is_equal_to("one")
+            .has_length(3)
+            .starts_with('o');
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn first_element_of_iterator_with_no_elements_fails() {
+        let subject: Vec<i32> = vec![];
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .first_element_ref()
+                .is_equal_to(42);
+        })
+        .panics_with_message(
+            r"expected my_custom_collection to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn verify_first_element_of_iterator_assertion_fails() {
+        let subject = vec!["four", "two", "three"];
+
+        let failures = verify_that(subject)
+            .named("my_collection")
+            .first_element_ref()
+            .is_equal_to("one")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected the first element of my_collection to be equal to "one"
+   but was: "four"
+  expected: "one"
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_one_element() {
+        let subject = vec!["single"];
+
+        assert_that(subject)
+            .last_element_ref()
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn last_element_of_iterator_with_several_elements() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .last_element_ref()
+            .is_equal_to("five")
+            .has_length(4)
+            .starts_with("fi");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn last_element_of_iterator_with_no_elements_fails() {
+        let subject: Vec<i32> = vec![];
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .last_element_ref()
+                .is_equal_to(42);
+        })
+        .panics_with_message(
+            r"expected my_custom_collection to have at least one element, but has no elements
+  actual: []
+",
+        );
+    }
+
+    #[test]
+    fn verify_last_element_of_iterator_assertion_fails() {
+        let subject = vec!["one", "two", "four"];
+
+        let failures = verify_that(subject)
+            .named("my_collection")
+            .last_element_ref()
+            .is_equal_to("three")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected the last element of my_collection to be equal to "three"
+   but was: "four"
+  expected: "three"
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_one_element() {
+        let subject = vec!["single"];
+
+        assert_that(subject)
+            .nth_element_ref(0)
+            .is_equal_to("single")
+            .has_length(6)
+            .starts_with("si");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_second_element() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .nth_element_ref(1)
+            .is_equal_to("two")
+            .has_length(3)
+            .starts_with("tw");
+    }
+
+    #[test]
+    fn nth_element_of_iterator_with_several_elements_fifth_element() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .nth_element_ref(4)
+            .is_equal_to("five")
+            .has_length(4)
+            .starts_with("fi");
+    }
+
+    #[cfg(feature = "panic")]
+    #[test]
+    fn nth_element_of_iterator_with_five_elements_6th_element_fails() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that_code(|| {
+            assert_that(subject)
+                .named("my_custom_collection")
+                .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+                .nth_element_ref(5)
+                .is_equal_to("five");
+        })
+        .panics_with_message(
+            r#"expected my_custom_collection to have at least 6 elements, but has 5 elements
+  actual: ["one", "two", "three", "four", "five"]
+"#,
+        );
+    }
+
+    #[test]
+    fn verify_nth_element_of_iterator_assertion_fails() {
+        let subject = vec!["one", "four", "three"];
+
+        let failures = verify_that(subject)
+            .named("my_collection")
+            .nth_element_ref(1)
+            .is_equal_to("two")
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[r#"expected my_collection[1] to be equal to "two"
+   but was: "four"
+  expected: "two"
+"#]
+        );
+    }
+
+    #[test]
+    fn elements_at_positions_of_iterator() {
+        let subject = vec!["one", "two", "three", "four", "five"];
+
+        assert_that(subject)
+            .elements_ref_at([0, 2, 4])
+            .contains_exactly(["one", "three", "five"]);
+    }
+
+    #[test]
+    fn verify_elements_at_positions_of_empty_iterator_fails() {
+        let subject: Vec<&str> = vec![];
+
+        let failures = verify_that(subject)
+            .named("my_custom_collection")
+            .elements_ref_at([0, 1])
+            .contains_exactly(["one", "two"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected my_custom_collection at positions [0, 1] to contain exactly in order ["one", "two"]
+       but was: []
+      expected: ["one", "two"]
+       missing: ["one", "two"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
+    }
+
+    #[test]
+    fn verify_elements_at_out_of_bounds_position_fails() {
+        let subject = vec!["one", "two", "three"];
+
+        let failures = verify_that(subject)
+            .named("my_custom_collection")
+            .elements_ref_at([0, 3])
+            .contains_exactly(["one", "four"])
+            .display_failures();
+
+        assert_eq!(
+            failures,
+            &[
+                r#"expected my_custom_collection at positions [0, 3] to contain exactly in order ["one", "four"]
+       but was: ["one"]
+      expected: ["one", "four"]
+       missing: ["four"]
+         extra: []
+  out-of-order: []
+"#
+            ]
+        );
     }
 }

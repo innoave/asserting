@@ -8,7 +8,7 @@ use crate::expectations::{
     has_char_count, has_char_count_greater_than, has_char_count_in_range, has_char_count_less_than,
 };
 use crate::properties::CharCountProperty;
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Spec};
 use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::ops::RangeBounds;

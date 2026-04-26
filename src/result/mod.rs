@@ -1,15 +1,14 @@
 //! Implementation of assertions for `Result` values.
 
 use crate::assertions::{
-    AssertBorrowedResultValue, AssertHasError, AssertHasErrorMessage, AssertHasValue, AssertResult,
-    AssertResultValue,
+    AssertHasError, AssertHasErrorMessage, AssertHasValue, AssertResult, AssertResultValue,
 };
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     HasError, HasValue, IsErr, IsOk, has_error, has_value, is_equal_to, is_err, is_ok,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec, Unknown,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec, Unknown,
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::{
@@ -74,7 +73,7 @@ where
     }
 }
 
-impl<'a, T, E, R> AssertBorrowedResultValue for Spec<'a, &'a Result<T, E>, R>
+impl<'a, T, E, R> AssertResultValue for Spec<'a, &'a Result<T, E>, R>
 where
     T: Debug,
     E: Debug,

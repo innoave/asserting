@@ -3,7 +3,7 @@
 use crate::assertions::AssertCodePanics;
 use crate::colored::{mark_missing_string, mark_unexpected_string};
 use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
-use crate::spec::{Code, DiffFormat, Expectation, Expression, FailingStrategy, Spec};
+use crate::spec::{Code, DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Spec};
 use crate::std::any::Any;
 use crate::std::panic;
 

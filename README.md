@@ -457,9 +457,9 @@ for iterators that yield items in a well-defined order.
 | contains_all_in_order | verify that an iterator/collection contains all the given values and in the given order, possibly with other values between them                 |
 | starts_with           | verify that an iterator/collection contains the given values as the first elements in order                                                      |
 | ends_with             | verify that an iterator/collection contains the given values as the last elements in order                                                       |
-| first_element         | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the first element                                |
-| last_element          | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the last element                                 |
-| nth_element           | verfiy that an iterator/collection contains at least one element and return a `Spec` containing the nth element                                  |
+| first_element         | verify that an iterator/collection contains at least one element and return a `Spec` containing the first element                                |
+| last_element          | verify that an iterator/collection contains at least one element and return a `Spec` containing the last element                                 |
+| nth_element           | verify that an iterator/collection contains at least one element and return a `Spec` containing the nth element                                  |
 | elements_at           | pick the elements of an iterator/collection at the given positions and return a `Spec` containing the selected elements                          |
 
 ### Maps

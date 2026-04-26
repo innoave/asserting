@@ -11,7 +11,9 @@ use crate::expectations::{
 };
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::string::String;

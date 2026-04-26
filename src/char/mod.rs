@@ -5,7 +5,9 @@ use crate::expectations::{
     IsWhitespace, is_alphabetic, is_alphanumeric, is_ascii, is_control_char, is_digit,
     is_lower_case, is_upper_case, is_whitespace,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::format;
 use crate::std::string::{String, ToString};
 

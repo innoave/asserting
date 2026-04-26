@@ -6,7 +6,9 @@ use crate::expectations::{
     IsAfter, IsAtLeast, IsAtMost, IsBefore, IsBetween, IsGreaterThan, IsLessThan, is_after,
     is_at_least, is_at_most, is_before, is_between, is_greater_than, is_less_than,
 };
-use crate::spec::{DiffFormat, Expectation, Expression, FailingStrategy, Invertible, Spec};
+use crate::spec::{
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+};
 use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 

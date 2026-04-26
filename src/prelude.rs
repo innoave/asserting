@@ -20,8 +20,8 @@ pub use super::{
     colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
     properties::*,
     spec::{
-        CollectFailures, DoFail, GetFailures, Location, PanicOnFail, SoftPanic, assert_that,
-        verify_that,
+        And, CollectFailures, DoFail, Expecting, GetFailures, Location, PanicOnFail, Satisfies,
+        SoftPanic, assert_that, verify_that,
     },
     verify_that,
 };
