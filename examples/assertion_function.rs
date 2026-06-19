@@ -64,28 +64,21 @@ struct Snake {
 /// "snake.body" and "snake.head".
 #[track_caller]
 fn assert_snake_body(snake: &Snake, expected_body: &[Coord]) {
-    let mut failures = verify_that!(snake)
+    let expected_body = expected_body.to_vec();
+    let expected_head = expected_body[0];
+
+    let failures = verify_that!(snake)
         .with_configured_diff_format()
-        .extracting(|s| s.length)
-        .named("snake.length")
+        .extracting_ref("length", |s| &s.length)
         .is_equal_to(expected_body.len())
+        .and()
+        .extracting_ref("body", |s| &s.body)
+        .contains_exactly(expected_body)
+        .and()
+        .extracting_ref("head", |s| &s.head)
+        .is_equal_to(expected_head)
         .display_failures();
-    failures.extend(
-        verify_that!(snake)
-            .with_configured_diff_format()
-            .extracting(|s| &s.body)
-            .named("snake.body")
-            .contains_exactly(expected_body)
-            .display_failures(),
-    );
-    failures.extend(
-        verify_that!(snake)
-            .with_configured_diff_format()
-            .extracting(|s| s.head)
-            .named("snake.head")
-            .is_equal_to(expected_body[0])
-            .display_failures(),
-    );
+
     assert!(
         failures.is_empty(),
         "assertion of snake body failed: \n\n{}",
