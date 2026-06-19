@@ -265,7 +265,7 @@ mod all_elements {
 
         assert_that(subject)
             .is_not_empty()
-            .each_element(|person| person.extracting(|p| p.age).is_at_most(42));
+            .each_element(|person| person.extracting("age", |p| p.age).is_at_most(42));
     }
 
     #[test]
@@ -292,7 +292,7 @@ mod all_elements {
 
         assert_that(&subject)
             .is_not_empty()
-            .each_element(|person| person.extracting(|p| &p.name).starts_with('J'));
+            .each_element(|person| person.extracting("name", |p| &p.name).starts_with('J'));
     }
 
     #[test]
@@ -358,7 +358,7 @@ mod all_elements {
 
         assert_that(subject)
             .is_not_empty()
-            .any_element(|person| person.extracting(|p| p.age).is_at_most(20));
+            .any_element(|person| person.extracting("age", |p| p.age).is_at_most(20));
     }
 
     #[test]
@@ -385,7 +385,7 @@ mod all_elements {
 
         assert_that(&subject)
             .is_not_empty()
-            .any_element(|person| person.extracting(|p| &p.name).ends_with('n'));
+            .any_element(|person| person.extracting("name", |p| &p.name).ends_with('n'));
     }
 
     #[test]

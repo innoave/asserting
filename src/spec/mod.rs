@@ -785,10 +785,18 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// method to switch back to the original subject before calling
     /// `extracting_ref` for the other property.
     ///
+    /// The expression for failure reports is built from the expression of the
+    /// original subject, a dot as a separator, and the given property name.
+    /// The resulting expression is equal to
+    /// `format!("{original_expression}.{property_name}")`.
+    ///
+    /// If you do not like the default built expression, it can be overwritten
+    /// by calling the `named` method after the call to the `extract` method.
+    ///
     /// # Arguments
     ///
     /// * `property_name` - A name describing the extracted property used for
-    ///   referencing that property in failure reports.
+    ///   referencing this property in failure reports.
     /// * `extract` - A closure that returns a reference to the property to be
     ///   extracted.
     ///
@@ -865,13 +873,24 @@ impl<'a, S, R> Spec<'a, S, R> {
     ///
     /// This method is similar to the [`mapping`] method. In contrast to
     /// [`mapping`], this method does not copy the subject's name
-    /// (or expression) but resets it to the default "subject". The idea is
-    /// that the "extracted" property is most likely a different subject than
-    /// the original one.
+    /// (or expression) but builds a new expression from the given
+    /// `property_name` and the expression of the original subject. The
+    /// idea is that the "extracted" property is most likely a different subject
+    /// than the original one.
     ///
-    /// It is recommended to give the extracted property a specific name by
-    /// calling the `named` method. This helps with spotting the cause of a
-    /// failing assertion.
+    /// The expression for failure reports is built from the expression of the
+    /// original subject, a dot as a separator, and the given property name.
+    /// The resulting expression is equal to
+    /// `format!("{original_expression}.{property_name}")`.
+    ///
+    /// If you do not like the default built expression, it can be overwritten
+    /// by calling the `named` method after the call to the `extract` method.
+    ///
+    /// # Arguments
+    ///
+    /// * `property_name` - A name describing the extracted property used for
+    ///   referencing this property in failure reports.
+    /// * `extract` - A closure that returns the property to be extracted.
     ///
     /// # Example
     ///
@@ -889,22 +908,53 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// };
     ///
     /// assert_that!(some_thing)
-    ///     .extracting(|s| s.important_property)
-    ///     .named("some_thing.important_property")
+    ///     .extracting("important_property", |s| s.important_property)
     ///     .is_equal_to("imperdiet aliqua zzril eiusmod");
+    /// ```
     ///
+    /// In this example the resulting expression used in failure reports to
+    /// reference the asserted subject is `"some_thing.important_property"`.
+    ///
+    /// To overwrite the default built expression for failure reports, we can
+    /// call the `named` method, like so:
+    ///
+    /// ```
+    /// # use asserting::prelude::*;
+    /// #
+    /// # struct MyStruct {
+    /// #     important_property: String,
+    /// #     other_property: f64,
+    /// # }
+    /// #
+    /// # let some_thing = MyStruct {
+    /// #     important_property: "imperdiet aliqua zzril eiusmod".into(),
+    /// #     other_property: 99.9,
+    /// # };
+    /// #
+    /// assert_that!(some_thing)
+    ///     .extracting("important_property", |s| s.important_property)
+    ///     .is_equal_to("imperdiet aliqua zzril eiusmod")
+    ///     .named("my_struct's important property");
     /// ```
     ///
     /// [`extracting_ref`]: Self::extracting_ref
     /// [`mapping`]: Self::mapping
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn extracting<F, U>(self, extract: F) -> Spec<'a, U, R>
+    pub fn extracting<F, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> Spec<'a, U, R>
     where
         F: FnOnce(S) -> U,
     {
+        let derived_subject = extract(self.subject);
+        let orig_subject_name = &self.expression;
+        let property_name = property_name.into();
+        let expression = Expression(format!("{orig_subject_name}.{property_name}").into());
         Spec {
-            subject: extract(self.subject),
-            expression: Expression::default(),
+            subject: derived_subject,
+            expression,
             description: self.description,
             location: self.location,
             failures: self.failures,
@@ -927,7 +977,8 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// `Spec` also provides the [`extracting()`](Spec::extracting) method,
     /// which is similar to this method. In contrast to this method,
     /// [`extracting()`](Spec::extracting) does not copy the subject's name
-    /// (or expression) but resets it to the default "subject".
+    /// (or expression) but builds a new expression from the expression of the
+    /// original subject and the given property name.
     ///
     /// # Example
     ///

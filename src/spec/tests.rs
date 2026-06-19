@@ -92,11 +92,11 @@ fn extracting_from_subject_in_spec() {
     };
 
     assert_that(&foo)
-        .extracting(|s| &s.lorem)
+        .extracting("lorem", |s| &s.lorem)
         .is_equal_to("clita aute consequat dolor");
 
     assert_that(&foo)
-        .extracting(|s| s.ipsum)
+        .extracting("ipsum", |s| s.ipsum)
         .is_close_to(0.4519);
 }
 
