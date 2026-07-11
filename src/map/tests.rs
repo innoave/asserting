@@ -78,7 +78,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_contains_key_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -106,7 +106,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_does_not_contain_key_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -148,7 +148,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_contains_value_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -176,7 +176,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_does_not_contain_value_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -204,7 +204,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_contains_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -226,7 +226,7 @@ mod hashbrown {
     #[test]
     fn verify_borrowed_hashmap_contains_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&subject)
             .named("foo_map")
@@ -248,7 +248,7 @@ mod hashbrown {
     #[test]
     fn verify_mutable_borrowed_hashmap_contains_keys_fails() {
         let mut subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&mut subject)
             .named("foo_map")
@@ -277,7 +277,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_contains_values_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -306,7 +306,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_does_not_contain_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
         let formatted_extra = format!(
             "{:?}",
             subject
@@ -342,7 +342,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_does_not_contain_values_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -371,7 +371,7 @@ mod hashbrown {
     #[test]
     fn verify_hashmap_contains_exactly_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
         let formatted_extra = format!(
             "{:?}",
             subject
@@ -479,7 +479,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_contains_key_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -507,7 +507,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_does_not_contain_key_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -549,7 +549,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_contains_value_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -577,7 +577,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_does_not_contain_value_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -605,7 +605,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_contains_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -627,7 +627,7 @@ mod std_hash_map {
     #[test]
     fn verify_borrowed_hashmap_contains_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&subject)
             .named("foo_map")
@@ -649,7 +649,7 @@ mod std_hash_map {
     #[test]
     fn verify_mutable_borrowed_hashmap_contains_keys_fails() {
         let mut subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&mut subject)
             .named("foo_map")
@@ -678,7 +678,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_contains_values_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -707,7 +707,7 @@ mod std_hash_map {
     #[test]
     fn verify_hashmap_contains_exactly_keys_fails() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -922,7 +922,7 @@ mod btree_map {
     #[test]
     fn verify_btree_map_contains_keys_fails() {
         let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -944,7 +944,7 @@ mod btree_map {
     #[test]
     fn verify_borrowed_btree_map_contains_keys_fails() {
         let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&subject)
             .named("foo_map")
@@ -966,7 +966,7 @@ mod btree_map {
     #[test]
     fn verify_mutable_borrowed_btree_map_contains_keys_fails() {
         let mut subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(&mut subject)
             .named("foo_map")
@@ -995,7 +995,7 @@ mod btree_map {
     #[test]
     fn verify_btree_map_contains_values_fails() {
         let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -1024,7 +1024,7 @@ mod btree_map {
     #[test]
     fn verify_btree_map_contains_exactly_keys_fails() {
         let subject: BTreeMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject);
+        let formatted_actual = format!("{subject:?}");
         let formatted_extra = format!(
             "{:?}",
             subject
@@ -1062,7 +1062,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_contains_key() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
             .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
             .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m")
@@ -1089,7 +1089,7 @@ mod colored {
     fn highlight_diffs_hashmap_does_not_contain_key() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
         let formatted_actual =
-            format!("{:?}", &subject).replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m");
+            format!("{subject:?}").replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -1111,7 +1111,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_contains_value() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
             .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
             .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m")
@@ -1138,7 +1138,7 @@ mod colored {
     fn highlight_diffs_hashmap_does_not_contain_value() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
         let formatted_actual =
-            format!("{:?}", &subject).replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
+            format!("{subject:?}").replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
 
         let failures = verify_that(subject)
             .named("foo_map")
@@ -1160,7 +1160,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_contains_keys() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
             .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
 
@@ -1185,7 +1185,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_does_not_contain_keys() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
             .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
         let formatted_extra = format!(
@@ -1217,7 +1217,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_contains_values() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
             .replace("6: \"six\"", "\u{1b}[31m6: \"six\"\u{1b}[0m");
 
@@ -1242,7 +1242,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_does_not_contain_values() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("5: \"five\"", "\u{1b}[31m5: \"five\"\u{1b}[0m")
             .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
         let formatted_extra = format!(
@@ -1274,7 +1274,7 @@ mod colored {
     #[test]
     fn highlight_diffs_hashmap_contains_exactly_keys() {
         let subject: HashMap<_, _> = [(5, "five"), (1, "one"), (4, "four"), (6, "six")].into();
-        let formatted_actual = format!("{:?}", &subject)
+        let formatted_actual = format!("{subject:?}")
             .replace("1: \"one\"", "\u{1b}[31m1: \"one\"\u{1b}[0m")
             .replace("4: \"four\"", "\u{1b}[31m4: \"four\"\u{1b}[0m");
         let formatted_extra = format!(
