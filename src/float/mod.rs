@@ -176,7 +176,7 @@ mod cmp {
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
             format!(
                 "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
-                &self.expected, self.margin.epsilon, self.margin.ulps
+                self.expected, self.margin.epsilon, self.margin.ulps
             )
         }
     }
@@ -199,7 +199,7 @@ mod cmp {
             let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
             format!(
                 "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
-                &self.expected, self.margin.epsilon, self.margin.ulps
+                self.expected, self.margin.epsilon, self.margin.ulps
             )
         }
     }

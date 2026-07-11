@@ -94,7 +94,7 @@ where
         let marked_expected = mark_missing(&self.expected, format);
         format!(
             "expected {expression} to {not}contain {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -188,7 +188,7 @@ where
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected
+            self.expected
         )
     }
 }
@@ -257,7 +257,7 @@ where
             r"expected {expression} to {not}contain any of {:?}
    but was: {marked_actual}
   expected: {not}{marked_expected}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -305,7 +305,7 @@ where
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -351,7 +351,7 @@ where
    but was: {marked_actual}
   expected: {marked_expected}
      extra: {extra:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -415,7 +415,7 @@ where
     expected: {marked_expected}
        extra: {extra:?}
   duplicates: {duplicates:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -539,7 +539,7 @@ where
        missing: {missing:?}
          extra: {extra:?}
   out-of-order: {out_of_order:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -630,7 +630,7 @@ where
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -674,7 +674,7 @@ where
    but was: {actual:?}
   expected: {marked_expected}
    missing: {missing:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -727,7 +727,7 @@ where
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }
@@ -780,7 +780,7 @@ where
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            &self.expected,
+            self.expected,
         )
     }
 }

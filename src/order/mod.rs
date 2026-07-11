@@ -240,12 +240,12 @@ where
         let marked_start = if (actual < &self.min) || inverted {
             mark_missing(&self.min, format)
         } else {
-            format!("{:?}", &self.min)
+            format!("{:?}", self.min)
         };
         let marked_end = if (actual > &self.max) || inverted {
             mark_missing(&self.max, format)
         } else {
-            format!("{:?}", &self.max)
+            format!("{:?}", self.max)
         };
         format!(
             "expected {expression} to be {not}between {:?} and {:?}\n   but was: {marked_actual}\n  expected: {marked_start} {cmp} {marked_end}",
