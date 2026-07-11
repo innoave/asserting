@@ -1478,10 +1478,10 @@ impl Display for AssertFailure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.description {
             None => {
-                writeln!(f, "{}", &self.message)?;
+                writeln!(f, "{}", self.message)?;
             },
             Some(description) => {
-                writeln!(f, "{description}\n{}", &self.message)?;
+                writeln!(f, "{description}\n{}", self.message)?;
             },
         }
         Ok(())
