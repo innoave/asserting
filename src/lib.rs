@@ -281,7 +281,7 @@
 //!     age: 25,
 //! };
 //!
-//! assert_that!(person).extracting(|s| s.name)
+//! assert_that!(person).extracting("name", |s| s.name)
 //!     .is_equal_to("Silvia");
 //! ```
 //!

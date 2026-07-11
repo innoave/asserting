@@ -184,6 +184,14 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// method to switch back to the previous subject before calling
     /// `extracting_ref` for the other property.
     ///
+    /// The expression for failure reports is built from the expression of the
+    /// original subject, a dot as a separator, and the given property name.
+    /// The resulting expression is equal to
+    /// `format!("{original_expression}.{property_name}")`.
+    ///
+    /// If you do not like the default built expression, it can be overwritten
+    /// by calling the `named` method after the call to the `extract` method.
+    ///
     /// # Arguments
     ///
     /// * `property_name` - A name describing the extracted property used for
@@ -299,12 +307,14 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         F: FnOnce(&S) -> &B,
         B: ToOwned<Owned = U> + ?Sized,
     {
-        let extracted = extract(&self.subject).to_owned();
-        let expression = Expression(property_name.into());
+        let derived_subject = extract(&self.subject).to_owned();
+        let orig_subject_name = &self.expression;
+        let property_name = property_name.into();
+        let expression = Expression(format!("{orig_subject_name}.{property_name}").into());
         let diff_format = self.diff_format.clone();
         DerivedSpec {
             original: self,
-            subject: extracted,
+            subject: derived_subject,
             expression,
             diff_format,
         }
@@ -330,14 +340,24 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// that the "extracted" property is most likely a different subject than
     /// the original one.
     ///
-    /// It is recommended to give the extracted property a specific name by
-    /// calling the `named` method. This helps with spotting the cause of a
-    /// failing assertion.
+    /// The expression for failure reports is built from the expression of the
+    /// original subject, a dot as a separator, and the given property name.
+    /// The resulting expression is equal to
+    /// `format!("{original_expression}.{property_name}")`.
+    ///
+    /// If you do not like the default built expression, it can be overwritten
+    /// by calling the `named` method after the call to the `extract` method.
     ///
     /// This method does not memorize the current subject. Calling `and` on the
     /// extracted property switches back to the original subject of this
     /// `DerivedSpec`. The current subject is omitted. So, `and` always switches
     /// back to the subject before the last `extracting_ref` call.
+    ///
+    /// # Arguments
+    ///
+    /// * `property_name` - A name describing the extracted property used for
+    ///   referencing this property in failure reports.
+    /// * `extract` - A closure that returns the property to be extracted.
     ///
     /// # Example
     ///
@@ -374,26 +394,33 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     ///
     /// assert_that!(my_order)
     ///     .extracting_ref("items", |o| &o.items)
-    ///     .extracting(|i| i[0].name.clone())
+    ///     .extracting("name", |i| i[0].name.clone())
     ///     .is_equal_to("Apple")
     ///     .and()  // switches back to `my_order` not `my_order.items`
-    ///     .extracting(|o| o.id)
+    ///     .extracting("id", |o| o.id)
     ///     .is_equal_to("O261234");
     /// ```
     ///
     /// [`extracting_ref`]: Self::extracting_ref
     /// [`mapping`]: Self::mapping
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
-    pub fn extracting<F, U>(self, extract: F) -> DerivedSpec<'a, O, U>
+    pub fn extracting<F, U>(
+        self,
+        property_name: impl Into<Cow<'a, str>>,
+        extract: F,
+    ) -> DerivedSpec<'a, O, U>
     where
         F: FnOnce(S) -> U,
     {
-        let extracted = extract(self.subject);
+        let derived_subject = extract(self.subject);
+        let orig_subject_name = &self.expression;
+        let property_name = property_name.into();
+        let expression = Expression(format!("{orig_subject_name}.{property_name}").into());
         let diff_format = self.diff_format.clone();
         DerivedSpec {
             original: self.original,
-            subject: extracted,
-            expression: Expression::default(),
+            subject: derived_subject,
+            expression,
             diff_format,
         }
     }
@@ -413,7 +440,8 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// `DerivedSpec` also provides the [`extracting()`](DerivedSpec::extracting)
     /// method, which is similar to this method. In contrast to this method,
     /// [`extracting()`](DerivedSpec::extracting) does not copy the subject's
-    /// name (or expression) but resets it to the default "subject".
+    /// name (or expression) but builds a new expression from the expression of
+    /// the original subject and the given property name.
     ///
     /// # Example
     ///
@@ -1567,7 +1595,10 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| collection.remove(0))
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("the first element of {orig_subject_name}");
+        spec.extracting("", |mut collection| collection.remove(0))
+            .named(new_subject_name)
     }
 
     fn last_element(self) -> Self::SingleElement {
@@ -1578,11 +1609,14 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| {
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("the last element of {orig_subject_name}");
+        spec.extracting("", |mut collection| {
             collection.pop().unwrap_or_else(|| {
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
+        .named(new_subject_name)
     }
 
     fn nth_element(self, n: usize) -> Self::SingleElement {
@@ -1594,10 +1628,16 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| collection.remove(n))
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("{orig_subject_name}[{n}]");
+        spec.extracting("", |mut collection| collection.remove(n))
+            .named(new_subject_name)
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let indices = Vec::from_iter(indices);
+        let orig_subject_name = self.expression();
+        let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
         self.mapping(|subject| {
             subject
@@ -1606,6 +1646,7 @@ where
                 .filter_map(|(i, v)| if indices.contains(&i) { Some(v) } else { None })
                 .collect()
         })
+        .named(new_subject_name)
     }
 }
 
@@ -1706,12 +1747,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the first element of {orig_subject_name}");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.first()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn last_element_ref(self) -> Self::SingleElement {
@@ -1724,12 +1765,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the last element of {orig_subject_name}");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.last()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn nth_element_ref(self, n: usize) -> Self::SingleElement {
@@ -1743,12 +1784,12 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("{orig_subject_name}[{n}]");
-        original_spec.extracting_ref(new_subject_name, |collection|
+        original_spec.extracting_ref("", |collection|
             collection.get(n)
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        )
+        ).named(new_subject_name)
     }
 
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
@@ -1757,18 +1798,20 @@ where
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
         let original_spec = self.mapping(Vec::from_iter);
-        original_spec.extracting_ref_iter(new_subject_name, |collection| {
-            collection
-                .enumerate()
-                .filter_map(|(i, e)| {
-                    if indices.contains(&i) {
-                        Some(e.to_owned())
-                    } else {
-                        None
-                    }
-                })
-                .collect()
-        })
+        original_spec
+            .extracting_ref_iter("", |collection| {
+                collection
+                    .enumerate()
+                    .filter_map(|(i, e)| {
+                        if indices.contains(&i) {
+                            Some(e.to_owned())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            })
+            .named(new_subject_name)
     }
 }
 

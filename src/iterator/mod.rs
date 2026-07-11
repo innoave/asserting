@@ -800,11 +800,14 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| {
+        let original_expression = spec.expression();
+        let new_expression = format!("{original_expression}'s only element");
+        spec.extracting("", |mut collection| {
             collection.pop().unwrap_or_else(|| {
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
+        .named(new_expression)
     }
 
     fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
@@ -975,7 +978,10 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| collection.remove(0))
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("the first element of {orig_subject_name}");
+        spec.extracting("", |mut collection| collection.remove(0))
+            .named(new_subject_name)
     }
 
     fn last_element(self) -> Self::SingleElement {
@@ -986,11 +992,14 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| {
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("the last element of {orig_subject_name}");
+        spec.extracting("", |mut collection| {
             collection.pop().unwrap_or_else(|| {
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
+        .named(new_subject_name)
     }
 
     fn nth_element(self, n: usize) -> Self::SingleElement {
@@ -1002,7 +1011,10 @@ where
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
-        spec.extracting(|mut collection| collection.remove(n))
+        let orig_subject_name = spec.expression();
+        let new_subject_name = format!("{orig_subject_name}[{n}]");
+        spec.extracting("", |mut collection| collection.remove(n))
+            .named(new_subject_name)
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {

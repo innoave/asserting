@@ -68,34 +68,24 @@ where
     R: FailingStrategy,
 {
     fn has_body(mut self, expected_body: &[Coord]) -> Self {
+        let expected_body = expected_body.to_vec();
+        let expected_head = expected_body[0];
         let actual_body = self.subject().borrow();
         // we first collect all failures using the "soft assertion" mode of
         // asserting, which is started by using the `verify_that` function.
-        let mut failures;
-        failures = verify_that(actual_body)
+        let failures = verify_that(actual_body)
             // `verify_that` does not highlight differences by default, so we
             // switch on highlighting using the configured `DiffFormat`
             .with_configured_diff_format()
-            .extracting(|s| s.length)
-            .named("snake.length")
+            .extracting_ref("length", |s| &s.length)
             .is_equal_to(expected_body.len())
-            .display_failures();
-        failures.extend(
-            verify_that(actual_body)
-                .with_configured_diff_format()
-                .extracting(|s| &s.body)
-                .named("snake.body")
-                .contains_exactly(expected_body)
-                .display_failures(),
-        );
-        failures.extend(
-            verify_that(actual_body)
-                .with_configured_diff_format()
-                .extracting(|s| s.head)
-                .named("snake.head")
-                .is_equal_to(expected_body[0])
-                .display_failures(),
-        );
+            .and()
+            .extracting_ref("body", |s| &s.body)
+            .contains_exactly(expected_body)
+            .and()
+                .extracting_ref("head", |s| &s.head)
+                .is_equal_to(expected_head)
+                .display_failures();
         // if there are failures, we fail the whole assertion according to the
         // current `FailingStrategy`.
         if !failures.is_empty() {

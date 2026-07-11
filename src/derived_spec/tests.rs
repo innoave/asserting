@@ -66,7 +66,9 @@ fn extracting_person_name_contains_i() {
         gender: Gender::Female,
     };
 
-    assert_that(person).extracting(|p| p.name).contains('i');
+    assert_that(person)
+        .extracting("name", |p| p.name)
+        .contains('i');
 }
 
 #[test]
