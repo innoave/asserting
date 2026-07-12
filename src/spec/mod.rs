@@ -18,6 +18,7 @@ use crate::std::vec;
 use crate::std::vec::Vec;
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
+use std::cmp::Ordering;
 
 /// Starts an assertion for the given subject or expression in the
 /// [`PanicOnFail`] mode.
@@ -624,6 +625,30 @@ impl OwnedLocation {
     /// Returns the column number of this location.
     pub fn column(&self) -> u32 {
         self.column
+    }
+}
+
+impl PartialEq<Location<'_>> for OwnedLocation {
+    fn eq(&self, other: &Location<'_>) -> bool {
+        self.as_location() == *other
+    }
+}
+
+impl PartialEq<OwnedLocation> for Location<'_> {
+    fn eq(&self, other: &OwnedLocation) -> bool {
+        self == &other.as_location()
+    }
+}
+
+impl PartialOrd<Location<'_>> for OwnedLocation {
+    fn partial_cmp(&self, other: &Location<'_>) -> Option<Ordering> {
+        self.as_location().partial_cmp(other)
+    }
+}
+
+impl PartialOrd<OwnedLocation> for Location<'_> {
+    fn partial_cmp(&self, other: &OwnedLocation) -> Option<Ordering> {
+        self.partial_cmp(&other.as_location())
     }
 }
 

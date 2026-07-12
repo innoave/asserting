@@ -52,6 +52,34 @@ fn owned_location_can_be_referenced_as_location() {
 }
 
 #[test]
+fn can_check_equality_of_owned_location_and_location() {
+    let owned_location = OwnedLocation::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(owned_location).is_equal_to(Location::new("src/my_module/my_test.rs", 54, 13));
+}
+
+#[test]
+fn can_check_equality_of_location_and_owned_location() {
+    let location = Location::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(location).is_equal_to(OwnedLocation::new("src/my_module/my_test.rs", 54, 13));
+}
+
+#[test]
+fn can_compare_owned_location_to_location() {
+    let owned_location = OwnedLocation::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(owned_location).is_less_than(Location::new("src/my_module/my_test.rs", 55, 4));
+}
+
+#[test]
+fn can_compare_location_to_owned_location() {
+    let location = Location::new("src/my_module/my_test.rs", 54, 13);
+
+    assert_that!(location).is_greater_than(OwnedLocation::new("src/my_module/my_test.rs", 53, 38));
+}
+
+#[test]
 fn assert_failure_display_format() {
     let failure = AssertFailure {
         description: Some("this thing is the best".to_string()),
