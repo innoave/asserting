@@ -8,6 +8,7 @@ use crate::expectations::satisfies;
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
 use crate::std::borrow::{Borrow, Cow, ToOwned};
+use crate::std::cmp::Ordering;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::format;
@@ -18,7 +19,6 @@ use crate::std::vec;
 use crate::std::vec::Vec;
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
-use std::cmp::Ordering;
 
 /// Starts an assertion for the given subject or expression in the
 /// [`PanicOnFail`] mode.
