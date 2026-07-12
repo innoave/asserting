@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.15.0 - 2026-07-12
+
+_assert multiple properties of the same subject_
+
+### Added
+
+* chaining the extraction of multiple properties from the same subject
+  [(PR #88)](https://github.com/innoave/asserting/pull/88)
+* make `OwnedLocation` comparable to `Location` and vice versa
+  [(PR #95)](https://github.com/innoave/asserting/pull/95)
+
+### Changed
+
+* **Breaking**: add parameter `property_name` to `Spec::extracting` method
+  [(PR #91)](https://github.com/innoave/asserting/pull/91)
+* **Breaking:** rename trait `AssertElements` to `AssertFilteredElements`
+  [(PR #87)](https://github.com/innoave/asserting/pull/87)
+* **Breaking:** change assertion traits to define spec-like return types as associated types
+  [(PR #80)](https://github.com/innoave/asserting/pull/80)
+* **Breaking:** bump MSRV to 1.85.1
+  [(PR #81)](https://github.com/innoave/asserting/pull/81)
+* **Breaking:** upgrade to Rust 2024 edition
+  [(PR #84)](https://github.com/innoave/asserting/pull/84)
+* **Breaking:** update hashbrown dependency from 0.16 to 0.17
+  [(PR #86)](https://github.com/innoave/asserting/pull/86)
+* **Breaking:** update num-bigint dependency from 0.4 to 0.5
+  [(PR #93)](https://github.com/innoave/asserting/pull/93)
+
+### Removed
+
+* **Breaking**: remove unused traits `AssertBorrowedOptionValue` and `AssertBorrowedResultValue`
+  [(PR #89)](https://github.com/innoave/asserting/pull/89)
+
 ## 0.14.0 - 2026-03-15
 
 _we now have field-by-field recursive comparison_

@@ -46,7 +46,7 @@ require std can still be added.
 
 ```toml
 [dev-dependencies]
-asserting = { version = "0.14", default-features = false, features = ["colored", "float-cmp", "recursive", "regex"] }
+asserting = { version = "0.15", default-features = false, features = ["colored", "float-cmp", "recursive", "regex"] }
 ```
 
 Note that an allocator is needed for no-std.
