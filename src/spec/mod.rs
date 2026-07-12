@@ -8,6 +8,7 @@ use crate::expectations::satisfies;
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
 use crate::std::borrow::{Borrow, Cow, ToOwned};
+use crate::std::cmp::Ordering;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
 use crate::std::format;
@@ -624,6 +625,30 @@ impl OwnedLocation {
     /// Returns the column number of this location.
     pub fn column(&self) -> u32 {
         self.column
+    }
+}
+
+impl PartialEq<Location<'_>> for OwnedLocation {
+    fn eq(&self, other: &Location<'_>) -> bool {
+        self.as_location() == *other
+    }
+}
+
+impl PartialEq<OwnedLocation> for Location<'_> {
+    fn eq(&self, other: &OwnedLocation) -> bool {
+        self == &other.as_location()
+    }
+}
+
+impl PartialOrd<Location<'_>> for OwnedLocation {
+    fn partial_cmp(&self, other: &Location<'_>) -> Option<Ordering> {
+        self.as_location().partial_cmp(other)
+    }
+}
+
+impl PartialOrd<OwnedLocation> for Location<'_> {
+    fn partial_cmp(&self, other: &OwnedLocation) -> Option<Ordering> {
+        self.partial_cmp(&other.as_location())
     }
 }
 
