@@ -5,7 +5,15 @@
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
 
-Fluent assertions for tests in Rust that are convenient to write and easy to extend.
+Fluent assertions for tests in Rust. An extensive collection of assertions to express the intent of
+the expected result in a test.
+
+Fluent assertions help with expressing the intent of a test. Other developers quickly understand
+what the expected result of a test should be. One remembers more easily what could be wrong in the
+case of a test fails some months later due to a regression. The autocomplete feature of a coding
+editor or IDE helps with writing assertions as it suggests possible assertion methods. Distinct and
+more helpful error messages help to spot the difference between the expected value and the actual
+result. Fluent assertions read like natural English.
 
 Features of `asserting`:
 
@@ -14,13 +22,14 @@ Features of `asserting`:
 3. colored diffs between expected and actual values
    (see ["Highlighted differences"](#highlighted-differences))
 4. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
-5. field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
-6. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
-7. provide a reasonable number of assertions out of the box
-8. do not require that asserted types have to implement traits if it is not absolutely necessary
-9. support for asserting custom types with provided assertions
-10. writing custom assertions requires minimal effort
-11. support no-std environments
+5. concise and expressive assertions for more complex types like collections
+6. field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
+7. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
+8. support for asserting custom types with provided assertions (see ["Asserting custom types"])
+9. provide a reasonable number of assertions out of the box
+10. do not require that asserted types have to implement traits if it is not absolutely necessary
+11. custom assertions (see ["Custom assertions"](#custom-assertions))
+12. support no-std environments
 
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
@@ -29,54 +38,6 @@ The assertion methods are mostly inspired by the [AssertJ] library for Java but 
 syntax and idioms.
 
 To see what is changed with each release, see the [changelog](CHANGELOG.md).
-
-### Convenient to write
-
-Code editors and IDEs help with autocomplete to find the right method for the kind of assertion we
-want to write. The API docs of the assertions contain examples to help with writing assertions.
-
-The expected value does not need to be exactly of the same type as the subject. For example, instead
-of writing:
-
-```rust
-#[test]
-fn the_message_is_right() {
-    let message = "lorem consectetur ipsum exercitation".to_string();
-
-    assert_that!(message).is_equal_to("lorem consectetur ipsum exercitation".to_string());
-}
-```
-
-with `asserting` we can write:
-
-```rust
-#[test]
-fn the_message_is_right() {
-    let message = "lorem consectetur ipsum exercitation".to_string();
-
-    assert_that!(message).is_equal_to("lorem consectetur ipsum exercitation");
-}
-```
-
-Note that we do not convert the expected value to a `String`.
-
-This might seem to be a minor advantage, but when writing assertions for a collection of `String`s,
-converting every expected `&str` to `String` results in lots of noise.
-
-### Easy to extend
-
-Easy-to-extend means that we can write assertions for custom types with minimal effort.
-
-`asserting` provides three kinds of custom assertions:
-
-1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
-2. property-based assertions can be used with any type that implements the related property
-   (see "[property-based assertions]")
-3. write custom assertion methods by defining and implementing an extension trait
-   (see "[custom assertions]")
-
-The mentioned references link to a chapter in the crate's documentation that describes the
-possibilities for custom assertions, including examples.
 
 ## no-std support
 
@@ -88,7 +49,7 @@ require std can still be added.
 asserting = { version = "0.14", default-features = false, features = ["colored", "float-cmp", "recursive", "regex"] }
 ```
 
-An allocator is still needed for no-std.
+Note that an allocator is needed for no-std.
 
 ## Crate Features
 
@@ -493,6 +454,19 @@ requires the crate feature `panic` which is enabled by default.
 
 To start assertions on code, use the `assert_that_code!()` macro.
 
+## Custom assertions
+
+`asserting` provides three kinds of custom assertions:
+
+1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
+2. property-based assertions can be used with any type that implements the related property
+   (see "[property-based assertions]")
+3. write custom assertion methods by defining and implementing an extension trait
+   (see "[custom assertions]")
+
+The mentioned references link to a chapter in the crate's documentation that describes the
+possibilities for custom assertions, including examples.
+
 <!-- Badges and related URLs -->
 
 [crates-badge]: https://img.shields.io/crates/v/asserting.svg
@@ -510,6 +484,8 @@ To start assertions on code, use the `assert_that_code!()` macro.
 [code-coverage-url]: https://codecov.io/github/innoave/asserting
 
 <!-- External Links -->
+
+["Asserting custom types"]: https://docs.rs/asserting/latest/asserting/#asserting-custom-types
 
 ["Chaining assertions"]: https://docs.rs/asserting/latest/asserting/#chaining-assertions-on-the-same-subject
 
