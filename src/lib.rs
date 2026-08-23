@@ -992,6 +992,7 @@ mod os_sting;
 mod panic;
 mod predicate;
 mod range;
+mod representation;
 mod result;
 #[cfg(feature = "rust-decimal")]
 mod rust_decimal;

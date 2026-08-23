@@ -1,21 +1,23 @@
 use crate::assertions::AssertErrorHasSource;
-use crate::colored::{mark_missing, mark_missing_string, mark_unexpected, mark_unexpected_string};
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     ErrorHasSource, ErrorHasSourceMessage, error_has_source, error_has_source_message, not,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression,
+    FailingStrategy, Invertible, Represent, Spec,
 };
 use crate::std::error::Error;
 use crate::std::format;
 use crate::std::string::{String, ToString};
 
-impl<'a, S, R> AssertErrorHasSource for Spec<'a, S, R>
+impl<'a, S, D, R> AssertErrorHasSource for Spec<'a, S, D, R>
 where
     S: Error,
+    D: Represent<S>,
     R: FailingStrategy,
 {
-    type SourceMessage = Spec<'a, Option<String>, R>;
+    type SourceMessage = Spec<'a, Option<String>, DebugRepresentation, R>;
 
     fn has_no_source(self) -> Self {
         self.expecting(not(error_has_source()))
@@ -32,9 +34,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for ErrorHasSource
+impl<S, D> Expectation<S, D> for ErrorHasSource
 where
     S: Error,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.source().is_some()
@@ -45,6 +48,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (a, expected) = if inverted {
@@ -52,8 +56,8 @@ where
         } else {
             ("a", "<error with some source>")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to have {a} source\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -62,9 +66,10 @@ where
 
 impl Invertible for ErrorHasSource {}
 
-impl<S> Expectation<S> for ErrorHasSourceMessage
+impl<S, D> Expectation<S, D> for ErrorHasSourceMessage
 where
     S: Error,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject
@@ -77,20 +82,22 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected = &self.expected_source_message;
         if let Some(actual_source) = actual.source() {
-            let marked_actual = mark_unexpected_string(&actual_source.to_string(), format);
-            let marked_expected = mark_missing_string(expected, format);
+            let marked_actual =
+                mark_unexpected(&actual_source.to_string(), &DisplayRepresentation, format);
+            let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
             format!(
                 "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: \"{marked_actual}\"\n  expected: \"{marked_expected}\""
             )
         } else {
-            let mut marked_actual = mark_unexpected(actual, format);
+            let mut marked_actual = mark_unexpected(actual, representation, format);
             marked_actual.push_str(" - which has no source");
-            let marked_expected = mark_missing(expected, format);
+            let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
             format!(
                 "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
             )

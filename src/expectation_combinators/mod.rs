@@ -2,9 +2,9 @@ use crate::expectations::{All, Any, IntoRec, Not, Rec};
 use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
 use crate::std::string::String;
 
-impl<S, E> Expectation<S> for Rec<E>
+impl<S, E, D> Expectation<S, D> for Rec<E>
 where
-    E: Expectation<S>,
+    E: Expectation<S, D>,
 {
     fn test(&mut self, subject: &S) -> bool {
         let result = self.expectation.test(subject);
@@ -17,11 +17,12 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         if self.is_failure() {
             self.expectation
-                .message(expression, actual, inverted, format)
+                .message(expression, actual, inverted, representation, format)
                 + "\n"
         } else {
             String::new()
@@ -62,9 +63,9 @@ impl_into_rec_for_tuple! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 }
 impl_into_rec_for_tuple! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 }
 impl_into_rec_for_tuple! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 }
 
-impl<S, E> Expectation<S> for Not<E>
+impl<S, E, D> Expectation<S, D> for Not<E>
 where
-    E: Invertible + Expectation<S>,
+    E: Invertible + Expectation<S, D>,
 {
     fn test(&mut self, subject: &S) -> bool {
         !self.0.test(subject)
@@ -75,16 +76,18 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        self.0.message(expression, actual, !inverted, format)
+        self.0
+            .message(expression, actual, !inverted, representation, format)
     }
 }
 
 macro_rules! impl_expectation_for_all_combinator {
     ( $( $tp_name:ident )+ ) => {
         #[allow(non_snake_case)]
-        impl<S, $($tp_name: Expectation<S>),+> Expectation<S> for All<($(Rec<$tp_name>,)+)> {
+        impl<S, D, $($tp_name: Expectation<S, D>),+> Expectation<S, D> for All<($(Rec<$tp_name>,)+)> {
             fn test(&mut self, subject: &S) -> bool {
                 let ($($tp_name,)+) = &mut self.0;
                 $(
@@ -98,12 +101,13 @@ macro_rules! impl_expectation_for_all_combinator {
                 expression: &Expression<'_>,
                 actual: &S,
                 inverted: bool,
+                representation: &D,
                 format: &DiffFormat,
             ) -> String {
                 let ($($tp_name,)+) = &self.0;
                 let mut message = String::new();
                 $(
-                    message.push_str(&$tp_name.message(expression, actual, inverted, format));
+                    message.push_str(&$tp_name.message(expression, actual, inverted, representation, format));
                 )+
                 message
             }
@@ -127,7 +131,7 @@ impl_expectation_for_all_combinator! { A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 }
 macro_rules! impl_expectation_for_any_combinator {
     ( $( $tp_name:ident )+ ) => {
         #[allow(non_snake_case)]
-        impl<S, $($tp_name: Expectation<S>),+> Expectation<S> for Any<($(Rec<$tp_name>,)+)> {
+        impl<S, D, $($tp_name: Expectation<S, D>),+> Expectation<S, D> for Any<($(Rec<$tp_name>,)+)> {
             fn test(&mut self, subject: &S) -> bool {
                 let ($($tp_name,)+) = &mut self.0;
                 $(
@@ -141,12 +145,13 @@ macro_rules! impl_expectation_for_any_combinator {
                 expression: &Expression<'_>,
                 actual: &S,
                 inverted: bool,
+                representation: &D,
                 format: &DiffFormat,
             ) -> String {
                 let ($($tp_name,)+) = &self.0;
                 let mut message = String::new();
                 $(
-                    message.push_str(&$tp_name.message(expression, actual, inverted, format));
+                    message.push_str(&$tp_name.message(expression, actual, inverted, representation, format));
                 )+
                 message
             }

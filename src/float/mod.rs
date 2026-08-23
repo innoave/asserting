@@ -99,13 +99,15 @@ mod cmp {
     use crate::colored::mark_diff;
     use crate::expectations::{IsCloseTo, is_close_to, not};
     use crate::spec::{
-        DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+        DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
+        Spec,
     };
     use crate::std::{format, string::String};
     use float_cmp::{ApproxEq, F32Margin, F64Margin};
 
-    impl<R> AssertIsCloseToWithDefaultMargin<f32> for Spec<'_, f32, R>
+    impl<D, R> AssertIsCloseToWithDefaultMargin<f32> for Spec<'_, f32, D, R>
     where
+        D: Represent<f32>,
         R: FailingStrategy,
     {
         fn is_close_to(self, expected: f32) -> Self {
@@ -119,8 +121,9 @@ mod cmp {
         }
     }
 
-    impl<R> AssertIsCloseToWithinMargin<f32, F32Margin> for Spec<'_, f32, R>
+    impl<D, R> AssertIsCloseToWithinMargin<f32, F32Margin> for Spec<'_, f32, D, R>
     where
+        D: Represent<f32>,
         R: FailingStrategy,
     {
         fn is_close_to_with_margin(self, expected: f32, margin: impl Into<F32Margin>) -> Self {
@@ -132,8 +135,9 @@ mod cmp {
         }
     }
 
-    impl<R> AssertIsCloseToWithDefaultMargin<f64> for Spec<'_, f64, R>
+    impl<D, R> AssertIsCloseToWithDefaultMargin<f64> for Spec<'_, f64, D, R>
     where
+        D: Represent<f64>,
         R: FailingStrategy,
     {
         fn is_close_to(self, expected: f64) -> Self {
@@ -147,8 +151,9 @@ mod cmp {
         }
     }
 
-    impl<R> AssertIsCloseToWithinMargin<f64, F64Margin> for Spec<'_, f64, R>
+    impl<D, R> AssertIsCloseToWithinMargin<f64, F64Margin> for Spec<'_, f64, D, R>
     where
+        D: Represent<f64>,
         R: FailingStrategy,
     {
         fn is_close_to_with_margin(self, expected: f64, margin: impl Into<F64Margin>) -> Self {
@@ -160,7 +165,10 @@ mod cmp {
         }
     }
 
-    impl Expectation<f32> for IsCloseTo<f32, F32Margin> {
+    impl<D> Expectation<f32, D> for IsCloseTo<f32, F32Margin>
+    where
+        D: Represent<f32>,
+    {
         fn test(&mut self, subject: &f32) -> bool {
             subject.approx_eq(self.expected, self.margin)
         }
@@ -170,10 +178,12 @@ mod cmp {
             expression: &Expression<'_>,
             actual: &f32,
             inverted: bool,
+            representation: &D,
             format: &DiffFormat,
         ) -> String {
             let not = if inverted { "not " } else { "" };
-            let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
+            let (marked_actual, marked_expected) =
+                mark_diff(actual, &self.expected, representation, format);
             format!(
                 "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 self.expected, self.margin.epsilon, self.margin.ulps
@@ -183,7 +193,10 @@ mod cmp {
 
     impl Invertible for IsCloseTo<f32, F32Margin> {}
 
-    impl Expectation<f64> for IsCloseTo<f64, F64Margin> {
+    impl<D> Expectation<f64, D> for IsCloseTo<f64, F64Margin>
+    where
+        D: Represent<f64>,
+    {
         fn test(&mut self, subject: &f64) -> bool {
             subject.approx_eq(self.expected, self.margin)
         }
@@ -193,10 +206,12 @@ mod cmp {
             expression: &Expression<'_>,
             actual: &f64,
             inverted: bool,
+            representation: &D,
             format: &DiffFormat,
         ) -> String {
             let not = if inverted { "not " } else { "" };
-            let (marked_actual, marked_expected) = mark_diff(actual, &self.expected, format);
+            let (marked_actual, marked_expected) =
+                mark_diff(actual, &self.expected, representation, format);
             format!(
                 "expected {expression} to be {not}close to {:?}\n  within a margin of epsilon={:e} and ulps={}\n   but was: {marked_actual}\n  expected: {marked_expected}",
                 self.expected, self.margin.epsilon, self.margin.ulps

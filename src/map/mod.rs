@@ -1,7 +1,7 @@
 use crate::assertions::{AssertMapContainsKey, AssertMapContainsValue};
 use crate::colored::{
     mark_all_entries_in_map, mark_missing, mark_selected_entries_in_map,
-    mark_selected_items_in_collection, mark_unexpected_string,
+    mark_selected_items_in_collection, mark_unexpected,
 };
 use crate::expectations::{
     MapContainsExactlyKeys, MapContainsKey, MapContainsKeys, MapContainsValue, MapContainsValues,
@@ -12,20 +12,22 @@ use crate::expectations::{
 use crate::iterator::collect_selected_values;
 use crate::properties::MapProperties;
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
+    Represented, Spec,
 };
-use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::string::String;
 use crate::std::vec::Vec;
 use hashbrown::HashSet;
 
-impl<S, E, R> AssertMapContainsKey<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertMapContainsKey<E> for Spec<'_, S, D, R>
 where
-    S: MapProperties + Debug,
-    <S as MapProperties>::Key: PartialEq<E> + Debug,
-    <S as MapProperties>::Value: Debug,
-    E: Debug,
+    S: MapProperties,
+    <S as MapProperties>::Key: PartialEq<E>,
+    D: Represent<S>
+        + Represent<E>
+        + Represent<<S as MapProperties>::Key>
+        + Represent<<S as MapProperties>::Value>,
     R: FailingStrategy,
 {
     fn contains_key(self, expected_key: E) -> Self {
@@ -49,12 +51,11 @@ where
     }
 }
 
-impl<M, E> Expectation<M> for MapContainsKey<E>
+impl<M, E, D> Expectation<M, D> for MapContainsKey<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: PartialEq<E> + Debug,
-    <M as MapProperties>::Value: Debug,
-    E: Debug,
+    <M as MapProperties>::Key: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         subject.keys_property().any(|k| k == &self.expected_key)
@@ -65,9 +66,9 @@ where
         expression: &Expression<'_>,
         actual: &M,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected_key = &self.expected_key;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let (not, marked_actual) = if inverted {
             let found: HashSet<usize> = actual_entries
@@ -84,16 +85,18 @@ where
             let selected_entries_marked = mark_selected_entries_in_map(
                 &actual_entries,
                 &found,
+                representation,
                 format,
-                mark_unexpected_string,
+                mark_unexpected,
             );
             ("not ", selected_entries_marked)
         } else {
             let all_entries_marked =
-                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_string);
+                mark_all_entries_in_map(&actual_entries, representation, format, mark_unexpected);
             ("", all_entries_marked)
         };
-        let marked_expected = mark_missing(&self.expected_key, format);
+        let marked_expected = mark_missing(&self.expected_key, representation, format);
+        let expected_key = Represented::from((&self.expected_key, representation));
         format!(
             "expected {expression} to {not}contain the key {expected_key:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
@@ -102,12 +105,11 @@ where
 
 impl<E> Invertible for MapContainsKey<E> {}
 
-impl<M, E> Expectation<M> for MapContainsKeys<E>
+impl<M, E, D> Expectation<M, D> for MapContainsKeys<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: PartialEq<E> + Debug,
-    <M as MapProperties>::Value: Debug,
-    E: Debug,
+    <M as MapProperties>::Key: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         let keys = subject.keys_property().collect::<Vec<_>>();
@@ -125,6 +127,7 @@ where
         expression: &Expression<'_>,
         actual: &M,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let expected_keys = &self.expected_keys;
@@ -142,12 +145,23 @@ where
         let marked_actual = mark_selected_entries_in_map(
             &actual_entries,
             &extra_entries,
+            representation,
             format,
-            mark_unexpected_string,
+            mark_unexpected,
         );
-        let marked_expected =
-            mark_selected_items_in_collection(expected_keys, missing, format, mark_missing);
-        let missing_keys = collect_selected_values(missing, expected_keys);
+        let marked_expected = mark_selected_items_in_collection(
+            expected_keys,
+            missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing_keys = collect_selected_values(missing, expected_keys, representation);
+        let expected_keys = self
+            .expected_keys
+            .iter()
+            .map(|k| Represented::from((k, representation)))
+            .collect::<Vec<_>>();
 
         format!(
             r"expected {expression} to contain the keys {expected_keys:?}
@@ -158,12 +172,11 @@ where
     }
 }
 
-impl<M, E> Expectation<M> for MapDoesNotContainKeys<E>
+impl<M, E, D> Expectation<M, D> for MapDoesNotContainKeys<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: PartialEq<E> + Debug,
-    <M as MapProperties>::Value: Debug,
-    E: Debug,
+    <M as MapProperties>::Key: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         let keys = subject.keys_property().collect::<Vec<_>>();
@@ -181,6 +194,7 @@ where
         expression: &Expression<'_>,
         actual: &M,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let expected_keys = &self.expected_keys;
@@ -193,11 +207,26 @@ where
                 found.insert(actual_index);
             }
         }
-        let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_string);
-        let marked_expected =
-            mark_selected_items_in_collection(expected_keys, extra, format, mark_missing);
-        let extra_keys = collect_selected_values(&found, &actual_keys);
+        let marked_actual = mark_selected_entries_in_map(
+            &actual_entries,
+            &found,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            expected_keys,
+            extra,
+            representation,
+            format,
+            mark_missing,
+        );
+        let extra_keys = collect_selected_values(&found, &actual_keys, representation);
+        let expected_keys = self
+            .expected_keys
+            .iter()
+            .map(|k| Represented::from((k, representation)))
+            .collect::<Vec<_>>();
 
         format!(
             r"expected {expression} to not contain the keys {expected_keys:?}
@@ -208,12 +237,11 @@ where
     }
 }
 
-impl<M, E> Expectation<M> for MapContainsExactlyKeys<E>
+impl<M, E, D> Expectation<M, D> for MapContainsExactlyKeys<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: PartialEq<E> + Debug,
-    <M as MapProperties>::Value: Debug,
-    E: Debug,
+    <M as MapProperties>::Key: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         let actual_keys = subject.keys_property().collect::<Vec<_>>();
@@ -236,6 +264,7 @@ where
         expression: &Expression<'_>,
         actual: &M,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let expected_keys = &self.expected_keys;
@@ -244,12 +273,27 @@ where
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let actual_keys: Vec<_> = actual.keys_property().collect();
 
-        let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, extra, format, mark_unexpected_string);
-        let marked_expected =
-            mark_selected_items_in_collection(expected_keys, missing, format, mark_missing);
-        let missing_keys = collect_selected_values(missing, expected_keys);
-        let extra_keys = collect_selected_values(extra, &actual_keys);
+        let marked_actual = mark_selected_entries_in_map(
+            &actual_entries,
+            extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            expected_keys,
+            missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing_keys = collect_selected_values(missing, expected_keys, representation);
+        let extra_keys = collect_selected_values(extra, &actual_keys, representation);
+        let expected_keys = self
+            .expected_keys
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
             r"expected {expression} to contain exactly the keys {expected_keys:?}
@@ -261,12 +305,11 @@ where
     }
 }
 
-impl<S, E, R> AssertMapContainsValue<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertMapContainsValue<E> for Spec<'_, S, D, R>
 where
     S: MapProperties,
-    <S as MapProperties>::Key: Debug,
-    <S as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
+    <S as MapProperties>::Value: PartialEq<E>,
+    D: Represent<E> + Represent<<S as MapProperties>::Key> + Represent<<S as MapProperties>::Value>,
     R: FailingStrategy,
 {
     fn contains_value(self, expected_value: E) -> Self {
@@ -286,12 +329,11 @@ where
     }
 }
 
-impl<M, E> Expectation<M> for MapContainsValue<E>
+impl<M, E, D> Expectation<M, D> for MapContainsValue<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: Debug,
-    <M as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
+    <M as MapProperties>::Value: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         subject.values_property().any(|v| v == &self.expected_value)
@@ -302,9 +344,9 @@ where
         expression: &Expression<'_>,
         actual: &M,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected_value = &self.expected_value;
         let actual_entries: Vec<_> = actual.entries_property().collect();
         let (not, marked_actual) = if inverted {
             let found: HashSet<usize> = actual_entries
@@ -321,16 +363,18 @@ where
             let selected_entries_marked = mark_selected_entries_in_map(
                 &actual_entries,
                 &found,
+                representation,
                 format,
-                mark_unexpected_string,
+                mark_unexpected,
             );
             ("not ", selected_entries_marked)
         } else {
             let all_entries_marked =
-                mark_all_entries_in_map(&actual_entries, format, mark_unexpected_string);
+                mark_all_entries_in_map(&actual_entries, representation, format, mark_unexpected);
             ("", all_entries_marked)
         };
-        let marked_expected = mark_missing(&self.expected_value, format);
+        let marked_expected = mark_missing(&self.expected_value, representation, format);
+        let expected_value = Represented::from((&self.expected_value, representation));
 
         format!(
             "expected {expression} to {not}contain the value {expected_value:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
@@ -340,12 +384,11 @@ where
 
 impl<E> Invertible for MapContainsValue<E> {}
 
-impl<M, E> Expectation<M> for MapContainsValues<E>
+impl<M, E, D> Expectation<M, D> for MapContainsValues<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: Debug,
-    <M as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
+    <M as MapProperties>::Value: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         let values = subject.values_property().collect::<Vec<_>>();
@@ -363,6 +406,7 @@ where
         expression: &Expression<'_>,
         actual: &M,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let expected_values = &self.expected_values;
@@ -380,12 +424,23 @@ where
         let marked_actual = mark_selected_entries_in_map(
             &actual_entries,
             &extra_entries,
+            representation,
             format,
-            mark_unexpected_string,
+            mark_unexpected,
         );
-        let marked_expected =
-            mark_selected_items_in_collection(expected_values, missing, format, mark_missing);
-        let missing_values = collect_selected_values(missing, expected_values);
+        let marked_expected = mark_selected_items_in_collection(
+            expected_values,
+            missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing_values = collect_selected_values(missing, expected_values, representation);
+        let expected_values = self
+            .expected_values
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
             r"expected {expression} to contain the values {expected_values:?}
@@ -396,12 +451,11 @@ where
     }
 }
 
-impl<M, E> Expectation<M> for MapDoesNotContainValues<E>
+impl<M, E, D> Expectation<M, D> for MapDoesNotContainValues<E>
 where
     M: MapProperties,
-    <M as MapProperties>::Key: Debug,
-    <M as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
+    <M as MapProperties>::Value: PartialEq<E>,
+    D: Represent<E> + Represent<<M as MapProperties>::Key> + Represent<<M as MapProperties>::Value>,
 {
     fn test(&mut self, subject: &M) -> bool {
         let values = subject.values_property().collect::<Vec<_>>();
@@ -419,6 +473,7 @@ where
         expression: &Expression<'_>,
         actual: &M,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let expected_values = &self.expected_values;
@@ -434,11 +489,26 @@ where
                 found.insert(actual_index);
             }
         }
-        let marked_actual =
-            mark_selected_entries_in_map(&actual_entries, &found, format, mark_unexpected_string);
-        let marked_expected =
-            mark_selected_items_in_collection(expected_values, extra, format, mark_missing);
-        let extra_values = collect_selected_values(&found, &actual_values);
+        let marked_actual = mark_selected_entries_in_map(
+            &actual_entries,
+            &found,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            expected_values,
+            extra,
+            representation,
+            format,
+            mark_missing,
+        );
+        let extra_values = collect_selected_values(&found, &actual_values, representation);
+        let expected_values = self
+            .expected_values
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
             r"expected {expression} to not contain the values {expected_values:?}

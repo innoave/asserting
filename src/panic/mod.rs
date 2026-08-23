@@ -1,21 +1,24 @@
 //! Implementation of assertions for code that should or should not panic.
 
 use crate::assertions::AssertCodePanics;
-use crate::colored::{mark_missing_string, mark_unexpected_string};
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
-use crate::spec::{Code, DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Spec};
+use crate::spec::{
+    Code, DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting,
+    Expression, FailingStrategy, Spec,
+};
 use crate::std::any::Any;
 use crate::std::panic;
 
 const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";
 const UNKNOWN_PANIC_MESSAGE: &str = "<unknown panic message>";
 
-impl<'a, S, R> AssertCodePanics for Spec<'a, Code<S>, R>
+impl<'a, S, D, R> AssertCodePanics for Spec<'a, Code<S>, D, R>
 where
     S: FnOnce(),
     R: FailingStrategy,
 {
-    type Mapped = Spec<'a, (), R>;
+    type Mapped = Spec<'a, (), DebugRepresentation, R>;
 
     fn does_not_panic(self) -> Self::Mapped {
         self.expecting(does_not_panic()).mapping(|_| ())
@@ -31,7 +34,7 @@ where
     }
 }
 
-impl<S> Expectation<Code<S>> for DoesNotPanic
+impl<S, D> Expectation<Code<S>, D> for DoesNotPanic
 where
     S: FnOnce(),
 {
@@ -56,6 +59,7 @@ where
         expression: &Expression<'_>,
         _actual: &Code<S>,
         _inverted: bool,
+        _representation: &D,
         format: &DiffFormat,
     ) -> String {
         let panic_message = read_panic_message(self.actual_message.as_ref())
@@ -64,8 +68,9 @@ where
         if panic_message == ONLY_ONE_EXPECTATION {
             format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
         } else {
-            let marked_did_panic = mark_unexpected_string("did panic", format);
-            let marked_panic_message = mark_unexpected_string(&panic_message, format);
+            let marked_did_panic = mark_unexpected("did panic", &DisplayRepresentation, format);
+            let marked_panic_message =
+                mark_unexpected(&panic_message, &DisplayRepresentation, format);
             format!(
                 "expected {expression} to not panic, but {marked_did_panic}\n  with message: \"{marked_panic_message}\""
             )
@@ -73,7 +78,7 @@ where
     }
 }
 
-impl<S> Expectation<Code<S>> for DoesPanic
+impl<S, D> Expectation<Code<S>, D> for DoesPanic
 where
     S: FnOnce(),
 {
@@ -106,14 +111,17 @@ where
         expression: &Expression<'_>,
         _actual: &Code<S>,
         _inverted: bool,
+        _representation: &D,
         format: &DiffFormat,
     ) -> String {
         if let Some(actual_message) = self.actual_message.as_ref() {
             if actual_message == ONLY_ONE_EXPECTATION {
                 format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
             } else if let Some(expected_message) = &self.expected_message {
-                let marked_expected_message = mark_missing_string(expected_message, format);
-                let marked_actual_message = mark_unexpected_string(actual_message, format);
+                let marked_expected_message =
+                    mark_missing(expected_message, &DisplayRepresentation, format);
+                let marked_actual_message =
+                    mark_unexpected(actual_message, &DisplayRepresentation, format);
                 format!(
                     "expected {expression} to panic with message {expected_message:?}\n   but was: \"{marked_actual_message}\"\n  expected: \"{marked_expected_message}\""
                 )
@@ -122,12 +130,14 @@ where
                 format!("expected {expression} to panic, but did not panic")
             }
         } else if let Some(expected_message) = &self.expected_message {
-            let marked_did_not_panic = mark_unexpected_string("did not panic", format);
+            let marked_did_not_panic =
+                mark_unexpected("did not panic", &DisplayRepresentation, format);
             format!(
                 "expected {expression} to panic with message {expected_message:?},\n  but {marked_did_not_panic}"
             )
         } else {
-            let marked_did_not_panic = mark_unexpected_string("did not panic", format);
+            let marked_did_not_panic =
+                mark_unexpected("did not panic", &DisplayRepresentation, format);
             format!("expected {expression} to panic, but {marked_did_not_panic}")
         }
     }

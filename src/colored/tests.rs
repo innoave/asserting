@@ -28,6 +28,7 @@ mod without_colored_feature {
 #[cfg(feature = "colored")]
 mod with_colored_feature {
     use super::*;
+    use crate::spec::DebugRepresentation;
     use hashbrown::HashMap;
 
     #[test]
@@ -72,56 +73,72 @@ mod with_colored_feature {
 
     #[test]
     fn mark_unexpected_highlights_a_string_with_double_quotes() {
-        let marked_string = mark_unexpected("blandit invidunt", &DIFF_FORMAT_RED_YELLOW);
+        let marked_string = mark_unexpected(
+            "blandit invidunt",
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_YELLOW,
+        );
 
         assert_that(marked_string).is_equal_to("\u{1b}[31m\"blandit invidunt\"\u{1b}[0m");
     }
 
     #[test]
     fn mark_missing_highlights_a_string_with_double_quotes() {
-        let marked_string = mark_missing("blandit invidunt", &DIFF_FORMAT_RED_YELLOW);
+        let marked_string = mark_missing(
+            "blandit invidunt",
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_YELLOW,
+        );
 
         assert_that(marked_string).is_equal_to("\u{1b}[33m\"blandit invidunt\"\u{1b}[0m");
     }
 
     #[test]
     fn mark_unexpected_string_highlights_a_string_without_double_quotes() {
-        let marked_string = mark_unexpected_string("blandit invidunt", &DIFF_FORMAT_RED_YELLOW);
+        let marked_string = mark_unexpected_string(
+            "blandit invidunt",
+            &DisplayRepresentation,
+            &DIFF_FORMAT_RED_YELLOW,
+        );
 
         assert_that(marked_string).is_equal_to("\u{1b}[31mblandit invidunt\u{1b}[0m");
     }
 
     #[test]
     fn mark_missing_string_highlights_a_string_without_double_quotes() {
-        let marked_string = mark_missing_string("blandit invidunt", &DIFF_FORMAT_RED_YELLOW);
+        let marked_string = mark_missing_string(
+            "blandit invidunt",
+            &DisplayRepresentation,
+            &DIFF_FORMAT_RED_YELLOW,
+        );
 
         assert_that(marked_string).is_equal_to("\u{1b}[33mblandit invidunt\u{1b}[0m");
     }
 
     #[test]
     fn mark_unexpected_highlights_a_char_with_single_quotes() {
-        let marked_char = mark_unexpected(&'R', &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_unexpected(&'R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[31m'R'\u{1b}[0m");
     }
 
     #[test]
     fn mark_missing_highlights_a_char_with_single_quotes() {
-        let marked_char = mark_missing(&'R', &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_missing(&'R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[32m'R'\u{1b}[0m");
     }
 
     #[test]
     fn mark_unexpected_char_highlights_char_without_single_quotes() {
-        let marked_char = mark_unexpected_char('R', &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_unexpected_char('R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[31mR\u{1b}[0m");
     }
 
     #[test]
     fn mark_missing_char_highlights_char_without_single_quotes() {
-        let marked_char = mark_missing_char('R', &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_missing_char('R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[32mR\u{1b}[0m");
     }
@@ -267,6 +284,7 @@ mod with_colored_feature {
         let marked_collection = mark_selected_items_in_collection(
             collection,
             &selected,
+            &DebugRepresentation,
             &DIFF_FORMAT_RED_GREEN,
             mark_missing,
         );
@@ -278,8 +296,12 @@ mod with_colored_feature {
     fn mark_all_items_in_collection_for_empty_collection() {
         let collection: &[usize] = &[];
 
-        let marked_collection =
-            mark_all_items_in_collection(collection, &DIFF_FORMAT_RED_GREEN, mark_missing);
+        let marked_collection = mark_all_items_in_collection(
+            collection,
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_GREEN,
+            mark_missing,
+        );
 
         assert_that(marked_collection).is_equal_to("[]");
     }
@@ -293,6 +315,7 @@ mod with_colored_feature {
         let marked_map = mark_selected_entries_in_map(
             &map_entries,
             &selected,
+            &DebugRepresentation,
             &DIFF_FORMAT_RED_GREEN,
             mark_missing,
         );
@@ -305,8 +328,12 @@ mod with_colored_feature {
         let map: HashMap<String, usize> = HashMap::new();
         let map_entries: Vec<_> = map.iter().collect();
 
-        let marked_map =
-            mark_all_entries_in_map(&map_entries, &DIFF_FORMAT_RED_GREEN, mark_missing);
+        let marked_map = mark_all_entries_in_map(
+            &map_entries,
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_GREEN,
+            mark_missing,
+        );
 
         assert_that(marked_map).is_equal_to("{}");
     }

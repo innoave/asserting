@@ -1,12 +1,13 @@
 //! Implementation of the predicate assertion.
 
 use crate::expectations::Predicate;
-use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
+use crate::spec::{DiffFormat, Expectation, Expression, Invertible, Represent, Represented};
 use crate::std::{format, string::String};
 
-impl<S, P> Expectation<S> for Predicate<P>
+impl<S, P, D> Expectation<S, D> for Predicate<P>
 where
     P: Fn(&S) -> bool,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         (self.predicate)(subject)
@@ -15,12 +16,14 @@ where
     fn message(
         &self,
         expression: &Expression<'_>,
-        _actual: &S,
+        actual: &S,
         inverted: bool,
+        representation: &D,
         _format: &DiffFormat,
     ) -> String {
+        let represented_actual = Represented::from((actual, representation));
         self.message.clone().unwrap_or_else(|| {
-            format!("expected {expression} to satisfy the given predicate, but returned {inverted}")
+            format!("expected {expression} to satisfy the given predicate, but returned {inverted}\n  actual: {represented_actual}")
         })
     }
 }

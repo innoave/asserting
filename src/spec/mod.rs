@@ -246,7 +246,7 @@ macro_rules! verify_that_code {
 ///     .is_equal_to(42);
 /// ```
 #[track_caller]
-pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
+pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, DebugRepresentation, PanicOnFail> {
     #[cfg(not(feature = "colored"))]
     {
         Spec::new(subject, PanicOnFail)
@@ -313,7 +313,7 @@ pub fn assert_that<'a, S>(subject: S) -> Spec<'a, S, PanicOnFail> {
 /// ]);
 /// ```
 #[track_caller]
-pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
+pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, DebugRepresentation, CollectFailures> {
     Spec::new(subject, CollectFailures)
 }
 
@@ -347,7 +347,7 @@ pub fn verify_that<'a, S>(subject: S) -> Spec<'a, S, CollectFailures> {
 /// ```
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
-pub fn assert_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, PanicOnFail>
+pub fn assert_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, DebugRepresentation, PanicOnFail>
 where
     S: FnOnce(),
 {
@@ -417,7 +417,7 @@ where
 /// ```
 #[cfg(feature = "panic")]
 #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
-pub fn verify_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, CollectFailures>
+pub fn verify_that_code<'a, S>(code: S) -> Spec<'a, Code<S>, DebugRepresentation, CollectFailures>
 where
     S: FnOnce(),
 {
@@ -431,7 +431,7 @@ where
 /// expected property. In case the test of the expectation fails, the
 /// `message()` method is called to form an expectation-specific failure
 /// message.
-pub trait Expectation<S: ?Sized> {
+pub trait Expectation<S: ?Sized, D> {
     /// Verifies whether the actual subject fulfills the expected property.
     fn test(&mut self, subject: &S) -> bool;
 
@@ -441,6 +441,7 @@ pub trait Expectation<S: ?Sized> {
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String;
 }
@@ -664,7 +665,7 @@ impl PartialOrd<OwnedLocation> for Location<'_> {
 ///
 /// In case of the [`CollectFailures`] failing strategy, the [`AssertFailure`]s
 /// are collected in this struct.
-pub struct Spec<'a, S, R> {
+pub struct Spec<'a, S, D, R> {
     subject: S,
     expression: Expression<'a>,
     description: Option<Cow<'a, str>>,
@@ -672,9 +673,10 @@ pub struct Spec<'a, S, R> {
     failures: Vec<AssertFailure>,
     diff_format: DiffFormat,
     failing_strategy: R,
+    representation: D,
 }
 
-impl<S, R> Spec<'_, S, R> {
+impl<S, D, R> Spec<'_, S, D, R> {
     /// Returns the subject.
     pub fn subject(&self) -> &S {
         &self.subject
@@ -699,9 +701,15 @@ impl<S, R> Spec<'_, S, R> {
     pub fn failing_strategy(&self) -> &R {
         &self.failing_strategy
     }
+
+    /// Returns the representation used for displaying values in failure
+    /// reports.
+    pub fn representation(&self) -> &D {
+        &self.representation
+    }
 }
 
-impl<'a, S, R> Spec<'a, S, R> {
+impl<S, R> Spec<'_, S, DebugRepresentation, R> {
     /// Constructs a new `Spec` for the given subject and with the specified
     /// failing strategy.
     ///
@@ -717,9 +725,12 @@ impl<'a, S, R> Spec<'a, S, R> {
             failures: vec![],
             diff_format: colored::DIFF_FORMAT_NO_HIGHLIGHT,
             failing_strategy,
+            representation: DebugRepresentation,
         }
     }
+}
 
+impl<'a, S, D, R> Spec<'a, S, D, R> {
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a spec does nothing unless an assertion method is called"]
     pub fn named(mut self, subject_name: impl Into<Cow<'a, str>>) -> Self {
@@ -793,7 +804,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     #[cfg(feature = "recursive")]
     #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
     #[must_use = "the returned `RecursiveComparison` does nothing unless an assertion method like `is_equal_to` is called"]
-    pub fn using_recursive_comparison(self) -> RecursiveComparison<'a, S, R> {
+    pub fn using_recursive_comparison(self) -> RecursiveComparison<'a, S, D, R> {
         RecursiveComparison::new(self)
     }
 
@@ -870,7 +881,7 @@ impl<'a, S, R> Spec<'a, S, R> {
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> DerivedSpec<'a, Self, U>
+    ) -> DerivedSpec<'a, Self, U, DebugRepresentation>
     where
         F: FnOnce(&S) -> &B,
         B: ToOwned<Owned = U> + ?Sized,
@@ -969,7 +980,7 @@ impl<'a, S, R> Spec<'a, S, R> {
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> Spec<'a, U, R>
+    ) -> Spec<'a, U, DebugRepresentation, R>
     where
         F: FnOnce(S) -> U,
     {
@@ -985,6 +996,7 @@ impl<'a, S, R> Spec<'a, S, R> {
             failures: self.failures,
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
+            representation: DebugRepresentation,
         }
     }
 
@@ -1025,7 +1037,7 @@ impl<'a, S, R> Spec<'a, S, R> {
     /// assertion. So we map the subject of the type `Point` to a tuple of its
     /// fields.
     #[must_use = "a spec does nothing unless an assertion method is called"]
-    pub fn mapping<F, U>(self, map: F) -> Spec<'a, U, R>
+    pub fn mapping<F, U>(self, map: F) -> Spec<'a, U, DebugRepresentation, R>
     where
         F: FnOnce(S) -> U,
     {
@@ -1037,19 +1049,20 @@ impl<'a, S, R> Spec<'a, S, R> {
             failures: self.failures,
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
+            representation: DebugRepresentation,
         }
     }
 }
 
-impl<'a, I, R> AssertElements<'a, I> for Spec<'a, I, R>
+impl<'a, I, D, R> AssertElements<'a, I> for Spec<'a, I, D, R>
 where
     I: IntoIterator,
 {
-    type Output = Spec<'a, (), R>;
+    type Output = Spec<'a, (), DebugRepresentation, R>;
 
     fn each_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures,
     {
         let root_expression = &self.expression;
@@ -1064,6 +1077,7 @@ where
                 failures: vec![],
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
+                representation: DebugRepresentation,
             };
             let failures = assert(element_spec).failures();
             self.failures.extend(failures);
@@ -1081,12 +1095,13 @@ where
             failures: self.failures,
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
+            representation: DebugRepresentation,
         }
     }
 
     fn any_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures,
     {
         let root_expression = &self.expression;
@@ -1102,6 +1117,7 @@ where
                 failures: vec![],
                 diff_format: self.diff_format.clone(),
                 failing_strategy: CollectFailures,
+                representation: DebugRepresentation,
             };
             let failures = assert(element_spec).failures();
             if failures.is_empty() {
@@ -1123,25 +1139,28 @@ where
             failures: self.failures,
             diff_format: self.diff_format,
             failing_strategy: self.failing_strategy,
+            representation: DebugRepresentation,
         }
     }
 }
 
-impl<'a, I, R> Spec<'a, I, R>
+impl<'a, I, D, R> Spec<'a, I, D, R>
 where
     I: IntoIterator,
+    D: Clone,
 {
     pub(crate) fn extracting_ref_iter<F, U>(
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> DerivedSpec<'a, Spec<'a, Vec<<I as IntoIterator>::Item>, R>, Vec<U>>
+    ) -> DerivedSpec<'a, Spec<'a, Vec<<I as IntoIterator>::Item>, D, R>, Vec<U>, DebugRepresentation>
     where
         for<'b> F: Fn(slice::Iter<'b, <I as IntoIterator>::Item>) -> Vec<U>,
     {
         let property_name = Expression(property_name.into());
         let diff_format = self.diff_format.clone();
-        let orig_spec = self.mapping(Vec::from_iter);
+        let representation = self.representation().clone();
+        let orig_spec = self.mapping(Vec::from_iter).represented_by(representation);
         let new_subject = extract(orig_spec.subject.iter());
         DerivedSpec::new(orig_spec, new_subject, property_name, diff_format)
     }
@@ -1161,7 +1180,7 @@ pub trait DoFail {
     fn do_fail_with_message(&mut self, message: impl Into<String>);
 }
 
-impl<S, R> DoFail for Spec<'_, S, R>
+impl<S, D, R> DoFail for Spec<'_, S, D, R>
 where
     R: FailingStrategy,
 {
@@ -1248,7 +1267,7 @@ pub trait SoftPanic {
     fn soft_panic(&self);
 }
 
-impl<S> SoftPanic for Spec<'_, S, CollectFailures> {
+impl<S, D> SoftPanic for Spec<'_, S, D, CollectFailures> {
     fn soft_panic(&self) {
         if !self.failures.is_empty() {
             PanicOnFail.do_fail_with(&self.failures);
@@ -1347,7 +1366,7 @@ pub trait And {
     fn and(self) -> Self::Output;
 }
 
-impl<S, R> And for Spec<'_, S, R> {
+impl<S, D, R> And for Spec<'_, S, D, R> {
     type Output = Self;
 
     fn and(self) -> Self::Output {
@@ -1442,8 +1461,9 @@ pub trait Satisfies<S> {
         P: Fn(&S) -> bool;
 }
 
-impl<S, R> Satisfies<S> for Spec<'_, S, R>
+impl<S, D, R> Satisfies<S> for Spec<'_, S, D, R>
 where
+    D: Represent<S>,
     R: FailingStrategy,
 {
     fn satisfies<P>(self, predicate: P) -> Self
@@ -1463,7 +1483,7 @@ where
 
 /// Verify whether a subject meets the given expectation (impl of
 /// [`Expectation`]) and record a failure if it is not met.
-pub trait Expecting<S> {
+pub trait Expecting<S, D> {
     /// Asserts the given expectation.
     ///
     /// In case the expectation is not meet, the assertion fails, according to
@@ -1485,17 +1505,22 @@ pub trait Expecting<S> {
     /// ```
     #[allow(clippy::needless_pass_by_value, clippy::return_self_not_must_use)]
     #[track_caller]
-    fn expecting(self, expectation: impl Expectation<S>) -> Self;
+    fn expecting(self, expectation: impl Expectation<S, D>) -> Self;
 }
 
-impl<S, R> Expecting<S> for Spec<'_, S, R>
+impl<S, D, R> Expecting<S, D> for Spec<'_, S, D, R>
 where
     R: FailingStrategy,
 {
-    fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
+    fn expecting(mut self, mut expectation: impl Expectation<S, D>) -> Self {
         if !expectation.test(&self.subject) {
-            let message =
-                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
+            let message = expectation.message(
+                &self.expression,
+                &self.subject,
+                false,
+                &self.representation,
+                &self.diff_format,
+            );
             self.do_fail_with_message(message);
         }
         self
@@ -1508,7 +1533,7 @@ pub trait GetLocation<'a> {
     fn location(&self) -> Option<Location<'a>>;
 }
 
-impl<'a, S, R> GetLocation<'a> for Spec<'a, S, R> {
+impl<'a, S, D, R> GetLocation<'a> for Spec<'a, S, D, R> {
     fn location(&self) -> Option<Location<'a>> {
         self.location
     }
@@ -1526,7 +1551,7 @@ pub trait GetFailures {
     fn display_failures(&self) -> Vec<String>;
 }
 
-impl<S, R> GetFailures for Spec<'_, S, R> {
+impl<S, D, R> GetFailures for Spec<'_, S, D, R> {
     fn has_failures(&self) -> bool {
         !self.failures.is_empty()
     }
@@ -1729,6 +1754,126 @@ mod code {
         pub fn take(&self) -> Option<F> {
             self.0.borrow_mut().take()
         }
+    }
+}
+
+pub trait RepresentedBy<P> {
+    type Output;
+
+    fn represented_by(self, representation: P) -> Self::Output;
+}
+
+impl<'a, S, D, R, D2> RepresentedBy<D2> for Spec<'a, S, D, R> {
+    type Output = Spec<'a, S, D2, R>;
+
+    fn represented_by(self, representation: D2) -> Self::Output {
+        Spec {
+            subject: self.subject,
+            expression: self.expression,
+            description: self.description,
+            location: self.location,
+            failures: self.failures,
+            diff_format: self.diff_format,
+            failing_strategy: self.failing_strategy,
+            representation,
+        }
+    }
+}
+
+pub trait RepresentedAs {
+    type Subject;
+    type Output;
+
+    fn represented_as<F>(self, representation: F) -> Self::Output
+    where
+        F: Fn(&Self::Subject, &mut fmt::Formatter<'_>) -> fmt::Result + 'static;
+}
+
+impl<'a, S, D, R> RepresentedAs for Spec<'a, S, D, R> {
+    type Subject = S;
+    type Output = Spec<'a, S, AdHocRepresentation<S>, R>;
+
+    fn represented_as<F>(self, representation: F) -> Self::Output
+    where
+        F: Fn(&S, &mut fmt::Formatter<'_>) -> fmt::Result + 'static,
+    {
+        self.represented_by(AdHocRepresentation(Box::new(representation)))
+    }
+}
+
+pub trait Represent<T: ?Sized> {
+    fn represent(&self, value: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+}
+
+pub struct Represented<'t, 'd, T: ?Sized, D> {
+    pub value: &'t T,
+    pub representation: &'d D,
+}
+
+impl<T: ?Sized, D> Clone for Represented<'_, '_, T, D> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<T: ?Sized, D> Copy for Represented<'_, '_, T, D> {}
+
+impl<'t, 'd, T: ?Sized, D> From<(&'t T, &'d D)> for Represented<'t, 'd, T, D> {
+    fn from((value, representation): (&'t T, &'d D)) -> Self {
+        Represented {
+            value,
+            representation,
+        }
+    }
+}
+
+impl<T: ?Sized, D> Debug for Represented<'_, '_, T, D>
+where
+    D: Represent<T>,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.representation.represent(self.value, f)
+    }
+}
+
+impl<T: ?Sized, D> Display for Represented<'_, '_, T, D>
+where
+    D: Represent<T>,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.representation.represent(self.value, f)
+    }
+}
+
+pub struct AdHocRepresentation<T>(pub Box<dyn Fn(&T, &mut fmt::Formatter<'_>) -> fmt::Result>);
+
+impl<T> Represent<T> for AdHocRepresentation<T> {
+    fn represent(&self, value: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0(value, f)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DebugRepresentation;
+
+impl<T> Represent<T> for DebugRepresentation
+where
+    T: ?Sized + Debug,
+{
+    fn represent(&self, value: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Debug::fmt(value, f)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DisplayRepresentation;
+
+impl<T> Represent<T> for DisplayRepresentation
+where
+    T: ?Sized + Display,
+{
+    fn represent(&self, value: &T, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Display::fmt(value, f)
     }
 }
 

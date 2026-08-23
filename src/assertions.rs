@@ -10,8 +10,7 @@
 //! assertions.
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
-use crate::spec::{CollectFailures, GetFailures, Spec};
-use crate::std::fmt::Debug;
+use crate::spec::{CollectFailures, DebugRepresentation, GetFailures, Represent, Spec};
 use crate::std::ops::RangeBounds;
 use crate::std::string::String;
 
@@ -572,7 +571,7 @@ pub trait AssertOrder<E> {
 /// assert_that!('r').is_in_range('H'..);
 /// assert_that!('N').is_in_range(..'n');
 /// ```
-pub trait AssertInRange<E> {
+pub trait AssertInRange<E, D> {
     /// Verifies that the subject is within the expected range.
     ///
     /// # Examples
@@ -596,7 +595,8 @@ pub trait AssertInRange<E> {
     #[track_caller]
     fn is_in_range<R>(self, range: R) -> Self
     where
-        R: RangeBounds<E> + Debug;
+        R: RangeBounds<E>,
+        D: Represent<R>;
 
     /// Verifies that the subject is not within the expected range.
     ///
@@ -617,7 +617,8 @@ pub trait AssertInRange<E> {
     #[track_caller]
     fn is_not_in_range<R>(self, range: R) -> Self
     where
-        R: RangeBounds<E> + Debug;
+        R: RangeBounds<E>,
+        D: Represent<R>;
 }
 
 /// Assert whether a numeric value is negative or positive.
@@ -1364,7 +1365,7 @@ pub trait AssertEmptiness {
 /// assert_that!(&some_map).has_length(4);
 /// # }
 /// ```
-pub trait AssertHasLength<E> {
+pub trait AssertHasLength<E, D> {
     /// Verifies that the subject has the expected length.
     ///
     /// # Examples
@@ -1475,7 +1476,8 @@ pub trait AssertHasLength<E> {
     #[track_caller]
     fn has_length_in_range<U>(self, expected_range: U) -> Self
     where
-        U: RangeBounds<usize> + Debug;
+        U: RangeBounds<usize>,
+        D: Represent<U>;
 
     /// Verifies that the subject has a length that is less than the expected
     /// length.
@@ -1708,7 +1710,7 @@ pub trait AssertHasLength<E> {
 /// assert_that!(subject).has_at_least_char_count(20);
 /// assert_that!(subject).has_at_least_char_count(25);
 /// ```
-pub trait AssertHasCharCount<E> {
+pub trait AssertHasCharCount<E, D> {
     /// Verifies that the subject contains the expected number of characters.
     ///
     /// # Examples
@@ -1744,7 +1746,8 @@ pub trait AssertHasCharCount<E> {
     #[track_caller]
     fn has_char_count_in_range<U>(self, range: U) -> Self
     where
-        U: RangeBounds<usize> + Debug;
+        U: RangeBounds<usize>,
+        D: Represent<U>;
 
     /// Verifies that the subject contains less than the expected number of
     /// characters.
@@ -3934,7 +3937,7 @@ where
     #[track_caller]
     fn each_element<A, B>(self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures;
 
     /// Iterates over the elements of a collection or an iterator and executes
@@ -3982,7 +3985,7 @@ where
     #[track_caller]
     fn any_element<A, B>(self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures;
 }
 

@@ -338,14 +338,14 @@ use serde_core::Serialize;
 ///
 /// See the [module documentation](crate::recursive_comparison) for details
 /// about field-by-field recursive comparison.
-pub struct RecursiveComparison<'a, S, R> {
-    spec: Spec<'a, S, R>,
+pub struct RecursiveComparison<'a, S, D, R> {
+    spec: Spec<'a, S, D, R>,
     compared_fields: Vec<Path<'a>>,
     ignored_fields: Vec<Path<'a>>,
     ignore_not_expected_fields: bool,
 }
 
-impl<S, R> GetFailures for RecursiveComparison<'_, S, R> {
+impl<S, D, R> GetFailures for RecursiveComparison<'_, S, D, R> {
     fn has_failures(&self) -> bool {
         self.spec.has_failures()
     }
@@ -359,7 +359,7 @@ impl<S, R> GetFailures for RecursiveComparison<'_, S, R> {
     }
 }
 
-impl<S, R> DoFail for RecursiveComparison<'_, S, R>
+impl<S, D, R> DoFail for RecursiveComparison<'_, S, D, R>
 where
     R: FailingStrategy,
 {
@@ -372,14 +372,14 @@ where
     }
 }
 
-impl<S> SoftPanic for RecursiveComparison<'_, S, CollectFailures> {
+impl<S, D> SoftPanic for RecursiveComparison<'_, S, D, CollectFailures> {
     fn soft_panic(&self) {
         self.spec.soft_panic();
     }
 }
 
-impl<'a, S, R> RecursiveComparison<'a, S, R> {
-    pub(crate) fn new(spec: Spec<'a, S, R>) -> Self {
+impl<'a, S, D, R> RecursiveComparison<'a, S, D, R> {
+    pub(crate) fn new(spec: Spec<'a, S, D, R>) -> Self {
         Self {
             spec,
             compared_fields: vec![],
@@ -623,7 +623,7 @@ fn display_compare_details(compared: &ComparisonResult<'_>, diff_format: &DiffFo
     display_details
 }
 
-impl<S, E, R> AssertEquality<E> for RecursiveComparison<'_, S, R>
+impl<S, E, D, R> AssertEquality<E> for RecursiveComparison<'_, S, D, R>
 where
     S: Serialize,
     E: Serialize,
@@ -674,7 +674,7 @@ where
     }
 }
 
-impl<S, R> AssertEquivalence<Value> for RecursiveComparison<'_, S, R>
+impl<S, D, R> AssertEquivalence<Value> for RecursiveComparison<'_, S, D, R>
 where
     S: Serialize,
     R: FailingStrategy,

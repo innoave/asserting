@@ -1,9 +1,9 @@
 use crate::expectations::{
-    IsBetween, IsEmpty, IsGreaterThan, IsLessThan, IsNegative, IsOne, IsPositive, IsZero,
+    IsBetween, IsEmpty, IsGreaterThan, IsLessThan, IsNegative, IsOne, IsPositive, IsZero, Rec,
     StringContains, StringContainsAnyOf, all, any, not, rec,
 };
 use crate::prelude::*;
-use crate::spec::{Expectation, Expression};
+use crate::spec::{DebugRepresentation, Expectation, Expression};
 
 #[test]
 fn newly_created_rec_combinator_is_neither_success_nor_failure() {
@@ -17,7 +17,7 @@ fn newly_created_rec_combinator_is_neither_success_nor_failure() {
 fn rec_combinator_is_success_after_test_method_has_been_called() {
     let mut rec = rec(IsZero);
 
-    rec.test(&0);
+    <Rec<IsZero> as Expectation<i32, DebugRepresentation>>::test(&mut rec, &0);
 
     assert_that(rec.is_success()).is_true();
     assert_that(rec.is_failure()).is_false();
@@ -27,7 +27,7 @@ fn rec_combinator_is_success_after_test_method_has_been_called() {
 fn rec_combinator_is_failure_after_test_method_has_been_called() {
     let mut rec = rec(IsNegative);
 
-    rec.test(&1);
+    <Rec<IsNegative> as Expectation<i32, DebugRepresentation>>::test(&mut rec, &1);
 
     assert_that(rec.is_failure()).is_true();
     assert_that(rec.is_success()).is_false();
@@ -37,11 +37,12 @@ fn rec_combinator_is_failure_after_test_method_has_been_called() {
 fn rec_combinator_returns_empty_message_if_test_is_successful() {
     let mut rec = rec(IsGreaterThan { expected: 10 });
 
-    rec.test(&12);
+    <Rec<IsGreaterThan<i32>> as Expectation<i32, DebugRepresentation>>::test(&mut rec, &12);
     let message = rec.message(
         &Expression::from("foo"),
         &12,
         false,
+        &DebugRepresentation,
         &DIFF_FORMAT_NO_HIGHLIGHT,
     );
 
@@ -52,11 +53,12 @@ fn rec_combinator_returns_empty_message_if_test_is_successful() {
 fn rec_combinator_returns_failure_message_if_test_is_failure() {
     let mut rec = rec(IsOne);
 
-    rec.test(&12);
+    <Rec<IsOne> as Expectation<i32, DebugRepresentation>>::test(&mut rec, &12);
     let message = rec.message(
         &Expression::from("foo"),
         &12,
         false,
+        &DebugRepresentation,
         &DIFF_FORMAT_NO_HIGHLIGHT,
     );
 
