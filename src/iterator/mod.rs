@@ -1405,5 +1405,23 @@ pub fn collect_selected_values<'t, 'd, T, D>(
         .collect()
 }
 
+pub fn collect_selected_ref_values<'t, 'd, T, D>(
+    indices: &HashSet<usize>,
+    collection: &[&'t T],
+    representation: &'d D,
+) -> Vec<Represented<'t, 'd, T, D>> {
+    collection
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, value)| {
+            if indices.contains(&idx) {
+                Some(Represented::from((*value, representation)))
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests;

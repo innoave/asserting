@@ -112,7 +112,7 @@ where
         let marked_actual = mark_unexpected(actual, representation, format);
         let marked_expected = mark_missing(&expected, &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {not}lowercase\n   but was: {marked_actual}\n  expected: '{marked_expected}'"
         )
     }
 }
@@ -170,7 +170,7 @@ where
         let marked_actual = mark_unexpected(actual, representation, format);
         let marked_expected = mark_missing(&expected, &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be {not}uppercase\n   but was: {marked_actual}\n  expected: '{marked_expected}'"
         )
     }
 }

@@ -1151,14 +1151,14 @@ fn verify_string_ends_with_string_fails() {
 
     let failures = verify_that(subject)
         .named("my_thing")
-        .ends_with("abrupt end".to_string())
+        .ends_with("erit abrupt end".to_string())
         .display_failures();
 
     assert_eq!(
         failures,
-        &[r#"expected my_thing to end with "abrupt end"
+        &[r#"expected my_thing to end with "erit abrupt end"
    but was: "possim deserunt obcaecat hendrerit"
-  expected: "abrupt end"
+  expected: "erit abrupt end"
 "#]
     );
 }

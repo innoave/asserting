@@ -9,7 +9,7 @@ use crate::expectations::{
 };
 use crate::spec::{
     DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression,
-    FailingStrategy, Invertible, Represent, Represented, RepresentedBy, Spec, Unknown,
+    FailingStrategy, Invertible, Represent, Represented, RepresentedBy, Spec,
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::{
@@ -166,7 +166,7 @@ where
     fn has_error_message(self, expected: X) -> Self::ErrorMessage {
         let subject = match self.subject() {
             Ok(value) => Ok(format!(
-                "Ok({:?})",
+                "Ok({})",
                 Represented::from((value, self.representation()))
             )),
             Err(error) => Err(error.to_string()),
@@ -225,22 +225,21 @@ where
         representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected = Ok::<_, Unknown>(Unknown);
         let marked_actual = match actual {
             Ok(value) => mark_unexpected(
-                &format!("Ok({:?})", Represented::from((value, representation))),
+                &format!("Ok({})", Represented::from((value, representation))),
                 &DisplayRepresentation,
                 format,
             ),
             Err(error) => mark_unexpected(
-                &format!("Err({:?})", Represented::from((error, representation))),
+                &format!("Err({})", Represented::from((error, representation))),
                 &DisplayRepresentation,
                 format,
             ),
         };
-        let marked_expected = mark_missing(&expected, &DebugRepresentation, format);
+        let marked_expected = mark_missing(&"Ok(_)", &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be Ok(_)\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -261,22 +260,21 @@ where
         representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected = Err::<Unknown, Unknown>(Unknown);
         let marked_actual = match actual {
             Ok(value) => mark_unexpected(
-                &format!("Ok({:?})", Represented::from((value, representation))),
+                &format!("Ok({})", Represented::from((value, representation))),
                 &DisplayRepresentation,
                 format,
             ),
             Err(error) => mark_unexpected(
-                &format!("Err({:?})", Represented::from((error, representation))),
+                &format!("Err({})", Represented::from((error, representation))),
                 &DisplayRepresentation,
                 format,
             ),
         };
-        let marked_expected = mark_missing(&expected, &DebugRepresentation, format);
+        let marked_expected = mark_missing(&"Err(_)", &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be Err(_)\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
@@ -356,12 +354,12 @@ where
         let expected = &self.expected;
         let marked_actual = match actual {
             Ok(value) => mark_unexpected(
-                &format!("{:?}", Represented::from((value, representation))),
+                &format!("Ok({:?})", Represented::from((value, representation))),
                 &DisplayRepresentation,
                 format,
             ),
             Err(error) => mark_unexpected(
-                &format!("{:?}", Represented::from((error, representation))),
+                &format!("Err({:?})", Represented::from((error, representation))),
                 &DisplayRepresentation,
                 format,
             ),
@@ -427,12 +425,12 @@ where
         let expected = &self.expected;
         let marked_actual = match actual {
             Ok(value) => mark_unexpected(
-                &format!("{:?}", Represented::from((value, representation))),
+                &format!("Ok({:?})", Represented::from((value, representation))),
                 &DisplayRepresentation,
                 format,
             ),
             Err(error) => mark_unexpected(
-                &format!("{:?}", Represented::from((error, representation))),
+                &format!("Err({:?})", Represented::from((error, representation))),
                 &DisplayRepresentation,
                 format,
             ),

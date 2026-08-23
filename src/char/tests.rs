@@ -13,8 +13,8 @@ fn verify_char_is_lowercase_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be lowercase
-   but was: M
-  expected: m
+   but was: 'M'
+  expected: 'm'
 "]
     );
 }
@@ -31,8 +31,8 @@ fn verify_borrowed_char_is_lowercase_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be lowercase
-   but was: M
-  expected: m
+   but was: 'M'
+  expected: 'm'
 "]
     );
 }
@@ -49,8 +49,8 @@ fn verify_char_is_uppercase_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be uppercase
-   but was: k
-  expected: K
+   but was: 'k'
+  expected: 'K'
 "]
     );
 }
@@ -67,8 +67,8 @@ fn verify_borrowed_char_is_uppercase_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be uppercase
-   but was: x
-  expected: X
+   but was: 'x'
+  expected: 'X'
 "]
     );
 }
@@ -85,7 +85,7 @@ fn verify_char_is_ascii_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an ASCII character
-   but was: €
+   but was: '€'
   expected: an ASCII character
 "]
     );
@@ -103,7 +103,7 @@ fn verify_borrowed_char_is_ascii_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an ASCII character
-   but was: ❤
+   but was: '❤'
   expected: an ASCII character
 "]
     );
@@ -121,7 +121,7 @@ fn verify_char_is_alphabetic_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an alphabetic character
-   but was: 1
+   but was: '1'
   expected: an alphabetic character
 "]
     );
@@ -139,7 +139,7 @@ fn verify_borrowed_char_is_alphabetic_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an alphabetic character
-   but was: @
+   but was: '@'
   expected: an alphabetic character
 "]
     );
@@ -158,7 +158,7 @@ fn verify_char_is_alphanumeric_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an alphanumeric character
-   but was: @
+   but was: '@'
   expected: an alphanumeric character
 "]
     );
@@ -177,7 +177,7 @@ fn verify_borrowed_char_is_alphanumeric_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be an alphanumeric character
-   but was: +
+   but was: '+'
   expected: an alphanumeric character
 "]
     );
@@ -195,7 +195,7 @@ fn verify_char_is_control_char_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a control character
-   but was: [
+   but was: '['
   expected: a control character
 "]
     );
@@ -213,7 +213,7 @@ fn verify_borrowed_char_is_control_char_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a control character
-   but was: @
+   but was: '@'
   expected: a control character
 "]
     );
@@ -231,7 +231,7 @@ fn verify_char_is_digit_in_radix_10_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 10
-   but was: A
+   but was: 'A'
   expected: a digit in the radix 10
 "]
     );
@@ -249,7 +249,7 @@ fn verify_borrowed_char_is_digit_in_radix_10_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 10
-   but was: F
+   but was: 'F'
   expected: a digit in the radix 10
 "]
     );
@@ -267,7 +267,7 @@ fn verify_char_is_digit_in_radix_16_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 16
-   but was: G
+   but was: 'G'
   expected: a digit in the radix 16
 "]
     );
@@ -285,7 +285,7 @@ fn verify_borrowed_char_is_digit_in_radix_16_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 16
-   but was: g
+   but was: 'g'
   expected: a digit in the radix 16
 "]
     );
@@ -303,7 +303,7 @@ fn verify_char_is_digit_in_radix_7_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 7
-   but was: 7
+   but was: '7'
   expected: a digit in the radix 7
 "]
     );
@@ -321,7 +321,7 @@ fn verify_borrowed_char_is_digit_in_radix_7_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be a digit in the radix 7
-   but was: 9
+   but was: '9'
   expected: a digit in the radix 7
 "]
     );
@@ -339,7 +339,7 @@ fn verify_char_is_whitespace_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be whitespace
-   but was: _
+   but was: '_'
   expected: whitespace
 "]
     );
@@ -357,7 +357,7 @@ fn verify_borrowed_char_is_whitespace_fails() {
     assert_eq!(
         failures,
         &[r"expected subject to be whitespace
-   but was: =
+   but was: '='
   expected: whitespace
 "]
     );

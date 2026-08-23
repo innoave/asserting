@@ -62,7 +62,7 @@ trait AssertSnake {
 // we implement the `AssertSnake` trait for a generic `S: Borrow<Snake>` so that
 // the assertion method `has_body` can be called on owned and borrowed `Snake`
 // instances.
-impl<S, R> AssertSnake for Spec<'_, S, R>
+impl<S, D, R> AssertSnake for Spec<'_, S, D, R>
 where
     S: Borrow<Snake>,
     R: FailingStrategy,

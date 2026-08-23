@@ -95,7 +95,7 @@ mod with_colored_feature {
 
     #[test]
     fn mark_unexpected_string_highlights_a_string_without_double_quotes() {
-        let marked_string = mark_unexpected_string(
+        let marked_string = mark_unexpected(
             "blandit invidunt",
             &DisplayRepresentation,
             &DIFF_FORMAT_RED_YELLOW,
@@ -106,7 +106,7 @@ mod with_colored_feature {
 
     #[test]
     fn mark_missing_string_highlights_a_string_without_double_quotes() {
-        let marked_string = mark_missing_string(
+        let marked_string = mark_missing(
             "blandit invidunt",
             &DisplayRepresentation,
             &DIFF_FORMAT_RED_YELLOW,
@@ -131,14 +131,14 @@ mod with_colored_feature {
 
     #[test]
     fn mark_unexpected_char_highlights_char_without_single_quotes() {
-        let marked_char = mark_unexpected_char('R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_unexpected(&'R', &DisplayRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[31mR\u{1b}[0m");
     }
 
     #[test]
     fn mark_missing_char_highlights_char_without_single_quotes() {
-        let marked_char = mark_missing_char('R', &DebugRepresentation, &DIFF_FORMAT_RED_GREEN);
+        let marked_char = mark_missing(&'R', &DisplayRepresentation, &DIFF_FORMAT_RED_GREEN);
 
         assert_that(marked_char).is_equal_to("\u{1b}[32mR\u{1b}[0m");
     }
@@ -324,6 +324,26 @@ mod with_colored_feature {
     }
 
     #[test]
+    fn mark_selected_entries_in_map_with_entries() {
+        let key1 = 1;
+        let val1 = "one";
+        let key2 = 2;
+        let val2 = "two";
+        let map_entries = [(&key1, &val1), (&key2, &val2)];
+        let selected: HashSet<usize> = [0].into();
+
+        let marked_map = mark_selected_entries_in_map(
+            &map_entries,
+            &selected,
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_BLUE,
+            mark_missing,
+        );
+
+        assert_that(marked_map).is_equal_to("{\u{1b}[34m1: \"one\"\u{1b}[0m, 2: \"two\"}");
+    }
+
+    #[test]
     fn mark_all_entries_in_map_for_empty_map() {
         let map: HashMap<String, usize> = HashMap::new();
         let map_entries: Vec<_> = map.iter().collect();
@@ -336,6 +356,25 @@ mod with_colored_feature {
         );
 
         assert_that(marked_map).is_equal_to("{}");
+    }
+
+    #[test]
+    fn mark_all_entries_in_map_with_entries() {
+        let key1 = 1;
+        let val1 = "one";
+        let key2 = 2;
+        let val2 = "two";
+        let map_entries = [(&key1, &val1), (&key2, &val2)];
+
+        let marked_map = mark_all_entries_in_map(
+            &map_entries,
+            &DebugRepresentation,
+            &DIFF_FORMAT_RED_BLUE,
+            mark_unexpected,
+        );
+
+        assert_that(marked_map)
+            .is_equal_to("{\u{1b}[31m1: \"one\"\u{1b}[0m, \u{1b}[31m2: \"two\"\u{1b}[0m}");
     }
 }
 

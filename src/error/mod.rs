@@ -99,7 +99,7 @@ where
             marked_actual.push_str(" - which has no source");
             let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
             format!(
-                "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+                "expected {expression} to have a source message {not}equal to \"{expected}\"\n   but was: {marked_actual}\n  expected: {not}\"{marked_expected}\""
             )
         }
     }

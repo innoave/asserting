@@ -630,7 +630,7 @@
 //! an expectation that verifies that a value of type `Either` is a left value.
 //!
 //! ```no_run
-//! use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
+//! use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
 //! use std::fmt::Debug;
 //!
 //! #[derive(Debug)]
@@ -641,10 +641,9 @@
 //!
 //! struct IsLeft;
 //!
-//! impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! impl<L, R, D> Expectation<Either<L, R>, D> for IsLeft
 //! where
-//!     L: Debug,
-//!     R: Debug,
+//!     D: Represent<L> + Represent<R>,
 //! {
 //!     fn test(&mut self, subject: &Either<L, R>) -> bool {
 //!         match subject {
@@ -653,9 +652,20 @@
 //!         }
 //!     }
 //!
-//!     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
+//!     fn message(
+//!         &self,
+//!         expression: &Expression<'_>,
+//!         actual: &Either<L, R>,
+//!         _inverted: bool,
+//!         representation: &D,
+//!         _format: &DiffFormat
+//! ) -> String {
+//!         let represented_actual = match actual {
+//!             Either::Left(left) => format!("Left({:?})", Represented::from((left, representation))),
+//!             Either::Right(right) => format!("Right({:?})", Represented::from((right, representation))),
+//!         };
 //!         format!(
-//!             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//!             "expected {expression} is {:?}\n   but was: {represented_actual:?}\n  expected: {:?}",
 //!             Either::Left::<_, Unknown>(Unknown),
 //!             Either::Left::<_, Unknown>(Unknown),
 //!         )
@@ -667,7 +677,7 @@
 //! method:
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
 //! # use std::fmt::Debug;
 //! #
 //! # #[derive(Debug)]
@@ -678,10 +688,9 @@
 //! #
 //! # struct IsLeft;
 //! #
-//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # impl<L, R, D> Expectation<Either<L, R>, D> for IsLeft
 //! # where
-//! #     L: Debug,
-//! #     R: Debug,
+//! #     D: Represent<L> + Represent<R>,
 //! # {
 //! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
 //! #         match subject {
@@ -690,9 +699,20 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
+//! #     fn message(
+//! #         &self,
+//! #         expression: &Expression<'_>,
+//! #         actual: &Either<L, R>,
+//! #         _inverted: bool,
+//! #         representation: &D,
+//! #         _format: &DiffFormat
+//! #     ) -> String {
+//! #         let represented_actual = match actual {
+//! #             Either::Left(left) => format!("Left({:?})", Represented::from((left, representation))),
+//! #             Either::Right(right) => format!("Right({:?})", Represented::from((right, representation))),
+//! #         };
 //! #         format!(
-//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             "expected {expression} is {:?}\n   but was: {represented_actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #         )
@@ -715,7 +735,7 @@
 //! trait.
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
 //! #
 //! # #[derive(Debug)]
 //! # enum Either<L, R> {
@@ -725,10 +745,9 @@
 //! #
 //! # struct IsLeft;
 //! #
-//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # impl<L, R, D> Expectation<Either<L, R>, D> for IsLeft
 //! # where
-//! #     L: Debug,
-//! #     R: Debug,
+//! #     D: Represent<L> + Represent<R>,
 //! # {
 //! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
 //! #         match subject {
@@ -737,25 +756,34 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
+//! #     fn message(
+//! #         &self,
+//! #         expression: &Expression<'_>,
+//! #         actual: &Either<L, R>,
+//! #         _inverted: bool,
+//! #         representation: &D,
+//! #         _format: &DiffFormat
+//! #     ) -> String {
+//! #         let represented_actual = match actual {
+//! #             Either::Left(left) => format!("Left({:?})", Represented::from((left, representation))),
+//! #             Either::Right(right) => format!("Right({:?})", Represented::from((right, representation))),
+//! #         };
 //! #         format!(
-//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             "expected {expression} is {:?}\n   but was: {represented_actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #         )
 //! #      }
 //! # }
 //! use asserting::spec::{Expecting, FailingStrategy, Spec};
-//! use std::fmt::Debug;
 //!
 //! pub trait AssertEither {
 //!     fn is_left(self) -> Self;
 //! }
 //!
-//! impl<L, R, Q> AssertEither for Spec<'_, Either<L, R>, Q>
+//! impl<L, R, D, Q> AssertEither for Spec<'_, Either<L, R>, D, Q>
 //! where
-//!     L: Debug,
-//!     R: Debug,
+//!     D: Represent<L> + Represent<R>,
 //!     Q: FailingStrategy,
 //! {
 //!     fn is_left(self) -> Self {
@@ -768,8 +796,7 @@
 //! subject of type `Either` is a left value.
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
-//! # use std::fmt::Debug;
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
 //! #
 //! # #[derive(Debug)]
 //! # enum Either<L, R> {
@@ -779,10 +806,9 @@
 //! #
 //! # struct IsLeft;
 //! #
-//! # impl<L, R> Expectation<Either<L, R>> for IsLeft
+//! # impl<L, R, D> Expectation<Either<L, R>, D> for IsLeft
 //! # where
-//! #     L: Debug,
-//! #     R: Debug,
+//! #     D: Represent<L> + Represent<R>,
 //! # {
 //! #     fn test(&mut self, subject: &Either<L, R>) -> bool {
 //! #         match subject {
@@ -791,9 +817,20 @@
 //! #         }
 //! #     }
 //! #
-//! #     fn message(&self, expression: &Expression<'_>, actual: &Either<L, R>, _inverted: bool, _format: &DiffFormat) -> String {
+//! #     fn message(
+//! #         &self,
+//! #         expression: &Expression<'_>,
+//! #         actual: &Either<L, R>,
+//! #         _inverted: bool,
+//! #         representation: &D,
+//! #         _format: &DiffFormat
+//! #     ) -> String {
+//! #         let represented_actual = match actual {
+//! #             Either::Left(left) => format!("Left({:?})", Represented::from((left, representation))),
+//! #             Either::Right(right) => format!("Right({:?})", Represented::from((right, representation))),
+//! #         };
 //! #         format!(
-//! #             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+//! #             "expected {expression} is {:?}\n   but was: {represented_actual:?}\n  expected: {:?}",
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #             Either::Left::<_, Unknown>(Unknown),
 //! #         )
@@ -805,10 +842,9 @@
 //! #     fn is_left(self) -> Self;
 //! # }
 //! #
-//! # impl<L, R, Q> AssertEither for Spec<'_, Either<L, R>, Q>
+//! # impl<L, R, D, Q> AssertEither for Spec<'_, Either<L, R>, D, Q>
 //! # where
-//! #     L: Debug,
-//! #     R: Debug,
+//! #     D: Represent<L> + Represent<R>,
 //! #     Q: FailingStrategy,
 //! # {
 //! #     fn is_left(self) -> Self {
@@ -847,7 +883,7 @@
 //!
 //! // we implement the trait for a generic `S: Borrow<Person>` so that the
 //! // assertion method can be called on an owned or borrowed `Person` instance
-//! impl<'a, S, R> AssertOver18 for Spec<'a, S, R>
+//! impl<'a, S, D, R> AssertOver18 for Spec<'a, S, D, R>
 //! where
 //!     S: Borrow<Person>,
 //!     R: FailingStrategy,
@@ -906,6 +942,11 @@ mod std {
         extern crate alloc;
         pub use alloc::borrow::*;
         pub use core::borrow::*;
+    }
+
+    pub mod boxed {
+        extern crate alloc;
+        pub use alloc::boxed::*;
     }
 
     pub mod fmt {

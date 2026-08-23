@@ -9,7 +9,7 @@ use crate::expectations::{
     map_contains_keys, map_contains_value, map_contains_values, map_does_not_contain_keys,
     map_does_not_contain_values, not,
 };
-use crate::iterator::collect_selected_values;
+use crate::iterator::{collect_selected_ref_values, collect_selected_values};
 use crate::properties::MapProperties;
 use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
@@ -221,7 +221,7 @@ where
             format,
             mark_missing,
         );
-        let extra_keys = collect_selected_values(&found, &actual_keys, representation);
+        let extra_keys = collect_selected_ref_values(&found, &actual_keys, representation);
         let expected_keys = self
             .expected_keys
             .iter()
@@ -288,7 +288,7 @@ where
             mark_missing,
         );
         let missing_keys = collect_selected_values(missing, expected_keys, representation);
-        let extra_keys = collect_selected_values(extra, &actual_keys, representation);
+        let extra_keys = collect_selected_ref_values(extra, &actual_keys, representation);
         let expected_keys = self
             .expected_keys
             .iter()
@@ -503,7 +503,7 @@ where
             format,
             mark_missing,
         );
-        let extra_values = collect_selected_values(&found, &actual_values, representation);
+        let extra_values = collect_selected_ref_values(&found, &actual_values, representation);
         let expected_values = self
             .expected_values
             .iter()

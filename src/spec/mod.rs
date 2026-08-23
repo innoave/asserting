@@ -8,6 +8,7 @@ use crate::expectations::satisfies;
 use crate::recursive_comparison::RecursiveComparison;
 use crate::std::any;
 use crate::std::borrow::{Borrow, Cow, ToOwned};
+use crate::std::boxed::Box;
 use crate::std::cmp::Ordering;
 use crate::std::error::Error as StdError;
 use crate::std::fmt::{self, Debug, Display};
@@ -17,6 +18,7 @@ use crate::std::slice;
 use crate::std::string::{String, ToString};
 use crate::std::vec;
 use crate::std::vec::Vec;
+
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
 
@@ -1144,6 +1146,7 @@ where
     }
 }
 
+#[allow(clippy::type_complexity)]
 impl<'a, I, D, R> Spec<'a, I, D, R>
 where
     I: IntoIterator,
@@ -1406,7 +1409,7 @@ pub trait Satisfies<S> {
     /// let failures = verify_that!(22).satisfies(is_odd).display_failures();
     ///
     /// assert_that!(failures).contains_exactly([
-    ///     "expected 22 to satisfy the given predicate, but returned false\n"
+    ///     "expected 22 to satisfy the given predicate, but returned false\n  actual: 22\n"
     /// ]);
     /// ```
     ///
@@ -1693,20 +1696,30 @@ impl FailingStrategy for CollectFailures {
 ///
 /// ```no_run
 /// # use std::fmt::Debug;
-/// # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
+/// # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
 /// # struct IsOk;
-/// impl<T, E> Expectation<Result<T, E>> for IsOk
+/// impl<T, E, D> Expectation<Result<T, E>, D> for IsOk
 /// where
-///     T: Debug,
-///     E: Debug,
+///     D: Represent<T> + Represent<E>,
 /// {
 ///     fn test(&mut self, subject: &Result<T, E>) -> bool {
 ///         subject.is_ok()
 ///     }
 ///
-///     fn message(&self, expression: &Expression<'_>, actual: &Result<T, E>, _inverted: bool, _format: &DiffFormat) -> String {
+///     fn message(
+///         &self,
+///         expression: &Expression<'_>,
+///         actual: &Result<T, E>,
+///         _inverted: bool,
+///         representation: &D,
+///         _format: &DiffFormat
+///     ) -> String {
+///         let represented_actual = match actual {
+///             Ok(value) => format!("Ok({:?}", Represented::from((value, representation))),
+///             Err(error) => format!("Err({:?}", Represented::from((error, representation))),
+///         };
 ///         format!(
-///             "expected {expression} is {:?}\n   but was: {actual:?}\n  expected: {:?}",
+///             "expected {expression} is {:?}\n   but was: {represented_actual:?}\n  expected: {:?}",
 ///             Ok::<_, Unknown>(Unknown),
 ///             Ok::<_, Unknown>(Unknown),
 ///         )
@@ -1845,6 +1858,7 @@ where
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub struct AdHocRepresentation<T>(pub Box<dyn Fn(&T, &mut fmt::Formatter<'_>) -> fmt::Result>);
 
 impl<T> Represent<T> for AdHocRepresentation<T> {

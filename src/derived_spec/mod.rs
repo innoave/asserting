@@ -41,6 +41,7 @@ use crate::spec::{
     SoftPanic, Spec, Unknown,
 };
 use crate::std::borrow::{Cow, ToOwned};
+use crate::std::boxed::Box;
 use crate::std::error::Error;
 use crate::std::fmt;
 use crate::std::fmt::{Debug, Display};
@@ -508,6 +509,7 @@ impl<'a, O, S, D> DerivedSpec<'a, O, S, D> {
     }
 }
 
+#[allow(clippy::type_complexity)]
 impl<'a, O, I, D> DerivedSpec<'a, O, I, D>
 where
     I: IntoIterator,
@@ -1076,7 +1078,7 @@ where
 impl<O, T, E, D> AssertHasValue<E> for DerivedSpec<'_, O, Option<T>, D>
 where
     T: PartialEq<E>,
-    D: Represent<Option<T>> + Represent<Option<E>> + Represent<E>,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn has_value(self, expected: E) -> Self {
@@ -1087,7 +1089,7 @@ where
 impl<O, T, E, D> AssertHasValue<E> for DerivedSpec<'_, O, &Option<T>, D>
 where
     T: PartialEq<E>,
-    D: Represent<Option<T>> + Represent<Option<E>> + Represent<E>,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn has_value(self, expected: E) -> Self {
