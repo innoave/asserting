@@ -1325,7 +1325,7 @@ where
             .mapping(Vec::from_iter)
             .represented_by(representation.clone());
         original_spec
-            .extracting_ref_iter(new_subject_name, |collection| {
+            .extracting_ref_iter("", |collection| {
                 collection
                     .enumerate()
                     .filter_map(|(i, e)| {
@@ -1337,6 +1337,7 @@ where
                     })
                     .collect()
             })
+            .named(new_subject_name)
             .represented_by(representation)
     }
 }

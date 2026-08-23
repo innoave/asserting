@@ -186,7 +186,7 @@ where
     E: Display,
     X: Debug,
     String: PartialEq<X>,
-    D: Represent<T> + Represent<E>,
+    D: Represent<T>,
     R: FailingStrategy,
 {
     type ErrorMessage = Spec<'a, String, DebugRepresentation, R>;

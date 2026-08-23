@@ -38,7 +38,7 @@ use crate::spec::{
     AdHocRepresentation, And, AssertFailure, CollectFailures, DebugRepresentation, DiffFormat,
     DoFail, Expectation, Expecting, Expression, FailingStrategy, GetFailures, GetLocation,
     Location, PanicOnFail, Represent, Represented, RepresentedAs, RepresentedBy, Satisfies,
-    SoftPanic, Spec, Unknown,
+    SoftPanic, Spec,
 };
 use crate::std::borrow::{Cow, ToOwned};
 use crate::std::boxed::Box;
@@ -72,6 +72,11 @@ pub struct DerivedSpec<'a, O, S, D> {
 }
 
 impl<O, S, D> DerivedSpec<'_, O, S, D> {
+    /// Returns the subject.
+    pub fn subject(&self) -> &S {
+        &self.subject
+    }
+
     /// Returns the expression (or subject name) if one has been set.
     pub fn expression(&self) -> &Expression<'_> {
         &self.expression
@@ -769,8 +774,8 @@ where
 impl<O, S, D> AssertNumericIdentity for DerivedSpec<'_, O, S, D>
 where
     S: AdditiveIdentityProperty + MultiplicativeIdentityProperty + PartialEq,
-    O: DoFail,
     D: Represent<S>,
+    O: DoFail,
 {
     fn is_zero(self) -> Self {
         self.expecting(is_zero())
@@ -784,8 +789,8 @@ where
 impl<O, S, D> AssertSignum for DerivedSpec<'_, O, S, D>
 where
     S: SignumProperty,
-    O: DoFail,
     D: Represent<S>,
+    O: DoFail,
 {
     fn is_negative(self) -> Self {
         self.expecting(is_negative())
@@ -807,8 +812,8 @@ where
 impl<O, S, D> AssertInfinity for DerivedSpec<'_, O, S, D>
 where
     S: InfinityProperty,
-    O: DoFail,
     D: Represent<S>,
+    O: DoFail,
 {
     fn is_infinite(self) -> Self {
         self.expecting(is_infinite())
@@ -822,8 +827,8 @@ where
 impl<O, S, D> AssertNotANumber for DerivedSpec<'_, O, S, D>
 where
     S: IsNanProperty,
-    O: DoFail,
     D: Represent<S>,
+    O: DoFail,
 {
     fn is_not_a_number(self) -> Self {
         self.expecting(not(is_a_number()))
@@ -837,8 +842,8 @@ where
 impl<O, S, D> AssertDecimalNumber for DerivedSpec<'_, O, S, D>
 where
     S: DecimalProperties,
-    O: DoFail,
     D: Represent<S> + Represent<i64> + Represent<u64>,
+    O: DoFail,
 {
     fn has_scale_of(self, expected_scale: i64) -> Self {
         self.expecting(has_scale_of(expected_scale))
@@ -855,8 +860,8 @@ where
 
 impl<O, D> AssertBoolean for DerivedSpec<'_, O, bool, D>
 where
-    O: DoFail,
     D: Represent<bool>,
+    O: DoFail,
 {
     fn is_true(self) -> Self {
         self.expecting(is_true())
@@ -869,8 +874,8 @@ where
 
 impl<O, D> AssertChar for DerivedSpec<'_, O, char, D>
 where
-    O: DoFail,
     D: Represent<char> + Represent<str>,
+    O: DoFail,
 {
     fn is_lowercase(self) -> Self {
         self.expecting(is_lower_case())
@@ -907,8 +912,8 @@ where
 
 impl<O, D> AssertChar for DerivedSpec<'_, O, &char, D>
 where
-    O: DoFail,
     D: Represent<char> + Represent<str>,
+    O: DoFail,
 {
     fn is_lowercase(self) -> Self {
         self.expecting(is_lower_case())
@@ -946,8 +951,8 @@ where
 impl<O, S, D> AssertEmptiness for DerivedSpec<'_, O, S, D>
 where
     S: IsEmptyProperty,
-    O: DoFail,
     D: Represent<S>,
+    O: DoFail,
 {
     fn is_empty(self) -> Self {
         self.expecting(is_empty())
@@ -961,8 +966,8 @@ where
 impl<O, S, D> AssertHasLength<usize, D> for DerivedSpec<'_, O, S, D>
 where
     S: LengthProperty,
-    O: DoFail,
     D: Represent<usize>,
+    O: DoFail,
 {
     fn has_length(self, expected_length: usize) -> Self {
         self.expecting(has_length(expected_length))
@@ -996,8 +1001,8 @@ where
 impl<O, S, D> AssertHasCharCount<usize, D> for DerivedSpec<'_, O, S, D>
 where
     S: CharCountProperty,
-    O: DoFail,
     D: Represent<usize>,
+    O: DoFail,
 {
     fn has_char_count(self, expected_char_count: usize) -> Self {
         self.expecting(has_char_count(expected_char_count))
@@ -1030,7 +1035,7 @@ where
 
 impl<O, S, D> AssertOption for DerivedSpec<'_, O, Option<S>, D>
 where
-    D: Represent<Option<S>> + Represent<S> + Represent<Option<Unknown>>,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_some(self) -> Self {
@@ -1237,37 +1242,57 @@ where
 
 impl<'a, O, T, E, X, D> AssertHasErrorMessage<X> for DerivedSpec<'a, O, Result<T, E>, D>
 where
-    T: Debug,
     E: Display,
     X: Debug,
     String: PartialEq<X>,
+    D: Represent<T>,
     O: DoFail,
 {
     type ErrorMessage = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn has_error_message(self, expected: X) -> Self::ErrorMessage {
-        self.mapping(|result| match result {
-            Ok(value) => panic!("expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"),
+        let subject = match self.subject() {
+            Ok(value) => Ok(format!(
+                "Ok({:?})",
+                Represented::from((value, self.representation()))
+            )),
+            Err(error) => Err(error.to_string()),
+        };
+        self.mapping(|_result| match subject {
+            Ok(value) => panic!(
+                "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
+            ),
             Err(error) => error.to_string(),
-        }).expecting(is_equal_to(expected))
+        })
+        .expecting(is_equal_to(expected))
     }
 }
 
 impl<'a, O, T, E, X, D> AssertHasErrorMessage<X> for DerivedSpec<'a, O, &Result<T, E>, D>
 where
-    T: Debug,
     E: Display,
     X: Debug,
     String: PartialEq<X>,
+    D: Represent<T>,
     O: DoFail,
 {
     type ErrorMessage = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn has_error_message(self, expected: X) -> Self::ErrorMessage {
-        self.mapping(|result| match result {
-            Ok(value) => panic!("expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"),
+        let subject = match self.subject() {
+            Ok(value) => Ok(format!(
+                "Ok({:?})",
+                Represented::from((value, self.representation()))
+            )),
+            Err(error) => Err(error.to_string()),
+        };
+        self.mapping(|_result| match subject {
+            Ok(value) => panic!(
+                "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
+            ),
             Err(error) => error.to_string(),
-        }).expecting(is_equal_to(expected))
+        })
+        .expecting(is_equal_to(expected))
     }
 }
 
@@ -1448,7 +1473,7 @@ where
 impl<'a, O, S, D> AssertStringContainsAnyOf<&'a [char]> for DerivedSpec<'a, O, S, D>
 where
     S: 'a + AsRef<str>,
-    D: Represent<str> + Represent<char> + Represent<&'a [char]>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: &'a [char]) -> Self {
@@ -1463,7 +1488,7 @@ where
 impl<'a, O, S, const N: usize, D> AssertStringContainsAnyOf<[char; N]> for DerivedSpec<'a, O, S, D>
 where
     S: 'a + AsRef<str>,
-    D: Represent<str> + Represent<char> + Represent<[char; N]>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: [char; N]) -> Self {
@@ -1479,7 +1504,7 @@ impl<'a, O, S, const N: usize, D> AssertStringContainsAnyOf<&'a [char; N]>
     for DerivedSpec<'a, O, S, D>
 where
     S: 'a + AsRef<str>,
-    D: Represent<str> + Represent<char> + Represent<&'a [char; N]>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: &'a [char; N]) -> Self {
@@ -1701,15 +1726,17 @@ impl<'a, O, S, T, D> AssertOrderedElements for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: Debug,
+    D: Represent<T> + Clone,
     O: DoFail + GetFailures,
 {
-    type SingleElement = DerivedSpec<'a, O, T, DebugRepresentation>;
-    type MultipleElements = DerivedSpec<'a, O, Vec<T>, DebugRepresentation>;
+    type SingleElement = DerivedSpec<'a, O, T, D>;
+    type MultipleElements = DerivedSpec<'a, O, Vec<T>, D>;
 
     fn first_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1719,11 +1746,14 @@ where
         let new_subject_name = format!("the first element of {orig_subject_name}");
         spec.extracting("", |mut collection| collection.remove(0))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn last_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1737,12 +1767,15 @@ where
             })
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 
     fn nth_element(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1752,9 +1785,11 @@ where
         let new_subject_name = format!("{orig_subject_name}[{n}]");
         spec.extracting("", |mut collection| collection.remove(n))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
@@ -1767,6 +1802,7 @@ where
                 .collect()
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 }
 
@@ -1853,21 +1889,18 @@ impl<'a, O, S, T, U, D> AssertOrderedElementsRef for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: ToOwned<Owned = U> + Debug,
+    T: ToOwned<Owned = U>,
+    D: Represent<T> + Clone,
     O: DoFail + GetFailures,
 {
-    type SingleElement =
-        DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>, DebugRepresentation>, U, DebugRepresentation>;
-    type MultipleElements = DerivedSpec<
-        'a,
-        DerivedSpec<'a, O, Vec<T>, DebugRepresentation>,
-        Vec<U>,
-        DebugRepresentation,
-    >;
+    type SingleElement = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>, D>, U, D>;
+    type MultipleElements = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>, D>, Vec<U>, D>;
 
     fn first_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1881,11 +1914,14 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn last_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1899,12 +1935,15 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn nth_element_ref(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1918,14 +1957,18 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
-        let original_spec = self.mapping(Vec::from_iter);
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .represented_by(representation.clone());
         original_spec
             .extracting_ref_iter("", |collection| {
                 collection
@@ -1940,6 +1983,7 @@ where
                     .collect()
             })
             .named(new_subject_name)
+            .represented_by(representation)
     }
 }
 
