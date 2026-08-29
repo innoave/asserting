@@ -1262,7 +1262,7 @@ where
             Ok(value) => panic!(
                 "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
             ),
-            Err(error) => error.to_string(),
+            Err(error) => error,
         })
         .expecting(is_equal_to(expected))
     }
@@ -1290,7 +1290,7 @@ where
             Ok(value) => panic!(
                 "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
             ),
-            Err(error) => error.to_string(),
+            Err(error) => error,
         })
         .expecting(is_equal_to(expected))
     }
