@@ -2,8 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Common Changelog](https://common-changelog.org/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 0.16.0 - 2026-09-05
+
+_custom representation and asserting (foreign) types that do not implement `Debug`_
+
+### Added
+
+* **Breaking**: controlling type formatting in failure reports
+  [(PR #96)](https://github.com/innoave/asserting/pull/96)<br>
+  The API for writing custom expectations has changed. It now has an additional parameter
+  'representation' in many methods. Implementations of the Expectation trait should no longer
+  require implementing `Debug` but instead depend on the `Represent`-trait.<br>
+  Note: This feature does not break anything when using the crate for writing assertions in tests.
 
 ## 0.15.0 - 2026-07-12
 
@@ -121,8 +134,8 @@ _Pick elements of collections or iterators for assertion_
 
 ## 0.9.0 - 2025-06-28
 
-_"Does not contain" assertions for strings, collections and iterators and expectation combinators
-(not, all, any)_
+_"Does not contain" assertions for strings, collections and iterators and expectation combinators (
+not, all, any)_
 
 ### Added
 
