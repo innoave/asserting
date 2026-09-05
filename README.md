@@ -23,7 +23,7 @@ Features of `asserting`:
   (see ["Highlighted differences"](#highlighted-differences))
 * chaining of multiple assertions on the same subject (see ["Chaining assertions"])
 * concise and expressive assertions for more complex types like collections
-* field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
+* field-by-field recursive comparison (see ["Field-by-field recursive comparison"])
 * soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
 * support for asserting custom types with provided assertions (see ["Asserting custom types"])
 * custom representation of values in failure reports or if a (foreign) type does not implement
