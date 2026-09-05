@@ -17,19 +17,21 @@ result. Fluent assertions read like natural English.
 
 Features of `asserting`:
 
-1. assertions are convenient to write and easy to read
-2. helpful error messages in case of failing assertions
-3. colored diffs between expected and actual values
-   (see ["Highlighted differences"](#highlighted-differences))
-4. chaining of multiple assertions on the same subject (see ["Chaining assertions"])
-5. concise and expressive assertions for more complex types like collections
-6. field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
-7. soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
-8. support for asserting custom types with provided assertions (see ["Asserting custom types"])
-9. provide a reasonable number of assertions out of the box
-10. do not require that asserted types have to implement traits if it is not absolutely necessary
-11. custom assertions (see ["Custom assertions"](#custom-assertions))
-12. support no-std environments
+* assertions are convenient to write and easy to read
+* helpful error messages in case of failing assertions
+* colored diffs between expected and actual values
+  (see ["Highlighted differences"](#highlighted-differences))
+* chaining of multiple assertions on the same subject (see ["Chaining assertions"])
+* concise and expressive assertions for more complex types like collections
+* field-by-field recursive comparison (see ["Field-by-field recursive comparison"]) :new:
+* soft assertions (execute multiple assertions before panicking) (see ["Soft assertions"])
+* support for asserting custom types with provided assertions (see ["Asserting custom types"])
+* custom representation of values in failure reports or if a (foreign) type does not implement
+  [`Debug`] (see ["Type formatting (aka Representation)"])
+* provide a reasonable number of assertions out of the box
+* do not require that asserted types have to implement traits if it is not absolutely necessary
+* custom assertions (see ["Custom assertions"](#custom-assertions))
+* support no-std environments
 
 For an overview of the provided features and many examples on how to use `asserting` see the
 [crate-level documentation][docs-url].
@@ -71,8 +73,9 @@ default.
 
 ## Highlighted differences
 
-`asserting` can highlight the differences between the expected value(s) and the actual value(s) when
-printing assertion failures to the terminal. The colored diffs in assertion failures look like this:
+`asserting` can highlight the differences between the expected value (s) and the actual value (s)
+when printing assertion failures to the terminal. The colored diffs in assertion failures look like
+this:
 
 ![colored diffs in terminal](examples/colored_diffs.png)
 
@@ -89,9 +92,9 @@ It supports different variants of how differences are highlighted.
 | red-yellow | Differences are printed in the colors <span style="color: yellow">yellow</span> and <span style="color: red">red</span>.          | 
 | off        | Switches off highlighting. The differences are not highlighted at all.                                                            | 
 
-The mode can be configured by setting the environment variable `ASSERTING_HIGHLIGHT_DIFFS` to one
-of the modes in the table above. The value is case-insensitive. E.g., setting the environment
-variable to values like `Red-Blue`, `Bold` or `OFF` works as well.
+The mode can be configured by setting the environment variable `ASSERTING_HIGHLIGHT_DIFFS` to one of
+the modes in the table above. The value is case-insensitive. E.g., setting the environment variable
+to values like `Red-Blue`, `Bold` or `OFF` works as well.
 
 The intended way for configuring the highlighting mode is to set the environment variable in the
 configuration for `Cargo` by adding it to the `[env]` section in your `~/.cargo/config.toml` file:
@@ -127,8 +130,7 @@ for all types that implement `PartialEq<E>` with `E` being the type of the expec
 | is_equal_to     | verify that the subject is equal to an expected value    |
 | is_not_equal_to | verify that the subject is not equal to a specific value |
 
-for all types that implement `PartialEq` and the subject is of the same type as the expected
-value:
+for all types that implement `PartialEq` and the subject is of the same type as the expected value:
 
 | assertion      | description                                                                                   |
 |----------------|-----------------------------------------------------------------------------------------------|
@@ -459,10 +461,10 @@ To start assertions on code, use the `assert_that_code!()` macro.
 `asserting` provides three kinds of custom assertions:
 
 1. use any predicate function as a custom assertion (see "[predicate as custom assertion]")
-2. property-based assertions can be used with any type that implements the related property
-   (see "[property-based assertions]")
-3. write custom assertion methods by defining and implementing an extension trait
-   (see "[custom assertions]")
+2. property-based assertions can be used with any type that implements the related property (see
+   "[property-based assertions]")
+3. write custom assertion methods by defining and implementing an extension trait (see
+   "[custom assertions]")
 
 The mentioned references link to a chapter in the crate's documentation that describes the
 possibilities for custom assertions, including examples.
@@ -490,6 +492,8 @@ possibilities for custom assertions, including examples.
 ["Chaining assertions"]: https://docs.rs/asserting/latest/asserting/#chaining-assertions-on-the-same-subject
 
 ["Field-by-field recursive comparison"]: https://docs.rs/asserting/latest/asserting/#field-by-field-recursive-comparison
+
+["Type formatting (aka Representation)"]: https://docs.rs/asserting/latest/asserting/#type-formatting-aka-representation
 
 ["soft assertions"]: https://docs.rs/asserting/#soft-assertions
 
