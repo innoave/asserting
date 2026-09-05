@@ -6,7 +6,6 @@ license = "MIT OR Apache-2.0"
 edition = "2024"
 rust-version = "1.85.1"
 repository = "https://github.com/innoave/asserting"
-readme = "README.md"
 
 description = """
 Fluent assertions for tests in Rust that are convenient to write and easy to extend.
