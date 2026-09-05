@@ -353,7 +353,7 @@ mod colored {
             &[
                 "expected subject to have a source message equal to \"foo error\"\n   \
                     but was: \u{1b}[31mFoo\u{1b}[0m - which has no source\n  \
-                   expected: \u{1b}[33m\"foo error\"\u{1b}[0m\n\
+                   expected: \"\u{1b}[33mfoo error\u{1b}[0m\"\n\
             "
             ]
         );

@@ -3,7 +3,7 @@
 use crate::assertions::{
     AssertDecimalNumber, AssertInfinity, AssertNotANumber, AssertNumericIdentity, AssertSignum,
 };
-use crate::colored::{mark_missing, mark_missing_string, mark_unexpected};
+use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     HasPrecisionOf, HasScaleOf, IsANumber, IsFinite, IsInfinite, IsInteger, IsNegative, IsOne,
     IsPositive, IsZero, has_precision_of, has_scale_of, is_a_number, is_finite, is_infinite,
@@ -14,15 +14,16 @@ use crate::properties::{
     MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
+    Invertible, Represent, Represented, Spec,
 };
-use crate::std::fmt::Debug;
 use crate::std::format;
 use crate::std::string::String;
 
-impl<S, R> AssertSignum for Spec<'_, S, R>
+impl<S, D, R> AssertSignum for Spec<'_, S, D, R>
 where
-    S: SignumProperty + Debug,
+    S: SignumProperty,
+    D: Represent<S>,
     R: FailingStrategy,
 {
     fn is_negative(self) -> Self {
@@ -42,9 +43,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for IsNegative
+impl<S, D> Expectation<S, D> for IsNegative
 where
-    S: SignumProperty + Debug,
+    S: SignumProperty,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.is_negative_property()
@@ -55,6 +57,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -62,8 +65,8 @@ where
         } else {
             ("", "< 0")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}negative\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -72,9 +75,10 @@ where
 
 impl Invertible for IsNegative {}
 
-impl<S> Expectation<S> for IsPositive
+impl<S, D> Expectation<S, D> for IsPositive
 where
-    S: SignumProperty + Debug,
+    S: SignumProperty,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.is_positive_property()
@@ -85,6 +89,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -92,8 +97,8 @@ where
         } else {
             ("", "> 0")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}positive\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -102,9 +107,10 @@ where
 
 impl Invertible for IsPositive {}
 
-impl<S, R> AssertNumericIdentity for Spec<'_, S, R>
+impl<S, D, R> AssertNumericIdentity for Spec<'_, S, D, R>
 where
-    S: AdditiveIdentityProperty + MultiplicativeIdentityProperty + PartialEq + Debug,
+    S: AdditiveIdentityProperty + MultiplicativeIdentityProperty + PartialEq,
+    D: Represent<S>,
     R: FailingStrategy,
 {
     fn is_zero(self) -> Self {
@@ -116,9 +122,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for IsZero
+impl<S, D> Expectation<S, D> for IsZero
 where
-    S: AdditiveIdentityProperty + PartialEq + Debug,
+    S: AdditiveIdentityProperty + PartialEq,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         *subject == <S as AdditiveIdentityProperty>::additive_identity()
@@ -129,11 +136,12 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected(&actual, format);
-        let marked_expected = mark_missing(&S::additive_identity(), format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&S::additive_identity(), representation, format);
         format!(
             "expected {expression} to be {not}zero\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
@@ -142,9 +150,10 @@ where
 
 impl Invertible for IsZero {}
 
-impl<S> Expectation<S> for IsOne
+impl<S, D> Expectation<S, D> for IsOne
 where
-    S: MultiplicativeIdentityProperty + PartialEq + Debug,
+    S: MultiplicativeIdentityProperty + PartialEq,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         *subject == <S as MultiplicativeIdentityProperty>::multiplicative_identity()
@@ -155,11 +164,12 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&S::multiplicative_identity(), format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&S::multiplicative_identity(), representation, format);
         format!(
             "expected {expression} to be {not}one\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
@@ -168,9 +178,10 @@ where
 
 impl Invertible for IsOne {}
 
-impl<S, R> AssertInfinity for Spec<'_, S, R>
+impl<S, D, R> AssertInfinity for Spec<'_, S, D, R>
 where
-    S: InfinityProperty + Debug,
+    S: InfinityProperty,
+    D: Represent<S>,
     R: FailingStrategy,
 {
     fn is_infinite(self) -> Self {
@@ -182,9 +193,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for IsFinite
+impl<S, D> Expectation<S, D> for IsFinite
 where
-    S: InfinityProperty + Debug,
+    S: InfinityProperty,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.is_finite_property()
@@ -195,6 +207,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -202,8 +215,8 @@ where
         } else {
             ("", "a finite number")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}finite\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -212,9 +225,10 @@ where
 
 impl Invertible for IsFinite {}
 
-impl<S> Expectation<S> for IsInfinite
+impl<S, D> Expectation<S, D> for IsInfinite
 where
-    S: InfinityProperty + Debug,
+    S: InfinityProperty,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.is_infinite_property()
@@ -225,6 +239,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -232,8 +247,8 @@ where
         } else {
             ("", "an infinite number")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}infinite\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -242,9 +257,10 @@ where
 
 impl Invertible for IsInfinite {}
 
-impl<S, R> AssertNotANumber for Spec<'_, S, R>
+impl<S, D, R> AssertNotANumber for Spec<'_, S, D, R>
 where
-    S: IsNanProperty + Debug,
+    S: IsNanProperty,
+    D: Represent<S>,
     R: FailingStrategy,
 {
     fn is_not_a_number(self) -> Self {
@@ -256,9 +272,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for IsANumber
+impl<S, D> Expectation<S, D> for IsANumber
 where
-    S: IsNanProperty + Debug,
+    S: IsNanProperty,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         !subject.is_nan_property()
@@ -269,6 +286,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -276,8 +294,8 @@ where
         } else {
             ("", "a number")
         };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}a number\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
@@ -286,9 +304,10 @@ where
 
 impl Invertible for IsANumber {}
 
-impl<S, R> AssertDecimalNumber for Spec<'_, S, R>
+impl<S, D, R> AssertDecimalNumber for Spec<'_, S, D, R>
 where
-    S: DecimalProperties + Debug,
+    S: DecimalProperties,
+    D: Represent<S> + Represent<i64> + Represent<u64>,
     R: FailingStrategy,
 {
     fn has_scale_of(self, expected_scale: i64) -> Self {
@@ -304,9 +323,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for HasScaleOf
+impl<S, D> Expectation<S, D> for HasScaleOf
 where
-    S: DecimalProperties + Debug,
+    S: DecimalProperties,
+    D: Represent<i64>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.scale_property() == self.expected_scale
@@ -317,23 +337,26 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected_scale = self.expected_scale;
-        let marked_actual = mark_unexpected(&actual.scale_property(), format);
-        let marked_expected = mark_missing(&expected_scale, format);
+        let marked_actual = mark_unexpected(&actual.scale_property(), representation, format);
+        let marked_expected = mark_missing(&expected_scale, representation, format);
+        let represented_expected_scale = Represented::from((&expected_scale, representation));
         format!(
-            "expected {expression} to {not}have a scale of {expected_scale}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+            "expected {expression} to {not}have a scale of {represented_expected_scale}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
     }
 }
 
 impl Invertible for HasScaleOf {}
 
-impl<S> Expectation<S> for HasPrecisionOf
+impl<S, D> Expectation<S, D> for HasPrecisionOf
 where
-    S: DecimalProperties + Debug,
+    S: DecimalProperties,
+    D: Represent<u64>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.precision_property() == self.expected_precision
@@ -344,21 +367,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected_precision = self.expected_precision;
-        let marked_actual = mark_unexpected(&actual.precision_property(), format);
-        let marked_expected = mark_missing(&expected_precision, format);
+        let marked_actual = mark_unexpected(&actual.precision_property(), representation, format);
+        let marked_expected = mark_missing(&expected_precision, representation, format);
+        let represented_expected_precision =
+            Represented::from((&expected_precision, representation));
         format!(
-            "expected {expression} to {not}have a precision of {expected_precision}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+            "expected {expression} to {not}have a precision of {represented_expected_precision}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
     }
 }
 
-impl<S> Expectation<S> for IsInteger
+impl<S, D> Expectation<S, D> for IsInteger
 where
-    S: DecimalProperties + Debug,
+    S: DecimalProperties,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject.is_integer_property()
@@ -369,6 +396,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, expected) = if inverted {
@@ -376,8 +404,8 @@ where
         } else {
             ("", "an integer value")
         };
-        let marked_actual = mark_unexpected(&actual, format);
-        let marked_expected = mark_missing_string(expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(expected, &DisplayRepresentation, format);
         format!(
             "expected {expression} to be {not}an integer value\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )

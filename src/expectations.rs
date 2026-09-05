@@ -114,7 +114,7 @@ pub fn rec<E>(expectations: E) -> Rec<E> {
 /// ```
 /// use asserting::prelude::*;
 /// use asserting::expectations::{IsNegative, rec};
-/// use asserting::spec::Expectation;
+/// use asserting::spec::{DebugRepresentation, Expectation};
 ///
 /// // the result of new `Rec` is neither `success` nor `failure`
 /// let mut expectation = rec(IsNegative);
@@ -123,13 +123,13 @@ pub fn rec<E>(expectations: E) -> Rec<E> {
 ///
 /// // once the `test` method has been called, the result can be queried at a
 /// // later time.
-/// _ = expectation.test(&-42);  // returns true
+/// _ = Expectation::<_, DebugRepresentation>::test(&mut expectation, &-42);  // returns true
 /// assert_that!(expectation.is_success()).is_true();
 /// assert_that!(expectation.is_failure()).is_false();
 ///
 /// // once the `test` method has been called, the result can be queried at a
 /// // later time.
-/// _= expectation.test(&42);  // returns false
+/// _ = Expectation::<_, DebugRepresentation>::test(&mut expectation, &42);  // returns false
 /// assert_that!(expectation.is_success()).is_false();
 /// assert_that!(expectation.is_failure()).is_true();
 /// ```
@@ -841,13 +841,13 @@ pub struct StringContainsAnyOf<E> {
     pub expected: E,
 }
 
-/// Creates a [`StringStartWith`] expectation.
-pub fn string_starts_with<E>(expected: E) -> StringStartWith<E> {
-    StringStartWith { expected }
+/// Creates a [`StringStartsWith`] expectation.
+pub fn string_starts_with<E>(expected: E) -> StringStartsWith<E> {
+    StringStartsWith { expected }
 }
 
 #[must_use]
-pub struct StringStartWith<E> {
+pub struct StringStartsWith<E> {
     pub expected: E,
 }
 

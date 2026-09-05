@@ -35,11 +35,15 @@ use crate::properties::{
     MultiplicativeIdentityProperty, SignumProperty,
 };
 use crate::spec::{
-    And, AssertFailure, CollectFailures, DiffFormat, DoFail, Expectation, Expecting, Expression,
-    FailingStrategy, GetFailures, GetLocation, Location, PanicOnFail, Satisfies, SoftPanic, Spec,
+    AdHocRepresentation, And, AssertFailure, CollectFailures, DebugRepresentation, DiffFormat,
+    DoFail, Expectation, Expecting, Expression, FailingStrategy, GetFailures, GetLocation,
+    Location, PanicOnFail, Represent, Represented, RepresentedAs, RepresentedBy, Satisfies,
+    SoftPanic, Spec,
 };
 use crate::std::borrow::{Cow, ToOwned};
+use crate::std::boxed::Box;
 use crate::std::error::Error;
+use crate::std::fmt;
 use crate::std::fmt::{Debug, Display};
 use crate::std::format;
 use crate::std::ops::RangeBounds;
@@ -59,14 +63,20 @@ use hashbrown::HashSet;
 /// reports.
 ///
 /// [`Spec`]: Spec
-pub struct DerivedSpec<'a, O, S> {
+pub struct DerivedSpec<'a, O, S, D> {
     original: O,
     subject: S,
     expression: Expression<'a>,
     diff_format: DiffFormat,
+    representation: D,
 }
 
-impl<O, S> DerivedSpec<'_, O, S> {
+impl<O, S, D> DerivedSpec<'_, O, S, D> {
+    /// Returns the subject.
+    pub fn subject(&self) -> &S {
+        &self.subject
+    }
+
     /// Returns the expression (or subject name) if one has been set.
     pub fn expression(&self) -> &Expression<'_> {
         &self.expression
@@ -76,9 +86,15 @@ impl<O, S> DerivedSpec<'_, O, S> {
     pub const fn diff_format(&self) -> &DiffFormat {
         &self.diff_format
     }
+
+    /// Returns the representation used for displaying values in failure
+    /// reports.
+    pub fn representation(&self) -> &D {
+        &self.representation
+    }
 }
 
-impl<'a, O, S> DerivedSpec<'a, O, S> {
+impl<'a, O, S> DerivedSpec<'a, O, S, DebugRepresentation> {
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub(crate) fn new(
         original: O,
@@ -91,9 +107,12 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
             subject: derived_subject,
             expression,
             diff_format,
+            representation: DebugRepresentation,
         }
     }
+}
 
+impl<'a, O, S, D> DerivedSpec<'a, O, S, D> {
     /// Sets the subject name or expression for this assertion.
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
     pub fn named(mut self, subject_name: impl Into<Cow<'a, str>>) -> Self {
@@ -114,7 +133,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     }
 }
 
-impl<'a, O, S> GetLocation<'a> for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> GetLocation<'a> for DerivedSpec<'a, O, S, D>
 where
     O: GetLocation<'a>,
 {
@@ -123,7 +142,7 @@ where
     }
 }
 
-impl<O, S> GetFailures for DerivedSpec<'_, O, S>
+impl<O, S, D> GetFailures for DerivedSpec<'_, O, S, D>
 where
     O: GetFailures,
 {
@@ -140,7 +159,7 @@ where
     }
 }
 
-impl<O, S> DoFail for DerivedSpec<'_, O, S>
+impl<O, S, D> DoFail for DerivedSpec<'_, O, S, D>
 where
     O: DoFail,
 {
@@ -153,7 +172,7 @@ where
     }
 }
 
-impl<O, S> SoftPanic for DerivedSpec<'_, O, S>
+impl<O, S, D> SoftPanic for DerivedSpec<'_, O, S, D>
 where
     O: SoftPanic,
 {
@@ -162,7 +181,7 @@ where
     }
 }
 
-impl<O, S> And for DerivedSpec<'_, O, S> {
+impl<O, S, D> And for DerivedSpec<'_, O, S, D> {
     type Output = O;
 
     fn and(self) -> Self::Output {
@@ -170,7 +189,7 @@ impl<O, S> And for DerivedSpec<'_, O, S> {
     }
 }
 
-impl<'a, O, S> DerivedSpec<'a, O, S> {
+impl<'a, O, S, D> DerivedSpec<'a, O, S, D> {
     /// Extracts a property from the current subject.
     ///
     /// The extracting closure gets a reference to the current subject as an
@@ -302,7 +321,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> DerivedSpec<'a, Self, U>
+    ) -> DerivedSpec<'a, Self, U, DebugRepresentation>
     where
         F: FnOnce(&S) -> &B,
         B: ToOwned<Owned = U> + ?Sized,
@@ -317,10 +336,10 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
             subject: derived_subject,
             expression,
             diff_format,
+            representation: DebugRepresentation,
         }
     }
 
-    /// Maps the current subject to some other value.
     ///
     /// It takes a closure that maps the current subject to a new subject and
     /// returns a new `DerivedSpec` with the value returned by the closure as
@@ -408,7 +427,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> DerivedSpec<'a, O, U>
+    ) -> DerivedSpec<'a, O, U, DebugRepresentation>
     where
         F: FnOnce(S) -> U,
     {
@@ -422,6 +441,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
             subject: derived_subject,
             expression,
             diff_format,
+            representation: DebugRepresentation,
         }
     }
 
@@ -479,7 +499,7 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
     /// assertion. So we map the subject of the type `Point` to a tuple of its
     /// fields.
     #[must_use = "a derived spec does nothing unless an assertion method is called"]
-    pub fn mapping<F, U>(self, map: F) -> DerivedSpec<'a, O, U>
+    pub fn mapping<F, U>(self, map: F) -> DerivedSpec<'a, O, U, DebugRepresentation>
     where
         F: FnOnce(S) -> U,
     {
@@ -489,37 +509,48 @@ impl<'a, O, S> DerivedSpec<'a, O, S> {
             subject: mapped,
             expression: self.expression,
             diff_format: self.diff_format,
+            representation: DebugRepresentation,
         }
     }
 }
 
-impl<'a, O, I> DerivedSpec<'a, O, I>
+#[allow(clippy::type_complexity)]
+impl<'a, O, I, D> DerivedSpec<'a, O, I, D>
 where
     I: IntoIterator,
+    D: Clone,
 {
     pub(crate) fn extracting_ref_iter<F, U>(
         self,
         property_name: impl Into<Cow<'a, str>>,
         extract: F,
-    ) -> DerivedSpec<'a, DerivedSpec<'a, O, Vec<<I as IntoIterator>::Item>>, Vec<U>>
+    ) -> DerivedSpec<
+        'a,
+        DerivedSpec<'a, O, Vec<<I as IntoIterator>::Item>, D>,
+        Vec<U>,
+        DebugRepresentation,
+    >
     where
         for<'b> F: Fn(slice::Iter<'b, <I as IntoIterator>::Item>) -> Vec<U>,
     {
         let property_name = Expression(property_name.into());
         let diff_format = self.diff_format.clone();
-        let orig_spec = self.mapping(Vec::from_iter);
+        let representation = self.representation.clone();
+        let orig_spec = self.mapping(Vec::from_iter).represented_by(representation);
         let new_subject = extract(orig_spec.subject.iter());
         DerivedSpec {
             original: orig_spec,
             subject: new_subject,
             expression: property_name,
             diff_format,
+            representation: DebugRepresentation,
         }
     }
 }
 
-impl<O, S> Satisfies<S> for DerivedSpec<'_, O, S>
+impl<O, S, D> Satisfies<S> for DerivedSpec<'_, O, S, D>
 where
+    D: Represent<S>,
     O: DoFail,
 {
     fn satisfies<P>(self, predicate: P) -> Self
@@ -537,25 +568,56 @@ where
     }
 }
 
-impl<O, S> Expecting<S> for DerivedSpec<'_, O, S>
+impl<O, S, D> Expecting<S, D> for DerivedSpec<'_, O, S, D>
 where
     O: DoFail,
 {
-    fn expecting(mut self, mut expectation: impl Expectation<S>) -> Self {
+    fn expecting(mut self, mut expectation: impl Expectation<S, D>) -> Self {
         if !expectation.test(&self.subject) {
-            let message =
-                expectation.message(&self.expression, &self.subject, false, &self.diff_format);
+            let message = expectation.message(
+                &self.expression,
+                &self.subject,
+                false,
+                &self.representation,
+                &self.diff_format,
+            );
             self.do_fail_with_message(message);
         }
         self
     }
 }
 
-impl<O, S, E> AssertEquality<E> for DerivedSpec<'_, O, S>
+impl<'a, O, S, D, D2> RepresentedBy<D2> for DerivedSpec<'a, O, S, D> {
+    type Output = DerivedSpec<'a, O, S, D2>;
+
+    fn represented_by(self, representation: D2) -> Self::Output {
+        DerivedSpec {
+            original: self.original,
+            subject: self.subject,
+            expression: self.expression,
+            diff_format: self.diff_format,
+            representation,
+        }
+    }
+}
+
+impl<'a, O, S, D> RepresentedAs for DerivedSpec<'a, O, S, D> {
+    type Subject = S;
+    type Output = DerivedSpec<'a, O, S, AdHocRepresentation<S>>;
+
+    fn represented_as<F>(self, representation: F) -> Self::Output
+    where
+        F: Fn(&S, &mut fmt::Formatter<'_>) -> fmt::Result + 'static,
+    {
+        self.represented_by(AdHocRepresentation(Box::new(representation)))
+    }
+}
+
+impl<O, S, E, D> AssertEquality<E> for DerivedSpec<'_, O, S, D>
 where
-    S: PartialEq<E> + Debug,
-    E: Debug,
+    S: PartialEq<E>,
     O: DoFail,
+    D: Represent<S> + Represent<E>,
 {
     fn is_equal_to(self, expected: E) -> Self {
         self.expecting(is_equal_to(expected))
@@ -566,10 +628,11 @@ where
     }
 }
 
-impl<O, S> AssertSameAs<S> for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertSameAs<S> for DerivedSpec<'_, O, S, D>
 where
-    S: PartialEq + Debug,
+    S: PartialEq,
     O: DoFail,
+    D: Represent<S>,
 {
     fn is_same_as(self, expected: S) -> Self {
         self.expecting(is_same_as(expected))
@@ -585,11 +648,12 @@ mod float_cmp {
     use super::DerivedSpec;
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::expectations::{is_close_to, not};
-    use crate::spec::{DoFail, Expecting};
+    use crate::spec::{DoFail, Expecting, Represent};
     use float_cmp::{F32Margin, F64Margin};
 
-    impl<O> AssertIsCloseToWithinMargin<f32, F32Margin> for DerivedSpec<'_, O, f32>
+    impl<O, D> AssertIsCloseToWithinMargin<f32, F32Margin> for DerivedSpec<'_, O, f32, D>
     where
+        D: Represent<f32>,
         O: DoFail,
     {
         fn is_close_to_with_margin(self, expected: f32, margin: impl Into<F32Margin>) -> Self {
@@ -601,8 +665,9 @@ mod float_cmp {
         }
     }
 
-    impl<O> AssertIsCloseToWithDefaultMargin<f32> for DerivedSpec<'_, O, f32>
+    impl<O, D> AssertIsCloseToWithDefaultMargin<f32> for DerivedSpec<'_, O, f32, D>
     where
+        D: Represent<f32>,
         O: DoFail,
     {
         fn is_close_to(self, expected: f32) -> Self {
@@ -616,8 +681,9 @@ mod float_cmp {
         }
     }
 
-    impl<O> AssertIsCloseToWithinMargin<f64, F64Margin> for DerivedSpec<'_, O, f64>
+    impl<O, D> AssertIsCloseToWithinMargin<f64, F64Margin> for DerivedSpec<'_, O, f64, D>
     where
+        D: Represent<f64>,
         O: DoFail,
     {
         fn is_close_to_with_margin(self, expected: f64, margin: impl Into<F64Margin>) -> Self {
@@ -629,8 +695,9 @@ mod float_cmp {
         }
     }
 
-    impl<O> AssertIsCloseToWithDefaultMargin<f64> for DerivedSpec<'_, O, f64>
+    impl<O, D> AssertIsCloseToWithDefaultMargin<f64> for DerivedSpec<'_, O, f64, D>
     where
+        D: Represent<f64>,
         O: DoFail,
     {
         fn is_close_to(self, expected: f64) -> Self {
@@ -645,10 +712,10 @@ mod float_cmp {
     }
 }
 
-impl<O, S, E> AssertOrder<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertOrder<E> for DerivedSpec<'_, O, S, D>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
     O: DoFail,
 {
     fn is_less_than(self, expected: E) -> Self {
@@ -680,30 +747,34 @@ where
     }
 }
 
-impl<O, S, E> AssertInRange<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertInRange<E, D> for DerivedSpec<'_, O, S, D>
 where
-    S: PartialOrd<E> + Debug,
-    E: PartialOrd<S> + Debug,
+    S: PartialOrd<E>,
+    E: PartialOrd<S>,
+    D: Represent<S> + Represent<E>,
     O: DoFail,
 {
     fn is_in_range<R>(self, range: R) -> Self
     where
-        R: RangeBounds<E> + Debug,
+        R: RangeBounds<E>,
+        D: Represent<R>,
     {
         self.expecting(is_in_range(range))
     }
 
     fn is_not_in_range<R>(self, range: R) -> Self
     where
-        R: RangeBounds<E> + Debug,
+        R: RangeBounds<E>,
+        D: Represent<R>,
     {
         self.expecting(not(is_in_range(range)))
     }
 }
 
-impl<O, S> AssertNumericIdentity for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertNumericIdentity for DerivedSpec<'_, O, S, D>
 where
-    S: AdditiveIdentityProperty + MultiplicativeIdentityProperty + PartialEq + Debug,
+    S: AdditiveIdentityProperty + MultiplicativeIdentityProperty + PartialEq,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_zero(self) -> Self {
@@ -715,9 +786,10 @@ where
     }
 }
 
-impl<O, S> AssertSignum for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertSignum for DerivedSpec<'_, O, S, D>
 where
-    S: SignumProperty + Debug,
+    S: SignumProperty,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_negative(self) -> Self {
@@ -737,9 +809,10 @@ where
     }
 }
 
-impl<O, S> AssertInfinity for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertInfinity for DerivedSpec<'_, O, S, D>
 where
-    S: InfinityProperty + Debug,
+    S: InfinityProperty,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_infinite(self) -> Self {
@@ -751,9 +824,10 @@ where
     }
 }
 
-impl<O, S> AssertNotANumber for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertNotANumber for DerivedSpec<'_, O, S, D>
 where
-    S: IsNanProperty + Debug,
+    S: IsNanProperty,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_not_a_number(self) -> Self {
@@ -765,9 +839,10 @@ where
     }
 }
 
-impl<O, S> AssertDecimalNumber for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertDecimalNumber for DerivedSpec<'_, O, S, D>
 where
-    S: DecimalProperties + Debug,
+    S: DecimalProperties,
+    D: Represent<S> + Represent<i64> + Represent<u64>,
     O: DoFail,
 {
     fn has_scale_of(self, expected_scale: i64) -> Self {
@@ -783,8 +858,9 @@ where
     }
 }
 
-impl<O> AssertBoolean for DerivedSpec<'_, O, bool>
+impl<O, D> AssertBoolean for DerivedSpec<'_, O, bool, D>
 where
+    D: Represent<bool>,
     O: DoFail,
 {
     fn is_true(self) -> Self {
@@ -796,8 +872,9 @@ where
     }
 }
 
-impl<O> AssertChar for DerivedSpec<'_, O, char>
+impl<O, D> AssertChar for DerivedSpec<'_, O, char, D>
 where
+    D: Represent<char> + Represent<str>,
     O: DoFail,
 {
     fn is_lowercase(self) -> Self {
@@ -833,8 +910,9 @@ where
     }
 }
 
-impl<O> AssertChar for DerivedSpec<'_, O, &char>
+impl<O, D> AssertChar for DerivedSpec<'_, O, &char, D>
 where
+    D: Represent<char> + Represent<str>,
     O: DoFail,
 {
     fn is_lowercase(self) -> Self {
@@ -870,9 +948,10 @@ where
     }
 }
 
-impl<O, S> AssertEmptiness for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertEmptiness for DerivedSpec<'_, O, S, D>
 where
-    S: IsEmptyProperty + Debug,
+    S: IsEmptyProperty,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_empty(self) -> Self {
@@ -884,9 +963,10 @@ where
     }
 }
 
-impl<O, S> AssertHasLength<usize> for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertHasLength<usize, D> for DerivedSpec<'_, O, S, D>
 where
-    S: LengthProperty + Debug,
+    S: LengthProperty,
+    D: Represent<usize>,
     O: DoFail,
 {
     fn has_length(self, expected_length: usize) -> Self {
@@ -895,7 +975,8 @@ where
 
     fn has_length_in_range<R>(self, expected_range: R) -> Self
     where
-        R: RangeBounds<usize> + Debug,
+        R: RangeBounds<usize>,
+        D: Represent<R>,
     {
         self.expecting(has_length_in_range(expected_range))
     }
@@ -917,9 +998,10 @@ where
     }
 }
 
-impl<O, S> AssertHasCharCount<usize> for DerivedSpec<'_, O, S>
+impl<O, S, D> AssertHasCharCount<usize, D> for DerivedSpec<'_, O, S, D>
 where
-    S: CharCountProperty + Debug,
+    S: CharCountProperty,
+    D: Represent<usize>,
     O: DoFail,
 {
     fn has_char_count(self, expected_char_count: usize) -> Self {
@@ -928,7 +1010,8 @@ where
 
     fn has_char_count_in_range<U>(self, expected_range: U) -> Self
     where
-        U: RangeBounds<usize> + Debug,
+        U: RangeBounds<usize>,
+        D: Represent<U>,
     {
         self.expecting(has_char_count_in_range(expected_range))
     }
@@ -950,9 +1033,9 @@ where
     }
 }
 
-impl<O, S> AssertOption for DerivedSpec<'_, O, Option<S>>
+impl<O, S, D> AssertOption for DerivedSpec<'_, O, Option<S>, D>
 where
-    S: Debug,
+    D: Represent<S>,
     O: DoFail,
 {
     fn is_some(self) -> Self {
@@ -964,11 +1047,11 @@ where
     }
 }
 
-impl<'a, O, T> AssertOptionValue for DerivedSpec<'a, O, Option<T>>
+impl<'a, O, T, D> AssertOptionValue for DerivedSpec<'a, O, Option<T>, D>
 where
     O: DoFail,
 {
-    type Some = DerivedSpec<'a, O, T>;
+    type Some = DerivedSpec<'a, O, T, DebugRepresentation>;
 
     fn some(self) -> Self::Some {
         self.mapping(|subject| match subject {
@@ -980,12 +1063,12 @@ where
     }
 }
 
-impl<'a, O, T> AssertOptionValue for DerivedSpec<'a, O, &'a Option<T>>
+impl<'a, O, T, D> AssertOptionValue for DerivedSpec<'a, O, &'a Option<T>, D>
 where
     T: 'a,
     O: DoFail,
 {
-    type Some = DerivedSpec<'a, O, &'a T>;
+    type Some = DerivedSpec<'a, O, &'a T, DebugRepresentation>;
 
     fn some(self) -> Self::Some {
         self.mapping(|subject| match subject {
@@ -997,10 +1080,10 @@ where
     }
 }
 
-impl<O, T, E> AssertHasValue<E> for DerivedSpec<'_, O, Option<T>>
+impl<O, T, E, D> AssertHasValue<E> for DerivedSpec<'_, O, Option<T>, D>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn has_value(self, expected: E) -> Self {
@@ -1008,10 +1091,10 @@ where
     }
 }
 
-impl<O, T, E> AssertHasValue<E> for DerivedSpec<'_, O, &Option<T>>
+impl<O, T, E, D> AssertHasValue<E> for DerivedSpec<'_, O, &Option<T>, D>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn has_value(self, expected: E) -> Self {
@@ -1019,10 +1102,9 @@ where
     }
 }
 
-impl<O, T, E> AssertResult for DerivedSpec<'_, O, Result<T, E>>
+impl<O, T, E, D> AssertResult for DerivedSpec<'_, O, Result<T, E>, D>
 where
-    T: Debug,
-    E: Debug,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn is_ok(self) -> Self {
@@ -1034,10 +1116,9 @@ where
     }
 }
 
-impl<O, T, E> AssertResult for DerivedSpec<'_, O, &Result<T, E>>
+impl<O, T, E, D> AssertResult for DerivedSpec<'_, O, &Result<T, E>, D>
 where
-    T: Debug,
-    E: Debug,
+    D: Represent<T> + Represent<E>,
     O: DoFail,
 {
     fn is_ok(self) -> Self {
@@ -1049,67 +1130,76 @@ where
     }
 }
 
-impl<'a, O, T, E> AssertResultValue for DerivedSpec<'a, O, Result<T, E>>
+impl<'a, O, T, E, D> AssertResultValue for DerivedSpec<'a, O, Result<T, E>, D>
 where
-    T: Debug,
-    E: Debug,
+    D: Represent<T> + Represent<E> + Clone,
     O: DoFail,
 {
-    type Ok = DerivedSpec<'a, O, T>;
-    type Err = DerivedSpec<'a, O, E>;
+    type Ok = DerivedSpec<'a, O, T, D>;
+    type Err = DerivedSpec<'a, O, E, D>;
 
     fn ok(self) -> Self::Ok {
+        let representation = self.representation().clone();
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
+                let error = Represented::from((&error, &representation));
                 panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
+        .represented_by(representation)
     }
 
     fn err(self) -> Self::Err {
+        let representation = self.representation().clone();
         self.mapping(|subject| match subject {
             Ok(value) => {
+                let value = Represented::from((&value, &representation));
                 panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
+        .represented_by(representation)
     }
 }
 
-impl<'a, O, T, E> AssertResultValue for DerivedSpec<'a, O, &'a Result<T, E>>
+impl<'a, O, T, E, D> AssertResultValue for DerivedSpec<'a, O, &'a Result<T, E>, D>
 where
-    T: Debug,
-    E: Debug,
+    D: Represent<T> + Represent<E> + Clone,
     O: DoFail,
 {
-    type Ok = DerivedSpec<'a, O, &'a T>;
-    type Err = DerivedSpec<'a, O, &'a E>;
+    type Ok = DerivedSpec<'a, O, &'a T, D>;
+    type Err = DerivedSpec<'a, O, &'a E, D>;
 
     fn ok(self) -> Self::Ok {
+        let representation = self.representation().clone();
         self.mapping(|subject| match subject {
             Ok(value) => value,
             Err(error) => {
+                let error = Represented::from((error, &representation));
                 panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
+        .represented_by(representation)
     }
 
     fn err(self) -> Self::Err {
+        let representation = self.representation().clone();
         self.mapping(|subject| match subject {
             Ok(value) => {
+                let value = Represented::from((value, &representation));
                 panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
+        .represented_by(representation)
     }
 }
 
-impl<O, T, E, X> AssertHasValue<X> for DerivedSpec<'_, O, Result<T, E>>
+impl<O, T, E, X, D> AssertHasValue<X> for DerivedSpec<'_, O, Result<T, E>, D>
 where
-    T: PartialEq<X> + Debug,
-    E: Debug,
-    X: Debug,
+    T: PartialEq<X>,
+    D: Represent<T> + Represent<E> + Represent<X>,
     O: DoFail,
 {
     fn has_value(self, expected: X) -> Self {
@@ -1117,11 +1207,10 @@ where
     }
 }
 
-impl<O, T, E, X> AssertHasValue<X> for DerivedSpec<'_, O, &Result<T, E>>
+impl<O, T, E, X, D> AssertHasValue<X> for DerivedSpec<'_, O, &Result<T, E>, D>
 where
-    T: PartialEq<X> + Debug,
-    E: Debug,
-    X: Debug,
+    T: PartialEq<X>,
+    D: Represent<T> + Represent<E> + Represent<X>,
     O: DoFail,
 {
     fn has_value(self, expected: X) -> Self {
@@ -1129,11 +1218,10 @@ where
     }
 }
 
-impl<O, T, E, X> AssertHasError<X> for DerivedSpec<'_, O, Result<T, E>>
+impl<O, T, E, X, D> AssertHasError<X> for DerivedSpec<'_, O, Result<T, E>, D>
 where
-    T: Debug,
-    E: PartialEq<X> + Debug,
-    X: Debug,
+    E: PartialEq<X>,
+    D: Represent<T> + Represent<E> + Represent<X>,
     O: DoFail,
 {
     fn has_error(self, expected: X) -> Self {
@@ -1141,11 +1229,10 @@ where
     }
 }
 
-impl<O, T, E, X> AssertHasError<X> for DerivedSpec<'_, O, &Result<T, E>>
+impl<O, T, E, X, D> AssertHasError<X> for DerivedSpec<'_, O, &Result<T, E>, D>
 where
-    T: Debug,
-    E: PartialEq<X> + Debug,
-    X: Debug,
+    E: PartialEq<X>,
+    D: Represent<T> + Represent<E> + Represent<X>,
     O: DoFail,
 {
     fn has_error(self, expected: X) -> Self {
@@ -1153,48 +1240,69 @@ where
     }
 }
 
-impl<'a, O, T, E, X> AssertHasErrorMessage<X> for DerivedSpec<'a, O, Result<T, E>>
+impl<'a, O, T, E, X, D> AssertHasErrorMessage<X> for DerivedSpec<'a, O, Result<T, E>, D>
 where
-    T: Debug,
     E: Display,
     X: Debug,
     String: PartialEq<X>,
+    D: Represent<T>,
     O: DoFail,
 {
-    type ErrorMessage = DerivedSpec<'a, O, String>;
+    type ErrorMessage = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn has_error_message(self, expected: X) -> Self::ErrorMessage {
-        self.mapping(|result| match result {
-            Ok(value) => panic!("expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"),
-            Err(error) => error.to_string(),
-        }).expecting(is_equal_to(expected))
+        let subject = match self.subject() {
+            Ok(value) => Ok(format!(
+                "Ok({:?})",
+                Represented::from((value, self.representation()))
+            )),
+            Err(error) => Err(error.to_string()),
+        };
+        self.mapping(|_result| match subject {
+            Ok(value) => panic!(
+                "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
+            ),
+            Err(error) => error,
+        })
+        .expecting(is_equal_to(expected))
     }
 }
 
-impl<'a, O, T, E, X> AssertHasErrorMessage<X> for DerivedSpec<'a, O, &Result<T, E>>
+impl<'a, O, T, E, X, D> AssertHasErrorMessage<X> for DerivedSpec<'a, O, &Result<T, E>, D>
 where
-    T: Debug,
     E: Display,
     X: Debug,
     String: PartialEq<X>,
+    D: Represent<T>,
     O: DoFail,
 {
-    type ErrorMessage = DerivedSpec<'a, O, String>;
+    type ErrorMessage = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn has_error_message(self, expected: X) -> Self::ErrorMessage {
-        self.mapping(|result| match result {
-            Ok(value) => panic!("expected the subject to be `Err(_)` with message {expected:?}, but was `Ok({value:?})`"),
-            Err(error) => error.to_string(),
-        }).expecting(is_equal_to(expected))
+        let subject = match self.subject() {
+            Ok(value) => Ok(format!(
+                "Ok({:?})",
+                Represented::from((value, self.representation()))
+            )),
+            Err(error) => Err(error.to_string()),
+        };
+        self.mapping(|_result| match subject {
+            Ok(value) => panic!(
+                "expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
+            ),
+            Err(error) => error,
+        })
+        .expecting(is_equal_to(expected))
     }
 }
 
-impl<'a, O, S> AssertErrorHasSource for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertErrorHasSource for DerivedSpec<'a, O, S, D>
 where
     S: Error,
+    D: Represent<S>,
     O: DoFail,
 {
-    type SourceMessage = DerivedSpec<'a, O, Option<String>>;
+    type SourceMessage = DerivedSpec<'a, O, Option<String>, DebugRepresentation>;
 
     fn has_no_source(self) -> Self {
         self.expecting(not(error_has_source()))
@@ -1211,7 +1319,7 @@ where
     }
 }
 
-impl<O, S, E> AssertHasDebugString<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertHasDebugString<E> for DerivedSpec<'_, O, S, D>
 where
     S: Debug,
     E: AsRef<str>,
@@ -1226,12 +1334,12 @@ where
     }
 }
 
-impl<'a, O, S> AssertDebugString for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertDebugString for DerivedSpec<'a, O, S, D>
 where
     S: Debug,
     O: DoFail,
 {
-    type DebugString = DerivedSpec<'a, O, String>;
+    type DebugString = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn debug_string(self) -> Self::DebugString {
         let expression_debug_string = format!("{}'s debug string", self.expression);
@@ -1240,7 +1348,7 @@ where
     }
 }
 
-impl<O, S, E> AssertHasDisplayString<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertHasDisplayString<E> for DerivedSpec<'_, O, S, D>
 where
     S: Display,
     E: AsRef<str>,
@@ -1255,12 +1363,12 @@ where
     }
 }
 
-impl<'a, O, S> AssertDisplayString for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertDisplayString for DerivedSpec<'a, O, S, D>
 where
     S: Display,
     O: DoFail,
 {
-    type DisplayString = DerivedSpec<'a, O, String>;
+    type DisplayString = DerivedSpec<'a, O, String, DebugRepresentation>;
 
     fn display_string(self) -> Self::DisplayString {
         let expression_display_string = format!("{}'s display string", self.expression);
@@ -1269,9 +1377,10 @@ where
     }
 }
 
-impl<'a, O, S> AssertStringPattern<&'a str> for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertStringPattern<&'a str> for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str>,
     O: DoFail,
 {
     fn contains(self, pattern: &'a str) -> Self {
@@ -1299,9 +1408,10 @@ where
     }
 }
 
-impl<'a, O, S> AssertStringPattern<String> for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertStringPattern<String> for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str>,
     O: DoFail,
 {
     fn contains(self, pattern: String) -> Self {
@@ -1329,9 +1439,10 @@ where
     }
 }
 
-impl<'a, O, S> AssertStringPattern<char> for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertStringPattern<char> for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains(self, pattern: char) -> Self {
@@ -1359,9 +1470,10 @@ where
     }
 }
 
-impl<'a, O, S> AssertStringContainsAnyOf<&'a [char]> for DerivedSpec<'a, O, S>
+impl<'a, O, S, D> AssertStringContainsAnyOf<&'a [char]> for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: &'a [char]) -> Self {
@@ -1373,9 +1485,10 @@ where
     }
 }
 
-impl<'a, O, S, const N: usize> AssertStringContainsAnyOf<[char; N]> for DerivedSpec<'a, O, S>
+impl<'a, O, S, const N: usize, D> AssertStringContainsAnyOf<[char; N]> for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: [char; N]) -> Self {
@@ -1387,9 +1500,11 @@ where
     }
 }
 
-impl<'a, O, S, const N: usize> AssertStringContainsAnyOf<&'a [char; N]> for DerivedSpec<'a, O, S>
+impl<'a, O, S, const N: usize, D> AssertStringContainsAnyOf<&'a [char; N]>
+    for DerivedSpec<'a, O, S, D>
 where
-    S: 'a + AsRef<str> + Debug,
+    S: 'a + AsRef<str>,
+    D: Represent<str> + Represent<char>,
     O: DoFail,
 {
     fn contains_any_of(self, expected: &'a [char; N]) -> Self {
@@ -1406,12 +1521,12 @@ mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::derived_spec::DerivedSpec;
     use crate::expectations::{not, string_matches};
-    use crate::spec::{DoFail, Expecting};
-    use crate::std::fmt::Debug;
+    use crate::spec::{DoFail, Expecting, Represent};
 
-    impl<O, S> AssertStringMatches for DerivedSpec<'_, O, S>
+    impl<O, S, D> AssertStringMatches for DerivedSpec<'_, O, S, D>
     where
-        S: AsRef<str> + Debug,
+        S: AsRef<str>,
+        D: Represent<str>,
         O: DoFail,
     {
         fn matches(self, regex_pattern: &str) -> Self {
@@ -1424,111 +1539,139 @@ mod regex {
     }
 }
 
-impl<'a, O, S, T, E> AssertIteratorContains<E> for DerivedSpec<'a, O, S>
+impl<'a, O, S, T, E, D> AssertIteratorContains<E> for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E> + Clone,
     O: DoFail,
 {
-    type Sequence = DerivedSpec<'a, O, Vec<T>>;
+    type Sequence = DerivedSpec<'a, O, Vec<T>, D>;
 
     fn contains(self, element: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains(element))
     }
 
     fn does_not_contain(self, element: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(not(iterator_contains(element)))
     }
 }
 
-impl<'a, O, S, T, E> AssertIteratorContainsInAnyOrder<E> for DerivedSpec<'a, O, S>
+impl<'a, O, S, T, E, D> AssertIteratorContainsInAnyOrder<E> for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
-    T: PartialEq<<E as IntoIterator>::Item> + Debug,
+    T: PartialEq<<E as IntoIterator>::Item>,
     E: IntoIterator,
-    <E as IntoIterator>::Item: Debug,
+    D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     O: DoFail,
 {
-    type Sequence = DerivedSpec<'a, O, Vec<T>>;
+    type Sequence = DerivedSpec<'a, O, Vec<T>, D>;
 
     fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_exactly_in_any_order(expected))
     }
 
     fn contains_any_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_any_of(expected))
     }
 
     fn does_not_contain_any_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(not(iterator_contains_any_of(expected)))
     }
 
     fn contains_all_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_all_of(expected))
     }
 
     fn contains_only(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_only(expected))
     }
 
     fn contains_only_once(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_only_once(expected))
     }
 }
 
-impl<'a, O, S, T, E> AssertIteratorContainsInOrder<E> for DerivedSpec<'a, O, S>
+impl<'a, O, S, T, E, D> AssertIteratorContainsInOrder<E> for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     E: IntoIterator,
     <E as IntoIterator>::IntoIter: DefinedOrderProperty,
-    <E as IntoIterator>::Item: Debug,
-    T: PartialEq<<E as IntoIterator>::Item> + Debug,
+    T: PartialEq<<E as IntoIterator>::Item>,
+    D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     O: DoFail,
 {
-    type Sequence = DerivedSpec<'a, O, Vec<T>>;
+    type Sequence = DerivedSpec<'a, O, Vec<T>, D>;
 
     fn contains_exactly(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_exactly(expected))
     }
 
     fn contains_sequence(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_sequence(expected))
     }
 
     fn contains_all_in_order(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_all_in_order(expected))
     }
 
     fn starts_with(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_starts_with(expected))
     }
 
     fn ends_with(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_ends_with(expected))
     }
 }
 
-impl<O, S, E> AssertMapContainsKey<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertMapContainsKey<E> for DerivedSpec<'_, O, S, D>
 where
-    S: MapProperties + Debug,
-    <S as MapProperties>::Key: PartialEq<E> + Debug,
-    <S as MapProperties>::Value: Debug,
-    E: Debug,
+    S: MapProperties,
+    <S as MapProperties>::Key: PartialEq<E>,
+    D: Represent<S>
+        + Represent<E>
+        + Represent<<S as MapProperties>::Key>
+        + Represent<<S as MapProperties>::Value>,
     O: DoFail,
 {
     fn contains_key(self, expected_key: E) -> Self {
@@ -1552,12 +1695,14 @@ where
     }
 }
 
-impl<O, S, E> AssertMapContainsValue<E> for DerivedSpec<'_, O, S>
+impl<O, S, E, D> AssertMapContainsValue<E> for DerivedSpec<'_, O, S, D>
 where
-    S: MapProperties + Debug,
-    <S as MapProperties>::Key: Debug,
-    <S as MapProperties>::Value: PartialEq<E> + Debug,
-    E: Debug,
+    S: MapProperties,
+    <S as MapProperties>::Value: PartialEq<E>,
+    D: Represent<S>
+        + Represent<E>
+        + Represent<<S as MapProperties>::Key>
+        + Represent<<S as MapProperties>::Value>,
     O: DoFail,
 {
     fn contains_value(self, expected_value: E) -> Self {
@@ -1577,19 +1722,21 @@ where
     }
 }
 
-impl<'a, O, S, T> AssertOrderedElements for DerivedSpec<'a, O, S>
+impl<'a, O, S, T, D> AssertOrderedElements for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: Debug,
+    D: Represent<T> + Clone,
     O: DoFail + GetFailures,
 {
-    type SingleElement = DerivedSpec<'a, O, T>;
-    type MultipleElements = DerivedSpec<'a, O, Vec<T>>;
+    type SingleElement = DerivedSpec<'a, O, T, D>;
+    type MultipleElements = DerivedSpec<'a, O, Vec<T>, D>;
 
     fn first_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1599,11 +1746,14 @@ where
         let new_subject_name = format!("the first element of {orig_subject_name}");
         spec.extracting("", |mut collection| collection.remove(0))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn last_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1617,12 +1767,15 @@ where
             })
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 
     fn nth_element(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1632,9 +1785,11 @@ where
         let new_subject_name = format!("{orig_subject_name}[{n}]");
         spec.extracting("", |mut collection| collection.remove(n))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
@@ -1647,19 +1802,20 @@ where
                 .collect()
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 }
 
-impl<'a, O, I> AssertElements<'a, I> for DerivedSpec<'a, O, I>
+impl<'a, O, I, D> AssertElements<'a, I> for DerivedSpec<'a, O, I, D>
 where
     I: 'a + IntoIterator,
     O: DoFail + GetLocation<'a>,
 {
-    type Output = DerivedSpec<'a, O, ()>;
+    type Output = DerivedSpec<'a, O, (), DebugRepresentation>;
 
     fn each_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures,
     {
         let root_expression = &self.expression;
@@ -1686,12 +1842,13 @@ where
             subject: (),
             expression: self.expression,
             diff_format: self.diff_format,
+            representation: DebugRepresentation,
         }
     }
 
     fn any_element<A, B>(mut self, assert: A) -> Self::Output
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, CollectFailures>) -> B,
+        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
         B: GetFailures,
     {
         let root_expression = &self.expression;
@@ -1723,23 +1880,27 @@ where
             subject: (),
             expression: self.expression,
             diff_format: self.diff_format,
+            representation: DebugRepresentation,
         }
     }
 }
 
-impl<'a, O, S, T, U> AssertOrderedElementsRef for DerivedSpec<'a, O, S>
+impl<'a, O, S, T, U, D> AssertOrderedElementsRef for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: ToOwned<Owned = U> + Debug,
+    T: ToOwned<Owned = U>,
+    D: Represent<T> + Clone,
     O: DoFail + GetFailures,
 {
-    type SingleElement = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>>, U>;
-    type MultipleElements = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>>, Vec<U>>;
+    type SingleElement = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>, D>, U, D>;
+    type MultipleElements = DerivedSpec<'a, DerivedSpec<'a, O, Vec<T>, D>, Vec<U>, D>;
 
     fn first_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1753,11 +1914,14 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn last_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1771,12 +1935,15 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn nth_element_ref(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1790,14 +1957,18 @@ where
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
         ).named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
-        let original_spec = self.mapping(Vec::from_iter);
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .represented_by(representation.clone());
         original_spec
             .extracting_ref_iter("", |collection| {
                 collection
@@ -1812,6 +1983,7 @@ where
                     .collect()
             })
             .named(new_subject_name)
+            .represented_by(representation)
     }
 }
 

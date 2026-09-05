@@ -5,8 +5,7 @@ use crate::assertions::{
     AssertIteratorContainsInOrder, AssertOrderedElements, AssertOrderedElementsRef,
 };
 use crate::colored::{
-    mark_all_items_in_collection, mark_missing, mark_missing_string,
-    mark_selected_items_in_collection, mark_unexpected, mark_unexpected_string,
+    mark_all_items_in_collection, mark_missing, mark_selected_items_in_collection, mark_unexpected,
 };
 use crate::derived_spec::DerivedSpec;
 use crate::expectations::{
@@ -22,40 +21,43 @@ use crate::expectations::{
 };
 use crate::properties::DefinedOrderProperty;
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, GetFailures, Invertible,
-    PanicOnFail, Spec,
+    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
+    GetFailures, Invertible, PanicOnFail, Represent, Represented, RepresentedBy, Spec,
 };
 use crate::std::borrow::ToOwned;
 use crate::std::cmp::Ordering;
-use crate::std::fmt::Debug;
 use crate::std::mem;
 use crate::std::{format, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 
-impl<'a, S, T, E, R> AssertIteratorContains<E> for Spec<'a, S, R>
+impl<'a, S, T, E, D, R> AssertIteratorContains<E> for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E> + Clone,
     R: FailingStrategy,
 {
-    type Sequence = Spec<'a, Vec<T>, R>;
+    type Sequence = Spec<'a, Vec<T>, D, R>;
 
     fn contains(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains(expected))
     }
 
     fn does_not_contain(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(not(iterator_contains(expected)))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContains<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContains<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         subject.iter().any(|e| e == &self.expected)
@@ -66,6 +68,7 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, marked_actual) = if inverted {
@@ -83,69 +86,83 @@ where
             let marked_actual = mark_selected_items_in_collection(
                 actual,
                 &found_unexpected,
+                representation,
                 format,
                 mark_unexpected,
             );
             ("not ", marked_actual)
         } else {
-            let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+            let marked_actual =
+                mark_all_items_in_collection(actual, representation, format, mark_unexpected);
             ("", marked_actual)
         };
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to {not}contain {:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
-            self.expected,
+            "expected {expression} to {not}contain {represented_expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IteratorContains<E> {}
 
-impl<'a, S, T, E, R> AssertIteratorContainsInAnyOrder<E> for Spec<'a, S, R>
+impl<'a, S, T, E, D, R> AssertIteratorContainsInAnyOrder<E> for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    T: PartialEq<<E as IntoIterator>::Item> + Debug,
+    T: PartialEq<<E as IntoIterator>::Item>,
     E: IntoIterator,
-    <E as IntoIterator>::Item: Debug,
+    D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     R: FailingStrategy,
 {
-    type Sequence = Spec<'a, Vec<T>, R>;
+    type Sequence = Spec<'a, Vec<T>, D, R>;
 
     fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_exactly_in_any_order(expected))
     }
 
-    fn contains_any_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_any_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_any_of(expected))
     }
 
-    fn does_not_contain_any_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn does_not_contain_any_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(not(iterator_contains_any_of(expected)))
     }
 
-    fn contains_all_of(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_all_of(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_all_of(expected))
     }
 
-    fn contains_only(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_only(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_only(expected))
     }
 
-    fn contains_only_once(self, expected: E) -> Spec<'a, Vec<T>, R> {
+    fn contains_only_once(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_only_once(expected))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsExactlyInAnyOrder<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsExactlyInAnyOrder<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let missing = &mut self.missing;
@@ -173,30 +190,45 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let missing = collect_selected_values(&self.missing, &self.expected);
-        let extra = collect_selected_values(&self.extra, actual);
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain exactly in any order {:?}
+            r"expected {expression} to contain exactly in any order {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            self.expected
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsAnyOf<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsAnyOf<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         for expected in &self.expected {
@@ -212,6 +244,7 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, marked_actual, marked_expected) = if inverted {
@@ -237,37 +270,44 @@ where
             let marked_actual = mark_selected_items_in_collection(
                 actual,
                 &found_in_actual,
+                representation,
                 format,
                 mark_unexpected,
             );
             let marked_expected = mark_selected_items_in_collection(
                 &self.expected,
                 &found_in_expected,
+                representation,
                 format,
                 mark_missing,
             );
             ("not ", marked_actual, marked_expected)
         } else {
-            let marked_actual = mark_all_items_in_collection(actual, format, mark_unexpected);
+            let marked_actual =
+                mark_all_items_in_collection(actual, representation, format, mark_unexpected);
             let marked_expected =
-                mark_all_items_in_collection(&self.expected, format, mark_missing);
+                mark_all_items_in_collection(&self.expected, representation, format, mark_missing);
             ("", marked_actual, marked_expected)
         };
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
         format!(
-            r"expected {expression} to {not}contain any of {:?}
+            r"expected {expression} to {not}contain any of {represented_expected:?}
    but was: {marked_actual}
   expected: {not}{marked_expected}",
-            self.expected,
         )
     }
 }
 
 impl<E> Invertible for IteratorContainsAnyOf<E> {}
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsAllOf<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsAllOf<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let missing = &mut self.missing;
@@ -286,6 +326,7 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let mut extra = HashSet::new();
@@ -294,26 +335,40 @@ where
                 extra.insert(actual_index);
             }
         }
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_selected_values(&self.missing, &self.expected);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain all of {:?}
+            r"expected {expression} to contain all of {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsOnly<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsOnly<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let extra = &mut self.extra;
@@ -332,6 +387,7 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let mut missing = HashSet::new();
@@ -340,26 +396,40 @@ where
                 missing.insert(expected_index);
             }
         }
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &missing, format, mark_missing);
-        let extra = collect_selected_values(&self.extra, actual);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain only {:?}
+            r"expected {expression} to contain only {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
      extra: {extra:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsOnlyOnce<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsOnlyOnce<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let extra = &mut self.extra;
@@ -383,19 +453,23 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let actual_duplicates_and_extras = self.duplicates.union(&self.extra).copied().collect();
         let marked_actual = mark_selected_items_in_collection(
             actual,
             &actual_duplicates_and_extras,
+            representation,
             format,
             mark_unexpected,
         );
-        let duplicates = collect_selected_values(&self.duplicates, actual);
+        let duplicates = collect_selected_values(&self.duplicates, actual, representation);
         let mut expected_duplicates_and_missing = HashSet::new();
         for (expected_index, expected) in self.expected.iter().enumerate() {
-            if duplicates.iter().any(|duplicate| *duplicate == expected)
+            if duplicates
+                .iter()
+                .any(|duplicate| duplicate.value == expected)
                 || !actual.iter().any(|actual| actual == expected)
             {
                 expected_duplicates_and_missing.insert(expected_index);
@@ -404,64 +478,79 @@ where
         let marked_expected = mark_selected_items_in_collection(
             &self.expected,
             &expected_duplicates_and_missing,
+            representation,
             format,
             mark_missing,
         );
-        let extra = collect_selected_values(&self.extra, actual);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain only once {:?}
+            r"expected {expression} to contain only once {represented_expected:?}
      but was: {marked_actual}
     expected: {marked_expected}
        extra: {extra:?}
   duplicates: {duplicates:?}",
-            self.expected,
         )
     }
 }
 
-impl<'a, S, T, E, R> AssertIteratorContainsInOrder<E> for Spec<'a, S, R>
+impl<'a, S, T, E, D, R> AssertIteratorContainsInOrder<E> for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     E: IntoIterator,
     <E as IntoIterator>::IntoIter: DefinedOrderProperty,
-    <E as IntoIterator>::Item: Debug,
-    T: PartialEq<<E as IntoIterator>::Item> + Debug,
+    T: PartialEq<<E as IntoIterator>::Item>,
+    D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     R: FailingStrategy,
 {
-    type Sequence = Spec<'a, Vec<T>, R>;
+    type Sequence = Spec<'a, Vec<T>, D, R>;
 
     fn contains_exactly(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_exactly(expected))
     }
 
     fn contains_sequence(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_sequence(expected))
     }
 
     fn contains_all_in_order(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_contains_all_in_order(expected))
     }
 
     fn starts_with(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_starts_with(expected))
     }
 
     fn ends_with(self, expected: E) -> Self::Sequence {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(iterator_ends_with(expected))
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsExactly<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsExactly<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let mut maybe_extras = Vec::new();
@@ -510,44 +599,55 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let out_of_order = collect_selected_values(&self.out_of_order, actual);
+        let out_of_order = collect_selected_values(&self.out_of_order, actual, representation);
         let mut expected_indices = self.missing.clone();
         for (expected_index, expected) in self.expected.iter().enumerate() {
-            if out_of_order.iter().any(|actual| *actual == expected) {
+            if out_of_order.iter().any(|actual| actual.value == expected) {
                 expected_indices.insert(expected_index);
             }
         }
         let marked_expected = mark_selected_items_in_collection(
             &self.expected,
             &expected_indices,
+            representation,
             format,
             mark_missing,
         );
         let actual_indices = self.extra.union(&self.out_of_order).copied().collect();
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &actual_indices, format, mark_unexpected);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &actual_indices,
+            representation,
+            format,
+            mark_unexpected,
+        );
 
-        let missing = collect_selected_values(&self.missing, &self.expected);
-        let extra = collect_selected_values(&self.extra, actual);
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain exactly in order {:?}
+            r"expected {expression} to contain exactly in order {represented_expected:?}
        but was: {marked_actual}
       expected: {marked_expected}
        missing: {missing:?}
          extra: {extra:?}
   out-of-order: {out_of_order:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsSequence<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsSequence<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let subject_length = subject.len();
@@ -615,30 +715,45 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_selected_values(&self.missing, &self.expected);
-        let extra = collect_selected_values(&self.extra, actual);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain the sequence {:?}
+            r"expected {expression} to contain the sequence {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorContainsAllInOrder<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorContainsAllInOrder<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let missing = &mut self.missing;
@@ -663,26 +778,40 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_selected_values(&self.missing, &self.expected);
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
+        let represented_actual = actual
+            .iter()
+            .map(|s| Represented::from((s, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to contain all of {:?} in order
-   but was: {actual:?}
+            r"expected {expression} to contain all of {represented_expected:?} in order
+   but was: {represented_actual:?}
   expected: {marked_expected}
    missing: {missing:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorStartsWith<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorStartsWith<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let missing = &mut self.missing;
@@ -712,30 +841,45 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_selected_values(&self.missing, &self.expected);
-        let extra = collect_selected_values(&self.extra, actual);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to start with {:?}
+            r"expected {expression} to start with {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            self.expected,
         )
     }
 }
 
-impl<T, E> Expectation<Vec<T>> for IteratorEndsWith<E>
+impl<T, E, D> Expectation<Vec<T>, D> for IteratorEndsWith<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         let missing = &mut self.missing;
@@ -765,63 +909,87 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.extra, format, mark_unexpected);
-        let marked_expected =
-            mark_selected_items_in_collection(&self.expected, &self.missing, format, mark_missing);
-        let missing = collect_selected_values(&self.missing, &self.expected);
-        let extra = collect_selected_values(&self.extra, actual);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.extra,
+            representation,
+            format,
+            mark_unexpected,
+        );
+        let marked_expected = mark_selected_items_in_collection(
+            &self.expected,
+            &self.missing,
+            representation,
+            format,
+            mark_missing,
+        );
+        let missing = collect_selected_values(&self.missing, &self.expected, representation);
+        let extra = collect_selected_values(&self.extra, actual, representation);
+        let represented_expected = self
+            .expected
+            .iter()
+            .map(|e| Represented::from((e, representation)))
+            .collect::<Vec<_>>();
 
         format!(
-            r"expected {expression} to end with {:?}
+            r"expected {expression} to end with {represented_expected:?}
    but was: {marked_actual}
   expected: {marked_expected}
    missing: {missing:?}
      extra: {extra:?}",
-            self.expected,
         )
     }
 }
 
-impl<'a, S, T, R> AssertFilteredElements<T> for Spec<'a, S, R>
+impl<'a, S, T, D, R> AssertFilteredElements<T> for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    T: Debug,
+    D: Represent<T> + Clone,
     R: FailingStrategy,
 {
-    type SingleElement = Spec<'a, T, R>;
-    type MultipleElements = Spec<'a, Vec<T>, R>;
+    type SingleElement = Spec<'a, T, D, R>;
+    type MultipleElements = Spec<'a, Vec<T>, D, R>;
 
     fn single_element(self) -> Self::SingleElement {
-        let spec = self.mapping(Vec::from_iter).expecting(has_single_element());
+        let representation = self.representation().clone();
+        let spec = self
+            .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
+            .expecting(has_single_element());
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
             unreachable!("Assertion failed and should have panicked! Please report a bug.")
         }
         let original_expression = spec.expression();
         let new_expression = format!("{original_expression}'s only element");
-        spec.extracting("", |mut collection| {
+        spec.extracting("[0]", |mut collection| {
             collection.pop().unwrap_or_else(|| {
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
         .named(new_expression)
+        .represented_by(representation)
     }
 
     fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
     where
         C: FnMut(&T) -> bool,
     {
+        let representation = self.representation().clone();
         self.mapping(|subject| subject.into_iter().filter(condition).collect())
+            .represented_by(representation)
     }
 
     fn any_satisfies<P>(self, predicate: P) -> Self::MultipleElements
     where
         P: FnMut(&T) -> bool,
     {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(any_satisfies(predicate))
     }
 
@@ -829,7 +997,9 @@ where
     where
         P: FnMut(&T) -> bool,
     {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(all_satisfy(predicate))
     }
 
@@ -837,14 +1007,16 @@ where
     where
         P: FnMut(&T) -> bool,
     {
+        let representation = self.representation().clone();
         self.mapping(Vec::from_iter)
+            .represented_by(representation)
             .expecting(none_satisfies(predicate))
     }
 }
 
-impl<T> Expectation<Vec<T>> for HasSingleElement
+impl<T, D> Expectation<Vec<T>, D> for HasSingleElement
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         subject.len() == 1
@@ -855,26 +1027,35 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let actual_length = actual.len();
         let actual_elements = match actual_length {
-            0 => mark_unexpected_string("no elements", format),
-            1 => mark_unexpected_string("exactly one element", format),
-            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
+            0 => mark_unexpected("no elements", &DisplayRepresentation, format),
+            1 => mark_unexpected("exactly one element", &DisplayRepresentation, format),
+            _ => mark_unexpected(
+                &format!("{actual_length} elements"),
+                &DisplayRepresentation,
+                format,
+            ),
         };
-        let expected_elements = mark_missing_string("exactly one element", format);
+        let expected_elements = mark_missing("exactly one element", &DisplayRepresentation, format);
+        let represented_actual = actual
+            .iter()
+            .map(|s| Represented::from((s, representation)))
+            .collect::<Vec<_>>();
         format!(
             r"expected {expression} to have {expected_elements}, but has {actual_elements}
-  actual: {actual:?}"
+  actual: {represented_actual:?}"
         )
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for AnySatisfies<P>
+impl<T, P, D> Expectation<Vec<T>, D> for AnySatisfies<P>
 where
-    T: Debug,
     P: FnMut(&T) -> bool,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         subject.iter().any(|e| (self.predicate)(e))
@@ -885,19 +1066,24 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         _format: &DiffFormat,
     ) -> String {
+        let represented_actual = actual
+            .iter()
+            .map(|s| Represented::from((s, representation)))
+            .collect::<Vec<_>>();
         format!(
             r"expected any element of {expression} to satisfy the predicate, but none did
-  actual: {actual:?}"
+  actual: {represented_actual:?}"
         )
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for AllSatisfy<P>
+impl<T, P, D> Expectation<Vec<T>, D> for AllSatisfy<P>
 where
-    T: Debug,
     P: FnMut(&T) -> bool,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         for (i, e) in subject.iter().enumerate() {
@@ -913,12 +1099,18 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let number_of_failing = self.failing.len();
-        let failing = collect_selected_values(&self.failing, actual);
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.failing, format, mark_unexpected);
+        let failing = collect_selected_values(&self.failing, actual, representation);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.failing,
+            representation,
+            format,
+            mark_unexpected,
+        );
         format!(
             r"expected all elements of {expression} to satisfy the predicate, but {number_of_failing} did not
    actual: {marked_actual}
@@ -927,10 +1119,10 @@ where
     }
 }
 
-impl<T, P> Expectation<Vec<T>> for NoneSatisfies<P>
+impl<T, P, D> Expectation<Vec<T>, D> for NoneSatisfies<P>
 where
-    T: Debug,
     P: FnMut(&T) -> bool,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         for (i, e) in subject.iter().enumerate() {
@@ -946,12 +1138,18 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let number_of_failing = self.failing.len();
-        let failing = collect_selected_values(&self.failing, actual);
-        let marked_actual =
-            mark_selected_items_in_collection(actual, &self.failing, format, mark_unexpected);
+        let failing = collect_selected_values(&self.failing, actual, representation);
+        let marked_actual = mark_selected_items_in_collection(
+            actual,
+            &self.failing,
+            representation,
+            format,
+            mark_unexpected,
+        );
         format!(
             r"expected none of the elements of {expression} to satisfy the predicate, but {number_of_failing} did
    actual: {marked_actual}
@@ -960,19 +1158,21 @@ where
     }
 }
 
-impl<'a, S, T, R> AssertOrderedElements for Spec<'a, S, R>
+impl<'a, S, T, D, R> AssertOrderedElements for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: Debug,
+    D: Represent<T> + Clone,
     R: FailingStrategy,
 {
-    type SingleElement = Spec<'a, T, R>;
-    type MultipleElements = Spec<'a, Vec<T>, R>;
+    type SingleElement = Spec<'a, T, D, R>;
+    type MultipleElements = Spec<'a, Vec<T>, D, R>;
 
     fn first_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -980,13 +1180,16 @@ where
         }
         let orig_subject_name = spec.expression();
         let new_subject_name = format!("the first element of {orig_subject_name}");
-        spec.extracting("", |mut collection| collection.remove(0))
+        spec.extracting("[first]", |mut collection| collection.remove(0))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn last_element(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -994,18 +1197,21 @@ where
         }
         let orig_subject_name = spec.expression();
         let new_subject_name = format!("the last element of {orig_subject_name}");
-        spec.extracting("", |mut collection| {
+        spec.extracting("[last]", |mut collection| {
             collection.pop().unwrap_or_else(|| {
                 unreachable!("Assertion failed and should have panicked! Please report a bug.")
             })
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 
     fn nth_element(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if spec.has_failures() {
             PanicOnFail.do_fail_with(&spec.failures());
@@ -1013,11 +1219,13 @@ where
         }
         let orig_subject_name = spec.expression();
         let new_subject_name = format!("{orig_subject_name}[{n}]");
-        spec.extracting("", |mut collection| collection.remove(n))
+        spec.extracting("[nth]", |mut collection| collection.remove(n))
             .named(new_subject_name)
+            .represented_by(representation)
     }
 
     fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
@@ -1030,23 +1238,27 @@ where
                 .collect()
         })
         .named(new_subject_name)
+        .represented_by(representation)
     }
 }
 
-impl<'a, S, T, U, R> AssertOrderedElementsRef for Spec<'a, S, R>
+impl<'a, S, T, U, D, R> AssertOrderedElementsRef for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
     <S as IntoIterator>::IntoIter: DefinedOrderProperty,
-    T: 'a + ToOwned<Owned = U> + Debug,
+    T: 'a + ToOwned<Owned = U>,
     U: Clone,
+    D: Represent<T> + Clone,
     R: FailingStrategy,
 {
-    type SingleElement = DerivedSpec<'a, Spec<'a, Vec<T>, R>, U>;
-    type MultipleElements = DerivedSpec<'a, Spec<'a, Vec<T>, R>, Vec<U>>;
+    type SingleElement = DerivedSpec<'a, Spec<'a, Vec<T>, D, R>, U, D>;
+    type MultipleElements = DerivedSpec<'a, Spec<'a, Vec<T>, D, R>, Vec<U>, D>;
 
     fn first_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1054,17 +1266,19 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the first element of {orig_subject_name}");
-        original_spec.extracting_ref("", |collection|
+        original_spec.extracting_ref("[first]", |collection|
             collection.first()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        ).named(new_subject_name)
+        ).named(new_subject_name).represented_by(representation)
     }
 
     fn last_element_ref(self) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(1));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1072,18 +1286,20 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("the last element of {orig_subject_name}");
-        original_spec.extracting_ref("", |collection|
+        original_spec.extracting_ref("[last]", |collection|
             collection.last()
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        ).named(new_subject_name)
+        ).named(new_subject_name).represented_by(representation)
     }
 
     fn nth_element_ref(self, n: usize) -> Self::SingleElement {
+        let representation = self.representation().clone();
         let min_len = n + 1;
         let original_spec = self
             .mapping(Vec::from_iter)
+            .represented_by(representation.clone())
             .expecting(has_at_least_number_of_elements(min_len));
         if original_spec.has_failures() {
             PanicOnFail.do_fail_with(&original_spec.failures());
@@ -1091,38 +1307,44 @@ where
         }
         let orig_subject_name = original_spec.expression();
         let new_subject_name = format!("{orig_subject_name}[{n}]");
-        original_spec.extracting_ref("", |collection|
+        original_spec.extracting_ref("[nth]", |collection|
             collection.get(n)
                 .unwrap_or_else(||
                     unreachable!("We should have asserted before, that there is at least one element in the collection/iterator. Please file a bug.")
                 )
-        ).named(new_subject_name)
+        ).named(new_subject_name).represented_by(representation)
     }
 
     fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements {
+        let representation = self.representation().clone();
         let indices = Vec::from_iter(indices);
         let orig_subject_name = self.expression();
         let new_subject_name = format!("{orig_subject_name} at positions {indices:?}");
         let indices = HashSet::<_>::from_iter(indices);
-        let original_spec = self.mapping(Vec::from_iter);
-        original_spec.extracting_ref_iter(new_subject_name, |collection| {
-            collection
-                .enumerate()
-                .filter_map(|(i, e)| {
-                    if indices.contains(&i) {
-                        Some(e.to_owned())
-                    } else {
-                        None
-                    }
-                })
-                .collect()
-        })
+        let original_spec = self
+            .mapping(Vec::from_iter)
+            .represented_by(representation.clone());
+        original_spec
+            .extracting_ref_iter("", |collection| {
+                collection
+                    .enumerate()
+                    .filter_map(|(i, e)| {
+                        if indices.contains(&i) {
+                            Some(e.to_owned())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            })
+            .named(new_subject_name)
+            .represented_by(representation)
     }
 }
 
-impl<T> Expectation<Vec<T>> for HasAtLeastNumberOfElements
+impl<T, D> Expectation<Vec<T>, D> for HasAtLeastNumberOfElements
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Vec<T>) -> bool {
         subject.len() >= self.expected_number_of_elements
@@ -1133,36 +1355,68 @@ where
         expression: &Expression<'_>,
         actual: &Vec<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let actual_length = actual.len();
         let actual_elements = match actual_length {
-            0 => mark_unexpected_string("no elements", format),
-            1 => mark_unexpected_string("one element", format),
-            _ => mark_unexpected_string(&format!("{actual_length} elements"), format),
-        };
-        let expected_elements = match self.expected_number_of_elements {
-            0 => mark_missing_string("no elements", format),
-            1 => mark_missing_string("at least one element", format),
-            _ => mark_missing_string(
-                &format!("at least {} elements", self.expected_number_of_elements),
+            0 => mark_unexpected("no elements", &DisplayRepresentation, format),
+            1 => mark_unexpected("one element", &DisplayRepresentation, format),
+            _ => mark_unexpected(
+                &format!("{actual_length} elements"),
+                &DisplayRepresentation,
                 format,
             ),
         };
+        let expected_elements = match self.expected_number_of_elements {
+            0 => mark_missing("no elements", &DisplayRepresentation, format),
+            1 => mark_missing("at least one element", &DisplayRepresentation, format),
+            _ => mark_missing(
+                &format!("at least {} elements", self.expected_number_of_elements),
+                &DisplayRepresentation,
+                format,
+            ),
+        };
+        let represented_actual = actual
+            .iter()
+            .map(|s| Represented::from((s, representation)))
+            .collect::<Vec<_>>();
         format!(
             r"expected {expression} to have {expected_elements}, but has {actual_elements}
-  actual: {actual:?}"
+  actual: {represented_actual:?}"
         )
     }
 }
 
-pub fn collect_selected_values<'a, T>(indices: &HashSet<usize>, collection: &'a [T]) -> Vec<&'a T> {
+pub fn collect_selected_values<'t, 'd, T, D>(
+    indices: &HashSet<usize>,
+    collection: &'t [T],
+    representation: &'d D,
+) -> Vec<Represented<'t, 'd, T, D>> {
     collection
         .iter()
         .enumerate()
         .filter_map(|(idx, value)| {
             if indices.contains(&idx) {
-                Some(value)
+                Some(Represented::from((value, representation)))
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+pub fn collect_selected_ref_values<'t, 'd, T, D>(
+    indices: &HashSet<usize>,
+    collection: &[&'t T],
+    representation: &'d D,
+) -> Vec<Represented<'t, 'd, T, D>> {
+    collection
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, value)| {
+            if indices.contains(&idx) {
+                Some(Represented::from((*value, representation)))
             } else {
                 None
             }

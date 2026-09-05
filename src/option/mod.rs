@@ -4,14 +4,14 @@ use crate::assertions::{AssertHasValue, AssertOption, AssertOptionValue};
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{HasValue, IsNone, IsSome, has_value, is_none, is_some};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec, Unknown,
+    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
+    Invertible, Represent, Represented, RepresentedBy, Spec,
 };
-use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 
-impl<S, R> AssertOption for Spec<'_, Option<S>, R>
+impl<T, D, R> AssertOption for Spec<'_, Option<T>, D, R>
 where
-    S: Debug,
+    D: Represent<T>,
     R: FailingStrategy,
 {
     fn is_some(self) -> Self {
@@ -23,9 +23,9 @@ where
     }
 }
 
-impl<S, R> AssertOption for Spec<'_, &Option<S>, R>
+impl<T, D, R> AssertOption for Spec<'_, &Option<T>, D, R>
 where
-    S: Debug,
+    D: Represent<T>,
     R: FailingStrategy,
 {
     fn is_some(self) -> Self {
@@ -37,42 +37,48 @@ where
     }
 }
 
-impl<'a, T, R> AssertOptionValue for Spec<'a, Option<T>, R>
+impl<'a, T, D, R> AssertOptionValue for Spec<'a, Option<T>, D, R>
 where
+    D: Represent<T> + Clone,
     R: FailingStrategy,
 {
-    type Some = Spec<'a, T, R>;
+    type Some = Spec<'a, T, D, R>;
 
     fn some(self) -> Self::Some {
+        let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
                 panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
+        .represented_by(value_representation)
     }
 }
 
-impl<'a, T, R> AssertOptionValue for Spec<'a, &'a Option<T>, R>
+impl<'a, T, D, R> AssertOptionValue for Spec<'a, &'a Option<T>, D, R>
 where
+    D: Represent<T> + Clone,
     R: FailingStrategy,
 {
-    type Some = Spec<'a, &'a T, R>;
+    type Some = Spec<'a, &'a T, D, R>;
 
     fn some(self) -> Self::Some {
+        let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
                 panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
+        .represented_by(value_representation)
     }
 }
 
-impl<S, E, R> AssertHasValue<E> for Spec<'_, Option<S>, R>
+impl<T, E, D, R> AssertHasValue<E> for Spec<'_, Option<T>, D, R>
 where
-    S: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
     R: FailingStrategy,
 {
     fn has_value(self, expected: E) -> Self {
@@ -80,10 +86,10 @@ where
     }
 }
 
-impl<S, E, R> AssertHasValue<E> for Spec<'_, &Option<S>, R>
+impl<T, E, D, R> AssertHasValue<E> for Spec<'_, &Option<T>, D, R>
 where
-    S: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
     R: FailingStrategy,
 {
     fn has_value(self, expected: E) -> Self {
@@ -91,9 +97,9 @@ where
     }
 }
 
-impl<T> Expectation<Option<T>> for IsSome
+impl<T, D> Expectation<Option<T>, D> for IsSome
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Option<T>) -> bool {
         subject.is_some()
@@ -104,23 +110,30 @@ where
         expression: &Expression<'_>,
         actual: &Option<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected = Some(Unknown);
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
+        let marked_actual = match actual {
+            Some(value) => mark_unexpected(
+                &format!("Some({})", Represented::from((value, representation))),
+                &DisplayRepresentation,
+                format,
+            ),
+            None => mark_unexpected("None", &DisplayRepresentation, format),
+        };
+        let marked_expected = mark_missing("Some(_)", &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be Some(_)\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
 
-impl<T> Expectation<&Option<T>> for IsSome
+impl<T, D> Expectation<&Option<T>, D> for IsSome
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        <Self as Expectation<Option<T>>>::test(self, subject)
+        <Self as Expectation<Option<T>, D>>::test(self, subject)
     }
 
     fn message(
@@ -128,15 +141,23 @@ where
         expression: &Expression<'_>,
         actual: &&Option<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
+        <Self as Expectation<Option<T>, D>>::message(
+            self,
+            expression,
+            actual,
+            inverted,
+            representation,
+            format,
+        )
     }
 }
 
-impl<T> Expectation<Option<T>> for IsNone
+impl<T, D> Expectation<Option<T>, D> for IsNone
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &Option<T>) -> bool {
         subject.is_none()
@@ -147,23 +168,30 @@ where
         expression: &Expression<'_>,
         actual: &Option<T>,
         _inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        let expected = None::<Unknown>;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&expected, format);
+        let marked_actual = match actual {
+            Some(value) => mark_unexpected(
+                &format!("Some({:?})", Represented::from((value, representation))),
+                &DisplayRepresentation,
+                format,
+            ),
+            None => mark_unexpected("None", &DisplayRepresentation, format),
+        };
+        let marked_expected = mark_missing("None", &DisplayRepresentation, format);
         format!(
-            "expected {expression} to be {expected:?}\n   but was: {marked_actual}\n  expected: {marked_expected}"
+            "expected {expression} to be None\n   but was: {marked_actual}\n  expected: {marked_expected}"
         )
     }
 }
 
-impl<T> Expectation<&Option<T>> for IsNone
+impl<T, D> Expectation<&Option<T>, D> for IsNone
 where
-    T: Debug,
+    D: Represent<T>,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        <Self as Expectation<Option<T>>>::test(self, subject)
+        <Self as Expectation<Option<T>, D>>::test(self, subject)
     }
 
     fn message(
@@ -171,16 +199,24 @@ where
         expression: &Expression<'_>,
         actual: &&Option<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
+        <Self as Expectation<Option<T>, D>>::message(
+            self,
+            expression,
+            actual,
+            inverted,
+            representation,
+            format,
+        )
     }
 }
 
-impl<T, E> Expectation<Option<T>> for HasValue<E>
+impl<T, E, D> Expectation<Option<T>, D> for HasValue<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &Option<T>) -> bool {
         subject
@@ -193,27 +229,40 @@ where
         expression: &Expression<'_>,
         actual: &Option<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&Some(expected), format);
+        let marked_actual = match actual {
+            Some(value) => mark_unexpected(
+                &format!("Some({:?})", Represented::from((value, representation))),
+                &DisplayRepresentation,
+                format,
+            ),
+            None => mark_unexpected("None", &DisplayRepresentation, format),
+        };
+        let marked_expected = mark_missing(
+            &format!("Some({:?})", Represented::from((expected, representation))),
+            &DisplayRepresentation,
+            format,
+        );
+        let represented_expected = Represented::from((expected, representation));
         format!(
-            "expected {expression} to be some {not}containing {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
+            "expected {expression} to be some {not}containing {represented_expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}"
         )
     }
 }
 
 impl<E> Invertible for HasValue<E> {}
 
-impl<T, E> Expectation<&Option<T>> for HasValue<E>
+impl<T, E, D> Expectation<&Option<T>, D> for HasValue<E>
 where
-    T: PartialEq<E> + Debug,
-    E: Debug,
+    T: PartialEq<E>,
+    D: Represent<T> + Represent<E>,
 {
     fn test(&mut self, subject: &&Option<T>) -> bool {
-        <Self as Expectation<Option<T>>>::test(self, subject)
+        <Self as Expectation<Option<T>, D>>::test(self, subject)
     }
 
     fn message(
@@ -221,9 +270,17 @@ where
         expression: &Expression<'_>,
         actual: &&Option<T>,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
-        <Self as Expectation<Option<T>>>::message(self, expression, actual, inverted, format)
+        <Self as Expectation<Option<T>, D>>::message(
+            self,
+            expression,
+            actual,
+            inverted,
+            representation,
+            format,
+        )
     }
 }
 

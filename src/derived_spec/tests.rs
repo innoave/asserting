@@ -226,7 +226,7 @@ fn verify_that_subject_satisfies_predicate_fails() {
 
     assert_eq!(
         failures,
-        &["expected answer.val to satisfy the given predicate, but returned false\n"]
+        &["expected answer.val to satisfy the given predicate, but returned false\n  actual: 51\n"]
     );
 }
 

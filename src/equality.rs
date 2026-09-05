@@ -9,16 +9,17 @@ use crate::expectations::{
     is_equal_to, is_same_as, not,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
+    Represented, Spec,
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::format;
 use crate::std::string::{String, ToString};
 
-impl<S, E, R> AssertEquality<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertEquality<E> for Spec<'_, S, D, R>
 where
-    S: PartialEq<E> + Debug,
-    E: Debug,
+    S: PartialEq<E>,
+    D: Represent<S> + Represent<E>,
     R: FailingStrategy,
 {
     fn is_equal_to(self, expected: E) -> Self {
@@ -30,10 +31,10 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for IsEqualTo<E>
+impl<S, D, E> Expectation<S, D> for IsEqualTo<E>
 where
-    S: PartialEq<E> + Debug,
-    E: Debug,
+    S: PartialEq<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject == &self.expected
@@ -44,23 +45,26 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
-        let (marked_actual, marked_expected) = mark_diff(actual, expected, format);
+        let represented_expected = Represented::from((expected, representation));
+        let (marked_actual, marked_expected) = mark_diff(actual, expected, representation, format);
         format!(
-            "expected {expression} to be {not}equal to {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to be {not}equal to {represented_expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsEqualTo<E> {}
 
-impl<S, R> AssertSameAs<S> for Spec<'_, S, R>
+impl<S, D, R> AssertSameAs<S> for Spec<'_, S, D, R>
 where
-    S: PartialEq + Debug,
+    S: PartialEq,
     R: FailingStrategy,
+    D: Represent<S>,
 {
     fn is_same_as(self, expected: S) -> Self {
         self.expecting(is_same_as(expected))
@@ -71,9 +75,10 @@ where
     }
 }
 
-impl<S> Expectation<S> for IsSameAs<S>
+impl<S, D> Expectation<S, D> for IsSameAs<S>
 where
-    S: PartialEq + Debug,
+    S: PartialEq,
+    D: Represent<S>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject == &self.expected
@@ -84,20 +89,22 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
         let expected = &self.expected;
-        let (marked_actual, marked_expected) = mark_diff(actual, expected, format);
+        let represented_expected = Represented::from((expected, representation));
+        let (marked_actual, marked_expected) = mark_diff(actual, expected, representation, format);
         format!(
-            "expected {expression} to be {not}the same as {expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
+            "expected {expression} to be {not}the same as {represented_expected:?}\n   but was: {marked_actual}\n  expected: {not}{marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsSameAs<E> {}
 
-impl<S, E, R> AssertHasDebugString<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertHasDebugString<E> for Spec<'_, S, D, R>
 where
     S: Debug,
     E: AsRef<str>,
@@ -112,7 +119,7 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for HasDebugString<E>
+impl<S, E, D> Expectation<S, D> for HasDebugString<E>
 where
     S: Debug,
     E: AsRef<str>,
@@ -126,6 +133,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        _representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };
@@ -140,7 +148,7 @@ where
 
 impl<E> Invertible for HasDebugString<E> {}
 
-impl<S, E, R> AssertHasDisplayString<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertHasDisplayString<E> for Spec<'_, S, D, R>
 where
     S: Display,
     E: AsRef<str>,
@@ -155,7 +163,7 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for HasDisplayString<E>
+impl<S, E, D> Expectation<S, D> for HasDisplayString<E>
 where
     S: Display,
     E: AsRef<str>,
@@ -169,6 +177,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        _representation: &D,
         format: &DiffFormat,
     ) -> String {
         let not = if inverted { "not " } else { "" };

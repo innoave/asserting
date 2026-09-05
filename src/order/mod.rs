@@ -7,15 +7,15 @@ use crate::expectations::{
     is_at_least, is_at_most, is_before, is_between, is_greater_than, is_less_than,
 };
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
+    Represented, Spec,
 };
-use crate::std::fmt::Debug;
 use crate::std::{format, string::String};
 
-impl<S, E, R> AssertOrder<E> for Spec<'_, S, R>
+impl<S, E, D, R> AssertOrder<E> for Spec<'_, S, D, R>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
     R: FailingStrategy,
 {
     fn is_less_than(self, expected: E) -> Self {
@@ -47,10 +47,10 @@ where
     }
 }
 
-impl<S, E> Expectation<S> for IsLessThan<E>
+impl<S, E, D> Expectation<S, D> for IsLessThan<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject < &self.expected
@@ -61,24 +61,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", ">=") } else { ("", "<") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}less than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}less than {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsLessThan<E> {}
 
-impl<S, E> Expectation<S> for IsAtMost<E>
+impl<S, E, D> Expectation<S, D> for IsAtMost<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject <= &self.expected
@@ -89,24 +90,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", ">") } else { ("", "<=") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}at most {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}at most {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsAtMost<E> {}
 
-impl<S, E> Expectation<S> for IsGreaterThan<E>
+impl<S, E, D> Expectation<S, D> for IsGreaterThan<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject > &self.expected
@@ -117,24 +119,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", "<=") } else { ("", ">") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}greater than {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}greater than {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsGreaterThan<E> {}
 
-impl<S, E> Expectation<S> for IsAtLeast<E>
+impl<S, E, D> Expectation<S, D> for IsAtLeast<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject >= &self.expected
@@ -145,24 +148,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", "<") } else { ("", ">=") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}at least {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}at least {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsAtLeast<E> {}
 
-impl<S, E> Expectation<S> for IsBefore<E>
+impl<S, E, D> Expectation<S, D> for IsBefore<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject < &self.expected
@@ -173,24 +177,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", ">=") } else { ("", "<") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}before {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}before {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsBefore<E> {}
 
-impl<S, E> Expectation<S> for IsAfter<E>
+impl<S, E, D> Expectation<S, D> for IsAfter<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject > &self.expected
@@ -201,24 +206,25 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted { ("not ", "<=") } else { ("", ">") };
-        let marked_actual = mark_unexpected(actual, format);
-        let marked_expected = mark_missing(&self.expected, format);
+        let marked_actual = mark_unexpected(actual, representation, format);
+        let marked_expected = mark_missing(&self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
         format!(
-            "expected {expression} to be {not}after {:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
-            self.expected,
+            "expected {expression} to be {not}after {represented_expected:?}\n   but was: {marked_actual}\n  expected: {cmp} {marked_expected}",
         )
     }
 }
 
 impl<E> Invertible for IsAfter<E> {}
 
-impl<S, E> Expectation<S> for IsBetween<E>
+impl<S, E, D> Expectation<S, D> for IsBetween<E>
 where
-    S: PartialOrd<E> + Debug,
-    E: Debug,
+    S: PartialOrd<E>,
+    D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
         subject >= &self.min && subject <= &self.max
@@ -229,6 +235,7 @@ where
         expression: &Expression<'_>,
         actual: &S,
         inverted: bool,
+        representation: &D,
         format: &DiffFormat,
     ) -> String {
         let (not, cmp) = if inverted {
@@ -236,20 +243,21 @@ where
         } else {
             ("", "<= x <=")
         };
-        let marked_actual = mark_unexpected(actual, format);
+        let expected_min = Represented::from((&self.min, representation));
+        let expected_max = Represented::from((&self.max, representation));
+        let marked_actual = mark_unexpected(actual, representation, format);
         let marked_start = if (actual < &self.min) || inverted {
-            mark_missing(&self.min, format)
+            mark_missing(&self.min, representation, format)
         } else {
-            format!("{:?}", self.min)
+            format!("{expected_min:?}")
         };
         let marked_end = if (actual > &self.max) || inverted {
-            mark_missing(&self.max, format)
+            mark_missing(&self.max, representation, format)
         } else {
-            format!("{:?}", self.max)
+            format!("{expected_max:?}")
         };
         format!(
-            "expected {expression} to be {not}between {:?} and {:?}\n   but was: {marked_actual}\n  expected: {marked_start} {cmp} {marked_end}",
-            self.min, self.max
+            "expected {expression} to be {not}between {expected_min:?} and {expected_max:?}\n   but was: {marked_actual}\n  expected: {marked_start} {cmp} {marked_end}",
         )
     }
 }

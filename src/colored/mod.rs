@@ -51,23 +51,18 @@ pub use with_colored_feature::{
     diff_format_for_mode,
 };
 
-use crate::spec::{DiffFormat, Highlight};
-use crate::std::fmt::Debug;
+use crate::spec::{DiffFormat, DisplayRepresentation, Highlight, Represent, Represented};
 use crate::std::format;
 use crate::std::string::{String, ToString};
 use crate::std::vec::Vec;
 use hashbrown::HashSet;
 #[cfg(feature = "colored")]
 use with_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
-    mark_missing_string_impl, mark_unexpected_char_impl, mark_unexpected_impl,
-    mark_unexpected_string_impl,
+    configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,
 };
 #[cfg(not(feature = "colored"))]
 use without_colored_feature::{
-    configured_diff_format_impl, mark_diff_impl, mark_missing_char_impl, mark_missing_impl,
-    mark_missing_string_impl, mark_unexpected_char_impl, mark_unexpected_impl,
-    mark_unexpected_string_impl,
+    configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,
 };
 
 const NO_HIGHLIGHT: Highlight = Highlight { start: "", end: "" };
@@ -131,7 +126,7 @@ pub fn configured_diff_format() -> DiffFormat {
 }
 
 /// Highlights differences between the expected and the actual value and returns
-/// the debug formatted values with marked differences.
+/// the debug-formatted values with marked differences.
 ///
 /// The style for marking differences is determined by the provided
 /// [`DiffFormat`].
@@ -144,7 +139,7 @@ pub fn configured_diff_format() -> DiffFormat {
 ///
 /// It returns a tuple of two `String`s. The first string contains the actual
 /// value, and the second one contains the expected value. Both strings
-/// represent their according value as debug formatted string with differences
+/// represent their according value as debug-formatted string with differences
 /// highlighted.
 ///
 /// # Examples
@@ -154,12 +149,20 @@ pub fn configured_diff_format() -> DiffFormat {
 /// # fn main() {}
 /// # #[cfg(feature = "colored")]
 /// # fn main() {
-/// use asserting::colored::{mark_diff, DIFF_FORMAT_RED_GREEN};
+/// use asserting::{
+///     colored::{mark_diff, DIFF_FORMAT_RED_GREEN},
+///     spec::DebugRepresentation,
+/// };
 ///
 /// let actual = "Hello Welt!";
 /// let expected = "Hello World!";
 ///
-/// let (marked_actual, marked_expected) = mark_diff(&actual, &expected, &DIFF_FORMAT_RED_GREEN);
+/// let (marked_actual, marked_expected) = mark_diff(
+///     &actual,
+///     &expected,
+///     &DebugRepresentation,
+///     &DIFF_FORMAT_RED_GREEN
+/// );
 ///
 /// assert_eq!(marked_actual, "\"Hello W\u{1b}[31me\u{1b}[0ml\u{1b}[31mt\u{1b}[0m!\"");
 /// assert_eq!(marked_expected, "\"Hello W\u{1b}[32mor\u{1b}[0ml\u{1b}[32md\u{1b}[0m!\"");
@@ -171,7 +174,10 @@ pub fn configured_diff_format() -> DiffFormat {
 /// # fn main() {}
 /// # #[cfg(feature = "colored")]
 /// # fn main() {
-/// use asserting::colored::{mark_diff, DIFF_FORMAT_RED_BLUE};
+/// use asserting::{
+///     colored::{mark_diff, DIFF_FORMAT_RED_BLUE},
+///     spec::DebugRepresentation,
+/// };
 ///
 /// #[derive(Debug)]
 /// struct Pos {
@@ -182,17 +188,30 @@ pub fn configured_diff_format() -> DiffFormat {
 /// let actual = Pos { x: 45, y: -21 };
 /// let expected = Pos { x: -45, y: -33 };
 ///
-/// let (marked_actual, marked_expected) = mark_diff(&actual, &expected, &DIFF_FORMAT_RED_BLUE);
+/// let (marked_actual, marked_expected) = mark_diff(
+///     &actual,
+///     &expected,
+///     &DebugRepresentation,
+///     &DIFF_FORMAT_RED_BLUE
+/// );
 ///
 /// assert_eq!(marked_actual, "Pos { x: 45, y: -\u{1b}[31m21\u{1b}[0m }");
 /// assert_eq!(marked_expected, "Pos { x: \u{1b}[34m-\u{1b}[0m45, y: -\u{1b}[34m33\u{1b}[0m }");
 /// # }
 /// ```
-pub fn mark_diff<S, E>(actual: &S, expected: &E, format: &DiffFormat) -> (String, String)
+pub fn mark_diff<S, E, D>(
+    actual: &S,
+    expected: &E,
+    representation: &D,
+    format: &DiffFormat,
+) -> (String, String)
 where
-    S: Debug + ?Sized,
-    E: Debug + ?Sized,
+    S: ?Sized,
+    E: ?Sized,
+    D: Represent<S> + Represent<E>,
 {
+    let actual = Represented::from((actual, representation));
+    let expected = Represented::from((expected, representation));
     let actual = format!("{actual:?}");
     let expected = format!("{expected:?}");
     mark_diff_impl(&actual, &expected, format)
@@ -218,60 +237,22 @@ pub fn mark_diff_str(actual: &str, expected: &str, format: &DiffFormat) -> (Stri
 
 /// Highlights the given value as "unexpected value" using the color for
 /// unexpected values or bold as specified by the given [`DiffFormat`].
-pub fn mark_unexpected<T>(value: &T, format: &DiffFormat) -> String
+pub fn mark_unexpected<T, D>(value: &T, representation: &D, format: &DiffFormat) -> String
 where
-    T: Debug + ?Sized,
+    T: ?Sized,
+    D: Represent<T>,
 {
-    mark_unexpected_impl(value, format)
+    mark_unexpected_impl(value, representation, format)
 }
 
 /// Highlights the given value as "missing value" using the color for
 /// "missing values" as specified by the given [`DiffFormat`].
-pub fn mark_missing<T>(value: &T, format: &DiffFormat) -> String
+pub fn mark_missing<T, D>(value: &T, representation: &D, format: &DiffFormat) -> String
 where
-    T: Debug + ?Sized,
+    T: ?Sized,
+    D: Represent<T>,
 {
-    mark_missing_impl(value, format)
-}
-
-/// Highlights the given string as "unexpected value" using the color for
-/// unexpected values or bold as specified by the given [`DiffFormat`].
-///
-/// When using this function in comparison to [`mark_unexpected`], the returned
-/// string does not contain quotes at the start and end of the string as they
-/// appear in the debug formatted string returned by [`mark_unexpected`].
-pub fn mark_unexpected_string(string: &str, format: &DiffFormat) -> String {
-    mark_unexpected_string_impl(string, format)
-}
-
-/// Highlights the given string as "missing value" using the color for
-/// missing values as specified by the given [`DiffFormat`].
-///
-/// When using this function in comparison to [`mark_missing`], the returned
-/// string does not contain quotes at the start and end of the string as they
-/// appear in the debug formatted string returned by [`mark_missing`].
-pub fn mark_missing_string(string: &str, format: &DiffFormat) -> String {
-    mark_missing_string_impl(string, format)
-}
-
-/// Highlights the given character as "unexpected value" using the color for
-/// unexpected values or bold as specified by the given [`DiffFormat`].
-///
-/// When using this function in comparison to [`mark_unexpected`], the returned
-/// string does not contain single quotes around the character as they
-/// appear in the debug formatted string returned by [`mark_unexpected`].
-pub fn mark_unexpected_char(character: char, format: &DiffFormat) -> String {
-    mark_unexpected_char_impl(character, format)
-}
-
-/// Highlights the given character as "missing value" using the color for
-/// missing values as specified by the given [`DiffFormat`].
-///
-/// When using this function in comparison to [`mark_missing`], the returned
-/// string does not contain single quotes around the character as they
-/// appear in the debug formatted string returned by [`mark_missing`].
-pub fn mark_missing_char(character: char, format: &DiffFormat) -> String {
-    mark_missing_char_impl(character, format)
+    mark_missing_impl(value, representation, format)
 }
 
 /// Highlights a substring within a string using the color for unexpected values
@@ -303,7 +284,14 @@ pub fn mark_unexpected_substring_in_string(
     substring: &str,
     format: &DiffFormat,
 ) -> String {
-    mark_substring_in_string(string, substring, format, mark_unexpected_string)
+    mark_substring_in_string(
+        string,
+        substring,
+        format,
+        |string, _: &DisplayRepresentation, format| {
+            mark_unexpected(string, &DisplayRepresentation, format)
+        },
+    )
 }
 
 /// Highlights a substring within a string using the color for missing values
@@ -335,7 +323,14 @@ pub fn mark_missing_substring_in_string(
     substring: &str,
     format: &DiffFormat,
 ) -> String {
-    mark_substring_in_string(string, substring, format, mark_missing_string)
+    mark_substring_in_string(
+        string,
+        substring,
+        format,
+        |string, _: &DisplayRepresentation, format| {
+            mark_missing(string, &DisplayRepresentation, format)
+        },
+    )
 }
 
 fn mark_substring_in_string<F>(
@@ -345,13 +340,13 @@ fn mark_substring_in_string<F>(
     mark: F,
 ) -> String
 where
-    F: Fn(&str, &DiffFormat) -> String,
+    F: Fn(&str, &DisplayRepresentation, &DiffFormat) -> String,
 {
     if let Some(position) = string.find(substring) {
         let length = substring.len();
         let begin = &string[..position];
         let end = &string[position + length..];
-        let marked_substr = mark(substring, format);
+        let marked_substr = mark(substring, &DisplayRepresentation, format);
         format!("{begin}{marked_substr}{end}")
     } else {
         string.to_string()
@@ -387,7 +382,9 @@ pub fn mark_unexpected_char_in_string(
     character: char,
     format: &DiffFormat,
 ) -> String {
-    mark_char_in_string(string, character, format, mark_unexpected_string)
+    mark_char_in_string(string, character, format, |string, format| {
+        mark_unexpected(string, &DisplayRepresentation, format)
+    })
 }
 
 /// Highlights all occurences of a character within a string using the color for
@@ -415,7 +412,9 @@ pub fn mark_unexpected_char_in_string(
 /// # }
 /// ```
 pub fn mark_missing_char_in_string(string: &str, character: char, format: &DiffFormat) -> String {
-    mark_char_in_string(string, character, format, mark_missing_string)
+    mark_char_in_string(string, character, format, |string, format| {
+        mark_missing(string, &DisplayRepresentation, format)
+    })
 }
 
 fn mark_char_in_string<F>(string: &str, character: char, format: &DiffFormat, mark: F) -> String
@@ -562,7 +561,10 @@ fn mark_selected_chars_in_string(
 /// # fn main() {}
 /// # #[cfg(feature = "colored")]
 /// # fn main() {
-/// use asserting::colored::{mark_missing, mark_selected_items_in_collection, DIFF_FORMAT_RED_BLUE};
+/// use asserting::{
+///     colored::{mark_missing, mark_selected_items_in_collection, DIFF_FORMAT_RED_BLUE},
+///     spec::DebugRepresentation,
+/// };
 /// use hashbrown::HashSet;
 ///
 /// let collection = [1, 2, 3, 4, 5];
@@ -571,6 +573,7 @@ fn mark_selected_chars_in_string(
 /// let marked_collection = mark_selected_items_in_collection(
 ///     &collection,
 ///     &selected_items,
+///     &DebugRepresentation,
 ///     &DIFF_FORMAT_RED_BLUE,
 ///     mark_missing
 /// );
@@ -578,15 +581,16 @@ fn mark_selected_chars_in_string(
 /// assert_eq!(marked_collection, "[1, \u{1b}[34m2\u{1b}[0m, \u{1b}[34m3\u{1b}[0m, 4, \u{1b}[34m5\u{1b}[0m]");
 /// # }
 /// ```
-pub fn mark_selected_items_in_collection<T, F>(
+pub fn mark_selected_items_in_collection<T, D, F>(
     collection: &[T],
     selected_indices: &HashSet<usize>,
+    representation: &D,
     format: &DiffFormat,
     mark: F,
 ) -> String
 where
-    T: Debug,
-    F: Fn(&T, &DiffFormat) -> String,
+    D: Represent<T>,
+    F: Fn(&T, &D, &DiffFormat) -> String,
 {
     let mut marked_collection = String::with_capacity(collection.len() + 2);
     marked_collection.push('[');
@@ -595,8 +599,9 @@ where
         .enumerate()
         .map(|(index, item)| {
             if selected_indices.contains(&index) {
-                mark(item, format)
+                mark(item, representation, format)
             } else {
+                let item = Represented::from((item, representation));
                 format!("{item:?}")
             }
         })
@@ -627,13 +632,17 @@ where
 /// # fn main() {}
 /// # #[cfg(feature = "colored")]
 /// # fn main() {
-/// use asserting::colored::{mark_all_items_in_collection, mark_unexpected, DIFF_FORMAT_RED_BLUE};
+/// use asserting::{
+///     colored::{mark_all_items_in_collection, mark_unexpected, DIFF_FORMAT_RED_BLUE},
+///     spec::DebugRepresentation,
+/// };
 /// use hashbrown::HashSet;
 ///
 /// let collection = [1, 2, 3, 4, 5];
 ///
 /// let marked_collection = mark_all_items_in_collection(
 ///     &collection,
+///     &DebugRepresentation,
 ///     &DIFF_FORMAT_RED_BLUE,
 ///     mark_unexpected
 /// );
@@ -641,16 +650,20 @@ where
 /// assert_eq!(marked_collection, "[\u{1b}[31m1\u{1b}[0m, \u{1b}[31m2\u{1b}[0m, \u{1b}[31m3\u{1b}[0m, \u{1b}[31m4\u{1b}[0m, \u{1b}[31m5\u{1b}[0m]");
 /// # }
 /// ```
-pub fn mark_all_items_in_collection<T, F>(collection: &[T], format: &DiffFormat, mark: F) -> String
+pub fn mark_all_items_in_collection<T, D, F>(
+    collection: &[T],
+    representation: &D,
+    format: &DiffFormat,
+    mark: F,
+) -> String
 where
-    T: Debug,
-    F: Fn(&T, &DiffFormat) -> String,
+    F: Fn(&T, &D, &DiffFormat) -> String,
 {
     let mut marked_collection = String::with_capacity(collection.len() + 2);
     marked_collection.push('[');
     collection
         .iter()
-        .map(|item| mark(item, format))
+        .map(|item| mark(item, representation, format))
         .for_each(|item| {
             marked_collection.push_str(&item);
             marked_collection.push_str(", ");
@@ -678,7 +691,8 @@ where
 /// # fn main() {}
 /// # #[cfg(all(feature = "colored", feature = "std"))]
 /// # fn main() {
-/// use asserting::colored::{mark_missing_string, mark_selected_entries_in_map, DIFF_FORMAT_RED_BLUE};
+/// use asserting::colored::{mark_missing, mark_selected_entries_in_map, DIFF_FORMAT_RED_BLUE};
+/// use asserting::spec::DebugRepresentation;
 /// use hashbrown::HashSet;
 /// use std::collections::BTreeMap;
 ///
@@ -689,23 +703,24 @@ where
 /// let marked_map = mark_selected_entries_in_map(
 ///     &map_entries,
 ///     &selected_entries,
+///     &DebugRepresentation,
 ///     &DIFF_FORMAT_RED_BLUE,
-///     mark_missing_string
+///     mark_missing,
 /// );
 ///
 /// assert_eq!(marked_map, "{\u{1b}[34m1: \"one\"\u{1b}[0m, 2: \"two\", \u{1b}[34m3: \"three\"\u{1b}[0m, 4: \"four\"}");
 /// # }
 /// ```
-pub fn mark_selected_entries_in_map<K, V, F>(
-    map_entries: &[(K, V)],
+pub fn mark_selected_entries_in_map<K, V, D, F>(
+    map_entries: &[(&K, &V)],
     selected_indices: &HashSet<usize>,
+    representation: &D,
     format: &DiffFormat,
     mark: F,
 ) -> String
 where
-    K: Debug,
-    V: Debug,
-    F: Fn(&str, &DiffFormat) -> String,
+    F: Fn(&str, &DisplayRepresentation, &DiffFormat) -> String,
+    D: Represent<K> + Represent<V>,
 {
     let mut marked_map_entries = String::with_capacity(map_entries.len() + 2);
     marked_map_entries.push('{');
@@ -713,9 +728,11 @@ where
         .iter()
         .enumerate()
         .map(|(index, entry)| {
-            let key_value_pair = format!("{:?}: {:?}", entry.0, entry.1);
+            let represented_key = Represented::from((entry.0, representation));
+            let represented_value = Represented::from((entry.1, representation));
+            let key_value_pair = format!("{represented_key:?}: {represented_value:?}");
             if selected_indices.contains(&index) {
-                mark(&key_value_pair, format)
+                mark(&key_value_pair, &DisplayRepresentation, format)
             } else {
                 key_value_pair
             }
@@ -747,7 +764,8 @@ where
 /// # fn main() {}
 /// # #[cfg(all(feature = "colored", feature = "std"))]
 /// # fn main() {
-/// use asserting::colored::{mark_all_entries_in_map, mark_unexpected_string, DIFF_FORMAT_RED_BLUE};
+/// use asserting::colored::{mark_all_entries_in_map, mark_unexpected, DIFF_FORMAT_RED_BLUE};
+/// use asserting::spec::DebugRepresentation;
 /// use std::collections::BTreeMap;
 ///
 /// let map: BTreeMap<_, _> = [(1, "one"), (2, "two"), (3, "three"), (4, "four")].into();
@@ -755,30 +773,33 @@ where
 /// let map_entries: Vec<_> = map.iter().collect();
 /// let marked_map = mark_all_entries_in_map(
 ///     &map_entries,
+///     &DebugRepresentation,
 ///     &DIFF_FORMAT_RED_BLUE,
-///     mark_unexpected_string
+///     mark_unexpected,
 /// );
 ///
 /// assert_eq!(marked_map, "{\u{1b}[31m1: \"one\"\u{1b}[0m, \u{1b}[31m2: \"two\"\u{1b}[0m, \u{1b}[31m3: \"three\"\u{1b}[0m, \u{1b}[31m4: \"four\"\u{1b}[0m}");
 /// # }
 /// ```
-pub fn mark_all_entries_in_map<K, V, F>(
-    map_entries: &[(K, V)],
+pub fn mark_all_entries_in_map<K, V, D, F>(
+    map_entries: &[(&K, &V)],
+    representation: &D,
     format: &DiffFormat,
     mark: F,
 ) -> String
 where
-    K: Debug,
-    V: Debug,
-    F: Fn(&str, &DiffFormat) -> String,
+    F: Fn(&str, &DisplayRepresentation, &DiffFormat) -> String,
+    D: Represent<K> + Represent<V>,
 {
     let mut marked_map_entries = String::with_capacity(map_entries.len() + 2);
     marked_map_entries.push('{');
     map_entries
         .iter()
         .map(|entry| {
-            let key_value_pair = format!("{:?}: {:?}", entry.0, entry.1);
-            mark(&key_value_pair, format)
+            let represented_key = Represented::from((entry.0, representation));
+            let represented_value = Represented::from((entry.1, representation));
+            let key_value_pair = format!("{represented_key:?}: {represented_value:?}");
+            mark(&key_value_pair, &DisplayRepresentation, format)
         })
         .for_each(|entry| {
             marked_map_entries.push_str(&entry);
@@ -795,9 +816,8 @@ where
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
-    use crate::spec::DiffFormat;
+    use crate::spec::{DiffFormat, Represent, Represented};
     use crate::std::{
-        fmt::Debug,
         format,
         string::{String, ToString},
     };
@@ -817,47 +837,31 @@ mod without_colored_feature {
     }
 
     #[inline]
-    pub fn mark_unexpected_impl<T>(value: &T, _format: &DiffFormat) -> String
+    pub fn mark_unexpected_impl<T, D>(value: &T, representation: &D, _format: &DiffFormat) -> String
     where
-        T: Debug + ?Sized,
+        T: ?Sized,
+        D: Represent<T>,
     {
+        let value = Represented::from((value, representation));
         format!("{value:?}")
     }
 
     #[inline]
-    pub fn mark_missing_impl<T>(value: &T, _format: &DiffFormat) -> String
+    pub fn mark_missing_impl<T, D>(value: &T, representation: &D, _format: &DiffFormat) -> String
     where
-        T: Debug + ?Sized,
+        T: ?Sized,
+        D: Represent<T>,
     {
+        let value = Represented::from((value, representation));
         format!("{value:?}")
-    }
-
-    #[inline]
-    pub fn mark_unexpected_string_impl(string: &str, _format: &DiffFormat) -> String {
-        string.to_string()
-    }
-
-    #[inline]
-    pub fn mark_missing_string_impl(string: &str, _format: &DiffFormat) -> String {
-        string.to_string()
-    }
-
-    #[inline]
-    pub fn mark_unexpected_char_impl(character: char, _format: &DiffFormat) -> String {
-        format!("{character}")
-    }
-
-    #[inline]
-    pub fn mark_missing_char_impl(character: char, _format: &DiffFormat) -> String {
-        format!("{character}")
     }
 }
 
 #[cfg(feature = "colored")]
 mod with_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
-    use crate::spec::{DiffFormat, Highlight};
-    use crate::std::{fmt::Debug, format, string::String};
+    use crate::spec::{DiffFormat, Highlight, Represent, Represented};
+    use crate::std::{format, string::String};
 
     #[cfg(feature = "std")]
     #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
@@ -1079,48 +1083,26 @@ mod with_colored_feature {
     }
 
     #[inline]
-    pub fn mark_unexpected_impl<T>(value: &T, format: &DiffFormat) -> String
+    pub fn mark_unexpected_impl<T, D>(value: &T, representation: &D, format: &DiffFormat) -> String
     where
-        T: Debug + ?Sized,
+        T: ?Sized,
+        D: Represent<T>,
     {
+        let value = Represented::from((value, representation));
         format!(
-            "{}{value:?}{}",
+            "{}{value}{}",
             format.unexpected.start, format.unexpected.end
         )
     }
 
     #[inline]
-    pub fn mark_missing_impl<T>(value: &T, format: &DiffFormat) -> String
+    pub fn mark_missing_impl<T, D>(value: &T, representation: &D, format: &DiffFormat) -> String
     where
-        T: Debug + ?Sized,
+        T: ?Sized,
+        D: Represent<T>,
     {
-        format!("{}{value:?}{}", format.missing.start, format.missing.end)
-    }
-
-    #[inline]
-    pub fn mark_unexpected_string_impl(string: &str, format: &DiffFormat) -> String {
-        format!(
-            "{}{string}{}",
-            format.unexpected.start, format.unexpected.end
-        )
-    }
-
-    #[inline]
-    pub fn mark_missing_string_impl(string: &str, format: &DiffFormat) -> String {
-        format!("{}{string}{}", format.missing.start, format.missing.end)
-    }
-
-    #[inline]
-    pub fn mark_unexpected_char_impl(character: char, format: &DiffFormat) -> String {
-        format!(
-            "{}{character}{}",
-            format.unexpected.start, format.unexpected.end
-        )
-    }
-
-    #[inline]
-    pub fn mark_missing_char_impl(character: char, format: &DiffFormat) -> String {
-        format!("{}{character}{}", format.missing.start, format.missing.end)
+        let value = Represented::from((value, representation));
+        format!("{}{value}{}", format.missing.start, format.missing.end)
     }
 }
 
