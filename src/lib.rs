@@ -905,11 +905,128 @@
 //! assert_that!(person).is_over_18();
 //! ```
 //!
+//! # Type formatting (aka Representation)
+//!
+//! `asserting` uses a representation mechanism to control how values of
+//! different types are formatted in the failure report of failing assertions.
+//!
+//! By default, the formatting of values is delegated to the `fmt`-method of the
+//! [`std::fmt::Debug`] trait. We can write assertions for any type that
+//! implements `std::fmt::Debug`. In failure reports the subject and the
+//! expected value are formatted by the implementation of the `Debug`-trait.
+//! This works well for most cases, but there are two situations where we need
+//! a more flexible mechanism:
+//!
+//! 1. asserting the value of a type that does not implement `std::fmt::Debug`
+//! 2. custom formatting, without changing the `std::fmt::Debug` implementation
+//!
+//! With the representation mechanism, we implement custom formatting of values
+//! of any type, including foreign types in other crates. The representation
+//! mechanism is based on the [`Represent`] trait. Its `represent` method has a
+//! similar signature as the `fmt`-method of the `Debug` and `Display` traits in
+//! the standard library.
+//!
+//! If a type already implements [`Debug`], we can use an ad-hoc representation
+//! or a representation struct as well. This is useful when we want to get
+//! custom formatted values in failure reports of failing assertions.
+//!
+//! ## Ad-hoc representation
+//!
+//! Let's have a look at an example. We want to write an assertion for a type
+//! `Foo` that does not implement `std::fmt::Debug`. Now we have two options.
+//! Either specify a so-called ad-hoc representation or implement a custom
+//! representation.
+//!
+//! The ad-hoc representation is just a function or closure with a signature
+//! similar to the `fmt`-method of the `Debug`-trait. When writing an assertion,
+//! we configure the [`Spec`] to use the ad-hoc representation by calling the
+//! `represented_as` method.
+//!
+//! ```
+//! use asserting::prelude::*;
+//!
+//! #[derive(PartialEq)]
+//! struct Foo {
+//!     bar: String,
+//!     baz: u16,
+//! }
+//!
+//! let foo = Foo { bar: "bar".into(), baz: 42 };
+//!
+//! assert_that!(foo)
+//!     .represented_as(|val, f| write!(f, "Foo {{ bar: {}, baz: {} }}", val.bar, val.baz))
+//!     .is_equal_to(Foo { bar: "bar".into(), baz: 42 });
+//! ```
+//!
+//! We can also write a function that formats a value of type `Foo` and hand-in
+//! this function in the call to `represented_as`:
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use core::fmt;
+//!
+//! #[derive(PartialEq)]
+//! struct Foo {
+//!     bar: String,
+//!     baz: u16,
+//! }
+//!
+//! fn represent_foo(value: &Foo, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//!     write!(f, "Foo {{ bar: {}, baz: {} }}", value.bar, value.baz)
+//! }
+//!
+//! let foo = Foo { bar: "bar".into(), baz: 42 };
+//!
+//! assert_that!(foo)
+//!     .represented_as(represent_foo)
+//!     .is_equal_to(Foo { bar: "bar".into(), baz: 42 });
+//! ```
+//!
+//! ## Representation struct
+//!
+//! The second option is to define a representation struct and implement the
+//! [`Represent`] trait for the type `Foo` on this representation struct. When
+//! writing the assertion, we hand-in the representation struct to the
+//! `represented_by` method:
+//!
+//! ```
+//! use asserting::prelude::*;
+//! use core::fmt;
+//!
+//! #[derive(PartialEq)]
+//! struct Foo {
+//!     bar: String,
+//!     baz: u16,
+//! }
+//!
+//! #[derive(Clone, Copy)]
+//! struct FooRepresentation;
+//!
+//! impl Represent<Foo> for FooRepresentation {
+//!     fn represent(&self, value: &Foo, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//!         write!(f, "Foo {{ bar: {}, baz: {} }}", value.bar, value.baz)
+//!     }
+//! }
+//!
+//! let foo = Foo { bar: "bar".into(), baz: 42 };
+//!
+//! assert_that(foo)
+//!     .represented_by(FooRepresentation)
+//!     .is_equal_to(Foo { bar: "bar".into(), baz: 42 });
+//! ```
+//!
+//! In most cases the representation struct will be just a unit struct like in
+//! our example. It is recommended to derive `Clone` for the representation
+//! struct. When asserting values in container types like `Vec<Foo>` or
+//! `Option<Foo>`, it is required that the representation struct implements
+//! `Clone`.
+//!
 //! [`AssertElements`]: assertions::AssertElements
 //! [`AssertFilteredElements`]: assertions::AssertFilteredElements
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
+//! [`Represent`]: spec::Represent
 //! [`Spec`]: spec::Spec
 //! [`Spec::expecting()`]: spec::Expecting::expecting
 //! [`Spec::satisfies()`]: spec::Satisfies::satisfies
