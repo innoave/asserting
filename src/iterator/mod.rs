@@ -19,7 +19,6 @@ use crate::expectations::{
     iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
     iterator_ends_with, iterator_starts_with, none_satisfies, not,
 };
-use crate::properties::DefinedOrderProperty;
 use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     GetFailures, Invertible, PanicOnFail, Represent, Represented, RepresentedBy, Spec,
@@ -502,9 +501,7 @@ where
 impl<'a, S, T, E, D, R> AssertIteratorContainsInOrder<E> for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     E: IntoIterator,
-    <E as IntoIterator>::IntoIter: DefinedOrderProperty,
     T: PartialEq<<E as IntoIterator>::Item>,
     D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     R: FailingStrategy,
@@ -1161,7 +1158,6 @@ where
 impl<'a, S, T, D, R> AssertOrderedElements for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     D: Represent<T> + Clone,
     R: FailingStrategy,
 {
@@ -1245,7 +1241,6 @@ where
 impl<'a, S, T, U, D, R> AssertOrderedElementsRef for Spec<'a, S, D, R>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     T: 'a + ToOwned<Owned = U>,
     U: Clone,
     D: Represent<T> + Clone,
