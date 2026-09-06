@@ -30,9 +30,9 @@ use crate::expectations::{
     string_contains, string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{
-    AdditiveIdentityProperty, CharCountProperty, DecimalProperties, DefinedOrderProperty,
-    InfinityProperty, IsEmptyProperty, IsNanProperty, LengthProperty, MapProperties,
-    MultiplicativeIdentityProperty, SignumProperty,
+    AdditiveIdentityProperty, CharCountProperty, DecimalProperties, InfinityProperty,
+    IsEmptyProperty, IsNanProperty, LengthProperty, MapProperties, MultiplicativeIdentityProperty,
+    SignumProperty,
 };
 use crate::spec::{
     AdHocRepresentation, And, AssertFailure, CollectFailures, DebugRepresentation, DiffFormat,
@@ -1619,9 +1619,7 @@ where
 impl<'a, O, S, T, E, D> AssertIteratorContainsInOrder<E> for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     E: IntoIterator,
-    <E as IntoIterator>::IntoIter: DefinedOrderProperty,
     T: PartialEq<<E as IntoIterator>::Item>,
     D: Represent<T> + Represent<<E as IntoIterator>::Item> + Clone,
     O: DoFail,
@@ -1725,7 +1723,6 @@ where
 impl<'a, O, S, T, D> AssertOrderedElements for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     D: Represent<T> + Clone,
     O: DoFail + GetFailures,
 {
@@ -1888,7 +1885,6 @@ where
 impl<'a, O, S, T, U, D> AssertOrderedElementsRef for DerivedSpec<'a, O, S, D>
 where
     S: IntoIterator<Item = T>,
-    <S as IntoIterator>::IntoIter: DefinedOrderProperty,
     T: ToOwned<Owned = U>,
     D: Represent<T> + Clone,
     O: DoFail + GetFailures,

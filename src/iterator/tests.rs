@@ -1115,3 +1115,43 @@ mod extracted_elements_ref {
         );
     }
 }
+
+mod derived_iterator {
+    use super::*;
+
+    #[test]
+    fn derived_iterator_contains_exactly_elements() {
+        let subject = ["one", "two", "three", "four", "five"];
+        let derived_iter = subject.into_iter().skip(1).take(3);
+
+        assert_that(derived_iter).contains_exactly(["two", "three", "four"]);
+    }
+
+    #[test]
+    fn derived_iterator_starts_with_element() {
+        let subject = ["one", "two", "three", "four", "five"];
+        let derived_iter = subject.into_iter().skip(1).take(3);
+
+        assert_that(derived_iter).starts_with(["two"]);
+    }
+
+    #[test]
+    fn derived_iterator_ends_with_sequence() {
+        let subject = ["one", "two", "three", "four", "five"];
+        let derived_iter = subject.into_iter().skip(1).take(3);
+
+        assert_that(derived_iter).ends_with(["three", "four"]);
+    }
+
+    #[test]
+    fn first_element_of_derived_iterator_with_several_elements() {
+        let subject = ["one", "two", "three", "four", "five"];
+        let derived_iter = subject.into_iter().skip(1).take(3);
+
+        assert_that(derived_iter)
+            .first_element()
+            .is_equal_to("two")
+            .has_length(3)
+            .starts_with('t');
+    }
+}
