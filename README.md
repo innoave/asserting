@@ -505,8 +505,6 @@ possibilities for custom assertions, including examples.
 
 [`assertions`]: https://docs.rs/asserting/latest/asserting/assertions/
 
-[`DefinedOrderProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.DefinedOrderProperty.html
-
 [`IsEmptyProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.IsEmptyProperty.html
 
 [`LengthProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.LengthProperty.html
