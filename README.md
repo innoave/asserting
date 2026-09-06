@@ -43,7 +43,7 @@ To see what is changed with each release, see the [changelog](CHANGELOG.md).
 
 ## no-std support
 
-To use `asserting` in a no-std environment disable the default features. Features that do not
+To use `asserting` in a no-std environment, disable the default features. Features that do not
 require std can still be added.
 
 ```toml
