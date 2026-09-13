@@ -257,6 +257,31 @@ pub trait AssertEquivalence<E> {
     fn is_not_equivalent_to(self, expected: E) -> Self;
 }
 
+/// Assert a single value is in a set of expected values.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!("two").is_in(["one", "two", "three"]);
+/// assert_that!(42).is_in([22, 42, 50, 88]);
+/// ```
+pub trait AssertIsIn<I, E> {
+    /// Verifies that the actual value is in the set of expected values.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("two").is_in(["one", "two", "three"]);
+    /// assert_that!(42).is_in([1, 2, 42, 5, 6]);
+    /// ```
+    #[track_caller]
+    fn is_in(self, expected_values: I) -> Self;
+}
+
 /// Assert approximate equality for floating point numbers.
 ///
 /// # Examples
@@ -276,7 +301,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
     ///
-    /// For comparison, the epsilon and ULPS values of the given margin are
+    /// For the comparison the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// # Examples
@@ -299,7 +324,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value not approximately equals to the expected
     /// value.
     ///
-    /// For comparison, the epsilon and ULPS values of the given margin are
+    /// For the comparison the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// # Examples

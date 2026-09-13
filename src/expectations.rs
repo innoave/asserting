@@ -259,6 +259,20 @@ pub struct IsSameAs<E> {
     pub expected: E,
 }
 
+pub fn is_in<E, I>(expected_values: I) -> IsIn<E>
+where
+    I: IntoIterator<Item = E>,
+{
+    IsIn {
+        expected_values: Vec::from_iter(expected_values),
+    }
+}
+
+#[must_use]
+pub struct IsIn<E> {
+    pub expected_values: Vec<E>,
+}
+
 /// Creates an [`IsCloseTo`] expectation.
 ///
 /// The margin is set to a default value. To define a custom margin, use the

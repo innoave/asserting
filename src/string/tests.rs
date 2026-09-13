@@ -1,5 +1,7 @@
 use crate::prelude::*;
 use crate::std::string::{String, ToString};
+use crate::std::vec;
+use hashbrown::HashSet;
 
 #[test]
 fn string_is_equal_to_string() {
@@ -1370,6 +1372,136 @@ fn verify_string_does_not_end_with_char_fails() {
    but was: "possim deserunt obcaecat hendrerit"
   expected: not 't'
 "#]
+    );
+}
+
+#[test]
+fn string_is_in_an_array_of_strings() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn string_is_in_a_vec_of_strings() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in(vec![
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn string_is_in_a_array_of_str() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio",
+        "tempor nihil in minim",
+        "id culpa et in",
+    ]);
+}
+
+#[test]
+fn str_is_in_an_array_of_strings() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_a_vec_of_strings() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(vec![
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_a_array_of_str() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio",
+        "tempor nihil in minim",
+        "id culpa et in",
+    ]);
+}
+
+#[test]
+fn str_is_in_borrowed_array_of_string() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(&[
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_slice_of_string() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(
+        &[
+            "aliquip nulla eros odio".to_string(),
+            "tempor nihil in minim".to_string(),
+            "id culpa et in".to_string(),
+        ][..],
+    );
+}
+
+#[test]
+fn str_is_in_hashset_of_str() {
+    let subject: &str = "zero";
+
+    let expected_values: HashSet<&str> = HashSet::from_iter(["one", "two", "three", "zero"]);
+
+    assert_that(subject).is_in(expected_values);
+}
+
+#[test]
+fn verify_str_is_in_empty_array_fails() {
+    let subject: &str = "tempor nihil in minim";
+    let expected: [&str; 0] = [];
+
+    let failures = verify_that!(subject).is_in(expected).display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r#"expected subject to be in []
+          but was: "tempor nihil in minim"
+  which is not in: []
+"#,
+    );
+}
+
+#[test]
+fn verify_str_is_in_array_of_several_str_fails() {
+    let subject: &str = "zero";
+
+    let failures = verify_that!(subject)
+        .is_in(["one", "two", "three", "four"])
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r#"expected subject to be in ["one", "two", "three", "four"]
+          but was: "zero"
+  which is not in: ["one", "two", "three", "four"]
+"#,
     );
 }
 

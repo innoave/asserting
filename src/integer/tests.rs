@@ -1,4 +1,6 @@
 use crate::prelude::*;
+use crate::std::vec;
+use hashbrown::HashSet;
 
 #[test]
 fn usize_is_equal_to_usize() {
@@ -475,6 +477,73 @@ fn verify_u64_is_one_fails() {
    but was: 0
   expected: 1
 "]
+    );
+}
+
+#[test]
+fn i32_is_in_array_of_i32() {
+    let subject: i32 = 32;
+
+    assert_that(subject).is_in([20, 42, 32, 100]);
+}
+
+#[test]
+fn i32_is_in_vec_of_i32() {
+    let subject: i32 = 32;
+
+    assert_that(subject).is_in(vec![32, 42, 20, 100]);
+}
+
+#[test]
+fn i32_is_in_hashset_of_i32() {
+    let subject: i32 = 42;
+
+    let expected_values: HashSet<i32> = HashSet::from([20, 42, 32, 100]);
+
+    assert_that(subject).is_in(expected_values);
+}
+
+#[test]
+fn borrowed_i32_is_in_borrowed_array_of_i32() {
+    let subject: &i32 = &32;
+
+    assert_that(subject).is_in(&[32, 42, 20, 100]);
+}
+
+#[test]
+fn borrowed_i32_is_in_slice_of_i32() {
+    let subject: &i32 = &32;
+
+    assert_that(subject).is_in(&[32, 42, 20, 100][..]);
+}
+
+#[test]
+fn verify_i32_is_in_empty_array_fails() {
+    let subject: i32 = 42;
+
+    let failures = verify_that!(subject).is_in([]).display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to be in []
+          but was: 42
+  which is not in: []
+",
+    );
+}
+
+#[test]
+fn verify_i32_is_in_array_with_several_i32_fails() {
+    let subject: i32 = 42;
+
+    let failures = verify_that!(subject)
+        .is_in([43, 11, 22, 33, 88])
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to be in [43, 11, 22, 33, 88]
+          but was: 42
+  which is not in: [43, 11, 22, 33, 88]
+",
     );
 }
 
