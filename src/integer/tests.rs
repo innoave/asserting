@@ -533,6 +533,22 @@ fn verify_i32_is_in_empty_array_fails() {
 }
 
 #[test]
+fn verify_i32_is_in_maybe_empty_for_empty_array_fails() {
+    let subject: i32 = 42;
+
+    let failures = verify_that!(subject)
+        .is_in_maybe_empty([])
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to be in []
+          but was: 42
+  which is not in: []
+",
+    );
+}
+
+#[test]
 fn verify_i32_is_in_array_with_several_i32_fails() {
     let subject: i32 = 42;
 
@@ -572,6 +588,15 @@ fn verify_i32_is_not_in_empty_array_fails() {
   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
 ",
     );
+}
+
+#[test]
+fn is_not_in_maybe_empty_for_empty_array() {
+    let subject: i32 = 42;
+
+    let expected_values: [i32; 0] = [];
+
+    assert_that(subject).is_not_in_maybe_empty(expected_values);
 }
 
 #[cfg(feature = "colored")]

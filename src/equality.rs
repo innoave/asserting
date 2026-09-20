@@ -208,8 +208,16 @@ where
         self.expecting(is_in(expected_values))
     }
 
+    fn is_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(is_in(expected_values).allow_empty())
+    }
+
     fn is_not_in(self, expected_values: I) -> Self {
         self.expecting(not(is_in(expected_values)))
+    }
+
+    fn is_not_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values).allow_empty()))
     }
 }
 
@@ -219,7 +227,7 @@ where
     D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
-        if self.expected_values.is_empty() {
+        if !self.allow_empty && self.expected_values.is_empty() {
             return self.inverted;
         }
         self.expected_values
@@ -241,7 +249,7 @@ where
             .iter()
             .map(|expected| Represented::from((expected, representation)))
             .collect::<Vec<_>>();
-        if self.expected_values.is_empty() {
+        if !self.allow_empty && self.expected_values.is_empty() {
             let (method, behavior, alternative) = if inverted {
                 ("is_not_in", "succeed", "is_not_in_maybe_empty")
             } else {

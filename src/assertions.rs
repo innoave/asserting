@@ -287,6 +287,9 @@ pub trait AssertIsIn<I, E> {
     #[track_caller]
     fn is_in(self, expected_values: I) -> Self;
 
+    #[track_caller]
+    fn is_in_maybe_empty(self, expected_values: I) -> Self;
+
     /// Verifies that the actual value is not in the set of expected values.
     ///
     /// The set of expected values can be given in any type of collection
@@ -302,6 +305,9 @@ pub trait AssertIsIn<I, E> {
     /// ```
     #[track_caller]
     fn is_not_in(self, expected_values: I) -> Self;
+
+    #[track_caller]
+    fn is_not_in_maybe_empty(self, expected_values: I) -> Self;
 }
 
 /// Assert approximate equality for floating point numbers.

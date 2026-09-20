@@ -1477,9 +1477,12 @@ fn str_is_in_hashset_of_str() {
 #[test]
 fn verify_str_is_in_empty_array_fails() {
     let subject: &str = "tempor nihil in minim";
-    let expected: [&str; 0] = [];
 
-    let failures = verify_that!(subject).is_in(expected).display_failures();
+    let expected_values: [&str; 0] = [];
+
+    let failures = verify_that!(subject)
+        .is_in(expected_values)
+        .display_failures();
 
     assert_that!(failures).single_element().is_equal_to(
         r"expected subject to be in []
@@ -1487,6 +1490,24 @@ fn verify_str_is_in_empty_array_fails() {
   This would always fail, which is likely a bug in your test setup.
   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
 ",
+    );
+}
+
+#[test]
+fn verify_string_is_in_maybe_empty_for_empty_array_fails() {
+    let subject: &str = "tempor nihil in minim";
+
+    let expected_values: [&str; 0] = [];
+
+    let failures = verify_that!(subject)
+        .is_in_maybe_empty(expected_values)
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r#"expected subject to be in []
+          but was: "tempor nihil in minim"
+  which is not in: []
+"#,
     );
 }
 
@@ -1544,6 +1565,15 @@ fn verify_string_is_not_in_an_empty_array_fails() {
   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
 ",
     );
+}
+
+#[test]
+fn string_is_not_in_maybe_empty_for_empty_array() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    let expected_values: [String; 0] = [];
+
+    assert_that(subject).is_not_in_maybe_empty(expected_values);
 }
 
 #[cfg(feature = "regex")]

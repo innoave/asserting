@@ -655,8 +655,16 @@ where
         self.expecting(is_in(expected_values))
     }
 
+    fn is_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(is_in(expected_values).allow_empty())
+    }
+
     fn is_not_in(self, expected_values: I) -> Self {
         self.expecting(not(is_in(expected_values)))
+    }
+
+    fn is_not_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values).allow_empty()))
     }
 }
 

@@ -1158,6 +1158,16 @@ mod slice;
 mod string;
 mod vec;
 
+use crate::std::{format, string::String};
+
+fn failure_empty_collection(method: &str, behavior: &str, alternative: &str) -> String {
+    format!(
+        "  An assertion using `{method}()` was made against an empty collection.\n  \
+         This would always {behavior}, which is likely a bug in your test setup.\n  \
+         If an empty collection should be allowed in your test, use `{alternative}()`."
+    )
+}
+
 // test code snippets in the README.md
 #[cfg(doctest)]
 #[doc = include_str!("../README.md")]
@@ -1174,23 +1184,4 @@ mod dummy_extern_uses {
     use serde_bytes as _;
     use time as _;
     use version_sync as _;
-}
-
-fn failure_empty_collection(method: &str, behavior: &str, alternative: &str) -> String {
-    format!(
-        "  An assertion using `{method}()` was made against an empty collection.\n  \
-         This would always {behavior}, which is likely a bug in your test setup.\n  \
-         If an empty collection should be allowed in your test, use `{alternative}()`."
-    )
-}
-
-macro_rules! panic_on_empty_collection {
-    (method:expr, alternative:expr, behavior:expr) => {
-        panic!(
-            "An assertion using `{}()` was made against an empty collection.\n \
-            This would always {}, which is likely a bug in your test setup.\n \
-            If an empty collection should be allowed in your test, use `{}()`.",
-            method, behavior, alternative
-        );
-    };
 }

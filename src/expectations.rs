@@ -269,6 +269,7 @@ where
     I: IntoIterator<Item = E>,
 {
     IsIn {
+        allow_empty: false,
         inverted: false,
         expected_values: Vec::from_iter(expected_values),
     }
@@ -276,8 +277,18 @@ where
 
 #[must_use]
 pub struct IsIn<E> {
+    pub allow_empty: bool,
     pub inverted: bool,
     pub expected_values: Vec<E>,
+}
+
+impl<E> IsIn<E> {
+    pub fn allow_empty(self) -> Self {
+        Self {
+            allow_empty: true,
+            ..self
+        }
+    }
 }
 
 /// Creates an [`IsCloseTo`] expectation.
