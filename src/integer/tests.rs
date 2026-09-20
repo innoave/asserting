@@ -525,8 +525,9 @@ fn verify_i32_is_in_empty_array_fails() {
 
     assert_that!(failures).single_element().is_equal_to(
         r"expected subject to be in []
-          but was: 42
-  which is not in: []
+  An assertion using `is_in()` was made against an empty collection.
+  This would always fail, which is likely a bug in your test setup.
+  If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
 ",
     );
 }
@@ -543,6 +544,32 @@ fn verify_i32_is_in_array_with_several_i32_fails() {
         r"expected subject to be in [43, 11, 22, 33, 88]
           but was: 42
   which is not in: [43, 11, 22, 33, 88]
+",
+    );
+}
+
+#[test]
+fn i32_is_not_in_array_of_i32() {
+    let subject: i32 = 41;
+
+    assert_that(subject).is_not_in([20, 42, 32, 100]);
+}
+
+#[test]
+fn verify_i32_is_not_in_empty_array_fails() {
+    let subject: i32 = 41;
+
+    let expected_values: [i32; 0] = [];
+
+    let failures = verify_that(subject)
+        .is_not_in(expected_values)
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to not be in []
+  An assertion using `is_not_in()` was made against an empty collection.
+  This would always succeed, which is likely a bug in your test setup.
+  If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
 ",
     );
 }

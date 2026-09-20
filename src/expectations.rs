@@ -3,6 +3,7 @@
 #![allow(missing_docs)]
 #![warn(clippy::return_self_not_must_use)]
 
+use crate::spec::Invertible;
 use crate::std::marker::PhantomData;
 use crate::std::{string::String, vec::Vec};
 use hashbrown::HashSet;
@@ -23,7 +24,11 @@ use regex::Regex;
 /// assert_that!([1, 2, 3]).expecting(not(HasLength { expected_length: 4 }));
 /// assert_that!("almost").expecting(not(StringContains { expected: "entire" }));
 /// ```
-pub fn not<E>(expectation: E) -> Not<E> {
+pub fn not<E>(mut expectation: E) -> Not<E>
+where
+    E: Invertible,
+{
+    expectation.set_inverted();
     Not(expectation)
 }
 
@@ -264,12 +269,14 @@ where
     I: IntoIterator<Item = E>,
 {
     IsIn {
+        inverted: false,
         expected_values: Vec::from_iter(expected_values),
     }
 }
 
 #[must_use]
 pub struct IsIn<E> {
+    pub inverted: bool,
     pub expected_values: Vec<E>,
 }
 

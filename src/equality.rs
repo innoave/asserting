@@ -10,6 +10,7 @@ use crate::expectations::{
     HasDebugString, HasDisplayString, IsEqualTo, IsIn, IsSameAs, has_debug_string,
     has_display_string, is_equal_to, is_in, is_same_as, not,
 };
+use crate::failure_empty_collection;
 use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
@@ -206,6 +207,10 @@ where
     fn is_in(self, expected_values: I) -> Self {
         self.expecting(is_in(expected_values))
     }
+
+    fn is_not_in(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values)))
+    }
 }
 
 impl<S, E, D> Expectation<S, D> for IsIn<E>
@@ -214,6 +219,9 @@ where
     D: Represent<S> + Represent<E>,
 {
     fn test(&mut self, subject: &S) -> bool {
+        if self.expected_values.is_empty() {
+            return self.inverted;
+        }
         self.expected_values
             .iter()
             .any(|expected| subject == expected)
@@ -233,6 +241,17 @@ where
             .iter()
             .map(|expected| Represented::from((expected, representation)))
             .collect::<Vec<_>>();
+        if self.expected_values.is_empty() {
+            let (method, behavior, alternative) = if inverted {
+                ("is_not_in", "succeed", "is_not_in_maybe_empty")
+            } else {
+                ("is_in", "fail", "is_in_maybe_empty")
+            };
+            return format!(
+                "expected {expression} to {not}be in {expected_values:?}\n{}",
+                failure_empty_collection(method, behavior, alternative)
+            );
+        }
         let marked_actual = mark_unexpected(actual, representation, format);
         let marked_expected = mark_all_items_in_collection(
             &self.expected_values,
@@ -248,4 +267,8 @@ where
     }
 }
 
-impl<E> Invertible for IsIn<E> {}
+impl<E> Invertible for IsIn<E> {
+    fn set_inverted(&mut self) {
+        self.inverted = !self.inverted;
+    }
+}

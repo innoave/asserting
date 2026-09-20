@@ -459,7 +459,9 @@ pub trait Expectation<S: ?Sized, D> {
 /// clearly states whether the expectation has been inverted or not.
 ///
 /// [`Not`]: crate::expectations::Not
-pub trait Invertible {}
+pub trait Invertible {
+    fn set_inverted(&mut self) {}
+}
 
 /// A textual representation of the expression or subject that is being
 /// asserted.

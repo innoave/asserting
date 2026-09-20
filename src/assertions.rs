@@ -266,9 +266,15 @@ pub trait AssertEquivalence<E> {
 ///
 /// assert_that!("two").is_in(["one", "two", "three"]);
 /// assert_that!(42).is_in([22, 42, 50, 88]);
+///
+/// assert_that!("zero").is_not_in(["one", "two", "three"]);
+/// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
 /// ```
 pub trait AssertIsIn<I, E> {
     /// Verifies that the actual value is in the set of expected values.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
     ///
     /// # Examples
     ///
@@ -280,6 +286,22 @@ pub trait AssertIsIn<I, E> {
     /// ```
     #[track_caller]
     fn is_in(self, expected_values: I) -> Self;
+
+    /// Verifies that the actual value is not in the set of expected values.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("zero").is_not_in(["one", "two", "three"]);
+    /// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
+    /// ```
+    #[track_caller]
+    fn is_not_in(self, expected_values: I) -> Self;
 }
 
 /// Assert approximate equality for floating point numbers.

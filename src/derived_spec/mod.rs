@@ -654,6 +654,10 @@ where
     fn is_in(self, expected_values: I) -> Self {
         self.expecting(is_in(expected_values))
     }
+
+    fn is_not_in(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values)))
+    }
 }
 
 #[cfg(feature = "float-cmp")]
