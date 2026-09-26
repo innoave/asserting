@@ -52,10 +52,13 @@ pub use with_colored_feature::{
 };
 
 use crate::spec::{DiffFormat, DisplayRepresentation, Highlight, Represent, Represented};
-use crate::std::format;
-use crate::std::string::{String, ToString};
-use crate::std::vec::Vec;
+use crate::std::{
+    format,
+    string::{String, ToString},
+    vec::Vec,
+};
 use hashbrown::HashSet;
+
 #[cfg(feature = "colored")]
 use with_colored_feature::{
     configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,

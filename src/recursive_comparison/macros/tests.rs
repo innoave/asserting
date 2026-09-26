@@ -1,6 +1,5 @@
 use crate::recursive_comparison::value::*;
-use crate::std::string::ToString;
-use crate::std::vec::Vec;
+use crate::std::{string::ToString, vec::Vec};
 
 #[test]
 fn false_value() {

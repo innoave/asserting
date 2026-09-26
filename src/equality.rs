@@ -12,9 +12,11 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::std::fmt::{Debug, Display};
-use crate::std::format;
-use crate::std::string::{String, ToString};
+use crate::std::{
+    fmt::{Debug, Display},
+    format,
+    string::{String, ToString},
+};
 
 impl<S, E, D, R> AssertEquality<E> for Spec<'_, S, D, R>
 where

@@ -15,9 +15,7 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::std::format;
-use crate::std::string::String;
-use crate::std::vec::Vec;
+use crate::std::{format, string::String, vec::Vec};
 use hashbrown::HashSet;
 
 impl<S, E, D, R> AssertMapContainsKey<E> for Spec<'_, S, D, R>
@@ -579,8 +577,7 @@ mod hashbrown_impls {
 #[cfg(feature = "std")]
 mod std_hashmap_impls {
     use crate::properties::MapProperties;
-    use crate::std::collections::HashMap;
-    use crate::std::iter::Iterator;
+    use crate::std::{collections::HashMap, iter::Iterator};
 
     impl<K, V, H> MapProperties for HashMap<K, V, H> {
         type Key = K;
@@ -636,8 +633,7 @@ mod std_hashmap_impls {
 
 mod btree_map_impls {
     use crate::properties::MapProperties;
-    use crate::std::collections::BTreeMap;
-    use crate::std::iter::Iterator;
+    use crate::std::{collections::BTreeMap, iter::Iterator};
 
     impl<K, V> MapProperties for BTreeMap<K, V> {
         type Key = K;

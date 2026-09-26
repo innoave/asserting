@@ -1,3 +1,5 @@
+#[cfg(feature = "std")]
+use crate::assert_panic_message;
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
 #[cfg(feature = "colored")]
@@ -149,16 +151,17 @@ fn assert_that_macro_with_borrowed_str_subject() {
     assert_that!(input_string).is_equal_to("adipiscing rebum amet iusto");
 }
 
+#[cfg(feature = "std")]
 #[test]
-#[should_panic(
-    expected = "expected ultimate_answer to be equal to 42\n   but was: 51\n  expected: 42\n"
-)]
 fn assert_that_macro_is_equal_to_with_integers_fails() {
     let ultimate_answer = 51;
 
-    assert_that!(ultimate_answer)
-        .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-        .is_equal_to(42);
+    assert_panic_message!(
+        assert_that!(ultimate_answer)
+            .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+            .is_equal_to(42),
+        "expected ultimate_answer to be equal to 42\n   but was: 51\n  expected: 42\n"
+    );
 }
 
 #[test]
@@ -241,67 +244,70 @@ fn soft_assertions_with_chained_assertion_methods() {
         .soft_panic();
 }
 
+#[cfg(feature = "std")]
 #[test]
-#[should_panic = "expected subject to contain \"unimportant\"\n   \
-       but was: \"the answer to all important questions is 42\"\n  \
-      expected: \"unimportant\"\n\
-    \n\
-    expected subject to have at most a length of 41\n   \
-       but was: 43\n  \
-      expected: <= 41\n\
-"]
 fn soft_assertions_panic_once_with_multiple_failure_messages() {
     let subject = "the answer to all important questions is 42".to_string();
 
-    verify_that(subject)
-        .contains("unimportant")
-        .has_at_most_length(41)
-        .soft_panic();
-}
-
-#[cfg(feature = "colored")]
-#[test]
-fn and_called_on_spec_does_nothing() {
-    let subject = "the answer to all important questions is 42".to_string();
-
-    let original_spec = verify_that(subject)
-        .named("answer")
-        .with_diff_format(DIFF_FORMAT_RED_BLUE)
-        .is_empty();
-    let original_spec_type = type_name_of_val(&original_spec);
-    let original_subject = original_spec.subject().clone();
-    let original_diff_format = original_spec.diff_format().clone();
-    let original_failures = original_spec.failures();
-    assert!(!original_failures.is_empty());
-
-    let returned_spec = original_spec.and();
-
-    assert_eq!(type_name_of_val(&returned_spec), original_spec_type);
-    assert_eq!(returned_spec.subject(), &original_subject);
-    assert_eq!(returned_spec.diff_format(), &original_diff_format);
-    assert_eq!(returned_spec.failures(), original_failures);
+    assert_panic_message!(
+        verify_that(subject)
+            .contains("unimportant")
+            .has_at_most_length(41)
+            .soft_panic(),
+        "expected subject to contain \"unimportant\"\n   \
+            but was: \"the answer to all important questions is 42\"\n  \
+           expected: \"unimportant\"\n\
+         \n\
+         expected subject to have at most a length of 41\n   \
+            but was: 43\n  \
+            expected: <= 41\n"
+    );
 }
 
 #[cfg(feature = "colored")]
 mod colored {
-    use crate::prelude::*;
+    use super::*;
 
+    #[cfg(feature = "std")]
     #[test]
-    #[should_panic = "expected subject to contain \"unimportant\"\n   \
-       but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
-      expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
-    \n\
-    expected subject to have at most a length of 41\n   \
-       but was: \u{1b}[31m43\u{1b}[0m\n  \
-      expected: <= \u{1b}[32m41\u{1b}[0m\n\
-"]
     fn soft_assertions_panic_message_contains_highlighted_diffs() {
         let subject = "the answer to all important questions is 42";
 
-        verify_that(subject)
-            .with_configured_diff_format()
-            .contains("unimportant")
-            .has_at_most_length(41)
-            .soft_panic();
+        assert_panic_message!(
+            verify_that(subject)
+                .with_configured_diff_format()
+                .contains("unimportant")
+                .has_at_most_length(41)
+                .soft_panic(),
+            "expected subject to contain \"unimportant\"\n   \
+                but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
+               expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
+             \n\
+             expected subject to have at most a length of 41\n   \
+                but was: \u{1b}[31m43\u{1b}[0m\n  \
+               expected: <= \u{1b}[32m41\u{1b}[0m\n"
+        );
+    }
+
+    #[test]
+    fn and_called_on_spec_does_nothing() {
+        let subject = "the answer to all important questions is 42".to_string();
+
+        let original_spec = verify_that(subject)
+            .named("answer")
+            .with_diff_format(DIFF_FORMAT_RED_BLUE)
+            .is_empty();
+        let original_spec_type = type_name_of_val(&original_spec);
+        let original_subject = original_spec.subject().clone();
+        let original_diff_format = original_spec.diff_format().clone();
+        let original_failures = original_spec.failures();
+        assert!(!original_failures.is_empty());
+
+        let returned_spec = original_spec.and();
+
+        assert_eq!(type_name_of_val(&returned_spec), original_spec_type);
+        assert_eq!(returned_spec.subject(), &original_subject);
+        assert_eq!(returned_spec.diff_format(), &original_diff_format);
+        assert_eq!(returned_spec.failures(), original_failures);
     }
 }

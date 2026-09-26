@@ -1,7 +1,6 @@
 mod hashbrown {
     use crate::prelude::*;
-    use crate::std::format;
-    use crate::std::vec::Vec;
+    use crate::std::{format, vec::Vec};
     use hashbrown::HashMap;
 
     #[test]
@@ -402,8 +401,7 @@ mod hashbrown {
 #[cfg(feature = "std")]
 mod std_hash_map {
     use crate::prelude::*;
-    use crate::std::collections::HashMap;
-    use crate::std::format;
+    use crate::std::{collections::HashMap, format};
 
     #[test]
     fn hashmap_is_empty() {
@@ -730,9 +728,7 @@ mod std_hash_map {
 
 mod btree_map {
     use crate::prelude::*;
-    use crate::std::collections::BTreeMap;
-    use crate::std::format;
-    use crate::std::vec::Vec;
+    use crate::std::{collections::BTreeMap, format, vec::Vec};
 
     #[test]
     fn btree_map_is_empty() {
@@ -1055,8 +1051,7 @@ mod btree_map {
 #[cfg(feature = "colored")]
 mod colored {
     use crate::prelude::*;
-    use crate::std::format;
-    use crate::std::vec::Vec;
+    use crate::std::{format, vec::Vec};
     use hashbrown::HashMap;
 
     #[test]

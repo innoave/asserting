@@ -1,6 +1,6 @@
 use crate::prelude::*;
-use crate::std::slice;
 use crate::std::{
+    slice,
     string::{String, ToString},
     vec,
     vec::Vec,

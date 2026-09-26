@@ -40,16 +40,18 @@ use crate::spec::{
     Location, PanicOnFail, Represent, Represented, RepresentedAs, RepresentedBy, Satisfies,
     SoftPanic, Spec,
 };
-use crate::std::borrow::{Cow, ToOwned};
-use crate::std::boxed::Box;
-use crate::std::error::Error;
-use crate::std::fmt;
-use crate::std::fmt::{Debug, Display};
-use crate::std::format;
-use crate::std::ops::RangeBounds;
-use crate::std::slice;
-use crate::std::string::{String, ToString};
-use crate::std::vec::Vec;
+use crate::std::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+    error::Error,
+    fmt,
+    fmt::{Debug, Display},
+    format,
+    ops::RangeBounds,
+    slice,
+    string::{String, ToString},
+    vec::Vec,
+};
 use hashbrown::HashSet;
 
 /// A `DerivedSpec` does assertions on a derived subject while keeping track

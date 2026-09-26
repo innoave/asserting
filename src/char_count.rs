@@ -11,9 +11,7 @@ use crate::properties::CharCountProperty;
 use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Represent, Represented, Spec,
 };
-use crate::std::format;
-use crate::std::ops::RangeBounds;
-use crate::std::string::String;
+use crate::std::{format, ops::RangeBounds, string::String};
 
 impl<S, D, R> AssertHasCharCount<usize, D> for Spec<'_, S, D, R>
 where

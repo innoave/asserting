@@ -7,8 +7,7 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::std::format;
-use crate::std::string::String;
+use crate::std::{format, string::String};
 
 impl<D, R> AssertBoolean for Spec<'_, bool, D, R>
 where

@@ -23,10 +23,7 @@ use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     GetFailures, Invertible, PanicOnFail, Represent, Represented, RepresentedBy, Spec,
 };
-use crate::std::borrow::ToOwned;
-use crate::std::cmp::Ordering;
-use crate::std::mem;
-use crate::std::{format, string::String, vec, vec::Vec};
+use crate::std::{borrow::ToOwned, cmp::Ordering, format, mem, string::String, vec, vec::Vec};
 use hashbrown::HashSet;
 
 impl<'a, S, T, E, D, R> AssertIteratorContains<E> for Spec<'a, S, D, R>
