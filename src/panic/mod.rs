@@ -1,12 +1,15 @@
 //! Handle panics in `std` and `no_std` environments.
 //!
-//! In assertion functions we use the [`trigger_panic`] function of this module which
-//! provides panics with a custom payload in `std` environments to be able to
-//! verify whether the panic message contains the location of the assertion
-//! call.
+//! In assertion functions we use the [`trigger_panic`] function of this module
+//! which supports a custom payload in panics when in `std` environment and
+//! a string-formatted payload in `no_std` environments. The custom payload adds
+//! the ability to verify the location of the test assertion by using the
+//! [`assert_panic_location`] macro.
 //!
 //! The macros [`assert_panic_location!`] and [`assert_panic_message!`] provide
 //! a convenient way for verifying the panic location and the panic message.
+//! Note: These macros are intended for testing of assertion functions itself
+//! but not for being used in end-user tests testing a project's code.
 //!
 //! [`assert_panic_location!`]: crate::assert_panic_location
 //! [`assert_panic_message!`]: crate::assert_panic_message
@@ -52,6 +55,7 @@ pub fn trigger_panic(message: impl Into<String>) -> ! {
 /// A payload for panic calls that contains the panic message and the panic
 /// location.
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[derive(Debug)]
 pub struct AssertionPanicPayload {
     /// The panic message.
@@ -74,6 +78,9 @@ mod std_impl {
 
 /// Verifies that an assertion panics at the location in the tests.
 ///
+/// This macro is intended for testing of assertion functions itself but not
+/// for being used in end-user tests testing a project's code.
+///
 /// The expected location is taken from the line where the macro call starts.
 /// This macro works only properly if the given assertion is located at the
 /// same line as the macro call. For longer lines it might be necessary to
@@ -91,6 +98,7 @@ mod std_impl {
 /// assert_panic_location!(assert_that!("some longer assertion").starts_with("some").contains("much longer"));
 /// ```
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[macro_export]
 macro_rules! assert_panic_location {
     ($expression:expr) => {{
@@ -119,6 +127,9 @@ macro_rules! assert_panic_location {
 }
 
 /// Verifies that an assertion panics with the given message.
+///
+/// This macro is intended for testing of assertion functions itself but not
+/// for being used in end-user tests testing a project's code.
 ///
 /// # Examples
 ///
