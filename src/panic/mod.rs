@@ -138,7 +138,9 @@ macro_rules! assert_panic_location {
 /// use asserting::assert_panic_message;
 ///
 /// assert_panic_message!(
-///     assert_that!(41).is_zero(),
+///     assert_that!(41)
+///         .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+///         .is_zero(),
 ///     "expected 41 to be zero\n   but was: \u{1b}[31m41\u{1b}[0m\n  expected: \u{1b}[33m0\u{1b}[0m\n"
 /// );
 ///
