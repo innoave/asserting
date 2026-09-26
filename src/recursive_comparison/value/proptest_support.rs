@@ -4,8 +4,7 @@
 //! generating arbitrary values of type [`Value`] and [`Number`].
 
 use crate::recursive_comparison::value::{F32, F64, Number, Value};
-use crate::std::string::String;
-use crate::std::vec;
+use crate::std::{string::String, vec};
 use proptest::prelude::*;
 
 /// Returns a [`Strategy`] for generating arbitrary values of type [`Value`].

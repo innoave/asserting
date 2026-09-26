@@ -2,11 +2,13 @@
 //! structure used for recursive comparison.
 
 use super::Value;
-use crate::std::borrow::{Borrow, Cow};
-use crate::std::cmp::Ordering;
-use crate::std::fmt::{self, Debug};
-use crate::std::format;
-use crate::std::hash::{Hash, Hasher};
+use crate::std::{
+    borrow::{Borrow, Cow},
+    cmp::Ordering,
+    fmt::{self, Debug},
+    format,
+    hash::{Hash, Hasher},
+};
 use indexmap::IndexMap;
 use rapidhash::quality::RandomState;
 

@@ -48,7 +48,7 @@ where
         let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
-                panic!("expected the subject to be `Some(_)`, but was `None`")
+                crate::panic::trigger_panic("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
@@ -67,7 +67,7 @@ where
         let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
-                panic!("expected the subject to be `Some(_)`, but was `None`")
+                crate::panic::trigger_panic("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })

@@ -1,7 +1,9 @@
 use crate::prelude::*;
-use crate::std::string::{String, ToString};
-use crate::std::vec;
-use crate::std::vec::Vec;
+use crate::std::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 #[cfg(feature = "bigdecimal")]
 use bigdecimal::BigDecimal;
 #[cfg(feature = "float-cmp")]
@@ -939,6 +941,8 @@ fn extracting_ref_vec_contains_all_in_order() {
 
 mod iterator_all_elements {
     use super::*;
+    #[cfg(feature = "std")]
+    use crate::assert_panic_message;
 
     #[derive(Debug, Clone)]
     struct Person {
@@ -988,16 +992,19 @@ mod iterator_all_elements {
             });
     }
 
+    #[cfg(feature = "std")]
     #[test]
-    #[should_panic = "expected numbers.val[1] to be not equal to 4\n   but was: 4\n  expected: not 4\n"]
     fn assert_each_element_of_an_iterator_panics_if_one_assertion_fails() {
         let subject = Numbers(vec![2, 4, 6, 8, 10]);
 
-        assert_that(subject)
-            .named("numbers")
-            .extracting_ref("val", |numbers| &numbers.0)
-            .is_not_empty()
-            .each_element(|e| e.is_not_equal_to(4));
+        assert_panic_message!(
+            assert_that(subject)
+                .named("numbers")
+                .extracting_ref("val", |numbers| &numbers.0)
+                .is_not_empty()
+                .each_element(|e| e.is_not_equal_to(4)),
+            "expected numbers.val[1] to be not equal to 4\n   but was: 4\n  expected: not 4\n"
+        );
     }
 
     #[test]

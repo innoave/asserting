@@ -17,8 +17,7 @@ use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     Invertible, Represent, Represented, Spec,
 };
-use crate::std::format;
-use crate::std::string::String;
+use crate::std::{format, string::String};
 
 impl<S, D, R> AssertSignum for Spec<'_, S, D, R>
 where

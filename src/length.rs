@@ -12,8 +12,7 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::std::ops::RangeBounds;
-use crate::std::{format, string::String};
+use crate::std::{format, ops::RangeBounds, string::String};
 
 impl<S, D, R> AssertEmptiness for Spec<'_, S, D, R>
 where

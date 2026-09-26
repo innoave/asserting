@@ -9,8 +9,10 @@ use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     Invertible, Represent, Spec,
 };
-use crate::std::format;
-use crate::std::string::{String, ToString};
+use crate::std::{
+    format,
+    string::{String, ToString},
+};
 
 impl<D, R> AssertChar for Spec<'_, char, D, R>
 where

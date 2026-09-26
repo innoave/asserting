@@ -3,8 +3,7 @@
 #![allow(missing_docs)]
 #![warn(clippy::return_self_not_must_use)]
 
-use crate::std::marker::PhantomData;
-use crate::std::{string::String, vec::Vec};
+use crate::std::{marker::PhantomData, string::String, vec::Vec};
 use hashbrown::HashSet;
 #[cfg(feature = "regex")]
 use regex::Regex;
