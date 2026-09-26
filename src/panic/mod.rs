@@ -4,7 +4,7 @@
 //! which supports a custom payload in panics when in `std` environment and
 //! a string-formatted payload in `no_std` environments. The custom payload adds
 //! the ability to verify the location of the test assertion by using the
-//! [`assert_panic_location`] macro.
+//! [`assert_panic_location!`] macro.
 //!
 //! The macros [`assert_panic_location!`] and [`assert_panic_message!`] provide
 //! a convenient way for verifying the panic location and the panic message.
