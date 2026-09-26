@@ -2,12 +2,14 @@
 
 use crate::recursive_comparison::value::{Field, Number};
 use crate::recursive_comparison::value::{Map, Value};
-use crate::std::borrow::Cow;
-use crate::std::error::Error as StdError;
-use crate::std::fmt::{self, Display};
-use crate::std::string::{String, ToString};
-use crate::std::vec;
-use crate::std::vec::Vec;
+use crate::std::{
+    borrow::Cow,
+    error::Error as StdError,
+    fmt::{self, Display},
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 use serde_core::ser::Error as SerdeError;
 use serde_core::{Serialize, Serializer, ser};
 

@@ -1,8 +1,6 @@
 use super::*;
 use crate::recursive_comparison::value::proptest_support::*;
-use crate::std::cmp::Ordering;
-use crate::std::format;
-use crate::std::hash::BuildHasher;
+use crate::std::{cmp::Ordering, format, hash::BuildHasher};
 use hashbrown::DefaultHashBuilder;
 use proptest::prelude::*;
 

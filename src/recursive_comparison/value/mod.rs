@@ -7,11 +7,13 @@ mod number;
 pub mod proptest_support;
 
 use crate::recursive_comparison::path::Path;
-use crate::std::borrow::Cow;
-use crate::std::fmt::{self, Debug};
-use crate::std::string::{String, ToString};
-use crate::std::vec::Vec;
-use crate::std::{format, vec};
+use crate::std::{
+    borrow::Cow,
+    fmt::{self, Debug},
+    string::{String, ToString},
+    vec::Vec,
+    {format, vec},
+};
 pub use map::Map;
 pub use number::{F32, F64, Number};
 

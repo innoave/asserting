@@ -1,157 +1,178 @@
-//! Implementation of assertions for code that should or should not panic.
+//! Handle panics in `std` and `no_std` environments.
+//!
+//! In assertion functions we use the [`trigger_panic`] function of this module
+//! which supports a custom payload in panics when in `std` environment and
+//! a string-formatted payload in `no_std` environments. The custom payload adds
+//! the ability to verify the location of the test assertion by using the
+//! [`assert_panic_location!`] macro.
+//!
+//! The macros [`assert_panic_location!`] and [`assert_panic_message!`] provide
+//! a convenient way for verifying the panic location and the panic message.
+//! Note: These macros are intended for testing of assertion functions itself
+//! but not for being used in end-user tests testing a project's code.
+//!
+//! [`assert_panic_location!`]: crate::assert_panic_location
+//! [`assert_panic_message!`]: crate::assert_panic_message
 
-use crate::assertions::AssertCodePanics;
-use crate::colored::{mark_missing, mark_unexpected};
-use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
-use crate::spec::{
-    Code, DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting,
-    Expression, FailingStrategy, Spec,
-};
-use crate::std::any::Any;
-use crate::std::panic;
+use crate::std::string::String;
 
-const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";
-const UNKNOWN_PANIC_MESSAGE: &str = "<unknown panic message>";
-
-impl<'a, S, D, R> AssertCodePanics for Spec<'a, Code<S>, D, R>
-where
-    S: FnOnce(),
-    R: FailingStrategy,
-{
-    type Mapped = Spec<'a, (), DebugRepresentation, R>;
-
-    fn does_not_panic(self) -> Self::Mapped {
-        self.expecting(does_not_panic()).mapping(|_| ())
+/// Panics with the given message and the location of the caller.
+///
+/// Using this function instead of the std `panic!` macro provides the
+/// possibility to verify the panic location of assertions by using the macro
+/// [`assert_panic_location!`].
+///
+/// In `std`-environments this function triggers a `std::panic::panic_any` with
+/// a payload of type [`AssertionPanicPayload`]. In `no_std`-environments it
+/// panics with a string-formatted payload.
+///
+/// # Panics
+///
+/// Calling this function **always** leads to a panic.
+///
+/// * If the `std` crate feature is active, the panic is triggered by calling
+///   [`std::panic::panic_any`] with a payload of type [`AssertionPanicPayload`].
+/// * In `no_std`-environments it panics with a string-formatted payload using
+///   the [`std::panic!`] macro.
+///
+/// [`assert_panic_location!`]: crate::assert_panic_location
+#[track_caller]
+pub fn trigger_panic(message: impl Into<String>) -> ! {
+    #[cfg(feature = "std")]
+    {
+        std::panic::panic_any(AssertionPanicPayload {
+            message: message.into(),
+            location: core::panic::Location::caller(),
+        })
     }
-
-    fn panics(self) -> Self::Mapped {
-        self.expecting(does_panic()).mapping(|_| ())
-    }
-
-    fn panics_with_message(self, message: impl Into<String>) -> Self::Mapped {
-        self.expecting(does_panic().with_message(message))
-            .mapping(|_| ())
-    }
-}
-
-impl<S, D> Expectation<Code<S>, D> for DoesNotPanic
-where
-    S: FnOnce(),
-{
-    fn test(&mut self, subject: &Code<S>) -> bool {
-        if let Some(function) = subject.take() {
-            let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
-            match result {
-                Ok(()) => true,
-                Err(panic_message) => {
-                    self.actual_message = Some(panic_message);
-                    false
-                },
-            }
-        } else {
-            self.actual_message = Some(Box::new(ONLY_ONE_EXPECTATION));
-            false
-        }
-    }
-
-    fn message(
-        &self,
-        expression: &Expression<'_>,
-        _actual: &Code<S>,
-        _inverted: bool,
-        _representation: &D,
-        format: &DiffFormat,
-    ) -> String {
-        let panic_message = read_panic_message(self.actual_message.as_ref())
-            .unwrap_or_else(|| UNKNOWN_PANIC_MESSAGE.to_string());
-
-        if panic_message == ONLY_ONE_EXPECTATION {
-            format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
-        } else {
-            let marked_did_panic = mark_unexpected("did panic", &DisplayRepresentation, format);
-            let marked_panic_message =
-                mark_unexpected(&panic_message, &DisplayRepresentation, format);
-            format!(
-                "expected {expression} to not panic, but {marked_did_panic}\n  with message: \"{marked_panic_message}\""
-            )
-        }
+    #[cfg(not(feature = "std"))]
+    {
+        let message = message.into();
+        crate::std::panic!("{message}")
     }
 }
 
-impl<S, D> Expectation<Code<S>, D> for DoesPanic
-where
-    S: FnOnce(),
-{
-    fn test(&mut self, subject: &Code<S>) -> bool {
-        if let Some(function) = subject.take() {
-            let result = panic::catch_unwind(panic::AssertUnwindSafe(function));
-            match result {
-                Ok(()) => false,
-                Err(panic_message) => {
-                    let panic_message = read_panic_message(Some(panic_message).as_ref())
-                        .unwrap_or_else(|| UNKNOWN_PANIC_MESSAGE.to_string());
-                    let test_result = if let Some(expected_message) = &self.expected_message {
-                        &panic_message == expected_message
-                    } else {
-                        // did panic - panic message should not be asserted
-                        true
-                    };
-                    self.actual_message = Some(panic_message);
-                    test_result
-                },
-            }
-        } else {
-            self.actual_message = Some(ONLY_ONE_EXPECTATION.to_string());
-            false
-        }
-    }
+/// A payload for panic calls that contains the panic message and the panic
+/// location.
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+#[derive(Debug)]
+pub struct AssertionPanicPayload {
+    /// The panic message.
+    pub message: String,
+    /// The location where the panic occurred.
+    pub location: &'static core::panic::Location<'static>,
+}
 
-    fn message(
-        &self,
-        expression: &Expression<'_>,
-        _actual: &Code<S>,
-        _inverted: bool,
-        _representation: &D,
-        format: &DiffFormat,
-    ) -> String {
-        if let Some(actual_message) = self.actual_message.as_ref() {
-            if actual_message == ONLY_ONE_EXPECTATION {
-                format!("error in test assertion: {ONLY_ONE_EXPECTATION}")
-            } else if let Some(expected_message) = &self.expected_message {
-                let marked_expected_message =
-                    mark_missing(expected_message, &DisplayRepresentation, format);
-                let marked_actual_message =
-                    mark_unexpected(actual_message, &DisplayRepresentation, format);
-                format!(
-                    "expected {expression} to panic with message {expected_message:?}\n   but was: \"{marked_actual_message}\"\n  expected: \"{marked_expected_message}\""
-                )
-            } else {
-                // should be unreachable
-                format!("expected {expression} to panic, but did not panic")
-            }
-        } else if let Some(expected_message) = &self.expected_message {
-            let marked_did_not_panic =
-                mark_unexpected("did not panic", &DisplayRepresentation, format);
-            format!(
-                "expected {expression} to panic with message {expected_message:?},\n  but {marked_did_not_panic}"
-            )
-        } else {
-            let marked_did_not_panic =
-                mark_unexpected("did not panic", &DisplayRepresentation, format);
-            format!("expected {expression} to panic, but {marked_did_not_panic}")
+#[cfg(feature = "std")]
+mod std_impl {
+    use super::AssertionPanicPayload;
+    use crate::std::{fmt, fmt::Display};
+
+    impl Display for AssertionPanicPayload {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.message)
         }
     }
 }
 
-fn read_panic_message(error: Option<&Box<dyn Any + Send>>) -> Option<String> {
-    error.and_then(|message| {
-        let message = &**message;
-        message
-            .downcast_ref::<String>()
-            .cloned()
-            .or_else(|| message.downcast_ref::<&str>().map(ToString::to_string))
-    })
+/// Verifies that an assertion panics at the location in the tests.
+///
+/// This macro is intended for testing of assertion functions itself but not
+/// for being used in end-user tests testing a project's code.
+///
+/// The expected location is taken from the line where the macro call starts.
+/// This macro works only properly if the given assertion is located at the
+/// same line as the macro call. For longer lines it might be necessary to
+/// suppress automatic code formatting using the attribute `#[rustfmt::skip]`.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+/// use asserting::assert_panic_location;
+///
+/// assert_panic_location!(assert_that!(41).is_equal_to(42));
+///
+/// #[rustfmt::skip]
+/// assert_panic_location!(assert_that!("some longer assertion").starts_with("some").contains("much longer"));
+/// ```
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+#[macro_export]
+macro_rules! assert_panic_location {
+    ($expression:expr) => {{
+        let expected_line = line!();
+        let expected_file = file!();
+
+        let result = std::panic::catch_unwind(core::panic::AssertUnwindSafe(|| {
+            $expression;
+        }));
+
+        let panic_error = result.expect_err("the assertion should have panicked!");
+        let panic_payload = panic_error
+            .downcast_ref::<$crate::panic::AssertionPanicPayload>()
+            .expect("panic is not caused by an assertion!");
+
+        // normalize file path
+        let expected_file = expected_file.replace("\\", "/");
+        let actual_file = panic_payload.location.file().replace("\\", "/");
+        let actual_line = panic_payload.location.line();
+
+        assert!(
+            actual_file == expected_file && actual_line == expected_line,
+            "wrong location in panic message!\n  expected location: {expected_file}:{expected_line}\n  actual location: {actual_file}:{actual_line}",
+        );
+    }};
 }
 
-#[cfg(test)]
-mod tests;
+/// Verifies that an assertion panics with the given message.
+///
+/// This macro is intended for testing of assertion functions itself but not
+/// for being used in end-user tests testing a project's code.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+/// use asserting::assert_panic_message;
+///
+/// assert_panic_message!(
+///     assert_that!(41)
+///         .with_diff_format(DIFF_FORMAT_RED_YELLOW)
+///         .is_zero(),
+///     "expected 41 to be zero\n   but was: \u{1b}[31m41\u{1b}[0m\n  expected: \u{1b}[33m0\u{1b}[0m\n"
+/// );
+///
+/// assert_panic_message!(
+///     assert_that!(-42)
+///         .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+///         .is_positive(),
+///     "expected -42 to be positive\n   but was: -42\n  expected: > 0\n"
+/// );
+/// ```
+#[cfg(feature = "std")]
+#[macro_export]
+macro_rules! assert_panic_message {
+    ($expression:expr, $expected_message:expr) => {{
+        let result = std::panic::catch_unwind(core::panic::AssertUnwindSafe(|| {
+            $expression;
+        }));
+
+        let panic_error = result.expect_err("the assertion should have panicked!");
+
+        let actual_message = panic_error
+            .downcast_ref::<$crate::panic::AssertionPanicPayload>()
+            .map(|payload| payload.message.clone())
+            .or_else(|| panic_error.downcast_ref::<String>().cloned())
+            .or_else(|| panic_error.downcast_ref::<&str>().map(ToString::to_string))
+            .expect("panic is not caused by an assertion!");
+
+        let expected_message = $expected_message;
+
+        assert_eq!(
+            &actual_message, expected_message,
+            "the panic message differs from the expected one!\n  expected message: {expected_message}\n  actual message: {actual_message}",
+        );
+    }};
+}

@@ -1,7 +1,9 @@
 use crate::prelude::*;
-use crate::std::error::Error;
-use crate::std::fmt::{self, Display};
-use crate::std::vec::Vec;
+use crate::std::{
+    error::Error,
+    fmt::{self, Display},
+    vec::Vec,
+};
 
 #[derive(Debug)]
 struct SuperError {

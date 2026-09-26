@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.16.1 - 2026-09-26
+
+### Fixed
+
+* failing assertions report the wrong location in the terminal
+  [(PR #98)](https://github.com/innoave/asserting/pull/98)
+
 ## 0.16.0 - 2026-09-05
 
 _custom representation and asserting (foreign) types that do not implement `Debug`_

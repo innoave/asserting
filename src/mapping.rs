@@ -1,8 +1,10 @@
 use crate::assertions::{AssertDebugString, AssertDisplayString};
 use crate::spec::{DebugRepresentation, FailingStrategy, Spec};
-use crate::std::fmt::{Debug, Display};
-use crate::std::format;
-use crate::std::string::{String, ToString};
+use crate::std::{
+    fmt::{Debug, Display},
+    format,
+    string::{String, ToString},
+};
 
 impl<'a, S, D, R> AssertDebugString for Spec<'a, S, D, R>
 where

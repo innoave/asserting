@@ -1,6 +1,5 @@
 use super::*;
-use crate::std::format;
-use crate::std::string::ToString;
+use crate::std::{format, string::ToString};
 
 #[test]
 fn path_from_empty_str() {

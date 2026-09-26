@@ -1043,7 +1043,7 @@
 //! [`and`]: spec::And::and
 //! [`serde::Serialize`]: serde_core::Serialize
 
-#![doc(html_root_url = "https://docs.rs/asserting/0.16.0")]
+#![doc(html_root_url = "https://docs.rs/asserting/0.16.1")]
 #![cfg_attr(not(feature = "std"), no_std)]
 // Render feature requirements in docs.rs
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -1114,6 +1114,7 @@ pub mod assertions;
 pub mod colored;
 pub mod derived_spec;
 pub mod expectations;
+pub mod panic;
 pub mod prelude;
 pub mod properties;
 #[cfg(feature = "recursive")]
@@ -1147,7 +1148,7 @@ mod order;
 #[cfg(feature = "std")]
 mod os_sting;
 #[cfg(feature = "panic")]
-mod panic;
+mod panic_assertion;
 mod predicate;
 mod range;
 mod representation;

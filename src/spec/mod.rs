@@ -6,18 +6,20 @@ use crate::derived_spec::DerivedSpec;
 use crate::expectations::satisfies;
 #[cfg(feature = "recursive")]
 use crate::recursive_comparison::RecursiveComparison;
-use crate::std::any;
-use crate::std::borrow::{Borrow, Cow, ToOwned};
-use crate::std::boxed::Box;
-use crate::std::cmp::Ordering;
-use crate::std::error::Error as StdError;
-use crate::std::fmt::{self, Debug, Display};
-use crate::std::format;
-use crate::std::ops::Deref;
-use crate::std::slice;
-use crate::std::string::{String, ToString};
-use crate::std::vec;
-use crate::std::vec::Vec;
+use crate::std::{
+    any,
+    borrow::{Borrow, Cow, ToOwned},
+    boxed::Box,
+    cmp::Ordering,
+    error::Error as StdError,
+    fmt::{self, Debug, Display},
+    format,
+    ops::Deref,
+    slice,
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
 
 #[cfg(feature = "panic")]
 use crate::std::{cell::RefCell, rc::Rc};
@@ -1186,11 +1188,13 @@ pub trait DoFail {
     /// Fails the assertion with the given [`AssertFailure`]s according to the
     /// current failing strategy of the `Spec` or other implementing
     /// spec-like struct.
+    #[track_caller]
     fn do_fail_with(&mut self, failures: impl IntoIterator<Item = AssertFailure>);
 
     /// Fails the assertion with the given failure message according to the
     /// current failing strategy of the `Spec` or other implementing
     /// spec-like struct.
+    #[track_caller]
     fn do_fail_with_message(&mut self, message: impl Into<String>);
 }
 
@@ -1664,7 +1668,7 @@ impl FailingStrategy for PanicOnFail {
             .map(ToString::to_string)
             .collect::<Vec<_>>()
             .join("\n");
-        panic!("{}", message);
+        crate::panic::trigger_panic(message);
     }
 }
 

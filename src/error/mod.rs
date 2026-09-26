@@ -7,9 +7,11 @@ use crate::spec::{
     DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression,
     FailingStrategy, Invertible, Represent, Spec,
 };
-use crate::std::error::Error;
-use crate::std::format;
-use crate::std::string::{String, ToString};
+use crate::std::{
+    error::Error,
+    format,
+    string::{String, ToString},
+};
 
 impl<'a, S, D, R> AssertErrorHasSource for Spec<'a, S, D, R>
 where

@@ -770,8 +770,7 @@ mod regex {
         DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
         Invertible, Represent, Spec,
     };
-    use crate::std::format;
-    use crate::std::string::String;
+    use crate::std::{format, string::String};
 
     impl<S, D, R> AssertStringMatches for Spec<'_, S, D, R>
     where

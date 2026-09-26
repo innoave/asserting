@@ -8,9 +8,11 @@ use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     Invertible, Represent, Represented, Spec,
 };
-use crate::std::format;
-use crate::std::ops::{Bound, Range, RangeBounds, RangeInclusive};
-use crate::std::string::String;
+use crate::std::{
+    format,
+    ops::{Bound, Range, RangeBounds, RangeInclusive},
+    string::String,
+};
 
 impl<T> IsEmptyProperty for Range<T>
 where
