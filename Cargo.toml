@@ -30,6 +30,7 @@ panic = ["std"]
 regex = ["dep:regex"]
 std = [
     "bigdecimal?/std",
+    "chrono?/std",
     "float-cmp?/std",
     "indexmap?/std",
     "num-bigint?/std",
