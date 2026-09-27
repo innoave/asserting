@@ -4,6 +4,8 @@ mod dummy_extern_uses {
     use anyhow as _;
     #[cfg(feature = "bigdecimal")]
     use bigdecimal as _;
+    #[cfg(feature = "chrono")]
+    use chrono as _;
     use fakeenv as _;
     #[cfg(feature = "float-cmp")]
     use float_cmp as _;
