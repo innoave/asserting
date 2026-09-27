@@ -1,39 +1,6 @@
 //! Check the version number of this crate specified in the crate root and the
 //! README.
-
-// workaround for false positive 'unused extern crate' warnings until
-// Rust issue [#95513](https://github.com/rust-lang/rust/issues/95513) is fixed
-mod dummy_extern_uses {
-    use anyhow as _;
-    use asserting as _;
-    #[cfg(feature = "bigdecimal")]
-    use bigdecimal as _;
-    use fakeenv as _;
-    #[cfg(feature = "float-cmp")]
-    use float_cmp as _;
-    use hashbrown as _;
-    #[cfg(feature = "recursive")]
-    use indexmap as _;
-    #[cfg(feature = "num-bigint")]
-    use num_bigint as _;
-    #[cfg(any(feature = "bigdecimal", feature = "num-bigint"))]
-    use once_cell as _;
-    use proptest as _;
-    #[cfg(feature = "recursive")]
-    use rapidhash as _;
-    #[cfg(feature = "regex")]
-    use regex as _;
-    #[cfg(feature = "rust-decimal")]
-    use rust_decimal as _;
-    #[cfg(feature = "colored")]
-    use sdiff as _;
-    use serde as _;
-    use serde_bytes as _;
-    #[cfg(feature = "recursive")]
-    use serde_core as _;
-    #[cfg(feature = "time")]
-    use time as _;
-}
+#![allow(unused_crate_dependencies)]
 
 #[test]
 fn test_readme_deps() {
