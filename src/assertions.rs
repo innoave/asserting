@@ -256,6 +256,230 @@ pub trait AssertEquivalence<E> {
     fn is_not_equivalent_to(self, expected: E) -> Self;
 }
 
+/// Assert whether a single value is in a set of expected values.
+///
+/// # Examples
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// assert_that!("two").is_in(["one", "two", "three"]);
+/// assert_that!(42).is_in([22, 42, 50, 88]);
+///
+/// assert_that!("zero").is_not_in(["one", "two", "three"]);
+/// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
+/// ```
+///
+/// The assertions [`is_in`] and [`is_not_in`] fail if the expected set of values
+/// is empty. This restrictive behavior is by design. In the vast majority of
+/// tests asserting against an empty set results in a "dead test". Asserting
+/// that a value is in an empty set always fails, while asserting that a value
+/// is not in an empty set always succeeds. So the assertion result does not
+/// depend on the actual value. This might not be what we want to assert.
+///
+/// ```
+/// # #[cfg(feature = "panic")]
+/// # {
+/// use asserting::prelude::*;
+///
+/// assert_that_code!(|| {
+///     assert_that!(42).is_in([]);  // always fails
+/// }).panics_with_message(
+///     r"expected 42 to be in []
+///   An assertion using `is_in()` was made against an empty collection.
+///   This would always fail, which is likely a bug in your test setup.
+///   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
+/// ");
+///
+/// assert_that_code!(|| {
+///     assert_that!(42).is_not_in([]);  // always fails
+/// }).panics_with_message(
+///     r"expected 42 to not be in []
+///   An assertion using `is_not_in()` was made against an empty collection.
+///   This would always succeed, which is likely a bug in your test setup.
+///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
+/// ");
+/// # }
+/// ```
+///
+/// If you need the mathematical correct behavior for some specific test, use
+/// the alternative methods [`is_in_maybe_empty`] and [`is_not_in_maybe_empty`].
+///
+/// ```
+/// use asserting::prelude::*;
+///
+/// # #[cfg(feature = "panic")]
+/// # {
+/// assert_that_code!(|| {
+///     assert_that!(42)
+///         .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+///         .is_in_maybe_empty([]);  // always fails
+/// }).panics_with_message(
+///     r"expected 42 to be in []
+///           but was: 42
+///   which is not in: []
+/// ");
+/// # }
+///
+/// assert_that!(42).is_not_in_maybe_empty([]);  // always succeeds
+/// ```
+///
+/// [`is_in`]: Self::is_in
+/// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
+/// [`is_not_in`]: Self::is_not_in
+/// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
+pub trait AssertIsIn<I, E> {
+    /// Verifies that the actual value is in the set of expected values.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
+    ///
+    /// If the expected set of values is empty, this assertion always fails
+    /// regardless of the actual value. This is a so-called "dead test" as it
+    /// does not assert anything about the actual value. This might be a bug
+    /// or design flaw of the test case. The failure message of the failing
+    /// assertion gives a hint that this test might not be what you want.
+    ///
+    /// If you explicitly want to allow the empty set for some special test,
+    /// use the alternative [`is_in_maybe_empty`] method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("two").is_in(["one", "two", "three"]);
+    /// assert_that!(42).is_in([1, 2, 42, 5, 6]);
+    ///
+    /// # #[cfg(feature = "panic")]
+    /// # {
+    /// assert_that_code!(|| {
+    ///     assert_that!(42).is_in([]);  // always fails
+    /// }).panics_with_message(
+    ///     r"expected 42 to be in []
+    ///   An assertion using `is_in()` was made against an empty collection.
+    ///   This would always fail, which is likely a bug in your test setup.
+    ///   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
+    /// ");
+    /// # }
+    /// ```
+    ///
+    /// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
+    #[track_caller]
+    fn is_in(self, expected_values: I) -> Self;
+
+    /// Verifies that the actual value is in the set of expected values
+    /// with the empty set allowed.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
+    ///
+    /// This assertion is basically the same as the [`is_in`] method, but it
+    /// explicitly allows the empty set for the expected values. Asserting
+    /// against an empty set is most likely a "dead test", as the test always
+    /// fails independent of the actual value. So when using this method, make
+    /// sure your test is actually testing something.
+    ///
+    /// If there is no good reason for using this method, stick with the more
+    /// restrictive [`is_in`] method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("two").is_in_maybe_empty(["one", "two", "three"]);
+    /// assert_that!(42).is_in_maybe_empty([1, 2, 42, 5, 6]);
+    ///
+    /// # #[cfg(feature = "panic")]
+    /// # {
+    /// assert_that_code!(|| {
+    ///     assert_that!(42)
+    ///         .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+    ///         .is_in_maybe_empty([]);  // always fails
+    /// }).panics_with_message(
+    ///     r"expected 42 to be in []
+    ///           but was: 42
+    ///   which is not in: []
+    /// ");
+    /// # }
+    /// ```
+    ///
+    /// [`is_in`]: Self::is_in
+    #[track_caller]
+    fn is_in_maybe_empty(self, expected_values: I) -> Self;
+
+    /// Verifies that the actual value is not in the set of expected values.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
+    ///
+    /// This assertion fails if the expected set of values is empty. This
+    /// behavior is different from the mathematically correct way. This is by
+    /// design as in the mathematical sense any element is not in the empty set.
+    /// But in the vast majority of tests this would be a "dead test" as the
+    /// assertion always succeeds independent of the actual value. In fact, the
+    /// test does not assert anything about the actual value.
+    ///
+    /// If for some test you need the mathematically correct interpretation, use
+    /// the alternative [`is_not_in_maybe_empty`] method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("zero").is_not_in(["one", "two", "three"]);
+    /// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
+    ///
+    /// # #[cfg(feature = "panic")]
+    /// # {
+    /// assert_that_code!(|| {
+    ///     assert_that!(42).is_not_in([]);  // always fails
+    /// }).panics_with_message(
+    ///     r"expected 42 to not be in []
+    ///   An assertion using `is_not_in()` was made against an empty collection.
+    ///   This would always succeed, which is likely a bug in your test setup.
+    ///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
+    /// ");
+    /// # }
+    /// ```
+    ///
+    /// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
+    #[track_caller]
+    fn is_not_in(self, expected_values: I) -> Self;
+
+    /// Verifies that the actual value is not in the set of expected values
+    /// with the empty set allowed.
+    ///
+    /// The set of expected values can be given in any type of collection
+    /// that implements the `IntoIterator` trait.
+    ///
+    /// This assertion is basically the same as the [`is_not_in`] method, but it
+    /// explicitly allows the empty set for the expected values. Asserting
+    /// against an empty set is most likely a "dead test", as the test always
+    /// succeeds independent of the actual value. So when using this method,
+    /// make sure your test is actually testing something.
+    ///
+    /// If there is no good reason for using this method, stick with the more
+    /// restrictive [`is_not_in`] method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    ///
+    /// assert_that!("zero").is_not_in_maybe_empty(["one", "two", "three"]);
+    /// assert_that!(42).is_not_in_maybe_empty([1, 2, 3, 4, 5, 6]);
+    ///
+    /// assert_that!(42).is_not_in_maybe_empty([]);  // always succeeds
+    /// ```
+    ///
+    /// [`is_not_in`]: Self::is_not_in
+    #[track_caller]
+    fn is_not_in_maybe_empty(self, expected_values: I) -> Self;
+}
+
 /// Assert approximate equality for floating point numbers.
 ///
 /// # Examples
@@ -275,7 +499,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
     ///
-    /// For comparison, the epsilon and ULPS values of the given margin are
+    /// For the comparison the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// # Examples
@@ -298,7 +522,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value not approximately equals to the expected
     /// value.
     ///
-    /// For comparison, the epsilon and ULPS values of the given margin are
+    /// For the comparison the epsilon and ULPS values of the given margin are
     /// used.
     ///
     /// # Examples

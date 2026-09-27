@@ -270,6 +270,17 @@ fn extracting_ref_string_is_same_as() {
 }
 
 #[test]
+fn extracting_ref_string_is_in_array_of_str() {
+    struct Name(String);
+
+    let name = Name("Alex".to_string());
+
+    assert_that(name)
+        .extracting_ref("0", |n| &n.0)
+        .is_in(["Susan", "Gabi", "Alex"]);
+}
+
+#[test]
 fn extracting_ref_i32_is_zero() {
     struct Int(i32);
 
@@ -330,6 +341,17 @@ fn extracting_ref_i32_is_in_range() {
     assert_that(number)
         .extracting_ref("0", |n| &n.0)
         .is_in_range(1..=9);
+}
+
+#[test]
+fn extracting_ref_i32_is_in_array_of_i32() {
+    struct Int(i32);
+
+    let number = Int(42);
+
+    assert_that(number)
+        .extracting_ref("0", |n| &n.0)
+        .is_in([0, 1, 2, 3, 42, 5, 6, 7, 8]);
 }
 
 #[cfg(feature = "float-cmp")]
