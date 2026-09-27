@@ -7,7 +7,7 @@ use crate::spec::{
     DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
     Invertible, Represent, Represented, RepresentedBy, Spec,
 };
-use crate::std::{format, string::String};
+use crate::std::{format, panic, string::String};
 
 impl<T, D, R> AssertOption for Spec<'_, Option<T>, D, R>
 where
@@ -48,7 +48,7 @@ where
         let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
-                crate::panic::trigger_panic("expected the subject to be `Some(_)`, but was `None`")
+                panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
@@ -67,7 +67,7 @@ where
         let value_representation = self.representation().clone();
         self.mapping(|subject| match subject {
             None => {
-                crate::panic::trigger_panic("expected the subject to be `Some(_)`, but was `None`")
+                panic!("expected the subject to be `Some(_)`, but was `None`")
             },
             Some(value) => value,
         })
