@@ -4,7 +4,7 @@ version = "0.16.2"
 authors = ["haraldmaida"]
 license = "MIT OR Apache-2.0"
 edition = "2024"
-rust-version = "1.85.1"
+rust-version = "1.88.0"
 repository = "https://github.com/innoave/asserting"
 
 description = """
