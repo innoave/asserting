@@ -51,7 +51,11 @@ where
     D: Represent<NaiveTime> + Represent<TemporalMargin>,
 {
     fn test(&mut self, subject: &NaiveTime) -> bool {
-        subject.signed_duration_since(self.expected).abs() <= self.margin.to_time_delta()
+        if *subject < self.expected {
+            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+        } else {
+            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+        }
     }
 
     fn message(
@@ -104,7 +108,11 @@ where
     D: Represent<NaiveDate> + Represent<TemporalMargin>,
 {
     fn test(&mut self, subject: &NaiveDate) -> bool {
-        subject.signed_duration_since(self.expected).abs() <= self.margin.to_time_delta()
+        if *subject < self.expected {
+            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+        } else {
+            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+        }
     }
 
     fn message(
@@ -158,7 +166,11 @@ where
     D: Represent<NaiveDateTime> + Represent<TemporalMargin>,
 {
     fn test(&mut self, subject: &NaiveDateTime) -> bool {
-        subject.signed_duration_since(self.expected).abs() <= self.margin.to_time_delta()
+        if *subject < self.expected {
+            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+        } else {
+            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+        }
     }
 
     fn message(
@@ -216,11 +228,17 @@ where
     D: Represent<DateTime<TZ1>> + Represent<DateTime<TZ2>> + Represent<TemporalMargin>,
 {
     fn test(&mut self, subject: &DateTime<TZ1>) -> bool {
-        subject
-            .naive_utc()
-            .signed_duration_since(self.expected.naive_utc())
-            .abs()
-            <= self.margin.to_time_delta()
+        if *subject < self.expected {
+            self.expected
+                .naive_utc()
+                .signed_duration_since(subject.naive_utc())
+                <= self.margin.to_time_delta()
+        } else {
+            subject
+                .naive_utc()
+                .signed_duration_since(self.expected.naive_utc())
+                <= self.margin.to_time_delta()
+        }
     }
 
     fn message(
