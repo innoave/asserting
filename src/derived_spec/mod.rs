@@ -5,11 +5,12 @@ use crate::assertions::{
     AssertBoolean, AssertChar, AssertDebugString, AssertDecimalNumber, AssertDisplayString,
     AssertElements, AssertEmptiness, AssertEquality, AssertErrorHasSource, AssertHasCharCount,
     AssertHasDebugString, AssertHasDisplayString, AssertHasError, AssertHasErrorMessage,
-    AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIteratorContains,
-    AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder, AssertMapContainsKey,
-    AssertMapContainsValue, AssertNotANumber, AssertNumericIdentity, AssertOption,
-    AssertOptionValue, AssertOrder, AssertOrderedElements, AssertOrderedElementsRef, AssertResult,
-    AssertResultValue, AssertSameAs, AssertSignum, AssertStringContainsAnyOf, AssertStringPattern,
+    AssertHasLength, AssertHasValue, AssertInRange, AssertInfinity, AssertIsIn,
+    AssertIteratorContains, AssertIteratorContainsInAnyOrder, AssertIteratorContainsInOrder,
+    AssertMapContainsKey, AssertMapContainsValue, AssertNotANumber, AssertNumericIdentity,
+    AssertOption, AssertOptionValue, AssertOrder, AssertOrderedElements, AssertOrderedElementsRef,
+    AssertResult, AssertResultValue, AssertSameAs, AssertSignum, AssertStringContainsAnyOf,
+    AssertStringPattern,
 };
 use crate::expectations::{
     error_has_source, error_has_source_message, has_at_least_char_count, has_at_least_length,
@@ -19,9 +20,9 @@ use crate::expectations::{
     has_length_in_range, has_length_less_than, has_precision_of, has_scale_of, has_value,
     is_a_number, is_after, is_alphabetic, is_alphanumeric, is_ascii, is_at_least, is_at_most,
     is_before, is_between, is_control_char, is_digit, is_empty, is_equal_to, is_err, is_false,
-    is_finite, is_greater_than, is_in_range, is_infinite, is_integer, is_less_than, is_lower_case,
-    is_negative, is_none, is_ok, is_one, is_positive, is_same_as, is_some, is_true, is_upper_case,
-    is_whitespace, is_zero, iterator_contains, iterator_contains_all_in_order,
+    is_finite, is_greater_than, is_in, is_in_range, is_infinite, is_integer, is_less_than,
+    is_lower_case, is_negative, is_none, is_ok, is_one, is_positive, is_same_as, is_some, is_true,
+    is_upper_case, is_whitespace, is_zero, iterator_contains, iterator_contains_all_in_order,
     iterator_contains_all_of, iterator_contains_any_of, iterator_contains_exactly,
     iterator_contains_exactly_in_any_order, iterator_contains_only, iterator_contains_only_once,
     iterator_contains_sequence, iterator_ends_with, iterator_starts_with,
@@ -642,6 +643,30 @@ where
 
     fn is_not_same_as(self, expected: S) -> Self {
         self.expecting(not(is_same_as(expected)))
+    }
+}
+
+impl<O, S, I, E, D> AssertIsIn<I, E> for DerivedSpec<'_, O, S, D>
+where
+    I: IntoIterator<Item = E>,
+    S: PartialEq<E>,
+    D: Represent<S> + Represent<E>,
+    O: DoFail,
+{
+    fn is_in(self, expected_values: I) -> Self {
+        self.expecting(is_in(expected_values))
+    }
+
+    fn is_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(is_in(expected_values).allow_empty())
+    }
+
+    fn is_not_in(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values)))
+    }
+
+    fn is_not_in_maybe_empty(self, expected_values: I) -> Self {
+        self.expecting(not(is_in(expected_values).allow_empty()))
     }
 }
 

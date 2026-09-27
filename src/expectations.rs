@@ -3,6 +3,7 @@
 #![allow(missing_docs)]
 #![warn(clippy::return_self_not_must_use)]
 
+use crate::spec::Invertible;
 use crate::std::{marker::PhantomData, string::String, vec::Vec};
 use hashbrown::HashSet;
 #[cfg(feature = "regex")]
@@ -22,7 +23,11 @@ use regex::Regex;
 /// assert_that!([1, 2, 3]).expecting(not(HasLength { expected_length: 4 }));
 /// assert_that!("almost").expecting(not(StringContains { expected: "entire" }));
 /// ```
-pub fn not<E>(expectation: E) -> Not<E> {
+pub fn not<E>(mut expectation: E) -> Not<E>
+where
+    E: Invertible,
+{
+    expectation.set_inverted();
     Not(expectation)
 }
 
@@ -256,6 +261,33 @@ pub fn is_same_as<E>(expected: E) -> IsSameAs<E> {
 
 pub struct IsSameAs<E> {
     pub expected: E,
+}
+
+pub fn is_in<E, I>(expected_values: I) -> IsIn<E>
+where
+    I: IntoIterator<Item = E>,
+{
+    IsIn {
+        allow_empty: false,
+        inverted: false,
+        expected_values: Vec::from_iter(expected_values),
+    }
+}
+
+#[must_use]
+pub struct IsIn<E> {
+    pub allow_empty: bool,
+    pub inverted: bool,
+    pub expected_values: Vec<E>,
+}
+
+impl<E> IsIn<E> {
+    pub fn allow_empty(self) -> Self {
+        Self {
+            allow_empty: true,
+            ..self
+        }
+    }
 }
 
 /// Creates an [`IsCloseTo`] expectation.

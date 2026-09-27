@@ -1,5 +1,7 @@
 use crate::prelude::*;
 use crate::std::string::{String, ToString};
+use crate::std::vec;
+use hashbrown::HashSet;
 
 #[test]
 fn string_is_equal_to_string() {
@@ -1371,6 +1373,207 @@ fn verify_string_does_not_end_with_char_fails() {
   expected: not 't'
 "#]
     );
+}
+
+#[test]
+fn string_is_in_an_array_of_strings() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn string_is_in_a_vec_of_strings() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in(vec![
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn string_is_in_a_array_of_str() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio",
+        "tempor nihil in minim",
+        "id culpa et in",
+    ]);
+}
+
+#[test]
+fn str_is_in_an_array_of_strings() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_a_vec_of_strings() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(vec![
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_a_array_of_str() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in([
+        "aliquip nulla eros odio",
+        "tempor nihil in minim",
+        "id culpa et in",
+    ]);
+}
+
+#[test]
+fn str_is_in_borrowed_array_of_string() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(&[
+        "aliquip nulla eros odio".to_string(),
+        "tempor nihil in minim".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_in_slice_of_string() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_in(
+        &[
+            "aliquip nulla eros odio".to_string(),
+            "tempor nihil in minim".to_string(),
+            "id culpa et in".to_string(),
+        ][..],
+    );
+}
+
+#[test]
+fn str_is_in_hashset_of_str() {
+    let subject: &str = "zero";
+
+    let expected_values: HashSet<&str> = HashSet::from_iter(["one", "two", "three", "zero"]);
+
+    assert_that(subject).is_in(expected_values);
+}
+
+#[test]
+fn verify_str_is_in_empty_array_fails() {
+    let subject: &str = "tempor nihil in minim";
+
+    let expected_values: [&str; 0] = [];
+
+    let failures = verify_that!(subject)
+        .is_in(expected_values)
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to be in []
+  An assertion using `is_in()` was made against an empty collection.
+  This would always fail, which is likely a bug in your test setup.
+  If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
+",
+    );
+}
+
+#[test]
+fn verify_string_is_in_maybe_empty_for_empty_array_fails() {
+    let subject: &str = "tempor nihil in minim";
+
+    let expected_values: [&str; 0] = [];
+
+    let failures = verify_that!(subject)
+        .is_in_maybe_empty(expected_values)
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r#"expected subject to be in []
+          but was: "tempor nihil in minim"
+  which is not in: []
+"#,
+    );
+}
+
+#[test]
+fn verify_str_is_in_array_of_several_str_fails() {
+    let subject: &str = "zero";
+
+    let failures = verify_that!(subject)
+        .is_in(["one", "two", "three", "four"])
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r#"expected subject to be in ["one", "two", "three", "four"]
+          but was: "zero"
+  which is not in: ["one", "two", "three", "four"]
+"#,
+    );
+}
+
+#[test]
+fn string_is_not_in_array_of_strings() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    assert_that(subject).is_not_in([
+        "aliquip nulla eros odio".to_string(),
+        "id culpa et in".to_string(),
+    ]);
+}
+
+#[test]
+fn str_is_not_in_array_of_str() {
+    let subject: &str = "tempor nihil in minim";
+
+    assert_that(subject).is_not_in([
+        "aliquip nulla eros odio",
+        "voluptate no lobortis qui",
+        "id culpa et in",
+    ]);
+}
+
+#[test]
+fn verify_string_is_not_in_an_empty_array_fails() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    let expected_values: [String; 0] = [];
+
+    let failures = verify_that(subject)
+        .is_not_in(expected_values)
+        .display_failures();
+
+    assert_that!(failures).single_element().is_equal_to(
+        r"expected subject to not be in []
+  An assertion using `is_not_in()` was made against an empty collection.
+  This would always succeed, which is likely a bug in your test setup.
+  If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
+",
+    );
+}
+
+#[test]
+fn string_is_not_in_maybe_empty_for_empty_array() {
+    let subject: String = "tempor nihil in minim".to_string();
+
+    let expected_values: [String; 0] = [];
+
+    assert_that(subject).is_not_in_maybe_empty(expected_values);
 }
 
 #[cfg(feature = "regex")]

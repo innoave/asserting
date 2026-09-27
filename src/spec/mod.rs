@@ -461,7 +461,18 @@ pub trait Expectation<S: ?Sized, D> {
 /// clearly states whether the expectation has been inverted or not.
 ///
 /// [`Not`]: crate::expectations::Not
-pub trait Invertible {}
+pub trait Invertible {
+    /// This method is called, when an [`Expectation`] is inverted by the
+    /// [`not`] factory method.
+    ///
+    /// It provides a default implementation which does noting.
+    ///
+    /// Expectations may implement it to store the "inverted" flag in their
+    /// struct for being used in the [`Expectation::test`] method.
+    ///
+    /// [`not`]: crate::expectations::not
+    fn set_inverted(&mut self) {}
+}
 
 /// A textual representation of the expression or subject that is being
 /// asserted.
