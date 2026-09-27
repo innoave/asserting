@@ -3,7 +3,6 @@
 use crate::assertions::AssertCodePanics;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
-use crate::panic::AssertionPanicPayload;
 use crate::spec::{
     Code, DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting,
     Expression, FailingStrategy, Spec,
@@ -147,9 +146,8 @@ fn read_panic_message(error: Option<&Box<dyn Any + Send>>) -> Option<String> {
     error.and_then(|message| {
         let message = &**message;
         message
-            .downcast_ref::<AssertionPanicPayload>()
-            .map(|payload| payload.message.clone())
-            .or_else(|| message.downcast_ref::<String>().cloned())
+            .downcast_ref::<String>()
+            .cloned()
             .or_else(|| message.downcast_ref::<&str>().map(ToString::to_string))
     })
 }
