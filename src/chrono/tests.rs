@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used)]
 
 use crate::prelude::*;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
 
 #[test]
 fn naive_time_is_equal_to() {
@@ -371,6 +371,149 @@ fn verify_naive_datetime_is_close_to_within_milliseconds_plus_margin_fails() {
             r"expected subject to be close to 2022-01-01T12:34:56.800 within 10ms
    but was: 2022-01-01T12:34:56.789
   expected: 2022-01-01T12:34:56.800
+"
+        ]
+    );
+}
+
+#[test]
+fn datetime_utc_is_equal_to() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_equal_to(Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap());
+}
+
+#[test]
+fn datetime_utc_is_before() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_before(Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 57).unwrap());
+}
+
+#[test]
+fn datetime_utc_is_after() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_after(Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 55).unwrap());
+}
+
+#[test]
+fn datetime_utc_is_between() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_between(
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+    );
+}
+
+#[test]
+fn datetime_utc_is_close_to_within_milliseconds_exact_equal() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_close_to_with_margin(
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        3.seconds(),
+    );
+}
+
+#[test]
+fn datetime_utc_is_close_to_within_milliseconds_plus_margin() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_close_to_with_margin(
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        3.seconds(),
+    );
+}
+
+#[test]
+fn datetime_utc_is_close_to_within_milliseconds_minus_margin() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    assert_that(subject).is_close_to_with_margin(
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        3.seconds(),
+    );
+}
+
+#[test]
+fn verify_datetime_utc_is_close_to_within_seconds_minus_margin_fails() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 52).unwrap(),
+            3.seconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:52Z within 3s
+   but was: 2022-01-01T12:34:56Z
+  expected: 2022-01-01T12:34:52Z
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_datetime_utc_is_close_to_within_seconds_plus_margin_fails() {
+    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Utc.with_ymd_and_hms(2022, 1, 1, 12, 35, 00).unwrap(),
+            3.seconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:35:00Z within 3s
+   but was: 2022-01-01T12:34:56Z
+  expected: 2022-01-01T12:35:00Z
+"
+        ]
+    );
+}
+
+#[test]
+fn datetime_fixedoffset_is_close_to_within_minutes_a_datetime_utc() {
+    let subject = FixedOffset::east_opt(3600)
+        .expect("invalid fixed offset value")
+        .with_ymd_and_hms(2022, 1, 1, 12, 34, 56)
+        .unwrap();
+
+    assert_that(subject).is_close_to_with_margin(
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        60.minutes(),
+    );
+}
+
+#[test]
+fn verify_datetime_fixedoffset_is_close_to_within_minutes_a_datetime_utc_fails() {
+    let subject = FixedOffset::east_opt(3600)
+        .expect("invalid fixed offset value")
+        .with_ymd_and_hms(2022, 1, 1, 12, 34, 56)
+        .unwrap();
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+            59.minutes(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56Z within 59m
+   but was: 2022-01-01T12:34:56+01:00
+  expected: 2022-01-01T12:34:56Z
 "
         ]
     );

@@ -6,7 +6,7 @@ use crate::spec::{
     Represented, Spec,
 };
 use crate::temporal_margin::TemporalMargin;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime, TimeDelta};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
 
 impl TemporalMargin {
     /// Converts this temporal margin to a [`TimeDelta`] value.
@@ -183,6 +183,68 @@ where
 }
 
 impl Invertible for IsCloseTo<NaiveDateTime, TemporalMargin> {}
+
+impl<TZ1, TZ2, D, R> AssertIsCloseToWithinMargin<DateTime<TZ2>, TemporalMargin>
+    for Spec<'_, DateTime<TZ1>, D, R>
+where
+    TZ1: TimeZone,
+    TZ2: TimeZone,
+    D: Represent<DateTime<TZ1>> + Represent<DateTime<TZ2>> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: DateTime<TZ2>,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: DateTime<TZ2>,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<TZ1, TZ2, D> Expectation<DateTime<TZ1>, D> for IsCloseTo<DateTime<TZ2>, TemporalMargin>
+where
+    TZ1: TimeZone,
+    TZ2: TimeZone,
+    D: Represent<DateTime<TZ1>> + Represent<DateTime<TZ2>> + Represent<TemporalMargin>,
+{
+    fn test(&mut self, subject: &DateTime<TZ1>) -> bool {
+        subject
+            .naive_utc()
+            .signed_duration_since(self.expected.naive_utc())
+            .abs()
+            <= self.margin.to_time_delta()
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &DateTime<TZ1>,
+        inverted: bool,
+        representation: &D,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let (marked_actual, marked_expected) =
+            mark_diff(actual, &self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
+        let represented_margin = Represented::from((&self.margin, representation));
+        format!(
+            r"expected {expression} to be {not}close to {represented_expected:?} within {represented_margin}
+   but was: {marked_actual}
+  expected: {marked_expected}"
+        )
+    }
+}
+
+impl<TZ> Invertible for IsCloseTo<DateTime<TZ>, TemporalMargin> where TZ: TimeZone {}
 
 #[cfg(test)]
 mod tests;
