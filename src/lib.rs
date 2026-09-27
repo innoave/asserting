@@ -1172,6 +1172,5 @@ mod dummy_extern_uses {
     use proptest as _;
     use serde as _;
     use serde_bytes as _;
-    use time as _;
     use version_sync as _;
 }

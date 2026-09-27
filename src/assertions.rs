@@ -392,7 +392,6 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// # Examples
 ///
 /// ```
-/// use time::macros::date;
 /// use asserting::prelude::*;
 ///
 /// let some_result: u16 = 42;
@@ -410,11 +409,19 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
 /// assert_that!(some_letter).is_after('K');
 /// assert_that!(some_letter).is_between('A', 'Z');
 ///
-/// let some_date = date!(2025-04-20);
+/// # #[cfg(feature = "time")]
+/// # {
+/// use time::{Date, Month};
 ///
-/// assert_that!(some_date).is_before(date!(2025-04-21));
-/// assert_that!(some_date).is_after(date!(2025-04-19));
-/// assert_that!(some_date).is_between(date!(2025-04-19), date!(2025-04-21));
+/// let some_date = Date::from_calendar_date(2025, Month::April, 20).expect("invalid date");
+///
+/// assert_that!(some_date).is_before(Date::from_calendar_date(2025, Month::April, 21).expect("invalid date"));
+/// assert_that!(some_date).is_after(Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"));
+/// assert_that!(some_date).is_between(
+///     Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"),
+///     Date::from_calendar_date(2025, Month::April, 21).expect("invalid date")
+/// );
+/// # }
 ///```
 pub trait AssertOrder<E> {
     /// Verifies that the subject is less than some expected value.
@@ -494,9 +501,13 @@ pub trait AssertOrder<E> {
     /// assert_that!(4).is_before(5);
     /// assert_that!(0.8).is_before(1.0);
     ///
-    /// use time::macros::date;
+    /// # #[cfg(feature = "time")]
+    /// # {
+    /// use time::{Date, Month};
     ///
-    /// assert_that!(date!(2025-05-30)).is_before(date!(2025-06-01));
+    /// assert_that!(Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"))
+    ///     .is_before(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"));
+    /// # }
     /// ```
     #[track_caller]
     fn is_before(self, expected: E) -> Self;
@@ -515,9 +526,13 @@ pub trait AssertOrder<E> {
     /// assert_that!(5).is_after(4);
     /// assert_that!(1.2).is_after(1.0);
     ///
-    /// use time::macros::date;
+    /// # #[cfg(feature = "time")]
+    /// # {
+    /// use time::{Date, Month};
     ///
-    /// assert_that!(date!(2025-06-01)).is_after(date!(2025-05-30));
+    /// assert_that!(Date::from_calendar_date(2025, Month::August, 1).expect("invalid date"))
+    ///     .is_after(Date::from_calendar_date(2025, Month::July, 31).expect("invalid date"));
+    /// # }
     /// ```
     #[track_caller]
     fn is_after(self, expected: E) -> Self;
@@ -537,9 +552,16 @@ pub trait AssertOrder<E> {
     /// assert_that!(5).is_between(4, 6);
     /// assert_that!(1.5).is_between(0.9, 1.8);
     ///
-    /// use time::macros::date;
+    /// # #[cfg(feature = "time")]
+    /// # {
+    /// use time::{Date, Month};
     ///
-    /// assert_that!(date!(2025-06-01)).is_between(date!(2025-05-30), date!(2025-06-02));
+    /// assert_that!(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"))
+    ///     .is_between(
+    ///         Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"),
+    ///         Date::from_calendar_date(2025, Month::June, 2).expect("invalid date"),
+    ///     );
+    /// # }
     /// ```
     #[track_caller]
     fn is_between(self, min: E, max: E) -> Self;

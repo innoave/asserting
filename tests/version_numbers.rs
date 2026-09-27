@@ -31,6 +31,7 @@ mod dummy_extern_uses {
     use serde_bytes as _;
     #[cfg(feature = "recursive")]
     use serde_core as _;
+    #[cfg(feature = "time")]
     use time as _;
 }
 
