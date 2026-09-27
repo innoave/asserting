@@ -1,5 +1,3 @@
-#[cfg(feature = "std")]
-use crate::assert_panic_message;
 use crate::prelude::*;
 use crate::spec::{AssertFailure, Expression, OwnedLocation};
 #[cfg(feature = "colored")]
@@ -151,17 +149,14 @@ fn assert_that_macro_with_borrowed_str_subject() {
     assert_that!(input_string).is_equal_to("adipiscing rebum amet iusto");
 }
 
-#[cfg(feature = "std")]
 #[test]
+#[should_panic = "expected ultimate_answer to be equal to 42\n   but was: 51\n  expected: 42\n"]
 fn assert_that_macro_is_equal_to_with_integers_fails() {
     let ultimate_answer = 51;
 
-    assert_panic_message!(
-        assert_that!(ultimate_answer)
-            .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-            .is_equal_to(42),
-        "expected ultimate_answer to be equal to 42\n   but was: 51\n  expected: 42\n"
-    );
+    assert_that!(ultimate_answer)
+        .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+        .is_equal_to(42);
 }
 
 #[test]
@@ -244,49 +239,43 @@ fn soft_assertions_with_chained_assertion_methods() {
         .soft_panic();
 }
 
-#[cfg(feature = "std")]
 #[test]
-fn soft_assertions_panic_once_with_multiple_failure_messages() {
-    let subject = "the answer to all important questions is 42".to_string();
-
-    assert_panic_message!(
-        verify_that(subject)
-            .contains("unimportant")
-            .has_at_most_length(41)
-            .soft_panic(),
-        "expected subject to contain \"unimportant\"\n   \
+#[should_panic = "expected subject to contain \"unimportant\"\n   \
             but was: \"the answer to all important questions is 42\"\n  \
            expected: \"unimportant\"\n\
          \n\
          expected subject to have at most a length of 41\n   \
             but was: 43\n  \
-            expected: <= 41\n"
-    );
+            expected: <= 41\n"]
+fn soft_assertions_panic_once_with_multiple_failure_messages() {
+    let subject = "the answer to all important questions is 42".to_string();
+
+    verify_that(subject)
+        .contains("unimportant")
+        .has_at_most_length(41)
+        .soft_panic();
 }
 
 #[cfg(feature = "colored")]
 mod colored {
     use super::*;
 
-    #[cfg(feature = "std")]
     #[test]
+    #[should_panic = "expected subject to contain \"unimportant\"\n   \
+            but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
+           expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
+         \n\
+         expected subject to have at most a length of 41\n   \
+            but was: \u{1b}[31m43\u{1b}[0m\n  \
+            expected: <= \u{1b}[32m41\u{1b}[0m\n"]
     fn soft_assertions_panic_message_contains_highlighted_diffs() {
         let subject = "the answer to all important questions is 42";
 
-        assert_panic_message!(
-            verify_that(subject)
-                .with_configured_diff_format()
-                .contains("unimportant")
-                .has_at_most_length(41)
-                .soft_panic(),
-            "expected subject to contain \"unimportant\"\n   \
-                but was: \"\u{1b}[31mthe answer to all important questions is 42\u{1b}[0m\"\n  \
-               expected: \"\u{1b}[32munimportant\u{1b}[0m\"\n\
-             \n\
-             expected subject to have at most a length of 41\n   \
-                but was: \u{1b}[31m43\u{1b}[0m\n  \
-               expected: <= \u{1b}[32m41\u{1b}[0m\n"
-        );
+        verify_that(subject)
+            .with_configured_diff_format()
+            .contains("unimportant")
+            .has_at_most_length(41)
+            .soft_panic();
     }
 
     #[test]

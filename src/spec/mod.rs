@@ -15,7 +15,7 @@ use crate::std::{
     fmt::{self, Debug, Display},
     format,
     ops::Deref,
-    slice,
+    panic, slice,
     string::{String, ToString},
     vec,
     vec::Vec,
@@ -1668,7 +1668,7 @@ impl FailingStrategy for PanicOnFail {
             .map(ToString::to_string)
             .collect::<Vec<_>>()
             .join("\n");
-        crate::panic::trigger_panic(message);
+        panic!("{message}");
     }
 }
 

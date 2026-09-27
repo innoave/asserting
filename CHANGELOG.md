@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.16.2 - 2026-09-27
+
+### Fixed
+
+* failing assertion shows 'Box<dyn Any>' in the terminal
+  [(PR #99)](https://github.com/innoave/asserting/pull/99)
+
 ## 0.16.1 - 2026-09-26
 
 ### Fixed

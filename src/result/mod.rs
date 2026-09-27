@@ -13,7 +13,7 @@ use crate::spec::{
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::{
-    format,
+    format, panic,
     string::{String, ToString},
 };
 
@@ -58,9 +58,7 @@ where
             Ok(value) => value,
             Err(error) => {
                 let error = Represented::from((&error, &representation));
-                crate::panic::trigger_panic(format!(
-                    "expected the subject to be `Ok(_)`, but was `Err({error:?})`"
-                ))
+                panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
         .represented_by(representation)
@@ -71,9 +69,7 @@ where
         self.mapping(|subject| match subject {
             Ok(value) => {
                 let value = Represented::from((&value, &representation));
-                crate::panic::trigger_panic(format!(
-                    "expected the subject to be `Err(_)`, but was `Ok({value:?})`"
-                ))
+                panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
@@ -94,9 +90,7 @@ where
             Ok(value) => value,
             Err(error) => {
                 let error = Represented::from((error, &representation));
-                crate::panic::trigger_panic(format!(
-                    "expected the subject to be `Ok(_)`, but was `Err({error:?})`"
-                ))
+                panic!("expected the subject to be `Ok(_)`, but was `Err({error:?})`")
             },
         })
         .represented_by(representation)
@@ -107,9 +101,7 @@ where
         self.mapping(|subject| match subject {
             Ok(value) => {
                 let value = Represented::from((value, &representation));
-                crate::panic::trigger_panic(format!(
-                    "expected the subject to be `Err(_)`, but was `Ok({value:?})`"
-                ))
+                panic!("expected the subject to be `Err(_)`, but was `Ok({value:?})`")
             },
             Err(error) => error,
         })
@@ -180,9 +172,9 @@ where
             Err(error) => Err(error.to_string()),
         };
         self.mapping(|_result| match subject {
-            Ok(value) => crate::panic::trigger_panic(format!(
+            Ok(value) => panic!(
                 r"expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
-            )),
+            ),
             Err(error) => error,
         })
         .expecting(is_equal_to(expected))
@@ -208,9 +200,9 @@ where
             Err(error) => Err(error.to_string()),
         };
         self.mapping(|_result| match subject {
-            Ok(value) => crate::panic::trigger_panic(format!(
+            Ok(value) => panic!(
                 r"expected the subject to be `Err(_)` with message {expected:?}, but was `{value}`"
-            )),
+            ),
             Err(error) => error,
         })
         .expecting(is_equal_to(expected))
