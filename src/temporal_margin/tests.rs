@@ -1,4 +1,5 @@
 use super::*;
+use crate::prelude::*;
 
 #[test]
 fn the_default_temporal_margin_is_zero_seconds() {
@@ -177,4 +178,24 @@ fn construct_temporal_margin_of_days_from_i32() {
 #[test]
 fn construct_temporal_margin_of_weeks_from_i32() {
     assert_eq!(52_i32.weeks(), TemporalMargin::Weeks(52));
+}
+
+#[test]
+fn compare_temporal_margin_23h_to_1d() {
+    assert_that(23.hours()).is_less_than(1.days());
+}
+
+#[test]
+fn compare_temporal_margin_2000us_to_1ms() {
+    assert_that(2000.microseconds()).is_greater_than(1.milliseconds());
+}
+
+#[test]
+fn compare_temporal_margin_14d_to_2w() {
+    assert_that(14.days()).is_equal_to(2.weeks());
+}
+
+#[test]
+fn compare_temporal_margin_2h_to_121m() {
+    assert_that(2.hours()).is_less_than(121.minutes());
 }
