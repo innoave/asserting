@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 use crate::temporal_margin::TemporalMargin;
-use time::{SignedDuration, Time};
+use time::{Date, Month, SignedDuration, Time};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_signed_duration() {
@@ -152,6 +152,122 @@ fn verify_time_is_close_to_within_milliseconds_plus_margin_fails() {
         [r"expected subject to be close to 12:34:56.8 within 10ms
    but was: 12:34:56.789
   expected: 12:34:56.8
+"]
+    );
+}
+
+#[test]
+fn date_is_equal_to() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value");
+
+    assert_that(subject).is_equal_to(
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+    );
+}
+
+#[test]
+fn date_is_before() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 27).expect("invalid naive date value");
+
+    assert_that(subject).is_before(
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+    );
+}
+
+#[test]
+fn date_is_after() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value");
+
+    assert_that(subject).is_after(
+        Date::from_calendar_date(2023, Month::February, 27).expect("invalid naive date value"),
+    );
+}
+
+#[test]
+fn date_is_between() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 27).expect("invalid naive date value");
+
+    assert_that(subject).is_between(
+        Date::from_calendar_date(2023, Month::February, 26).expect("invalid naive date value"),
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+    );
+}
+
+#[test]
+fn date_is_close_to_within_days_exact_equal() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+        1.days(),
+    );
+}
+
+#[test]
+fn date_is_close_to_within_days_plus_margin() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 27).expect("invalid naive date value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+        1.days(),
+    );
+}
+
+#[test]
+fn date_is_close_to_within_days_minus_margin() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Date::from_calendar_date(2023, Month::February, 27).expect("invalid naive date value"),
+        1.days(),
+    );
+}
+
+#[test]
+fn verify_date_is_close_to_within_days_minus_margin_fails() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Date::from_calendar_date(2023, Month::February, 26).expect("invalid naive date value"),
+            1.days(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 2023-02-26 within 1d
+   but was: 2023-02-28
+  expected: 2023-02-26
+"]
+    );
+}
+
+#[test]
+fn verify_date_is_close_to_within_days_plus_margin_fails() {
+    let subject =
+        Date::from_calendar_date(2023, Month::February, 26).expect("invalid naive date value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Date::from_calendar_date(2023, Month::February, 28).expect("invalid naive date value"),
+            1.days(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 2023-02-28 within 1d
+   but was: 2023-02-26
+  expected: 2023-02-28
 "]
     );
 }
