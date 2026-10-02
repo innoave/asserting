@@ -59,17 +59,19 @@ Overview of the crate features of `asserting`. The column "no-std" specifies if 
 available in no-std environments. The column "default" specifies if this feature is enabled by
 default.
 
-| Feature        | Description                                                           | no-std | default |
-|----------------|-----------------------------------------------------------------------|:------:|:-------:|
-| `std`          | Use the `std` library                                                 |   no   |   yes   |
-| `colored`      | Colored highlighting of differences between actual and expected value |  yes   |   yes   |
-| `recursive`    | Field-by-field recursive comparison mode                              |  yes   |   yes   |
-| `float-cmp`    | Floating point comparison (`ìs_close_to`)                             |  yes   |   yes   |
-| `regex`        | String matches Regex assertions (`matching`)                          |  yes   |   yes   |
-| `panic`        | Assert that code panics (with the expected message)                   |   no   |   yes   |
-| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                             |  yes   |   no    |
-| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal`                         |  yes   |   no    |
-| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                          |  yes   |   no    |
+| Feature        | Description                                                                                           | no-std | default |
+|----------------|-------------------------------------------------------------------------------------------------------|:------:|:-------:|
+| `std`          | Use the `std` library                                                                                 |   no   |   yes   |
+| `colored`      | Colored highlighting of differences between actual and expected value                                 |  yes   |   yes   |
+| `recursive`    | Field-by-field recursive comparison mode                                                              |  yes   |   yes   |
+| `float-cmp`    | Floating point comparison (`ìs_close_to`)                                                             |  yes   |   yes   |
+| `regex`        | String matches Regex assertions (`matching`)                                                          |  yes   |   yes   |
+| `panic`        | Assert that code panics (with the expected message)                                                   |   no   |   yes   |
+| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                                                             |  yes   |   no    |
+| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal`                                                         |  yes   |   no    |
+| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                                                          |  yes   |   no    |
+| `chrono`       | `is_close_to_with_margin` assertion for<br/> `NaiveDate`, `NaiveTime`, `NaiveDateTime` and `DateTime` |  yes   |   no    |
+| `time`         | `is_close_to_with_margin` assertion for<br/> `Date`, `Time`, `PlainDateTime` and `OffsetDateTime`     |  yes   |   no    |
 
 ## Highlighted differences
 
@@ -224,6 +226,17 @@ requires crate feature `float-cmp` which is enabled by default.
 |-----------------------------|--------------------------------------------------------------------------------------------------|
 | is_close_to                 | verify that the subject is approximately equal to the expected value within a default margin     |                                                 
 | is_not_close_to             | verify that the subject is not approximately equal to the expected value within a default margin |
+| is_close_to_with_margin     | verify that the subject is approximately equal to the expected value within the given margin     |
+| is_not_close_to_with_margin | verify that the subject is not approximately equal to the expected value within the given margin |
+
+### Date and Time
+
+for date, time and date-time values of the crates `chrono` and `time`.
+
+requires crate feature `chrono` or `time`.
+
+| assertion                   | description                                                                                      |
+|-----------------------------|--------------------------------------------------------------------------------------------------|
 | is_close_to_with_margin     | verify that the subject is approximately equal to the expected value within the given margin     |
 | is_not_close_to_with_margin | verify that the subject is not approximately equal to the expected value within the given margin |
 
