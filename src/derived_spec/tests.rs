@@ -6,12 +6,10 @@ use crate::std::{
 };
 #[cfg(feature = "bigdecimal")]
 use bigdecimal::BigDecimal;
-#[cfg(feature = "float-cmp")]
-use time::OffsetDateTime;
-#[cfg(feature = "float-cmp")]
-use time::macros::datetime;
+#[cfg(all(feature = "float-cmp", feature = "time"))]
+use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
 
-#[cfg(feature = "float-cmp")]
+#[cfg(all(feature = "float-cmp", feature = "time"))]
 #[derive(Debug, Clone, PartialEq)]
 struct Item {
     name: String,
@@ -19,7 +17,7 @@ struct Item {
     quantity: u32,
 }
 
-#[cfg(feature = "float-cmp")]
+#[cfg(all(feature = "float-cmp", feature = "time"))]
 struct Order {
     id: String,
     purchased_at: OffsetDateTime,
@@ -144,12 +142,17 @@ fn verify_extracting_ref_to_assert_all_fields_fails_with_all_failures() {
     );
 }
 
-#[cfg(feature = "float-cmp")]
+#[cfg(all(feature = "float-cmp", feature = "time"))]
+#[allow(clippy::expect_used)]
 #[test]
 fn extracting_ref_to_assert_all_order_item_fields() {
     let order = Order {
         id: "019d359f-d2f1-7d64-826e-c111ae12dd24".to_string(),
-        purchased_at: datetime!(2026-03-28 14:20:33 +01:00),
+        purchased_at: OffsetDateTime::new_in_offset(
+            Date::from_calendar_date(2026, Month::March, 28).expect("invalid date"),
+            Time::from_hms(14, 20, 33).expect("invalid time"),
+            UtcOffset::from_hms(1, 0, 0).expect("invalid offset"),
+        ),
         items: vec![
             Item {
                 name: "Apple".to_string(),
@@ -171,8 +174,16 @@ fn extracting_ref_to_assert_all_order_item_fields() {
         .and()
         .extracting_ref("purchased_at", |o| &o.purchased_at)
         .is_between(
-            datetime!(2026-03-28 14:00 +01:00),
-            datetime!(2026-03-28 15:00 +01:00),
+            OffsetDateTime::new_in_offset(
+                Date::from_calendar_date(2026, Month::March, 28).expect("invalid date"),
+                Time::from_hms(14, 0, 0).expect("invalid time"),
+                UtcOffset::from_hms(1, 0, 0).expect("invalid offset"),
+            ),
+            OffsetDateTime::new_in_offset(
+                Date::from_calendar_date(2026, Month::March, 28).expect("invalid date"),
+                Time::from_hms(15, 0, 0).expect("invalid time"),
+                UtcOffset::from_hms(1, 0, 0).expect("invalid offset"),
+            ),
         )
         .and()
         .extracting_ref("items", |o| &o.items)

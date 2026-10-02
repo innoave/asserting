@@ -1120,8 +1120,8 @@ pub mod properties;
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub mod recursive_comparison;
 pub mod spec;
-#[cfg(feature = "chrono")]
-#[cfg_attr(docsrs, doc(cfg(feature = "chrono")))]
+#[cfg(any(feature = "chrono", feature = "time"))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = "chrono", feature = "time"))))]
 pub mod temporal_margin;
 
 #[cfg(feature = "bigdecimal")]
@@ -1161,6 +1161,8 @@ mod result;
 mod rust_decimal;
 mod slice;
 mod string;
+#[cfg(feature = "time")]
+mod time;
 mod vec;
 
 use crate::std::{format, string::String};
@@ -1187,6 +1189,5 @@ mod dummy_extern_uses {
     use proptest as _;
     use serde as _;
     use serde_bytes as _;
-    use time as _;
     use version_sync as _;
 }

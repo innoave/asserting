@@ -4,7 +4,7 @@ version = "0.16.2"
 authors = ["haraldmaida"]
 license = "MIT OR Apache-2.0"
 edition = "2024"
-rust-version = "1.85.1"
+rust-version = "1.88.0"
 repository = "https://github.com/innoave/asserting"
 
 description = """
@@ -39,8 +39,10 @@ std = [
     "regex?/std",
     "rust_decimal?/std",
     "sdiff?/std",
-    "serde_core?/std"
+    "serde_core?/std",
+    "time?/std"
 ]
+time = ["dep:time"]
 
 [dependencies]
 hashbrown = "0.17"
@@ -57,12 +59,12 @@ regex = { version = "1", optional = true }
 rust_decimal = { version = "1", optional = true, default-features = false }
 sdiff = { version = "0.1", optional = true, default-features = false }
 serde_core = { version = "1", optional = true, default-features = false, features = ["alloc"] }
+time = { version = "0.3", optional = true, default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 anyhow = "1"
 fakeenv = { version = "0.1", default-features = false, features = ["fake"] }
 proptest = "1"
-time = { version = "0.3", default-features = false, features = ["macros"] }
 serde = { version = "1", default-features = false, features = ["alloc", "derive"] }
 serde_bytes = { version = "0.11", default-features = false, features = ["alloc"] }
 version-sync = "0.9"

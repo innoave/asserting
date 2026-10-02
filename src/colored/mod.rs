@@ -1039,9 +1039,12 @@ mod with_colored_feature {
             },
             Err(env::VarError::NotUnicode(value)) => {
                 #[cfg(feature = "std")]
-                eprintln!(
-                    "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
-                );
+                #[allow(clippy::unnecessary_debug_formatting)]
+                {
+                    eprintln!(
+                        "WARNING: the environment variable `{ENV_VAR_HIGHLIGHT_DIFFS}` is set to the unrecognized value {value:?}.\n\t=> Default highlight mode \"{DEFAULT_HIGHLIGHT_MODE}\" is used."
+                    );
+                }
                 DEFAULT_DIFF_FORMAT
             },
         }
