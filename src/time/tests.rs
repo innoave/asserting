@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 use crate::temporal_margin::TemporalMargin;
-use time::{Date, Month, SignedDuration, Time};
+use time::{Date, Month, PlainDateTime, SignedDuration, Time};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_signed_duration() {
@@ -269,5 +269,169 @@ fn verify_date_is_close_to_within_days_plus_margin_fails() {
    but was: 2023-02-26
   expected: 2023-02-28
 "]
+    );
+}
+
+#[test]
+fn plain_datetime_is_equal_to() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_equal_to(PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    ));
+}
+
+#[test]
+fn plain_datetime_is_before() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_before(PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 790).expect("invalid naive time value"),
+    ));
+}
+
+#[test]
+fn plain_datetime_is_after() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_after(PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 788).expect("invalid naive time value"),
+    ));
+}
+
+#[test]
+fn plain_datetime_is_between() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_between(
+        PlainDateTime::new(
+            Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+            Time::from_hms_milli(12, 34, 56, 788).expect("invalid naive time value"),
+        ),
+        PlainDateTime::new(
+            Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+            Time::from_hms_milli(12, 34, 56, 790).expect("invalid naive time value"),
+        ),
+    );
+}
+
+#[test]
+fn plain_datetime_is_close_to_within_milliseconds_exact_equal() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_close_to_with_margin(
+        PlainDateTime::new(
+            Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+            Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+        ),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn plain_datetime_is_close_to_within_milliseconds_plus_margin() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_close_to_with_margin(
+        PlainDateTime::new(
+            Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+            Time::from_hms_milli(12, 34, 56, 799).expect("invalid naive time value"),
+        ),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn plain_datetime_is_close_to_within_milliseconds_minus_margin() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    assert_that(subject).is_close_to_with_margin(
+        PlainDateTime::new(
+            Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+            Time::from_hms_milli(12, 34, 56, 779).expect("invalid naive time value"),
+        ),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn verify_plain_datetime_is_close_to_within_milliseconds_minus_margin_fails() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            PlainDateTime::new(
+                Date::from_calendar_date(2022, Month::January, 1)
+                    .expect("invalid naive date value"),
+                Time::from_hms_milli(12, 34, 56, 778).expect("invalid naive time value"),
+            ),
+            10.milliseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01 12:34:56.778 within 10ms
+   but was: 2022-01-01 12:34:56.789
+  expected: 2022-01-01 12:34:56.778
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_plain_datetime_is_close_to_within_milliseconds_plus_margin_fails() {
+    let subject = PlainDateTime::new(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid naive date value"),
+        Time::from_hms_milli(12, 34, 56, 789).expect("invalid naive time value"),
+    );
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            PlainDateTime::new(
+                Date::from_calendar_date(2022, Month::January, 1)
+                    .expect("invalid naive date value"),
+                Time::from_hms_milli(12, 34, 56, 800).expect("invalid naive time value"),
+            ),
+            10.milliseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01 12:34:56.8 within 10ms
+   but was: 2022-01-01 12:34:56.789
+  expected: 2022-01-01 12:34:56.8
+"
+        ]
     );
 }
