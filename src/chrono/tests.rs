@@ -457,27 +457,29 @@ fn datetime_utc_is_close_to_within_milliseconds_exact_equal() {
 
     assert_that(subject).is_close_to_with_margin(
         Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-        3.seconds(),
+        3.milliseconds(),
     );
 }
 
 #[test]
 fn datetime_utc_is_close_to_within_milliseconds_plus_margin() {
-    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+    let subject =
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
 
     assert_that(subject).is_close_to_with_margin(
         Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-        3.seconds(),
+        3.milliseconds(),
     );
 }
 
 #[test]
 fn datetime_utc_is_close_to_within_milliseconds_minus_margin() {
-    let subject = Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap();
+    let subject =
+        Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() - TimeDelta::milliseconds(3);
 
     assert_that(subject).is_close_to_with_margin(
         Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-        3.seconds(),
+        3.milliseconds(),
     );
 }
 
