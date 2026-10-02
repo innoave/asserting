@@ -652,3 +652,74 @@ fn verify_offsetdatetime_is_close_to_within_minutes_different_utc_offset_fails()
         ]
     );
 }
+
+#[test]
+fn extracting_ref_time_is_close_to_within_seconds() {
+    struct MyTime(Time);
+
+    let subject = MyTime(Time::from_hms(12, 34, 56).expect("invalid time value"));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            Time::from_hms(12, 34, 57).expect("invalid time value"),
+            2.seconds(),
+        );
+}
+
+#[test]
+fn extracting_ref_date_is_close_to_within_hours() {
+    struct MyDate(Date);
+
+    let subject =
+        MyDate(Date::from_calendar_date(2024, Month::December, 8).expect("invalid date value"));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            Date::from_calendar_date(2024, Month::December, 9).expect("invalid date value"),
+            24.hours(),
+        );
+}
+
+#[test]
+fn extracting_ref_plain_datetime_is_close_to_within_milliseconds() {
+    struct MyPlainDateTime(PlainDateTime);
+
+    let subject = MyPlainDateTime(PlainDateTime::new(
+        Date::from_calendar_date(2024, Month::December, 8).expect("invalid date value"),
+        Time::from_hms(12, 34, 56).expect("invalid time value"),
+    ));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            PlainDateTime::new(
+                Date::from_calendar_date(2024, Month::December, 8).expect("invalid date value"),
+                Time::from_hms(12, 34, 55).expect("invalid time value"),
+            ),
+            1000.milliseconds(),
+        );
+}
+
+#[test]
+fn extracting_ref_offset_datetime_is_close_to_within_minutes() {
+    struct MyOffsetDateTime(OffsetDateTime);
+
+    let subject = MyOffsetDateTime(OffsetDateTime::new_in_offset(
+        Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+        Time::from_hms(12, 34, 56).expect("invalid time value"),
+        UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+    ));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            OffsetDateTime::new_in_offset(
+                Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+                Time::from_hms(12, 34, 56).expect("invalid time value"),
+                UtcOffset::from_hms(2, 0, 0).expect("invalid utc offset value"),
+            ),
+            60.minutes(),
+        );
+}
