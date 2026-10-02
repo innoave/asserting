@@ -480,35 +480,87 @@ pub trait AssertIsIn<I, E> {
     fn is_not_in_maybe_empty(self, expected_values: I) -> Self;
 }
 
-/// Assert approximate equality for floating point numbers.
+/// Assert approximate equality for floating point numbers or temporal values
+/// like time, date and date-time.
+///
+/// These are comparisons for values that are challenging to compare exactly,
+/// such as floating-point numbers or temporal values. It compares the values
+/// tolerating a small margin of deviation.
 ///
 /// # Examples
 ///
 /// ```
 /// use asserting::prelude::*;
+/// # #[cfg(feature = "float-cmp")]
+/// # {
 ///
 /// assert_that!(10.0_f32 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
 /// assert_that!(10.0_f64 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
 ///
 /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
 /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
+/// # }
+/// # #[cfg(feature = "chrono")]
+/// # {
+///
+/// use chrono::{TimeDelta, TimeZone, Utc};
+///
+/// let subject =
+///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
+///
+/// assert_that(subject).is_close_to_with_margin(
+///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+///     3.milliseconds(),
+/// );
+/// # }
+/// # #[cfg(feature = "time")]
+/// # {
+///
+/// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
+///
+/// let subject = OffsetDateTime::new_in_offset(
+///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+///     Time::from_hms(12, 34, 56).expect("invalid time value"),
+///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+/// );
+///
+/// assert_that(subject).is_close_to_with_margin(
+///     OffsetDateTime::new_in_offset(
+///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+///         Time::from_hms(12, 34, 56).expect("invalid time value"),
+///         UtcOffset::UTC,
+///     ),
+///     60.minutes(),
+/// );
+/// # }
 /// ```
-#[cfg(feature = "float-cmp")]
-#[cfg_attr(docsrs, doc(cfg(feature = "float-cmp")))]
+#[cfg(any(feature = "float-cmp", feature = "chrono", feature = "time"))]
+#[cfg_attr(
+    docsrs,
+    doc(cfg(any(feature = "float-cmp", feature = "chrono", feature = "time")))
+)]
 pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
     ///
-    /// For the comparison the epsilon and ULPS values of the given margin are
-    /// used.
+    /// It is used to compare values of types that are not guaranteed to be
+    /// equal and are challenging to compare exactly. The most widely used
+    /// candidates are floating point numbers and temporal values.
     ///
-    /// # Examples
+    /// # Floating Point Numbers
+    ///
+    /// Floating point numbers are not guaranteed to be equal due to rounding
+    /// errors caused by how they are represented in memory. The margin for
+    /// floats is specified by a tuple of an epsilon and an ULPS value.
     ///
     /// ```
+    /// # #[cfg(feature = "float-cmp")]
+    /// # {
     /// use asserting::prelude::*;
     ///
     /// assert_that!(10.0_f32 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
     /// assert_that!(10.0_f64 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
+    /// # }
     /// ```
     ///
     /// The following articles describe the challenges with comparing floating
@@ -516,22 +568,77 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///
     /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
     /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    ///
+    /// # Date and Time Values
+    ///
+    /// Date and time values may vary if they are taken from a clock like the
+    /// system clock or a clock service. The margin for time values is
+    /// specified by a [`TemporalMargin`]. There are methods to conveniently
+    /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
+    /// the extension trait [`IntoTemporalMargin`] for which methods are
+    /// available.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// # #[cfg(feature = "chrono")]
+    /// # {
+    ///
+    /// use chrono::{TimeDelta, TimeZone, Utc};
+    ///
+    /// let subject =
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
+    ///
+    /// assert_that(subject).is_close_to_with_margin(
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+    ///     3.milliseconds(),
+    /// );
+    /// # }
+    /// # #[cfg(feature = "time")]
+    /// # {
+    ///
+    /// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
+    ///
+    /// let subject = OffsetDateTime::new_in_offset(
+    ///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+    ///     Time::from_hms(12, 34, 56).expect("invalid time value"),
+    ///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+    /// );
+    ///
+    /// assert_that(subject).is_close_to_with_margin(
+    ///     OffsetDateTime::new_in_offset(
+    ///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+    ///         Time::from_hms(12, 34, 56).expect("invalid time value"),
+    ///         UtcOffset::UTC,
+    ///     ),
+    ///     60.minutes(),
+    /// );
+    /// # }
+    /// ```
+    ///
+    /// [`IntoTemporalMargin`]: crate::temporal_margin::IntoTemporalMargin
+    /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
     #[track_caller]
     fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 
-    /// Verifies that the actual value not approximately equals to the expected
-    /// value.
     ///
-    /// For the comparison the epsilon and ULPS values of the given margin are
-    /// used.
+    /// It is used to compare values of types that are not guaranteed to be
+    /// equal and are challenging to compare exactly. The most widely used
+    /// candidates are floating point numbers and temporal values.
     ///
-    /// # Examples
+    /// # Floating Point Numbers
+    ///
+    /// Floating point numbers are not guaranteed to be equal due to rounding
+    /// errors caused by how they are represented in memory. The margin for
+    /// floats is specified by a tuple of an epsilon and an ULPS value.
     ///
     /// ```
+    /// # #[cfg(feature = "float-cmp")]
+    /// # {
     /// use asserting::prelude::*;
     ///
     /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
     /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
+    /// # }
     /// ```
     ///
     /// The following articles describe the challenges with comparing floating
@@ -539,6 +646,55 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///
     /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
     /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+    ///
+    /// # Date and Time Values
+    ///
+    /// Date and time values may vary if they are taken from a clock like the
+    /// system clock or a clock service. The margin for time values is
+    /// specified by a [`TemporalMargin`]. There are methods to conveniently
+    /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
+    /// the extension trait [`IntoTemporalMargin`] for which methods are
+    /// available.
+    ///
+    /// ```
+    /// use asserting::prelude::*;
+    /// # #[cfg(feature = "chrono")]
+    /// # {
+    ///
+    /// use chrono::{TimeDelta, TimeZone, Utc};
+    ///
+    /// let subject =
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(4);
+    ///
+    /// assert_that(subject).is_not_close_to_with_margin(
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+    ///     3.milliseconds(),
+    /// );
+    /// # }
+    /// # #[cfg(feature = "time")]
+    /// # {
+    ///
+    /// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
+    ///
+    /// let subject = OffsetDateTime::new_in_offset(
+    ///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+    ///     Time::from_hms(12, 34, 56).expect("invalid time value"),
+    ///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+    /// );
+    ///
+    /// assert_that(subject).is_not_close_to_with_margin(
+    ///     OffsetDateTime::new_in_offset(
+    ///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+    ///         Time::from_hms(12, 34, 56).expect("invalid time value"),
+    ///         UtcOffset::UTC,
+    ///     ),
+    ///     59.minutes(),
+    /// );
+    /// # }
+    /// ```
+    ///
+    /// [`IntoTemporalMargin`]: crate::temporal_margin::IntoTemporalMargin
+    /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
     #[track_caller]
     fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 }
