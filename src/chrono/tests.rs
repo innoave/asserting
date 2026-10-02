@@ -2,7 +2,9 @@
 
 use crate::prelude::*;
 use crate::temporal_margin::TemporalMargin;
-use chrono::{FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone, Utc};
+use chrono::{
+    DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone, Utc,
+};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_time_delta() {
@@ -563,4 +565,90 @@ fn verify_datetime_fixedoffset_is_close_to_within_minutes_a_datetime_utc_fails()
 "
         ]
     );
+}
+
+#[test]
+fn extracting_ref_naive_time_is_close_to_within_seconds() {
+    struct MyNaiveTime(NaiveTime);
+
+    let subject =
+        MyNaiveTime(NaiveTime::from_hms_opt(12, 34, 56).expect("invalid naive time value"));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            NaiveTime::from_hms_opt(12, 34, 57).expect("invalid naive time value"),
+            2.seconds(),
+        );
+}
+
+#[test]
+fn extracting_ref_naive_date_is_close_to_within_hours() {
+    struct MyNaiveDate(NaiveDate);
+
+    let subject =
+        MyNaiveDate(NaiveDate::from_ymd_opt(2024, 12, 8).expect("invalid naive date value"));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            NaiveDate::from_ymd_opt(2024, 12, 9).expect("invalid naive date value"),
+            24.hours(),
+        );
+}
+
+#[test]
+fn extracting_ref_naive_datetime_is_close_to_within_milliseconds() {
+    struct MyNaiveDateTime(NaiveDateTime);
+
+    let subject = MyNaiveDateTime(NaiveDateTime::new(
+        NaiveDate::from_ymd_opt(2024, 12, 8).expect("invalid naive date value"),
+        NaiveTime::from_hms_opt(12, 34, 56).expect("invalid naive time value"),
+    ));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            NaiveDateTime::new(
+                NaiveDate::from_ymd_opt(2024, 12, 8).expect("invalid naive date value"),
+                NaiveTime::from_hms_opt(12, 34, 55).expect("invalid naive time value"),
+            ),
+            1000.milliseconds(),
+        );
+}
+
+#[test]
+fn extracting_ref_datetime_utc_is_close_to_within_minutes() {
+    struct MyDateTime(DateTime<Utc>);
+
+    let subject = MyDateTime(Utc.with_ymd_and_hms(2023, 6, 30, 12, 34, 56).unwrap());
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            FixedOffset::east_opt(3600)
+                .expect("invalid fixed offset value")
+                .with_ymd_and_hms(2023, 6, 30, 12, 34, 56)
+                .unwrap(),
+            60.minutes(),
+        );
+}
+
+#[test]
+fn extracting_ref_datetime_fixed_offset_is_close_to_within_minutes() {
+    struct MyDateTime(DateTime<FixedOffset>);
+
+    let subject = MyDateTime(
+        FixedOffset::east_opt(3600)
+            .expect("invalid fixed offset value")
+            .with_ymd_and_hms(2023, 6, 30, 12, 34, 56)
+            .unwrap(),
+    );
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            Utc.with_ymd_and_hms(2023, 6, 30, 12, 34, 56).unwrap(),
+            60.minutes(),
+        );
 }

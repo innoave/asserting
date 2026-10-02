@@ -1,8 +1,9 @@
 use crate::assertions::AssertIsCloseToWithinMargin;
 use crate::colored::mark_diff;
+use crate::derived_spec::DerivedSpec;
 use crate::expectations::{IsCloseTo, is_close_to, not};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
+    DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
 use crate::temporal_margin::TemporalMargin;
@@ -263,6 +264,100 @@ where
 }
 
 impl<TZ> Invertible for IsCloseTo<DateTime<TZ>, TemporalMargin> where TZ: TimeZone {}
+
+impl<O, D> AssertIsCloseToWithinMargin<NaiveTime, TemporalMargin>
+    for DerivedSpec<'_, O, NaiveTime, D>
+where
+    D: Represent<NaiveTime> + Represent<TemporalMargin>,
+    O: DoFail,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: NaiveTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: NaiveTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<O, D> AssertIsCloseToWithinMargin<NaiveDate, TemporalMargin>
+    for DerivedSpec<'_, O, NaiveDate, D>
+where
+    D: Represent<NaiveDate> + Represent<TemporalMargin>,
+    O: DoFail,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: NaiveDate,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: NaiveDate,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<O, D> AssertIsCloseToWithinMargin<NaiveDateTime, TemporalMargin>
+    for DerivedSpec<'_, O, NaiveDateTime, D>
+where
+    D: Represent<NaiveDateTime> + Represent<TemporalMargin>,
+    O: DoFail,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: NaiveDateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: NaiveDateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<O, TZ1, TZ2, D> AssertIsCloseToWithinMargin<DateTime<TZ2>, TemporalMargin>
+    for DerivedSpec<'_, O, DateTime<TZ1>, D>
+where
+    TZ1: TimeZone,
+    TZ2: TimeZone,
+    D: Represent<DateTime<TZ1>> + Represent<DateTime<TZ2>> + Represent<TemporalMargin>,
+    O: DoFail,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: DateTime<TZ2>,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: DateTime<TZ2>,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
 
 #[cfg(test)]
 mod tests;
