@@ -2,6 +2,7 @@
 
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
+use jiff::civil::time;
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[test]
@@ -201,5 +202,88 @@ fn verify_timestamp_is_close_to_within_nanoseconds_plus_margin_fails() {
   expected: 1970-01-02T10:17:36.98765431Z
 "
         ]
+    );
+}
+
+#[test]
+fn civil_time_is_equal_to() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_equal_to(time(12, 34, 56, 789_000_000));
+}
+
+#[test]
+fn civil_time_is_before() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_before(time(12, 34, 56, 790_000_000));
+}
+
+#[test]
+fn civil_time_is_after() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_after(time(12, 34, 56, 788_000_000));
+}
+
+#[test]
+fn civil_time_is_between() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_between(time(12, 34, 56, 788_000_000), time(12, 34, 56, 790_000_000));
+}
+
+#[test]
+fn civil_time_is_close_to_within_milliseconds_exact_equal() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(time(12, 34, 56, 789_000_000), 10.milliseconds());
+}
+
+#[test]
+fn civil_time_is_close_to_within_milliseconds_plus_margin() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(time(12, 34, 56, 799_000_000), 10.milliseconds());
+}
+
+#[test]
+fn civil_time_is_close_to_within_milliseconds_minus_margin() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(time(12, 34, 56, 779_000_000), 10.milliseconds());
+}
+
+#[test]
+fn verify_civil_time_is_close_to_within_milliseconds_minus_margin_fails() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(time(12, 34, 56, 778_000_000), 10.milliseconds())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 12:34:56.778 within 10ms
+   but was: 12:34:56.789
+  expected: 12:34:56.778
+"]
+    );
+}
+
+#[test]
+fn verify_civil_time_is_close_to_within_milliseconds_plus_margin_fails() {
+    let subject = time(12, 34, 56, 789_000_000);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(time(12, 34, 56, 800_000_000), 10.milliseconds())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 12:34:56.8 within 10ms
+   but was: 12:34:56.789
+  expected: 12:34:56.8
+"]
     );
 }
