@@ -59,9 +59,9 @@ where
 {
     fn test(&mut self, subject: &NaiveTime) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -116,9 +116,9 @@ where
 {
     fn test(&mut self, subject: &NaiveDate) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -174,9 +174,9 @@ where
 {
     fn test(&mut self, subject: &NaiveDateTime) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -239,12 +239,12 @@ where
             self.expected
                 .naive_utc()
                 .signed_duration_since(subject.naive_utc())
-                <= self.margin.to_time_delta()
+                <= self.margin.to_duration()
         } else {
             subject
                 .naive_utc()
                 .signed_duration_since(self.expected.naive_utc())
-                <= self.margin.to_time_delta()
+                <= self.margin.to_duration()
         }
     }
 
