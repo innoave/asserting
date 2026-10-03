@@ -6,7 +6,7 @@ use crate::spec::{
     Represented, Spec,
 };
 use crate::temporal::{TemporalMargin, ToDuration};
-use jiff::civil::{Date, Time};
+use jiff::civil::{Date, DateTime, Time};
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[cfg(test)]
@@ -206,3 +206,60 @@ where
 }
 
 impl Invertible for IsCloseTo<Date, TemporalMargin> {}
+
+impl<D, R> AssertIsCloseToWithinMargin<DateTime, TemporalMargin> for Spec<'_, DateTime, D, R>
+where
+    D: Represent<DateTime> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: DateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: DateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<D> Expectation<DateTime, D> for IsCloseTo<DateTime, TemporalMargin>
+where
+    D: Represent<DateTime> + Represent<TemporalMargin>,
+{
+    fn test(&mut self, subject: &DateTime) -> bool {
+        if *subject < self.expected {
+            subject.duration_until(self.expected) <= self.margin.to_duration()
+        } else {
+            subject.duration_since(self.expected) <= self.margin.to_duration()
+        }
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &DateTime,
+        inverted: bool,
+        representation: &D,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let (marked_actual, marked_expected) =
+            mark_diff(actual, &self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
+        let represented_margin = Represented::from((&self.margin, representation));
+        format!(
+            r"expected {expression} to be {not}close to {represented_expected:?} within {represented_margin}
+   but was: {marked_actual}
+  expected: {marked_expected}"
+        )
+    }
+}
+
+impl Invertible for IsCloseTo<DateTime, TemporalMargin> {}

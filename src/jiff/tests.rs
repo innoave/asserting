@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
-use jiff::civil::{date, time};
+use jiff::civil::{date, datetime, time};
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[test]
@@ -368,5 +368,110 @@ fn verify_civil_date_is_close_to_within_days_plus_margin_fails() {
    but was: 2023-02-26
   expected: 2023-02-28
 "]
+    );
+}
+
+#[test]
+fn civil_datetime_is_equal_to() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_equal_to(datetime(2022, 1, 1, 12, 34, 56, 789_000_000));
+}
+
+#[test]
+fn civil_datetime_is_before() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_before(datetime(2022, 1, 1, 12, 34, 56, 790_000_000));
+}
+
+#[test]
+fn civil_datetime_is_after() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_after(datetime(2022, 1, 1, 12, 34, 56, 788_000_000));
+}
+
+#[test]
+fn civil_datetime_is_between() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_between(
+        datetime(2022, 1, 1, 12, 34, 56, 788_000_000),
+        datetime(2022, 1, 1, 12, 34, 56, 790_000_000),
+    );
+}
+
+#[test]
+fn civil_datetime_is_close_to_within_milliseconds_exact_equal() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(
+        datetime(2022, 1, 1, 12, 34, 56, 789_000_000),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn civil_datetime_is_close_to_within_milliseconds_plus_margin() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(
+        datetime(2022, 1, 1, 12, 34, 56, 799_000_000),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn civil_datetime_is_close_to_within_milliseconds_minus_margin() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    assert_that(subject).is_close_to_with_margin(
+        datetime(2022, 1, 1, 12, 34, 56, 779_000_000),
+        10.milliseconds(),
+    );
+}
+
+#[test]
+fn verify_civil_datetime_is_close_to_within_milliseconds_minus_margin_fails() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            datetime(2022, 1, 1, 12, 34, 56, 778_000_000),
+            10.milliseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56.778 within 10ms
+   but was: 2022-01-01T12:34:56.789
+  expected: 2022-01-01T12:34:56.778
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_civil_datetime_is_close_to_within_milliseconds_plus_margin_fails() {
+    let subject = datetime(2022, 1, 1, 12, 34, 56, 789_000_000);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            datetime(2022, 1, 1, 12, 34, 56, 800_000_000),
+            10.milliseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56.8 within 10ms
+   but was: 2022-01-01T12:34:56.789
+  expected: 2022-01-01T12:34:56.8
+"
+        ]
     );
 }

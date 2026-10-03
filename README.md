@@ -59,21 +59,21 @@ Overview of the crate features of `asserting`. The column "no-std" specifies if 
 available in no-std environments. The column "default" specifies if this feature is enabled by
 default.
 
-| Feature        | Description                                                                                                              | no-std | default |
-|----------------|--------------------------------------------------------------------------------------------------------------------------|:------:|:-------:|
-| `std`          | Use the `std` library                                                                                                    |   no   |   yes   |
-| `colored`      | Colored highlighting of differences between actual and expected value                                                    |  yes   |   yes   |
-| `recursive`    | Field-by-field recursive comparison mode                                                                                 |  yes   |   yes   |
-| `float-cmp`    | Floating point comparison (`ìs_close_to`)                                                                                |  yes   |   yes   |
-| `regex`        | String matches Regex assertions (`matching`)                                                                             |  yes   |   yes   |
-| `panic`        | Assert that code panics (with the expected message)                                                                      |   no   |   yes   |
-| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                                                                                |  yes   |   no    |
-| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal`                                                                            |  yes   |   no    |
-| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                                                                             |  yes   |   no    |
-| `temporal`     | Support for writing assertions for temporal types                                                                        |  yes   |   no    |
-| `chrono`       | `is_close_to_with_margin` assertion for `chrono` types:<br/> `NaiveDate`, `NaiveTime`, `NaiveDateTime` and `DateTime`    |  yes   |   no    |
-| `jiff`         | `is_close_to_with_margin` assertion for `jiff` types:<br/> `Timestamp`, `Span`, `civil::Date`, `civil::Time` and `Zoned` |  yes   |   no    |
-| `time`         | `is_close_to_with_margin` assertion for `time` types:<br/> `Date`, `Time`, `PlainDateTime` and `OffsetDateTime`          |  yes   |   no    |
+| Feature        | Description                                                                                                                         | no-std | default |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------|:------:|:-------:|
+| `std`          | Use the `std` library                                                                                                               |   no   |   yes   |
+| `colored`      | Colored highlighting of differences between actual and expected value                                                               |  yes   |   yes   |
+| `recursive`    | Field-by-field recursive comparison mode                                                                                            |  yes   |   yes   |
+| `float-cmp`    | Floating point comparison (`ìs_close_to`)                                                                                           |  yes   |   yes   |
+| `regex`        | String matches Regex assertions (`matching`)                                                                                        |  yes   |   yes   |
+| `panic`        | Assert that code panics (with the expected message)                                                                                 |   no   |   yes   |
+| `num-bigint`   | Enhanced support for `num-bigint::BigInt`                                                                                           |  yes   |   no    |
+| `bigdecimal`   | Enhanced support for `bigdecimal::BigDecimal`                                                                                       |  yes   |   no    |
+| `rust-decimal` | Enhanded support for `rust_decimal::Decimal`                                                                                        |  yes   |   no    |
+| `temporal`     | Support for writing assertions for temporal types                                                                                   |  yes   |   no    |
+| `chrono`       | `is_close_to_with_margin` assertion for `chrono` types:<br/> `NaiveDate`, `NaiveTime`, `NaiveDateTime` and `DateTime`               |  yes   |   no    |
+| `jiff`         | `is_close_to_with_margin` assertion for `jiff` types:<br/> `Timestamp`, `civil::Date`, `civil::Time`, `civil::DateTime` and `Zoned` |  yes   |   no    |
+| `time`         | `is_close_to_with_margin` assertion for `time` types:<br/> `Date`, `Time`, `PlainDateTime` and `OffsetDateTime`                     |  yes   |   no    |
 
 ## Highlighted differences
 
