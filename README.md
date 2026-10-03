@@ -73,7 +73,7 @@ default.
 | `temporal`     | Support for writing assertions for temporal types                                                                                   |  yes   |   no    |
 | `chrono`       | `is_close_to_with_margin` assertion for `chrono` types:<br/> `NaiveDate`, `NaiveTime`, `NaiveDateTime` and `DateTime`               |  yes   |   no    |
 | `jiff`         | `is_close_to_with_margin` assertion for `jiff` types:<br/> `Timestamp`, `civil::Date`, `civil::Time`, `civil::DateTime` and `Zoned` |  yes   |   no    |
-| `time`         | `is_close_to_with_margin` assertion for `time` types:<br/> `Date`, `Time`, `PlainDateTime` and `OffsetDateTime`                     |  yes   |   no    |
+| `time`         | `is_close_to_with_margin` assertion for `time` types:<br/> `Timestamp`, `Date`, `Time`, `PlainDateTime` and `OffsetDateTime`        |  yes   |   no    |
 
 ## Highlighted differences
 

@@ -7,7 +7,7 @@ use crate::spec::{
     DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::temporal::{TemporalMargin, ToDuration};
-use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time};
+use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time, Timestamp};
 
 impl ToDuration<SignedDuration> for TemporalMargin {
     fn to_duration(self) -> SignedDuration {
@@ -23,6 +23,65 @@ impl ToDuration<SignedDuration> for TemporalMargin {
         }
     }
 }
+
+impl<D, R> AssertIsCloseToWithinMargin<Timestamp, TemporalMargin> for Spec<'_, Timestamp, D, R>
+where
+    D: Represent<Timestamp> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<D> Expectation<Timestamp, D> for IsCloseTo<Timestamp, TemporalMargin>
+where
+    D: Represent<Timestamp> + Represent<TemporalMargin>,
+{
+    fn test(&mut self, subject: &Timestamp) -> bool {
+        if *subject < self.expected {
+            self.expected - *subject
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+        } else {
+            *subject - self.expected
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+        }
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Timestamp,
+        inverted: bool,
+        representation: &D,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let (marked_actual, marked_expected) =
+            mark_diff(actual, &self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
+        let represented_margin = Represented::from((&self.margin, representation));
+        format!(
+            r"expected {expression} to be {not}close to {represented_expected:?} within {represented_margin}
+   but was: {marked_actual}
+  expected: {marked_expected}"
+        )
+    }
+}
+
+impl Invertible for IsCloseTo<Timestamp, TemporalMargin> {}
 
 impl<D, R> AssertIsCloseToWithinMargin<Time, TemporalMargin> for Spec<'_, Time, D, R>
 where

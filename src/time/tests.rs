@@ -2,7 +2,9 @@
 
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
-use time::{Date, Month, OffsetDateTime, PlainDateTime, SignedDuration, Time, UtcOffset};
+use time::{
+    Date, Month, OffsetDateTime, PlainDateTime, SignedDuration, Time, Timestamp, UtcOffset,
+};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_duration() {
@@ -50,6 +52,114 @@ fn temporal_margin_of_days_to_duration() {
 fn temporal_margin_of_weeks_to_duration() {
     let subject: SignedDuration = TemporalMargin::Weeks(52).to_duration();
     assert_that(subject).is_equal_to(SignedDuration::weeks(52));
+}
+
+#[test]
+fn timestamp_is_equal_to() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject)
+        .is_equal_to(Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value"));
+}
+
+#[test]
+fn timestamp_is_before() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject)
+        .is_before(Timestamp::new(123_456, 987_654_322).expect("invalid timestamp value"));
+}
+
+#[test]
+fn timestamp_is_after() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject)
+        .is_after(Timestamp::new(123_456, 987_654_320).expect("invalid timestamp value"));
+}
+
+#[test]
+fn timestamp_is_between() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject).is_between(
+        Timestamp::new(123_455, 987_654_321).expect("invalid timestamp value"),
+        Timestamp::new(123_457, 987_654_321).expect("invalid timestamp value"),
+    );
+}
+
+#[test]
+fn timestamp_is_close_to_within_nanoseconds_exact_equal() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value"),
+        10.nanoseconds(),
+    );
+}
+
+#[test]
+fn timestamp_is_close_to_within_nanoseconds_plus_margin() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Timestamp::new(123_456, 987_654_311).expect("invalid timestamp value"),
+        10.nanoseconds(),
+    );
+}
+
+#[test]
+fn timestamp_is_close_to_within_nanoseconds_minus_margin() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    assert_that(subject).is_close_to_with_margin(
+        Timestamp::new(123_456, 987_654_331).expect("invalid timestamp value"),
+        10.nanoseconds(),
+    );
+}
+
+#[test]
+fn verify_timestamp_is_close_to_within_nanoseconds_minus_margin_fails() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Timestamp::new(123_456, 987_654_332).expect("invalid timestamp value"),
+            10.nanoseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 123456.987654332 within 10ns
+   but was: 123456.987654321
+  expected: 123456.987654332
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_timestamp_is_close_to_within_nanoseconds_plus_margin_fails() {
+    let subject = Timestamp::new(123_456, 987_654_321).expect("invalid timestamp value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            Timestamp::new(123_456, 987_654_310).expect("invalid timestamp value"),
+            10.nanoseconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 123456.98765431 within 10ns
+   but was: 123456.987654321
+  expected: 123456.98765431
+"
+        ]
+    );
 }
 
 #[test]
