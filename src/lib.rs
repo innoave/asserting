@@ -1188,6 +1188,7 @@ type TestCodeSnippetsInReadme = ();
 #[cfg(test)]
 mod dummy_extern_uses {
     use fakeenv as _;
+    use jiff as _;
     use proptest as _;
     use serde as _;
     use serde_bytes as _;

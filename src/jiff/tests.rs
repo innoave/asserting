@@ -475,3 +475,218 @@ fn verify_civil_datetime_is_close_to_within_milliseconds_plus_margin_fails() {
         ]
     );
 }
+
+#[test]
+fn zoned_is_equal_to() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid zoned value");
+
+    assert_that(subject).is_equal_to(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+    );
+}
+
+#[test]
+fn zoned_is_before() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value");
+
+    assert_that(subject).is_before(
+        date(2022, 1, 1)
+            .at(12, 34, 57, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+    );
+}
+
+#[test]
+fn zoned_is_after() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value");
+
+    assert_that(subject).is_after(
+        date(2022, 1, 1)
+            .at(12, 34, 55, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+    );
+}
+
+#[test]
+fn zoned_is_between() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value");
+
+    assert_that(subject).is_between(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+    );
+}
+
+#[test]
+fn zoned_is_close_to_within_milliseconds_exact_equal() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value");
+
+    assert_that(subject).is_close_to_with_margin(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+        3.milliseconds(),
+    );
+}
+
+#[test]
+fn zoned_is_close_to_within_milliseconds_plus_margin() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value")
+        + SignedDuration::from_millis(3);
+
+    assert_that(subject).is_close_to_with_margin(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+        3.milliseconds(),
+    );
+}
+
+#[test]
+fn zoned_is_close_to_within_milliseconds_minus_margin() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value")
+        - SignedDuration::from_millis(3);
+
+    assert_that(subject).is_close_to_with_margin(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+        3.seconds(),
+    );
+}
+
+#[test]
+fn verify_zoned_is_close_to_within_seconds_minus_margin_fails() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 53, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value")
+        - SignedDuration::from_millis(3);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            date(2022, 1, 1)
+                .at(12, 34, 56, 0)
+                .in_tz("UTC")
+                .expect("invalid Zoned value"),
+            3.seconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56+00:00[UTC] within 3s
+   but was: 2022-01-01T12:34:52.997+00:00[UTC]
+  expected: 2022-01-01T12:34:56+00:00[UTC]
+"
+        ]
+    );
+}
+
+#[test]
+fn verify_zoned_is_close_to_within_seconds_plus_margin_fails() {
+    let subject = date(2022, 1, 1)
+        .at(12, 35, 0, 0)
+        .in_tz("UTC")
+        .expect("invalid Zoned value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            date(2022, 1, 1)
+                .at(12, 34, 56, 0)
+                .in_tz("UTC")
+                .expect("invalid Zoned value"),
+            3.seconds(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56+00:00[UTC] within 3s
+   but was: 2022-01-01T12:35:00+00:00[UTC]
+  expected: 2022-01-01T12:34:56+00:00[UTC]
+"
+        ]
+    );
+}
+
+#[test]
+fn zoned_is_close_to_within_minutes_different_utc_offset() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("Europe/Vienna")
+        .expect("invalid Zoned value");
+
+    assert_that(subject).is_close_to_with_margin(
+        date(2022, 1, 1)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+        60.minutes(),
+    );
+}
+
+#[test]
+fn verify_zoned_is_close_to_within_minutes_different_utc_offset_fails() {
+    let subject = date(2022, 1, 1)
+        .at(12, 34, 56, 0)
+        .in_tz("Europe/Vienna")
+        .expect("invalid utc offset value");
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(
+            date(2022, 1, 1)
+                .at(12, 34, 56, 0)
+                .in_tz("UTC")
+                .expect("invalid Zoned value"),
+            59.minutes(),
+        )
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [
+            r"expected subject to be close to 2022-01-01T12:34:56+00:00[UTC] within 59m
+   but was: 2022-01-01T12:34:56+01:00[Europe/Vienna]
+  expected: 2022-01-01T12:34:56+00:00[UTC]
+"
+        ]
+    );
+}

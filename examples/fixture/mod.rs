@@ -12,7 +12,6 @@ mod dummy_extern_uses {
     use hashbrown as _;
     #[cfg(feature = "recursive")]
     use indexmap as _;
-    #[cfg(feature = "jiff")]
     use jiff as _;
     #[cfg(feature = "num-bigint")]
     use num_bigint as _;

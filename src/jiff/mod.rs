@@ -7,7 +7,7 @@ use crate::spec::{
 };
 use crate::temporal::{TemporalMargin, ToDuration};
 use jiff::civil::{Date, DateTime, Time};
-use jiff::{SignedDuration, Span, Timestamp};
+use jiff::{SignedDuration, Span, Timestamp, Zoned};
 
 #[cfg(test)]
 mod tests;
@@ -263,3 +263,56 @@ where
 }
 
 impl Invertible for IsCloseTo<DateTime, TemporalMargin> {}
+
+impl<D, R> AssertIsCloseToWithinMargin<Zoned, TemporalMargin> for Spec<'_, Zoned, D, R>
+where
+    D: Represent<Zoned> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(self, expected: Zoned, margin: impl Into<TemporalMargin>) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: Zoned,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<D> Expectation<Zoned, D> for IsCloseTo<Zoned, TemporalMargin>
+where
+    D: Represent<Zoned> + Represent<TemporalMargin>,
+{
+    fn test(&mut self, subject: &Zoned) -> bool {
+        if *subject < self.expected {
+            subject.duration_until(&self.expected) <= self.margin.to_duration()
+        } else {
+            subject.duration_since(&self.expected) <= self.margin.to_duration()
+        }
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Zoned,
+        inverted: bool,
+        representation: &D,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let (marked_actual, marked_expected) =
+            mark_diff(actual, &self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
+        let represented_margin = Represented::from((&self.margin, representation));
+        format!(
+            r"expected {expression} to be {not}close to {represented_expected:?} within {represented_margin}
+   but was: {marked_actual}
+  expected: {marked_expected}"
+        )
+    }
+}
+
+impl Invertible for IsCloseTo<Zoned, TemporalMargin> {}
