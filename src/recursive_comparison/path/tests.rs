@@ -1,11 +1,11 @@
 use super::*;
-use crate::std::{format, string::ToString};
+use crate::std::{borrow::Cow, format, string::ToString};
 
 #[test]
 fn path_from_empty_str() {
     let path = Path::from("");
 
-    assert!(path.segments().is_empty());
+    assert_eq!(path.segments(), &[Cow::Borrowed(""); 0]);
 }
 
 #[test]
@@ -50,7 +50,7 @@ fn path_from_str_three_fields_deep_with_wildcards() {
 fn path_from_empty_string() {
     let path = Path::from(String::new());
 
-    assert!(path.segments().is_empty());
+    assert_eq!(path.segments(), &[Cow::Borrowed(""); 0]);
 }
 
 #[test]
@@ -152,7 +152,7 @@ fn append_field_name_to_empty_path() {
     let new_path = path.append("foo");
 
     assert_eq!(new_path.segments(), &[Cow::Borrowed("foo")]);
-    assert!(path.segments().is_empty());
+    assert_eq!(path.segments(), &[Cow::Borrowed(""); 0]);
 }
 
 #[test]

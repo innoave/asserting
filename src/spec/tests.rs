@@ -290,7 +290,7 @@ mod colored {
         let original_subject = original_spec.subject().clone();
         let original_diff_format = original_spec.diff_format().clone();
         let original_failures = original_spec.failures();
-        assert!(!original_failures.is_empty());
+        assert_ne!(original_failures, []);
 
         let returned_spec = original_spec.and();
 
