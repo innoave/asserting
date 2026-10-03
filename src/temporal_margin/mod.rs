@@ -6,6 +6,7 @@ use crate::std::{
     fmt::{Debug, Display},
 };
 use std::cmp::Ordering;
+use std::time::Duration;
 
 /// Represents a temporal margin with various time units.
 #[derive(Clone, Copy)]
@@ -87,6 +88,29 @@ impl TemporalMargin {
             Self::Days(days) => i64::from(days) * 24 * 60 * 60 * 1000 * 1000 * 1000,
             Self::Weeks(weeks) => i64::from(weeks) * 7 * 24 * 60 * 60 * 1000 * 1000 * 1000,
         }
+    }
+}
+
+/// Conversion to a temporal duration type `T`.
+///
+/// This trait is used to convert a [`TemporalMargin`] to the various temporal
+/// duration types of foreign crates, like `chrono::TimeSpan`,
+/// `jiff::SignedDuration` or `time::SignedDuration`.
+pub trait ToDuration<T> {
+    /// Converts Self into a temporal duration `T`.
+    ///
+    /// # Panics
+    ///
+    /// Implementations may panic if the conversion is not possible, e.g.,
+    /// a value overflows a boundary.
+    fn to_duration(self) -> T;
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl ToDuration<Duration> for TemporalMargin {
+    fn to_duration(self) -> Duration {
+        Duration::from_nanos(self.to_nanoseconds() as u64)
     }
 }
 

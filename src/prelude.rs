@@ -49,4 +49,4 @@ pub use super::value;
     docsrs,
     doc(cfg(any(feature = "chrono", feature = "jiff", feature = "time")))
 )]
-pub use super::temporal_margin::ToTemporalMargin;
+pub use super::temporal_margin::{ToDuration, ToTemporalMargin};
