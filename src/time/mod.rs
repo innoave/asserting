@@ -6,12 +6,11 @@ use crate::spec::{
     DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::temporal_margin::TemporalMargin;
+use crate::temporal_margin::{TemporalMargin, ToDuration};
 use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time};
 
-impl TemporalMargin {
-    /// Converts this temporal margin to a [`SignedDuration`] value.
-    pub fn to_signed_duration(self) -> SignedDuration {
+impl ToDuration<SignedDuration> for TemporalMargin {
+    fn to_duration(self) -> SignedDuration {
         match self {
             Self::NanoSeconds(nanos) => SignedDuration::nanoseconds(i64::from(nanos)),
             Self::MicroSeconds(micros) => SignedDuration::microseconds(i64::from(micros)),
@@ -49,9 +48,11 @@ where
 {
     fn test(&mut self, subject: &Time) -> bool {
         if *subject < self.expected {
-            subject.duration_until(self.expected) <= self.margin.to_signed_duration()
+            subject.duration_until(self.expected)
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         } else {
-            subject.duration_since(self.expected) <= self.margin.to_signed_duration()
+            subject.duration_since(self.expected)
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         }
     }
 
@@ -102,9 +103,11 @@ where
 {
     fn test(&mut self, subject: &Date) -> bool {
         if *subject < self.expected {
-            self.expected - *subject <= self.margin.to_signed_duration()
+            self.expected - *subject
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         } else {
-            *subject - self.expected <= self.margin.to_signed_duration()
+            *subject - self.expected
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         }
     }
 
@@ -160,9 +163,11 @@ where
 {
     fn test(&mut self, subject: &PlainDateTime) -> bool {
         if *subject < self.expected {
-            self.expected - *subject <= self.margin.to_signed_duration()
+            self.expected - *subject
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         } else {
-            *subject - self.expected <= self.margin.to_signed_duration()
+            *subject - self.expected
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         }
     }
 
@@ -218,9 +223,11 @@ where
 {
     fn test(&mut self, subject: &OffsetDateTime) -> bool {
         if *subject < self.expected {
-            self.expected - *subject <= self.margin.to_signed_duration()
+            self.expected - *subject
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         } else {
-            *subject - self.expected <= self.margin.to_signed_duration()
+            *subject - self.expected
+                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
         }
     }
 

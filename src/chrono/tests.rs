@@ -7,6 +7,54 @@ use chrono::{
 };
 
 #[test]
+fn temporal_margin_of_nanoseconds_to_duration() {
+    let subject: TimeDelta = TemporalMargin::NanoSeconds(999).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::nanoseconds(999));
+}
+
+#[test]
+fn temporal_margin_of_microseconds_to_duration() {
+    let subject: TimeDelta = TemporalMargin::MicroSeconds(-999).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::microseconds(-999));
+}
+
+#[test]
+fn temporal_margin_of_milliseconds_to_duration() {
+    let subject: TimeDelta = TemporalMargin::MilliSeconds(999).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::milliseconds(999));
+}
+
+#[test]
+fn temporal_margin_of_seconds_to_duration() {
+    let subject: TimeDelta = TemporalMargin::Seconds(60).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::seconds(60));
+}
+
+#[test]
+fn temporal_margin_of_minutes_to_duration() {
+    let subject: TimeDelta = TemporalMargin::Minutes(-60).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::minutes(-60));
+}
+
+#[test]
+fn temporal_margin_of_hours_to_duration() {
+    let subject: TimeDelta = TemporalMargin::Hours(24).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::hours(24));
+}
+
+#[test]
+fn temporal_margin_of_days_to_duration() {
+    let subject: TimeDelta = TemporalMargin::Days(366).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::days(366));
+}
+
+#[test]
+fn temporal_margin_of_weeks_to_duration() {
+    let subject: TimeDelta = TemporalMargin::Weeks(52).to_duration();
+    assert_that(subject).is_equal_to(TimeDelta::weeks(52));
+}
+
+#[test]
 fn temporal_margin_of_nanoseconds_to_time_delta() {
     assert_that(TemporalMargin::NanoSeconds(999).to_time_delta())
         .is_equal_to(TimeDelta::nanoseconds(999));

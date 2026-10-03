@@ -6,8 +6,8 @@ use crate::spec::{
     DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::temporal_margin::TemporalMargin;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
+use crate::temporal_margin::{TemporalMargin, ToDuration};
+use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
 
 impl TemporalMargin {
     /// Converts this temporal margin to a [`TimeDelta`] value.
@@ -22,6 +22,12 @@ impl TemporalMargin {
             Self::Days(days) => TimeDelta::days(i64::from(days)),
             Self::Weeks(weeks) => TimeDelta::weeks(i64::from(weeks)),
         }
+    }
+}
+
+impl ToDuration<Duration> for TemporalMargin {
+    fn to_duration(self) -> Duration {
+        self.to_time_delta()
     }
 }
 

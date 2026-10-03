@@ -6,7 +6,6 @@ use crate::std::{
     fmt::{Debug, Display},
 };
 use std::cmp::Ordering;
-use std::time::Duration;
 
 /// Represents a temporal margin with various time units.
 #[derive(Clone, Copy)]
@@ -104,14 +103,6 @@ pub trait ToDuration<T> {
     /// Implementations may panic if the conversion is not possible, e.g.,
     /// a value overflows a boundary.
     fn to_duration(self) -> T;
-}
-
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl ToDuration<Duration> for TemporalMargin {
-    fn to_duration(self) -> Duration {
-        Duration::from_nanos(self.to_nanoseconds() as u64)
-    }
 }
 
 /// An extension trait for constructing [`TemporalMargin`]s from numeric values
