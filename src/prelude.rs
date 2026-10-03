@@ -44,6 +44,9 @@ pub use super::{
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub use super::value;
 
-#[cfg(feature = "chrono")]
-#[cfg_attr(docsrs, doc(cfg(feature = "chrono")))]
+#[cfg(any(feature = "chrono", feature = "jiff", feature = "time"))]
+#[cfg_attr(
+    docsrs,
+    doc(cfg(any(feature = "chrono", feature = "jiff", feature = "time")))
+)]
 pub use super::temporal_margin::ToTemporalMargin;
