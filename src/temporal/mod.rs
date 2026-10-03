@@ -90,6 +90,21 @@ impl TemporalMargin {
     }
 }
 
+/// Conversion to a temporal duration type `T`.
+///
+/// This trait is used to convert a [`TemporalMargin`] to the various temporal
+/// duration types of foreign crates, like `chrono::TimeSpan`,
+/// `jiff::SignedDuration` or `time::SignedDuration`.
+pub trait ToDuration<T> {
+    /// Converts Self into a temporal duration `T`.
+    ///
+    /// # Panics
+    ///
+    /// Implementations may panic if the conversion is not possible, e.g.,
+    /// a value overflows a boundary.
+    fn to_duration(self) -> T;
+}
+
 /// An extension trait for constructing [`TemporalMargin`]s from numeric values
 /// using a postfix notation.
 ///
@@ -97,73 +112,73 @@ impl TemporalMargin {
 ///
 /// ```
 /// use asserting::prelude::*;
-/// use asserting::temporal_margin::TemporalMargin;
+/// use asserting::temporal::TemporalMargin;
 ///
 /// assert_eq!(10.milliseconds(), TemporalMargin::MilliSeconds(10));
 /// assert_eq!(22.seconds(), TemporalMargin::Seconds(22));
 /// assert_eq!(60.minutes(), TemporalMargin::Minutes(60));
 /// assert_eq!(5.days(), TemporalMargin::Days(5));
 /// ```
-pub trait IntoTemporalMargin {
+pub trait ToTemporalMargin {
     /// Constructs a [`TemporalMargin`] of nanoseconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn nanoseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of microseconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn microseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of milliseconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn milliseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of seconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn seconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of minutes.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn minutes(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of hours.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn hours(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of days.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn days(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of weeks.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn weeks(self) -> TemporalMargin;
 }
 
-impl IntoTemporalMargin for i32 {
+impl ToTemporalMargin for i32 {
     fn nanoseconds(self) -> TemporalMargin {
         TemporalMargin::NanoSeconds(self)
     }

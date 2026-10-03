@@ -6,8 +6,8 @@ use crate::spec::{
     DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::temporal_margin::TemporalMargin;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
+use crate::temporal::{TemporalMargin, ToDuration};
+use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
 
 impl TemporalMargin {
     /// Converts this temporal margin to a [`TimeDelta`] value.
@@ -22,6 +22,12 @@ impl TemporalMargin {
             Self::Days(days) => TimeDelta::days(i64::from(days)),
             Self::Weeks(weeks) => TimeDelta::weeks(i64::from(weeks)),
         }
+    }
+}
+
+impl ToDuration<Duration> for TemporalMargin {
+    fn to_duration(self) -> Duration {
+        self.to_time_delta()
     }
 }
 
@@ -53,9 +59,9 @@ where
 {
     fn test(&mut self, subject: &NaiveTime) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -110,9 +116,9 @@ where
 {
     fn test(&mut self, subject: &NaiveDate) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -168,9 +174,9 @@ where
 {
     fn test(&mut self, subject: &NaiveDateTime) -> bool {
         if *subject < self.expected {
-            self.expected.signed_duration_since(*subject) <= self.margin.to_time_delta()
+            self.expected.signed_duration_since(*subject) <= self.margin.to_duration()
         } else {
-            subject.signed_duration_since(self.expected) <= self.margin.to_time_delta()
+            subject.signed_duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -233,12 +239,12 @@ where
             self.expected
                 .naive_utc()
                 .signed_duration_since(subject.naive_utc())
-                <= self.margin.to_time_delta()
+                <= self.margin.to_duration()
         } else {
             subject
                 .naive_utc()
                 .signed_duration_since(self.expected.naive_utc())
-                <= self.margin.to_time_delta()
+                <= self.margin.to_duration()
         }
     }
 

@@ -20,9 +20,10 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 default = ["std", "colored", "float-cmp", "panic", "recursive", "regex"]
 bigdecimal = ["dep:bigdecimal", "dep:once_cell"]
-chrono = ["dep:chrono"]
+chrono = ["temporal", "dep:chrono"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
+jiff = ["temporal", "dep:jiff"]
 num-bigint = ["dep:num-bigint", "dep:once_cell"]
 recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde", "dep:rapidhash"]
 rust-decimal = ["dep:rust_decimal"]
@@ -33,6 +34,7 @@ std = [
     "chrono?/std",
     "float-cmp?/std",
     "indexmap?/std",
+    "jiff?/std",
     "num-bigint?/std",
     "once_cell?/std",
     "rapidhash?/std",
@@ -42,7 +44,8 @@ std = [
     "serde_core?/std",
     "time?/std"
 ]
-time = ["dep:time"]
+temporal = []
+time = ["temporal", "dep:time"]
 
 [dependencies]
 hashbrown = "0.17"
@@ -52,6 +55,7 @@ bigdecimal = { version = "0.4", optional = true, default-features = false }
 chrono = { version = "0.4", optional = true, default-features = false, features = ["alloc"] }
 float-cmp = { version = "0.10", optional = true }
 indexmap = { version = "2", optional = true, default-features = false }
+jiff = { version = "0.2", optional = true, default-features = false, features = ["alloc"] }
 num-bigint = { version = "0.5", optional = true, default-features = false }
 once_cell = { version = "1", optional = true, default-features = false, features = ["alloc", "critical-section"] }
 rapidhash = { version = "4", optional = true, default-features = false }
@@ -64,6 +68,7 @@ time = { version = "0.3", optional = true, default-features = false, features = 
 [dev-dependencies]
 anyhow = "1"
 fakeenv = { version = "0.1", default-features = false, features = ["fake"] }
+jiff = { version = "0.2", default-features = true }
 proptest = "1"
 serde = { version = "1", default-features = false, features = ["alloc", "derive"] }
 serde_bytes = { version = "0.11", default-features = false, features = ["alloc"] }

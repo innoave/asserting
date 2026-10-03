@@ -1,55 +1,55 @@
 #![allow(clippy::expect_used)]
 
 use crate::prelude::*;
-use crate::temporal_margin::TemporalMargin;
+use crate::temporal::TemporalMargin;
 use time::{Date, Month, OffsetDateTime, PlainDateTime, SignedDuration, Time, UtcOffset};
 
 #[test]
-fn temporal_margin_of_nanoseconds_to_signed_duration() {
-    assert_that(TemporalMargin::NanoSeconds(999).to_signed_duration())
-        .is_equal_to(SignedDuration::nanoseconds(999));
+fn temporal_margin_of_nanoseconds_to_duration() {
+    let subject: SignedDuration = TemporalMargin::NanoSeconds(999).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::nanoseconds(999));
 }
 
 #[test]
-fn temporal_margin_of_microseconds_to_signed_duration() {
-    assert_that(TemporalMargin::MicroSeconds(-999).to_signed_duration())
-        .is_equal_to(SignedDuration::microseconds(-999));
+fn temporal_margin_of_microseconds_to_duration() {
+    let subject: SignedDuration = TemporalMargin::MicroSeconds(-999).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::microseconds(-999));
 }
 
 #[test]
-fn temporal_margin_of_milliseconds_to_signed_duration() {
-    assert_that(TemporalMargin::MilliSeconds(999).to_signed_duration())
-        .is_equal_to(SignedDuration::milliseconds(999));
+fn temporal_margin_of_milliseconds_to_duration() {
+    let subject: SignedDuration = TemporalMargin::MilliSeconds(999).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::milliseconds(999));
 }
 
 #[test]
-fn temporal_margin_of_seconds_to_signed_duration() {
-    assert_that(TemporalMargin::Seconds(60).to_signed_duration())
-        .is_equal_to(SignedDuration::seconds(60));
+fn temporal_margin_of_seconds_to_duration() {
+    let subject: SignedDuration = TemporalMargin::Seconds(60).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::seconds(60));
 }
 
 #[test]
-fn temporal_margin_of_minutes_to_signed_duration() {
-    assert_that(TemporalMargin::Minutes(-60).to_signed_duration())
-        .is_equal_to(SignedDuration::minutes(-60));
+fn temporal_margin_of_minutes_to_duration() {
+    let subject: SignedDuration = TemporalMargin::Minutes(-60).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::minutes(-60));
 }
 
 #[test]
-fn temporal_margin_of_hours_to_signed_duration() {
-    assert_that(TemporalMargin::Hours(24).to_signed_duration())
-        .is_equal_to(SignedDuration::hours(24));
+fn temporal_margin_of_hours_to_duration() {
+    let subject: SignedDuration = TemporalMargin::Hours(24).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::hours(24));
 }
 
 #[test]
-fn temporal_margin_of_days_to_signed_duration() {
-    assert_that(TemporalMargin::Days(366).to_signed_duration())
-        .is_equal_to(SignedDuration::days(366));
+fn temporal_margin_of_days_to_duration() {
+    let subject: SignedDuration = TemporalMargin::Days(366).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::days(366));
 }
 
 #[test]
-fn temporal_margin_of_weeks_to_signed_duration() {
-    assert_that(TemporalMargin::Weeks(52).to_signed_duration())
-        .is_equal_to(SignedDuration::weeks(52));
+fn temporal_margin_of_weeks_to_duration() {
+    let subject: SignedDuration = TemporalMargin::Weeks(52).to_duration();
+    assert_that(subject).is_equal_to(SignedDuration::weeks(52));
 }
 
 #[test]

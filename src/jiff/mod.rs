@@ -7,22 +7,100 @@ use crate::spec::{
     Represented, Spec,
 };
 use crate::temporal::{TemporalMargin, ToDuration};
-use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time};
+use jiff::civil::{Date, DateTime, Time};
+use jiff::{SignedDuration, Span, Timestamp, Zoned};
+
+#[cfg(test)]
+mod tests;
 
 impl ToDuration<SignedDuration> for TemporalMargin {
     fn to_duration(self) -> SignedDuration {
         match self {
-            Self::NanoSeconds(nanos) => SignedDuration::nanoseconds(i64::from(nanos)),
-            Self::MicroSeconds(micros) => SignedDuration::microseconds(i64::from(micros)),
-            Self::MilliSeconds(millis) => SignedDuration::milliseconds(i64::from(millis)),
-            Self::Seconds(seconds) => SignedDuration::seconds(i64::from(seconds)),
-            Self::Minutes(minutes) => SignedDuration::minutes(i64::from(minutes)),
-            Self::Hours(hours) => SignedDuration::hours(i64::from(hours)),
-            Self::Days(days) => SignedDuration::days(i64::from(days)),
-            Self::Weeks(weeks) => SignedDuration::weeks(i64::from(weeks)),
+            Self::NanoSeconds(nanos) => SignedDuration::from_nanos(i64::from(nanos)),
+            Self::MicroSeconds(micros) => SignedDuration::from_micros(i64::from(micros)),
+            Self::MilliSeconds(millis) => SignedDuration::from_millis(i64::from(millis)),
+            Self::Seconds(seconds) => SignedDuration::from_secs(i64::from(seconds)),
+            Self::Minutes(minutes) => SignedDuration::from_mins(i64::from(minutes)),
+            Self::Hours(hours) => SignedDuration::from_hours(i64::from(hours)),
+            Self::Days(days) => SignedDuration::from_hours(i64::from(days) * 24),
+            Self::Weeks(weeks) => SignedDuration::from_hours(i64::from(weeks) * 7 * 24),
         }
     }
 }
+
+impl TemporalMargin {
+    /// Converts this temporal margin to a [`Span`] value.
+    pub fn to_span(self) -> Span {
+        use jiff::ToSpan;
+        match self {
+            Self::NanoSeconds(nanos) => nanos.nanoseconds(),
+            Self::MicroSeconds(micros) => micros.microseconds(),
+            Self::MilliSeconds(millis) => millis.milliseconds(),
+            Self::Seconds(seconds) => seconds.seconds(),
+            Self::Minutes(minutes) => minutes.minutes(),
+            Self::Hours(hours) => hours.hours(),
+            Self::Days(days) => days.days(),
+            Self::Weeks(weeks) => weeks.weeks(),
+        }
+    }
+}
+
+impl<D, R> AssertIsCloseToWithinMargin<Timestamp, TemporalMargin> for Spec<'_, Timestamp, D, R>
+where
+    D: Represent<Timestamp> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
+
+impl<D> Expectation<Timestamp, D> for IsCloseTo<Timestamp, TemporalMargin>
+where
+    D: Represent<Timestamp> + Represent<TemporalMargin>,
+{
+    fn test(&mut self, subject: &Timestamp) -> bool {
+        if *subject < self.expected {
+            subject.duration_until(self.expected) <= self.margin.to_duration()
+        } else {
+            subject.duration_since(self.expected) <= self.margin.to_duration()
+        }
+    }
+
+    fn message(
+        &self,
+        expression: &Expression<'_>,
+        actual: &Timestamp,
+        inverted: bool,
+        representation: &D,
+        format: &DiffFormat,
+    ) -> String {
+        let not = if inverted { "not " } else { "" };
+        let (marked_actual, marked_expected) =
+            mark_diff(actual, &self.expected, representation, format);
+        let represented_expected = Represented::from((&self.expected, representation));
+        let represented_margin = Represented::from((&self.margin, representation));
+        format!(
+            r"expected {expression} to be {not}close to {represented_expected:?} within {represented_margin}
+   but was: {marked_actual}
+  expected: {marked_expected}"
+        )
+    }
+}
+
+impl Invertible for IsCloseTo<Timestamp, TemporalMargin> {}
 
 impl<D, R> AssertIsCloseToWithinMargin<Time, TemporalMargin> for Spec<'_, Time, D, R>
 where
@@ -48,11 +126,9 @@ where
 {
     fn test(&mut self, subject: &Time) -> bool {
         if *subject < self.expected {
-            subject.duration_until(self.expected)
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_until(self.expected) <= self.margin.to_duration()
         } else {
-            subject.duration_since(self.expected)
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -103,11 +179,9 @@ where
 {
     fn test(&mut self, subject: &Date) -> bool {
         if *subject < self.expected {
-            self.expected - *subject
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_until(self.expected) <= self.margin.to_duration()
         } else {
-            *subject - self.expected
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
@@ -134,15 +208,14 @@ where
 
 impl Invertible for IsCloseTo<Date, TemporalMargin> {}
 
-impl<D, R> AssertIsCloseToWithinMargin<PlainDateTime, TemporalMargin>
-    for Spec<'_, PlainDateTime, D, R>
+impl<D, R> AssertIsCloseToWithinMargin<DateTime, TemporalMargin> for Spec<'_, DateTime, D, R>
 where
-    D: Represent<PlainDateTime> + Represent<TemporalMargin>,
+    D: Represent<DateTime> + Represent<TemporalMargin>,
     R: FailingStrategy,
 {
     fn is_close_to_with_margin(
         self,
-        expected: PlainDateTime,
+        expected: DateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
@@ -150,31 +223,29 @@ where
 
     fn is_not_close_to_with_margin(
         self,
-        expected: PlainDateTime,
+        expected: DateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 
-impl<D> Expectation<PlainDateTime, D> for IsCloseTo<PlainDateTime, TemporalMargin>
+impl<D> Expectation<DateTime, D> for IsCloseTo<DateTime, TemporalMargin>
 where
-    D: Represent<PlainDateTime> + Represent<TemporalMargin>,
+    D: Represent<DateTime> + Represent<TemporalMargin>,
 {
-    fn test(&mut self, subject: &PlainDateTime) -> bool {
+    fn test(&mut self, subject: &DateTime) -> bool {
         if *subject < self.expected {
-            self.expected - *subject
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_until(self.expected) <= self.margin.to_duration()
         } else {
-            *subject - self.expected
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_since(self.expected) <= self.margin.to_duration()
         }
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
-        actual: &PlainDateTime,
+        actual: &DateTime,
         inverted: bool,
         representation: &D,
         format: &DiffFormat,
@@ -192,49 +263,42 @@ where
     }
 }
 
-impl Invertible for IsCloseTo<PlainDateTime, TemporalMargin> {}
+impl Invertible for IsCloseTo<DateTime, TemporalMargin> {}
 
-impl<D, R> AssertIsCloseToWithinMargin<OffsetDateTime, TemporalMargin>
-    for Spec<'_, OffsetDateTime, D, R>
+impl<D, R> AssertIsCloseToWithinMargin<Zoned, TemporalMargin> for Spec<'_, Zoned, D, R>
 where
-    D: Represent<OffsetDateTime> + Represent<TemporalMargin>,
+    D: Represent<Zoned> + Represent<TemporalMargin>,
     R: FailingStrategy,
 {
-    fn is_close_to_with_margin(
-        self,
-        expected: OffsetDateTime,
-        margin: impl Into<TemporalMargin>,
-    ) -> Self {
+    fn is_close_to_with_margin(self, expected: Zoned, margin: impl Into<TemporalMargin>) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
     }
 
     fn is_not_close_to_with_margin(
         self,
-        expected: OffsetDateTime,
+        expected: Zoned,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 
-impl<D> Expectation<OffsetDateTime, D> for IsCloseTo<OffsetDateTime, TemporalMargin>
+impl<D> Expectation<Zoned, D> for IsCloseTo<Zoned, TemporalMargin>
 where
-    D: Represent<OffsetDateTime> + Represent<TemporalMargin>,
+    D: Represent<Zoned> + Represent<TemporalMargin>,
 {
-    fn test(&mut self, subject: &OffsetDateTime) -> bool {
+    fn test(&mut self, subject: &Zoned) -> bool {
         if *subject < self.expected {
-            self.expected - *subject
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_until(&self.expected) <= self.margin.to_duration()
         } else {
-            *subject - self.expected
-                <= <TemporalMargin as ToDuration<SignedDuration>>::to_duration(self.margin)
+            subject.duration_since(&self.expected) <= self.margin.to_duration()
         }
     }
 
     fn message(
         &self,
         expression: &Expression<'_>,
-        actual: &OffsetDateTime,
+        actual: &Zoned,
         inverted: bool,
         representation: &D,
         format: &DiffFormat,
@@ -252,7 +316,30 @@ where
     }
 }
 
-impl Invertible for IsCloseTo<OffsetDateTime, TemporalMargin> {}
+impl Invertible for IsCloseTo<Zoned, TemporalMargin> {}
+
+impl<O, D> AssertIsCloseToWithinMargin<Timestamp, TemporalMargin>
+    for DerivedSpec<'_, O, Timestamp, D>
+where
+    D: Represent<Timestamp> + Represent<TemporalMargin>,
+    O: DoFail,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: Timestamp,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
+    }
+}
 
 impl<O, D> AssertIsCloseToWithinMargin<Time, TemporalMargin> for DerivedSpec<'_, O, Time, D>
 where
@@ -290,15 +377,14 @@ where
     }
 }
 
-impl<O, D> AssertIsCloseToWithinMargin<PlainDateTime, TemporalMargin>
-    for DerivedSpec<'_, O, PlainDateTime, D>
+impl<O, D> AssertIsCloseToWithinMargin<DateTime, TemporalMargin> for DerivedSpec<'_, O, DateTime, D>
 where
-    D: Represent<PlainDateTime> + Represent<TemporalMargin>,
+    D: Represent<DateTime> + Represent<TemporalMargin>,
     O: DoFail,
 {
     fn is_close_to_with_margin(
         self,
-        expected: PlainDateTime,
+        expected: DateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
@@ -306,35 +392,27 @@ where
 
     fn is_not_close_to_with_margin(
         self,
-        expected: PlainDateTime,
+        expected: DateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 
-impl<O, D> AssertIsCloseToWithinMargin<OffsetDateTime, TemporalMargin>
-    for DerivedSpec<'_, O, OffsetDateTime, D>
+impl<O, D> AssertIsCloseToWithinMargin<Zoned, TemporalMargin> for DerivedSpec<'_, O, Zoned, D>
 where
-    D: Represent<OffsetDateTime> + Represent<TemporalMargin>,
+    D: Represent<Zoned> + Represent<TemporalMargin>,
     O: DoFail,
 {
-    fn is_close_to_with_margin(
-        self,
-        expected: OffsetDateTime,
-        margin: impl Into<TemporalMargin>,
-    ) -> Self {
+    fn is_close_to_with_margin(self, expected: Zoned, margin: impl Into<TemporalMargin>) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
     }
 
     fn is_not_close_to_with_margin(
         self,
-        expected: OffsetDateTime,
+        expected: Zoned,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
-
-#[cfg(test)]
-mod tests;

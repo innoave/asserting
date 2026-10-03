@@ -1120,9 +1120,9 @@ pub mod properties;
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub mod recursive_comparison;
 pub mod spec;
-#[cfg(any(feature = "chrono", feature = "time"))]
-#[cfg_attr(docsrs, doc(cfg(any(feature = "chrono", feature = "time"))))]
-pub mod temporal_margin;
+#[cfg(feature = "temporal")]
+#[cfg_attr(docsrs, doc(cfg(feature = "temporal")))]
+pub mod temporal;
 
 #[cfg(feature = "bigdecimal")]
 mod bigdecimal;
@@ -1141,6 +1141,8 @@ mod expectation_combinators;
 mod float;
 mod integer;
 mod iterator;
+#[cfg(feature = "jiff")]
+mod jiff;
 mod length;
 mod map;
 mod mapping;
@@ -1186,6 +1188,7 @@ type TestCodeSnippetsInReadme = ();
 #[cfg(test)]
 mod dummy_extern_uses {
     use fakeenv as _;
+    use jiff as _;
     use proptest as _;
     use serde as _;
     use serde_bytes as _;
