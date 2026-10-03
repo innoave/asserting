@@ -3,9 +3,9 @@
 use crate::assertions::AssertBoolean;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{IsFalse, IsTrue, is_false, is_true};
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{format, string::String};
 

@@ -118,7 +118,8 @@ pub fn rec<E>(expectations: E) -> Rec<E> {
 /// ```
 /// use asserting::prelude::*;
 /// use asserting::expectations::{IsNegative, rec};
-/// use asserting::spec::{DebugRepresentation, Expectation};
+/// use asserting::representation::DebugRepresentation;
+/// use asserting::spec::Expectation;
 ///
 /// // the result of new `Rec` is neither `success` nor `failure`
 /// let mut expectation = rec(IsNegative);

@@ -1,7 +1,8 @@
 //! Implementation of the predicate assertion.
 
 use crate::expectations::Predicate;
-use crate::spec::{DiffFormat, Expectation, Expression, Invertible, Represent, Represented};
+use crate::representation::{Represent, Represented};
+use crate::spec::{DiffFormat, Expectation, Expression, Invertible};
 use crate::std::{format, string::String};
 
 impl<S, P, D> Expectation<S, D> for Predicate<P>

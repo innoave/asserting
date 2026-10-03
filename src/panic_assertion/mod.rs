@@ -3,10 +3,8 @@
 use crate::assertions::AssertCodePanics;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{DoesNotPanic, DoesPanic, does_not_panic, does_panic};
-use crate::spec::{
-    Code, DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting,
-    Expression, FailingStrategy, Spec,
-};
+use crate::representation::{DebugRepresentation, DisplayRepresentation};
+use crate::spec::{Code, DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Spec};
 use core::any::Any;
 
 const ONLY_ONE_EXPECTATION: &str = "only one expectation allowed when asserting closures!";

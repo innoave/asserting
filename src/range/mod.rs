@@ -4,9 +4,9 @@ use crate::assertions::AssertInRange;
 use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{IsInRange, is_in_range, not};
 use crate::properties::IsEmptyProperty;
+use crate::representation::{DisplayRepresentation, Represent, Represented};
 use crate::spec::{
-    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-    Invertible, Represent, Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{
     format,

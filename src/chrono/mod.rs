@@ -2,9 +2,9 @@ use crate::assertions::AssertIsCloseToWithinMargin;
 use crate::colored::mark_diff;
 use crate::derived_spec::DerivedSpec;
 use crate::expectations::{IsCloseTo, is_close_to, not};
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::temporal::{TemporalMargin, ToDuration};
 use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone};
@@ -28,28 +28,6 @@ impl TemporalMargin {
 impl ToDuration<Duration> for TemporalMargin {
     fn to_duration(self) -> Duration {
         self.to_time_delta()
-    }
-}
-
-impl<D, R> AssertIsCloseToWithinMargin<NaiveTime, TemporalMargin> for Spec<'_, NaiveTime, D, R>
-where
-    D: Represent<NaiveTime> + Represent<TemporalMargin>,
-    R: FailingStrategy,
-{
-    fn is_close_to_with_margin(
-        self,
-        expected: NaiveTime,
-        margin: impl Into<TemporalMargin>,
-    ) -> Self {
-        self.expecting(is_close_to(expected).within_margin(margin))
-    }
-
-    fn is_not_close_to_with_margin(
-        self,
-        expected: NaiveTime,
-        margin: impl Into<TemporalMargin>,
-    ) -> Self {
-        self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 
@@ -83,6 +61,28 @@ where
    but was: {marked_actual}
   expected: {marked_expected}"
         )
+    }
+}
+
+impl<D, R> AssertIsCloseToWithinMargin<NaiveTime, TemporalMargin> for Spec<'_, NaiveTime, D, R>
+where
+    D: Represent<NaiveTime> + Represent<TemporalMargin>,
+    R: FailingStrategy,
+{
+    fn is_close_to_with_margin(
+        self,
+        expected: NaiveTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(is_close_to(expected).within_margin(margin))
+    }
+
+    fn is_not_close_to_with_margin(
+        self,
+        expected: NaiveTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
+        self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 

@@ -8,9 +8,9 @@ use crate::expectations::{
     has_length_greater_than, has_length_in_range, has_length_less_than, is_empty, not,
 };
 use crate::properties::{IsEmptyProperty, LengthProperty};
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{format, ops::RangeBounds, string::String};
 

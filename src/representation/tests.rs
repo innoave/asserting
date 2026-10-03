@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::representation::{Represent, RepresentedAs, RepresentedBy};
 use crate::std::fmt;
 
 #[derive(PartialEq)]

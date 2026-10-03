@@ -5,9 +5,9 @@ use crate::expectations::{
     IsWhitespace, is_alphabetic, is_alphanumeric, is_ascii, is_control_char, is_digit,
     is_lower_case, is_upper_case, is_whitespace,
 };
+use crate::representation::{DisplayRepresentation, Represent};
 use crate::spec::{
-    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-    Invertible, Represent, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{
     format,

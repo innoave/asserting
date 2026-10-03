@@ -630,7 +630,8 @@
 //! an expectation that verifies that a value of type `Either` is a left value.
 //!
 //! ```no_run
-//! use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
+//! use asserting::representation::{Represent, Represented};
+//! use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! use std::fmt::Debug;
 //!
 //! #[derive(Debug)]
@@ -677,7 +678,8 @@
 //! method:
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
+//! # use asserting::representation::{Represent, Represented};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! # use std::fmt::Debug;
 //! #
 //! # #[derive(Debug)]
@@ -735,7 +737,8 @@
 //! trait.
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
+//! # use asserting::representation::{Represent, Represented};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! #
 //! # #[derive(Debug)]
 //! # enum Either<L, R> {
@@ -796,7 +799,8 @@
 //! subject of type `Either` is a left value.
 //!
 //! ```
-//! # use asserting::spec::{DiffFormat, Expectation, Expression, Represent, Represented, Unknown};
+//! # use asserting::representation::{Represent, Represented};
+//! # use asserting::spec::{DiffFormat, Expectation, Expression, Unknown};
 //! #
 //! # #[derive(Debug)]
 //! # enum Either<L, R> {
@@ -1026,7 +1030,7 @@
 //! [`AssertFailure`]: spec::AssertFailure
 //! [`Expectation`]: spec::Expectation
 //! [`LengthProperty`]: properties::LengthProperty
-//! [`Represent`]: spec::Represent
+//! [`Represent`]: representation::Represent
 //! [`Spec`]: spec::Spec
 //! [`Spec::expecting()`]: spec::Expecting::expecting
 //! [`Spec::satisfies()`]: spec::Satisfies::satisfies
@@ -1119,6 +1123,7 @@ pub mod properties;
 #[cfg(feature = "recursive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub mod recursive_comparison;
+pub mod representation;
 pub mod spec;
 #[cfg(feature = "temporal")]
 #[cfg_attr(docsrs, doc(cfg(feature = "temporal")))]
@@ -1157,7 +1162,6 @@ mod os_sting;
 mod panic_assertion;
 mod predicate;
 mod range;
-mod representation;
 mod result;
 #[cfg(feature = "rust-decimal")]
 mod rust_decimal;

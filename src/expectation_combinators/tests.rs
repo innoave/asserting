@@ -3,7 +3,8 @@ use crate::expectations::{
     StringContains, StringContainsAnyOf, all, any, not, rec,
 };
 use crate::prelude::*;
-use crate::spec::{DebugRepresentation, Expectation, Expression};
+use crate::representation::DebugRepresentation;
+use crate::spec::{Expectation, Expression};
 
 #[test]
 fn newly_created_rec_combinator_is_neither_success_nor_failure() {

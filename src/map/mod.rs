@@ -11,9 +11,9 @@ use crate::expectations::{
 };
 use crate::iterator::{collect_selected_ref_values, collect_selected_values};
 use crate::properties::MapProperties;
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{format, string::String, vec::Vec};
 use hashbrown::HashSet;

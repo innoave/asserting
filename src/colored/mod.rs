@@ -51,7 +51,7 @@ pub use with_colored_feature::{
     diff_format_for_mode,
 };
 
-use crate::spec::{DiffFormat, DisplayRepresentation, Highlight, Represent, Represented};
+use crate::spec::{DiffFormat, Highlight};
 use crate::std::{
     format,
     string::{String, ToString},
@@ -59,6 +59,7 @@ use crate::std::{
 };
 use hashbrown::HashSet;
 
+use crate::representation::{DisplayRepresentation, Represent, Represented};
 #[cfg(feature = "colored")]
 use with_colored_feature::{
     configured_diff_format_impl, mark_diff_impl, mark_missing_impl, mark_unexpected_impl,
@@ -154,7 +155,7 @@ pub fn configured_diff_format() -> DiffFormat {
 /// # fn main() {
 /// use asserting::{
 ///     colored::{mark_diff, DIFF_FORMAT_RED_GREEN},
-///     spec::DebugRepresentation,
+///     representation::DebugRepresentation,
 /// };
 ///
 /// let actual = "Hello Welt!";
@@ -179,7 +180,7 @@ pub fn configured_diff_format() -> DiffFormat {
 /// # fn main() {
 /// use asserting::{
 ///     colored::{mark_diff, DIFF_FORMAT_RED_BLUE},
-///     spec::DebugRepresentation,
+///     representation::DebugRepresentation,
 /// };
 ///
 /// #[derive(Debug)]
@@ -566,7 +567,7 @@ fn mark_selected_chars_in_string(
 /// # fn main() {
 /// use asserting::{
 ///     colored::{mark_missing, mark_selected_items_in_collection, DIFF_FORMAT_RED_BLUE},
-///     spec::DebugRepresentation,
+///     representation::DebugRepresentation,
 /// };
 /// use hashbrown::HashSet;
 ///
@@ -637,7 +638,7 @@ where
 /// # fn main() {
 /// use asserting::{
 ///     colored::{mark_all_items_in_collection, mark_unexpected, DIFF_FORMAT_RED_BLUE},
-///     spec::DebugRepresentation,
+///     representation::DebugRepresentation,
 /// };
 /// use hashbrown::HashSet;
 ///
@@ -695,7 +696,7 @@ where
 /// # #[cfg(all(feature = "colored", feature = "std"))]
 /// # fn main() {
 /// use asserting::colored::{mark_missing, mark_selected_entries_in_map, DIFF_FORMAT_RED_BLUE};
-/// use asserting::spec::DebugRepresentation;
+/// use asserting::representation::DebugRepresentation;
 /// use hashbrown::HashSet;
 /// use std::collections::BTreeMap;
 ///
@@ -768,7 +769,7 @@ where
 /// # #[cfg(all(feature = "colored", feature = "std"))]
 /// # fn main() {
 /// use asserting::colored::{mark_all_entries_in_map, mark_unexpected, DIFF_FORMAT_RED_BLUE};
-/// use asserting::spec::DebugRepresentation;
+/// use asserting::representation::DebugRepresentation;
 /// use std::collections::BTreeMap;
 ///
 /// let map: BTreeMap<_, _> = [(1, "one"), (2, "two"), (3, "three"), (4, "four")].into();
@@ -819,7 +820,8 @@ where
 #[cfg(not(feature = "colored"))]
 mod without_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
-    use crate::spec::{DiffFormat, Represent, Represented};
+    use crate::representation::{Represent, Represented};
+    use crate::spec::DiffFormat;
     use crate::std::{
         format,
         string::{String, ToString},
@@ -863,7 +865,8 @@ mod without_colored_feature {
 #[cfg(feature = "colored")]
 mod with_colored_feature {
     use super::DIFF_FORMAT_NO_HIGHLIGHT;
-    use crate::spec::{DiffFormat, Highlight, Represent, Represented};
+    use crate::representation::{Represent, Represented};
+    use crate::spec::{DiffFormat, Highlight};
     use crate::std::{format, string::String};
 
     #[cfg(feature = "std")]

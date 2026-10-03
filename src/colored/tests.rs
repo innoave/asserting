@@ -28,7 +28,7 @@ mod without_colored_feature {
 #[cfg(feature = "colored")]
 mod with_colored_feature {
     use super::*;
-    use crate::spec::DebugRepresentation;
+    use crate::representation::DebugRepresentation;
     use hashbrown::HashMap;
 
     #[test]
