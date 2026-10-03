@@ -2,7 +2,7 @@
 
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
-use jiff::civil::time;
+use jiff::civil::{date, time};
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[test]
@@ -284,6 +284,89 @@ fn verify_civil_time_is_close_to_within_milliseconds_plus_margin_fails() {
         [r"expected subject to be close to 12:34:56.8 within 10ms
    but was: 12:34:56.789
   expected: 12:34:56.8
+"]
+    );
+}
+
+#[test]
+fn civil_date_is_equal_to() {
+    let subject = date(2023, 2, 28);
+
+    assert_that(subject).is_equal_to(date(2023, 2, 28));
+}
+
+#[test]
+fn civil_date_is_before() {
+    let subject = date(2023, 2, 27);
+
+    assert_that(subject).is_before(date(2023, 2, 28));
+}
+
+#[test]
+fn civil_date_is_after() {
+    let subject = date(2023, 2, 28);
+
+    assert_that(subject).is_after(date(2023, 2, 27));
+}
+
+#[test]
+fn civil_date_is_between() {
+    let subject = date(2023, 2, 27);
+
+    assert_that(subject).is_between(date(2023, 2, 26), date(2023, 2, 28));
+}
+
+#[test]
+fn civil_date_is_close_to_within_days_exact_equal() {
+    let subject = date(2023, 2, 28);
+
+    assert_that(subject).is_close_to_with_margin(date(2023, 2, 28), 1.days());
+}
+
+#[test]
+fn civil_date_is_close_to_within_days_plus_margin() {
+    let subject = date(2023, 2, 27);
+
+    assert_that(subject).is_close_to_with_margin(date(2023, 2, 28), 1.days());
+}
+
+#[test]
+fn civil_date_is_close_to_within_days_minus_margin() {
+    let subject = date(2023, 2, 28);
+
+    assert_that(subject).is_close_to_with_margin(date(2023, 2, 27), 1.days());
+}
+
+#[test]
+fn verify_civil_date_is_close_to_within_days_minus_margin_fails() {
+    let subject = date(2023, 2, 28);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(date(2023, 2, 26), 1.days())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 2023-02-26 within 1d
+   but was: 2023-02-28
+  expected: 2023-02-26
+"]
+    );
+}
+
+#[test]
+fn verify_civil_date_is_close_to_within_days_plus_margin_fails() {
+    let subject = date(2023, 2, 26);
+
+    let failures = verify_that(subject)
+        .is_close_to_with_margin(date(2023, 2, 28), 1.days())
+        .display_failures();
+
+    assert_eq!(
+        failures,
+        [r"expected subject to be close to 2023-02-28 within 1d
+   but was: 2023-02-26
+  expected: 2023-02-28
 "]
     );
 }
