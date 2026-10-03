@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.17.0 - 2026-10-03
+
+### Added
+
+* provide `is_in` assertions for all types that implement `PartialEq`
+  [(PR #100)](https://github.com/innoave/asserting/pull/100)
+* provide `is_close_to_with_margin` assertion for temporal types of the `chrono`-crate (optional
+  crate feature "chrono")
+  [(PR #101)](https://github.com/innoave/asserting/pull/101)
+* provide `is_close_to_with_margin` assertion for temporal types of the `time`-crate (optional crate
+  feature "time")
+  [(PR #102)](https://github.com/innoave/asserting/pull/102)
+* provide `is_close_to_with_margin` assertion for temporal types of the `jiff`-crate (optional crate
+  feature "jiff")
+  [(PR #103)](https://github.com/innoave/asserting/pull/103)
+
+### Changed
+
+* remove the `DefinedOrderProperty` trait bound from collection and iterator assertion
+  [(PR #97)](https://github.com/innoave/asserting/pull/97)
+* **Breaking**: move representation system related types and functions to own module
+  [(PR #104)](https://github.com/innoave/asserting/pull/104)
+
 ## 0.16.2 - 2026-09-27
 
 ### Fixed
