@@ -513,6 +513,24 @@ pub trait AssertIsIn<I, E> {
 ///     3.milliseconds(),
 /// );
 /// # }
+/// # #[cfg(feature = "jiff")]
+/// # {
+///
+/// use jiff::{civil::date};
+///
+/// let subject = date(2022, 1, 1)
+///     .at(12, 34, 56, 0)
+///     .in_tz("Europe/Vienna")
+///     .expect("invalid Zoned value");
+///
+/// assert_that(subject).is_close_to_with_margin(
+///     date(2022, 1, 1)
+///         .at(12, 34, 56, 0)
+///         .in_tz("UTC")
+///         .expect("invalid Zoned value"),
+///     60.minutes(),
+/// );
+/// # }
 /// # #[cfg(feature = "time")]
 /// # {
 ///
@@ -572,8 +590,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// system clock or a clock service. The margin for time values is
     /// specified by a [`TemporalMargin`]. There are methods to conveniently
     /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`ToTemporalMargin`] for which methods are
-    /// available.
+    /// the extension trait [`ToTemporalMargin`] for all available methods.
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -588,6 +605,24 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// assert_that(subject).is_close_to_with_margin(
     ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
     ///     3.milliseconds(),
+    /// );
+    /// # }
+    /// # #[cfg(feature = "jiff")]
+    /// # {
+    ///
+    /// use jiff::{civil::date};
+    ///
+    /// let subject = date(2022, 1, 1)
+    ///     .at(12, 34, 56, 0)
+    ///     .in_tz("Europe/Vienna")
+    ///     .expect("invalid Zoned value");
+    ///
+    /// assert_that(subject).is_close_to_with_margin(
+    ///     date(2022, 1, 1)
+    ///         .at(12, 34, 56, 0)
+    ///         .in_tz("UTC")
+    ///         .expect("invalid Zoned value"),
+    ///     60.minutes(),
     /// );
     /// # }
     /// # #[cfg(feature = "time")]
@@ -650,8 +685,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// system clock or a clock service. The margin for time values is
     /// specified by a [`TemporalMargin`]. There are methods to conveniently
     /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`ToTemporalMargin`] for which methods are
-    /// available.
+    /// the extension trait [`ToTemporalMargin`] for all available methods.
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -666,6 +700,24 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// assert_that(subject).is_not_close_to_with_margin(
     ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
     ///     3.milliseconds(),
+    /// );
+    /// # }
+    /// # #[cfg(feature = "jiff")]
+    /// # {
+    ///
+    /// use jiff::{civil::date};
+    ///
+    /// let subject = date(2022, 1, 1)
+    ///     .at(12, 34, 56, 0)
+    ///     .in_tz("Europe/Vienna")
+    ///     .expect("invalid Zoned value");
+    ///
+    /// assert_that(subject).is_not_close_to_with_margin(
+    ///     date(2022, 1, 1)
+    ///         .at(12, 34, 56, 0)
+    ///         .in_tz("UTC")
+    ///         .expect("invalid Zoned value"),
+    ///     59.minutes(),
     /// );
     /// # }
     /// # #[cfg(feature = "time")]
