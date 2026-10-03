@@ -104,7 +104,7 @@ impl TemporalMargin {
 /// assert_eq!(60.minutes(), TemporalMargin::Minutes(60));
 /// assert_eq!(5.days(), TemporalMargin::Days(5));
 /// ```
-pub trait IntoTemporalMargin {
+pub trait ToTemporalMargin {
     /// Constructs a [`TemporalMargin`] of nanoseconds.
     ///
     /// # Panics
@@ -163,7 +163,7 @@ pub trait IntoTemporalMargin {
     fn weeks(self) -> TemporalMargin;
 }
 
-impl IntoTemporalMargin for i32 {
+impl ToTemporalMargin for i32 {
     fn nanoseconds(self) -> TemporalMargin {
         TemporalMargin::NanoSeconds(self)
     }

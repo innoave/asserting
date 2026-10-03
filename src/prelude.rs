@@ -46,4 +46,4 @@ pub use super::value;
 
 #[cfg(feature = "chrono")]
 #[cfg_attr(docsrs, doc(cfg(feature = "chrono")))]
-pub use super::temporal_margin::IntoTemporalMargin;
+pub use super::temporal_margin::ToTemporalMargin;

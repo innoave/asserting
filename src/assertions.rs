@@ -575,7 +575,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// system clock or a clock service. The margin for time values is
     /// specified by a [`TemporalMargin`]. There are methods to conveniently
     /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`IntoTemporalMargin`] for which methods are
+    /// the extension trait [`ToTemporalMargin`] for which methods are
     /// available.
     ///
     /// ```
@@ -615,7 +615,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// # }
     /// ```
     ///
-    /// [`IntoTemporalMargin`]: crate::temporal_margin::IntoTemporalMargin
+    /// [`ToTemporalMargin`]: crate::temporal_margin::ToTemporalMargin
     /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
     #[track_caller]
     fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
@@ -653,7 +653,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// system clock or a clock service. The margin for time values is
     /// specified by a [`TemporalMargin`]. There are methods to conveniently
     /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`IntoTemporalMargin`] for which methods are
+    /// the extension trait [`ToTemporalMargin`] for which methods are
     /// available.
     ///
     /// ```
@@ -693,7 +693,7 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// # }
     /// ```
     ///
-    /// [`IntoTemporalMargin`]: crate::temporal_margin::IntoTemporalMargin
+    /// [`ToTemporalMargin`]: crate::temporal_margin::ToTemporalMargin
     /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
     #[track_caller]
     fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
