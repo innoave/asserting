@@ -2,8 +2,8 @@
 
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
-use jiff::civil::{date, datetime, time};
-use jiff::{SignedDuration, Span, Timestamp};
+use jiff::civil::{Date, DateTime, Time, date, datetime, time};
+use jiff::{SignedDuration, Span, Timestamp, Zoned};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_duration() {
@@ -689,4 +689,96 @@ fn verify_zoned_is_close_to_within_minutes_different_utc_offset_fails() {
 "
         ]
     );
+}
+
+#[test]
+fn extracting_ref_timestamp_is_close_to_within_microseconds() {
+    struct MyTimestamp(Timestamp);
+
+    let subject =
+        MyTimestamp(Timestamp::new(123_456, 987_654_000).expect("invalid timestamp value"));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            Timestamp::new(123_456, 987_654_999).expect("invalid timestamp value"),
+            1.microseconds(),
+        );
+}
+
+#[test]
+fn extracting_ref_civil_time_is_close_to_within_seconds() {
+    struct MyCivilTime(Time);
+
+    let subject = MyCivilTime(time(12, 34, 56, 0));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(time(12, 34, 57, 0), 2.seconds());
+}
+
+#[test]
+fn extracting_ref_civil_date_is_close_to_within_hours() {
+    struct MyCivilDate(Date);
+
+    let subject = MyCivilDate(date(2024, 12, 8));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(date(2024, 12, 9), 24.hours());
+}
+
+#[test]
+fn extracting_ref_civil_datetime_is_close_to_within_milliseconds() {
+    struct MyCivilDateTime(DateTime);
+
+    let subject = MyCivilDateTime(date(2024, 12, 8).at(12, 34, 56, 0));
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(date(2024, 12, 8).at(12, 34, 55, 0), 1000.milliseconds());
+}
+
+#[test]
+fn extracting_ref_zoned_utc_is_close_to_within_minutes() {
+    struct MyZoned(Zoned);
+
+    let subject = MyZoned(
+        date(2023, 11, 30)
+            .at(12, 34, 56, 0)
+            .in_tz("UTC")
+            .expect("invalid Zoned value"),
+    );
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            date(2023, 11, 30)
+                .at(12, 34, 56, 0)
+                .in_tz("Europe/Vienna")
+                .expect("invalid Zoned value"),
+            60.minutes(),
+        );
+}
+
+#[test]
+fn extracting_ref_zoned_tz_is_close_to_within_minutes() {
+    struct MyZoned(Zoned);
+
+    let subject = MyZoned(
+        date(2023, 11, 30)
+            .at(12, 34, 56, 0)
+            .in_tz("Europe/Vienna")
+            .expect("invalid Zoned value"),
+    );
+
+    assert_that(&subject)
+        .extracting_ref("0", |s| &s.0)
+        .is_close_to_with_margin(
+            date(2023, 11, 30)
+                .at(12, 34, 56, 0)
+                .in_tz("UTC")
+                .expect("invalid Zoned value"),
+            60.minutes(),
+        );
 }
