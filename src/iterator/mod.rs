@@ -19,9 +19,10 @@ use crate::expectations::{
     iterator_contains_only, iterator_contains_only_once, iterator_contains_sequence,
     iterator_ends_with, iterator_starts_with, none_satisfies, not,
 };
+use crate::representation::{DisplayRepresentation, Represent, Represented, RepresentedBy};
 use crate::spec::{
-    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-    GetFailures, Invertible, PanicOnFail, Represent, Represented, RepresentedBy, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, GetFailures, Invertible,
+    PanicOnFail, Spec,
 };
 use crate::std::{borrow::ToOwned, cmp::Ordering, format, mem, string::String, vec, vec::Vec};
 use hashbrown::HashSet;

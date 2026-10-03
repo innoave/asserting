@@ -35,11 +35,12 @@ use crate::properties::{
     IsEmptyProperty, IsNanProperty, LengthProperty, MapProperties, MultiplicativeIdentityProperty,
     SignumProperty,
 };
+use crate::representation::{
+    AdHocRepresentation, DebugRepresentation, Represent, Represented, RepresentedAs, RepresentedBy,
+};
 use crate::spec::{
-    AdHocRepresentation, And, AssertFailure, CollectFailures, DebugRepresentation, DiffFormat,
-    DoFail, Expectation, Expecting, Expression, FailingStrategy, GetFailures, GetLocation,
-    Location, PanicOnFail, Represent, Represented, RepresentedAs, RepresentedBy, Satisfies,
-    SoftPanic, Spec,
+    And, AssertFailure, CollectFailures, DiffFormat, DoFail, Expectation, Expecting, Expression,
+    FailingStrategy, GetFailures, GetLocation, Location, PanicOnFail, Satisfies, SoftPanic, Spec,
 };
 use crate::std::{
     borrow::{Cow, ToOwned},
@@ -675,7 +676,8 @@ mod float_cmp {
     use super::DerivedSpec;
     use crate::assertions::{AssertIsCloseToWithDefaultMargin, AssertIsCloseToWithinMargin};
     use crate::expectations::{is_close_to, not};
-    use crate::spec::{DoFail, Expecting, Represent};
+    use crate::representation::Represent;
+    use crate::spec::{DoFail, Expecting};
     use float_cmp::{F32Margin, F64Margin};
 
     impl<O, D> AssertIsCloseToWithinMargin<f32, F32Margin> for DerivedSpec<'_, O, f32, D>
@@ -1548,7 +1550,8 @@ mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::derived_spec::DerivedSpec;
     use crate::expectations::{not, string_matches};
-    use crate::spec::{DoFail, Expecting, Represent};
+    use crate::representation::Represent;
+    use crate::spec::{DoFail, Expecting};
 
     impl<O, S, D> AssertStringMatches for DerivedSpec<'_, O, S, D>
     where

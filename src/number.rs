@@ -13,9 +13,9 @@ use crate::properties::{
     AdditiveIdentityProperty, DecimalProperties, InfinityProperty, IsNanProperty,
     MultiplicativeIdentityProperty, SignumProperty,
 };
+use crate::representation::{DisplayRepresentation, Represent, Represented};
 use crate::spec::{
-    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-    Invertible, Represent, Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{format, string::String};
 

@@ -7,9 +7,11 @@ use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     HasError, HasValue, IsErr, IsOk, has_error, has_value, is_equal_to, is_err, is_ok,
 };
+use crate::representation::{
+    DebugRepresentation, DisplayRepresentation, Represent, Represented, RepresentedBy,
+};
 use crate::spec::{
-    DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression,
-    FailingStrategy, Invertible, Represent, Represented, RepresentedBy, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::fmt::{Debug, Display};
 use crate::std::{

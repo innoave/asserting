@@ -8,9 +8,8 @@ use crate::expectations::{
     has_char_count, has_char_count_greater_than, has_char_count_in_range, has_char_count_less_than,
 };
 use crate::properties::CharCountProperty;
-use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Represent, Represented, Spec,
-};
+use crate::representation::{Represent, Represented};
+use crate::spec::{DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Spec};
 use crate::std::{format, ops::RangeBounds, string::String};
 
 impl<S, D, R> AssertHasCharCount<usize, D> for Spec<'_, S, D, R>

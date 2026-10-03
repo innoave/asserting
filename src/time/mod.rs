@@ -2,9 +2,9 @@ use crate::assertions::AssertIsCloseToWithinMargin;
 use crate::colored::mark_diff;
 use crate::derived_spec::DerivedSpec;
 use crate::expectations::{IsCloseTo, is_close_to, not};
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::temporal::{TemporalMargin, ToDuration};
 use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time};

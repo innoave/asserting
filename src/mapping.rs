@@ -1,5 +1,6 @@
 use crate::assertions::{AssertDebugString, AssertDisplayString};
-use crate::spec::{DebugRepresentation, FailingStrategy, Spec};
+use crate::representation::DebugRepresentation;
+use crate::spec::{FailingStrategy, Spec};
 use crate::std::{
     fmt::{Debug, Display},
     format,

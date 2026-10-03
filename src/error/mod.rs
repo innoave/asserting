@@ -3,9 +3,9 @@ use crate::colored::{mark_missing, mark_unexpected};
 use crate::expectations::{
     ErrorHasSource, ErrorHasSourceMessage, error_has_source, error_has_source_message, not,
 };
+use crate::representation::{DebugRepresentation, DisplayRepresentation, Represent};
 use crate::spec::{
-    DebugRepresentation, DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression,
-    FailingStrategy, Invertible, Represent, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{
     error::Error,

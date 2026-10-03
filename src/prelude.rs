@@ -19,9 +19,10 @@ pub use super::{
     assertions::*,
     colored::{DEFAULT_DIFF_FORMAT, DIFF_FORMAT_NO_HIGHLIGHT},
     properties::*,
+    representation::{Represent, RepresentedAs, RepresentedBy},
     spec::{
-        And, CollectFailures, DoFail, Expecting, GetFailures, Location, PanicOnFail, Represent,
-        RepresentedAs, RepresentedBy, Satisfies, SoftPanic, assert_that, verify_that,
+        And, CollectFailures, DoFail, Expecting, GetFailures, Location, PanicOnFail, Satisfies,
+        SoftPanic, assert_that, verify_that,
     },
     verify_that,
 };

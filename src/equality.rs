@@ -11,9 +11,9 @@ use crate::expectations::{
     has_display_string, is_equal_to, is_in, is_same_as, not,
 };
 use crate::failure_empty_collection;
+use crate::representation::{Represent, Represented};
 use crate::spec::{
-    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
-    Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::{
     fmt::{Debug, Display},

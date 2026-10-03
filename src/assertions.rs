@@ -10,7 +10,8 @@
 //! assertions.
 #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
 
-use crate::spec::{CollectFailures, DebugRepresentation, GetFailures, Represent, Spec};
+use crate::representation::{DebugRepresentation, Represent};
+use crate::spec::{CollectFailures, GetFailures, Spec};
 use crate::std::{ops::RangeBounds, string::String};
 
 /// Assert whether two values are equal or not.

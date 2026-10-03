@@ -10,9 +10,9 @@ use crate::expectations::{
     string_contains_any_of, string_ends_with, string_starts_with,
 };
 use crate::properties::{CharCountProperty, DefinedOrderProperty, IsEmptyProperty, LengthProperty};
+use crate::representation::{DisplayRepresentation, Represent, Represented};
 use crate::spec::{
-    DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-    Invertible, Represent, Represented, Spec,
+    DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
 };
 use crate::std::str::Chars;
 use crate::std::{
@@ -766,9 +766,9 @@ mod regex {
     use crate::assertions::AssertStringMatches;
     use crate::colored::{mark_missing, mark_unexpected};
     use crate::expectations::{StringMatches, not, string_matches};
+    use crate::representation::{DisplayRepresentation, Represent};
     use crate::spec::{
-        DiffFormat, DisplayRepresentation, Expectation, Expecting, Expression, FailingStrategy,
-        Invertible, Represent, Spec,
+        DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Spec,
     };
     use crate::std::{format, string::String};
 
