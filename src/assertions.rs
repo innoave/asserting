@@ -534,11 +534,8 @@ pub trait AssertIsIn<I, E> {
 /// );
 /// # }
 /// ```
-#[cfg(any(feature = "float-cmp", feature = "chrono", feature = "time"))]
-#[cfg_attr(
-    docsrs,
-    doc(cfg(any(feature = "float-cmp", feature = "chrono", feature = "time")))
-)]
+#[cfg(any(feature = "float-cmp", feature = "temporal",))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = "float-cmp", feature = "temporal",))))]
 pub trait AssertIsCloseToWithinMargin<E, M> {
     /// Verifies that the actual value is approximately equal to the expected
     /// value.
@@ -615,8 +612,8 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// # }
     /// ```
     ///
-    /// [`ToTemporalMargin`]: crate::temporal_margin::ToTemporalMargin
-    /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
+    /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
+    /// [`TemporalMargin`]: crate::temporal::TemporalMargin
     #[track_caller]
     fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 
@@ -693,8 +690,8 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// # }
     /// ```
     ///
-    /// [`ToTemporalMargin`]: crate::temporal_margin::ToTemporalMargin
-    /// [`TemporalMargin`]: crate::temporal_margin::TemporalMargin
+    /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
+    /// [`TemporalMargin`]: crate::temporal::TemporalMargin
     #[track_caller]
     fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 }

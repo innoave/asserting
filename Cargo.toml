@@ -20,10 +20,10 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 default = ["std", "colored", "float-cmp", "panic", "recursive", "regex"]
 bigdecimal = ["dep:bigdecimal", "dep:once_cell"]
-chrono = ["dep:chrono"]
+chrono = ["temporal", "dep:chrono"]
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
-jiff = ["dep:jiff"]
+jiff = ["temporal", "dep:jiff"]
 num-bigint = ["dep:num-bigint", "dep:once_cell"]
 recursive = ["dep:serde_core", "dep:indexmap", "indexmap/serde", "dep:rapidhash"]
 rust-decimal = ["dep:rust_decimal"]
@@ -44,7 +44,8 @@ std = [
     "serde_core?/std",
     "time?/std"
 ]
-time = ["dep:time"]
+temporal = []
+time = ["temporal", "dep:time"]
 
 [dependencies]
 hashbrown = "0.17"

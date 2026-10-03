@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used)]
 
 use crate::prelude::*;
-use crate::temporal_margin::TemporalMargin;
+use crate::temporal::TemporalMargin;
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[test]

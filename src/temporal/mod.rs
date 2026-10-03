@@ -112,7 +112,7 @@ pub trait ToDuration<T> {
 ///
 /// ```
 /// use asserting::prelude::*;
-/// use asserting::temporal_margin::TemporalMargin;
+/// use asserting::temporal::TemporalMargin;
 ///
 /// assert_eq!(10.milliseconds(), TemporalMargin::MilliSeconds(10));
 /// assert_eq!(22.seconds(), TemporalMargin::Seconds(22));

@@ -1120,12 +1120,9 @@ pub mod properties;
 #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
 pub mod recursive_comparison;
 pub mod spec;
-#[cfg(any(feature = "chrono", feature = "jiff", feature = "time"))]
-#[cfg_attr(
-    docsrs,
-    doc(cfg(any(feature = "chrono", feature = "jiff", feature = "time")))
-)]
-pub mod temporal_margin;
+#[cfg(feature = "temporal")]
+#[cfg_attr(docsrs, doc(cfg(feature = "temporal")))]
+pub mod temporal;
 
 #[cfg(feature = "bigdecimal")]
 mod bigdecimal;

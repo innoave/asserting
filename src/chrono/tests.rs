@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used)]
 
 use crate::prelude::*;
-use crate::temporal_margin::TemporalMargin;
+use crate::temporal::TemporalMargin;
 use chrono::{
     DateTime, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, TimeDelta, TimeZone, Utc,
 };

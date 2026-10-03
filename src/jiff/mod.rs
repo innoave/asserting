@@ -5,7 +5,7 @@ use crate::spec::{
     DiffFormat, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::temporal_margin::{TemporalMargin, ToDuration};
+use crate::temporal::{TemporalMargin, ToDuration};
 use jiff::{SignedDuration, Span, Timestamp};
 
 #[cfg(test)]

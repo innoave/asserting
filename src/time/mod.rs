@@ -6,7 +6,7 @@ use crate::spec::{
     DiffFormat, DoFail, Expectation, Expecting, Expression, FailingStrategy, Invertible, Represent,
     Represented, Spec,
 };
-use crate::temporal_margin::{TemporalMargin, ToDuration};
+use crate::temporal::{TemporalMargin, ToDuration};
 use time::{Date, OffsetDateTime, PlainDateTime, SignedDuration, Time};
 
 impl ToDuration<SignedDuration> for TemporalMargin {
