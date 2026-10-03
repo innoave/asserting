@@ -110,56 +110,56 @@ pub trait IntoTemporalMargin {
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn nanoseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of microseconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn microseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of milliseconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn milliseconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of seconds.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn seconds(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of minutes.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn minutes(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of hours.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn hours(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of days.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn days(self) -> TemporalMargin;
     /// Constructs a [`TemporalMargin`] of weeks.
     ///
     /// # Panics
     ///
     /// An implementation may panic if the numeric value cannot be converted
-    /// to an `i64`.
+    /// to an `i32`.
     fn weeks(self) -> TemporalMargin;
 }
 
