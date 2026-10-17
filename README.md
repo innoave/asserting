@@ -233,9 +233,9 @@ requires crate feature `float-cmp` which is enabled by default.
 
 ### Date and Time
 
-for date, time and date-time values of the crates `chrono` and `time`.
+for date, time and date-time values of the crates `chrono`, `jiff` and `time`.
 
-requires crate feature `chrono` or `time`.
+requires crate feature `chrono`, `jiff` or `time`.
 
 | assertion                   | description                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------------------|
