@@ -25,6 +25,12 @@ alias msrv := check-msrv
 default:
     just --list
 
+# install cargo subcommands used by recipies
+install-tools:
+    cargo install cargo-deny --locked
+    cargo install cargo-msrv --locked
+    cargo install cargo-llvm-cov --locked
+
 # build the crate for debugging
 build:
     cargo build --all-features
@@ -85,6 +91,10 @@ code-coverage:
     cargo +nightly llvm-cov --branch --all-features --no-report
     cargo +nightly llvm-cov report --html --open --ignore-filename-regex "tests|test_dsl"
 
+# run secuirty scan (using cargo deny)
+audit:
+    cargo deny check all
+
 # build the crate for release
 build-release:
     cargo build --release
@@ -118,3 +128,4 @@ continues-integration:
     just lint
     just test
     just build-docs
+    just audit
