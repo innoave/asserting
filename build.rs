@@ -14,7 +14,7 @@ fn main() {
 fn rewrite_readme_for_cratesio_with_absolute_urls() {
     let version = env::var("CARGO_PKG_VERSION").expect("CARGO_PKG_VERSION must be set");
 
-    println!("cargo:rerun-if-changed={}", README_PATH);
+    println!("cargo:rerun-if-changed={README_PATH}");
 
     if let Ok(content) = fs::read_to_string(README_PATH) {
         let target_url = format!("]({REPOSITORY_URL}{version}/docs/");
