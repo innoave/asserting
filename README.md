@@ -4,6 +4,7 @@
 [![docs.rs][docs-badge]][docs-url]
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
+[![security][security-audit-badge]][security-audit-url]
 
 Fluent assertions for tests in Rust. An extensive collection of assertions to express the intent of
 the expected result in a test.
@@ -159,6 +160,11 @@ possibilities for custom assertions, including examples.
 [code-coverage-badge]: https://codecov.io/github/innoave/asserting/graph/badge.svg?token=o0w7R7J0Op
 
 [code-coverage-url]: https://codecov.io/github/innoave/asserting
+
+[security-audit-badge]: https://github.com/innoave/asserting/actions/workflows/security.yml/badge.svg
+
+[security-audit-url]: https://github.com/innoave/asserting/actions
+
 
 <!-- External Links -->
 

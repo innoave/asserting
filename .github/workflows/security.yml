@@ -1,0 +1,27 @@
+name: Security Audits
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: '0 4 * * 5'
+
+permissions:
+  checks: write
+  contents: read
+  issues: write
+
+jobs:
+  cargo-deny:
+    name: Cargo Deny (RustSec & Licences & Bans)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+          arguments: --all-features
