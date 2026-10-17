@@ -6,6 +6,7 @@ license = "MIT OR Apache-2.0"
 edition = "2024"
 rust-version = "1.88.0"
 repository = "https://github.com/innoave/asserting"
+readme = "docs/cratesio/README.md"
 
 description = """
 Fluent assertions for tests in Rust that are convenient to write and easy to extend.
