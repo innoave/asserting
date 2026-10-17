@@ -83,9 +83,9 @@ where
             .extracting_ref("body", |s| &s.body)
             .contains_exactly(expected_body)
             .and()
-                .extracting_ref("head", |s| &s.head)
-                .is_equal_to(expected_head)
-                .display_failures();
+            .extracting_ref("head", |s| &s.head)
+            .is_equal_to(expected_head)
+            .display_failures();
         // if there are failures, we fail the whole assertion according to the
         // current `FailingStrategy`.
         if !failures.is_empty() {
