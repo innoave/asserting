@@ -5,6 +5,7 @@
 ![MSRV][msrv-badge]
 [![code coverage][code-coverage-badge]][code-coverage-url]
 [![security][security-audit-badge]][security-audit-url]
+[![OpenSSF Best Practices][openssf-best-practices-bagde]][openssf-best-practices-url]
 
 Fluent assertions for tests in Rust. An extensive collection of assertions to express the intent of
 the expected result in a test.
@@ -165,6 +166,9 @@ possibilities for custom assertions, including examples.
 
 [security-audit-url]: https://github.com/innoave/asserting/actions
 
+[openssf-best-practices-badge]: https://www.bestpractices.dev/projects/15639/badge
+
+[openssf-best-practices-url]: https://www.bestpractices.dev/projects/15639
 
 <!-- External Links -->
 
