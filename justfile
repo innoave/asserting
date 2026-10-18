@@ -11,6 +11,7 @@ alias c := check
 alias cc := code-coverage
 alias ci := continues-integration
 alias d := doc
+alias fmt := format
 alias l := lint
 alias la := lint-all-features
 alias ld := lint-default
@@ -38,6 +39,14 @@ build:
 # check syntax in all targets
 check:
     cargo check --all-targets --all-features
+
+# format the code using rustfmt
+format *options:
+    cargo +nightly fmt --all {{ options }}
+
+# check all code is formatted
+check-format:
+    just format --check
 
 # linting code using Clippy
 lint:
@@ -105,6 +114,7 @@ clean:
 
 # generate docs (but don't open it)
 
+# generate the api docs
 [env("RUSTDOCFLAGS", "--cfg docsrs")]
 build-docs *options:
     cargo +nightly doc --all-features --no-deps {{ options }}
@@ -124,6 +134,7 @@ check-msrv: setup-msrv
 # performs continues integration (CI) like tasks on the local machine
 [env("RUSTFLAGS", "-D warnings")]
 continues-integration:
+    just check-format
     just check-msrv
     just lint
     just test
