@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.18.0 - 2026-11-22
+
+### Changed
+
+_upgrade `jiff` dependency to version 1_
+
+* **Breaking**: upgrade `jiff` to version 1. The type `jiff:1:Zoned` has been renamed to
+  `jiff::ZonedDateTime`.
+  [(PR #112)](https://github.com/innoave/asserting/pull/112)
+
 ## 0.17.1 - 2026-11-22
 
 ### Deprecated
@@ -21,6 +31,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   [(PR #111)](https://github.com/innoave/asserting/pull/111)
 
 ## 0.17.0 - 2026-10-03
+
+_is_close_to like assertions for date and time_
 
 ### Added
 
