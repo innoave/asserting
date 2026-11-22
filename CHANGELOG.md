@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.17.1 - 2026-11-22
+
+### Deprecated
+
+* **Deprecate `chrono` feature:** The optional `chrono` feature is now deprecated because the
+  `chrono` crate has been marked as unmaintained (`RUSTSEC-2026-0543`). Support is retained for
+  backwards compatibility, but users are encouraged to migrate to the already supported `jiff` or
+  `time` features instead.
+  [(PR #110)](https://github.com/innoave/asserting/pull/110)
+
+### Docs
+
+* Include available assertions in doc comment of the assertions module
+  [(PR #111)](https://github.com/innoave/asserting/pull/111)
+
 ## 0.17.0 - 2026-10-03
 
 ### Added
