@@ -1,12 +1,5 @@
 ## Available Assertions
 
-This document gives an overview of the assertions provided by `asserting`.
-
-For a comprehensive list of available assertions, including examples, browse the documentation of
-the [`assertions`] module. The documentation of the assertion traits contains examples on how to use
-each assertion. The [crate-level documentation][docs-url] contains lots of examples as a quick
-introduction.
-
 ### Equality
 
 for all types that implement `PartialEq<E>` with `E` being the type of the expected value:
@@ -355,10 +348,6 @@ To start assertions on code, use the `assert_that_code!()` macro.
 
 
 <!-- Related URLs -->
-
-[docs-url]: https://docs.rs/asserting
-
-[`assertions`]: https://docs.rs/asserting/latest/asserting/assertions/
 
 [`IsEmptyProperty`]: https://docs.rs/asserting/latest/asserting/properties/trait.IsEmptyProperty.html
 
