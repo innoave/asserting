@@ -501,19 +501,6 @@ pub trait AssertIsIn<I, E> {
 /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
 /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
 /// # }
-/// # #[cfg(feature = "chrono")]
-/// # {
-///
-/// use chrono::{TimeDelta, TimeZone, Utc};
-///
-/// let subject =
-///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
-///
-/// assert_that(subject).is_close_to_with_margin(
-///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-///     3.milliseconds(),
-/// );
-/// # }
 /// # #[cfg(feature = "jiff")]
 /// # {
 ///
@@ -552,7 +539,25 @@ pub trait AssertIsIn<I, E> {
 ///     60.minutes(),
 /// );
 /// # }
+/// # #[cfg(feature = "chrono")]
+/// # {
+///
+/// use chrono::{TimeDelta, TimeZone, Utc};
+///
+/// let subject =
+///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
+///
+/// assert_that(subject).is_close_to_with_margin(
+///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+///     3.milliseconds(),
+/// );
+/// # }
 /// ```
+///
+/// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
+/// > Support in `asserting` is kept for backwards compatibility only. For
+/// > new code, consider using the `jiff` or `time` crate with the
+/// > corresponding feature in `asserting`.
 #[cfg(any(feature = "float-cmp", feature = "temporal",))]
 #[cfg_attr(docsrs, doc(cfg(any(feature = "float-cmp", feature = "temporal",))))]
 pub trait AssertIsCloseToWithinMargin<E, M> {
@@ -595,19 +600,6 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///
     /// ```
     /// use asserting::prelude::*;
-    /// # #[cfg(feature = "chrono")]
-    /// # {
-    ///
-    /// use chrono::{TimeDelta, TimeZone, Utc};
-    ///
-    /// let subject =
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
-    ///
-    /// assert_that(subject).is_close_to_with_margin(
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-    ///     3.milliseconds(),
-    /// );
-    /// # }
     /// # #[cfg(feature = "jiff")]
     /// # {
     ///
@@ -646,7 +638,25 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///     60.minutes(),
     /// );
     /// # }
+    /// # #[cfg(feature = "chrono")]
+    /// # {
+    ///
+    /// use chrono::{TimeDelta, TimeZone, Utc};
+    ///
+    /// let subject =
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
+    ///
+    /// assert_that(subject).is_close_to_with_margin(
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+    ///     3.milliseconds(),
+    /// );
+    /// # }
     /// ```
+    ///
+    /// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
+    /// > Support in `asserting` is kept for backwards compatibility only. For
+    /// > new code, consider using the `jiff` or `time` crate with the
+    /// > corresponding feature in `asserting`.
     ///
     /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
     /// [`TemporalMargin`]: crate::temporal::TemporalMargin
@@ -690,19 +700,6 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///
     /// ```
     /// use asserting::prelude::*;
-    /// # #[cfg(feature = "chrono")]
-    /// # {
-    ///
-    /// use chrono::{TimeDelta, TimeZone, Utc};
-    ///
-    /// let subject =
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(4);
-    ///
-    /// assert_that(subject).is_not_close_to_with_margin(
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-    ///     3.milliseconds(),
-    /// );
-    /// # }
     /// # #[cfg(feature = "jiff")]
     /// # {
     ///
@@ -741,7 +738,25 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     ///     59.minutes(),
     /// );
     /// # }
+    /// # #[cfg(feature = "chrono")]
+    /// # {
+    ///
+    /// use chrono::{TimeDelta, TimeZone, Utc};
+    ///
+    /// let subject =
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(4);
+    ///
+    /// assert_that(subject).is_not_close_to_with_margin(
+    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+    ///     3.milliseconds(),
+    /// );
+    /// # }
     /// ```
+    ///
+    /// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
+    /// > Support in `asserting` is kept for backwards compatibility only. For
+    /// > new code, consider using the `jiff` or `time` crate with the
+    /// > corresponding feature in `asserting`.
     ///
     /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
     /// [`TemporalMargin`]: crate::temporal::TemporalMargin

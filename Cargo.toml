@@ -21,7 +21,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 default = ["std", "colored", "float-cmp", "panic", "recursive", "regex"]
 bigdecimal = ["dep:bigdecimal", "dep:once_cell"]
-chrono = ["temporal", "dep:chrono"]
+chrono = ["temporal", "dep:chrono"]  # Deprecated: Prefer `jiff` or `time`
 colored = ["dep:sdiff"]
 float-cmp = ["dep:float-cmp"]
 jiff = ["temporal", "dep:jiff"]
