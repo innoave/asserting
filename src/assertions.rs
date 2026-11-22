@@ -5,87 +5,79 @@
 //! for one or several types. An assertion can be applied to all types that
 //! implement this assertion.
 //!
-//! All assertions provided by this crate are defined in this module. Browse
-//! over the traits in this module to get information about all provided
+//! All assertions provided by this crate are defined as traits in this module.
+//! Browse over the traits in this module to get information about all provided
 //! assertions.
-#![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
+//!
+//! The next chapter gives an overview of the available assertions.
+#![doc = include_str!("../docs/available-assertions.md")]
+#![allow(clippy::doc_markdown)]
 
-use crate::representation::{DebugRepresentation, Represent};
-use crate::spec::{CollectFailures, GetFailures, Spec};
-use crate::std::{ops::RangeBounds, string::String};
+#[doc(inline)]
+pub use traits::*;
 
-/// Assert whether two values are equal or not.
-///
-/// These assertions are implemented for all types that implement `PartialEq<E>`
-/// with `E` being the type of the expected value.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = "ea rebum dignissim suscipit".to_string();
-/// assert_that!(subject).is_equal_to("ea rebum dignissim suscipit");
-///
-/// let the_answer = 42;
-/// assert_that!(the_answer).is_equal_to(42);
-/// ```
-pub trait AssertEquality<E> {
-    /// Verifies that the subject is equal to some other value.
+#[warn(clippy::doc_markdown)]
+mod traits {
+    #![allow(clippy::wrong_self_convention, clippy::return_self_not_must_use)]
+
+    use crate::representation::{DebugRepresentation, Represent};
+    use crate::spec::{CollectFailures, GetFailures, Spec};
+    use crate::std::{ops::RangeBounds, string::String};
+
+    /// Assert whether two values are equal or not.
+    ///
+    /// These assertions are implemented for all types that implement `PartialEq<E>`
+    /// with `E` being the type of the expected value.
     ///
     /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
+    ///
+    /// let subject = "ea rebum dignissim suscipit".to_string();
+    /// assert_that!(subject).is_equal_to("ea rebum dignissim suscipit");
     ///
     /// let the_answer = 42;
     /// assert_that!(the_answer).is_equal_to(42);
-    ///
-    /// assert_that!(6 * 7).is_equal_to(42);
-    ///
-    /// let subject = "volutpat sunt te tincidunt".to_string();
-    /// assert_that!(subject).is_equal_to("volutpat sunt te tincidunt");
     /// ```
-    #[track_caller]
-    fn is_equal_to(self, expected: E) -> Self;
+    pub trait AssertEquality<E> {
+        /// Verifies that the subject is equal to some other value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let the_answer = 42;
+        /// assert_that!(the_answer).is_equal_to(42);
+        ///
+        /// assert_that!(6 * 7).is_equal_to(42);
+        ///
+        /// let subject = "volutpat sunt te tincidunt".to_string();
+        /// assert_that!(subject).is_equal_to("volutpat sunt te tincidunt");
+        /// ```
+        #[track_caller]
+        fn is_equal_to(self, expected: E) -> Self;
 
-    /// Verifies that the subject is not equal to some other value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(5 * 8).is_not_equal_to(42);
-    ///
-    /// let subject = "volutpat sunt te tincidunt".to_string();
-    /// assert_that!(subject).is_not_equal_to("Hello, World!");
-    /// ```
-    #[track_caller]
-    fn is_not_equal_to(self, expected: E) -> Self;
-}
+        /// Verifies that the subject is not equal to some other value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5 * 8).is_not_equal_to(42);
+        ///
+        /// let subject = "volutpat sunt te tincidunt".to_string();
+        /// assert_that!(subject).is_not_equal_to("Hello, World!");
+        /// ```
+        #[track_caller]
+        fn is_not_equal_to(self, expected: E) -> Self;
+    }
 
-/// Assert whether two values are of the same type and have the same value.
-///
-/// These assertions are implemented for all types that implement `PartialEq`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = String::from("adipiscing liber esse anim");
-/// assert_that!(subject).is_same_as("adipiscing liber esse anim".to_string());
-///
-/// let subject = "ea eu exercitation eu";
-/// assert_that!(subject).is_not_same_as("Ea eu exercitation");
-///
-/// assert_that!(42).is_same_as(42);
-/// assert_that!(41).is_not_same_as(42);
-/// ```
-pub trait AssertSameAs<E> {
-    /// Verifies that the subject is of the same type and has the same value as
-    /// some other value.
+    /// Assert whether two values are of the same type and have the same value.
+    ///
+    /// These assertions are implemented for all types that implement `PartialEq`.
     ///
     /// # Examples
     ///
@@ -95,77 +87,51 @@ pub trait AssertSameAs<E> {
     /// let subject = String::from("adipiscing liber esse anim");
     /// assert_that!(subject).is_same_as("adipiscing liber esse anim".to_string());
     ///
-    /// assert_that!(42).is_same_as(42);
-    /// ```
-    #[track_caller]
-    fn is_same_as(self, expected: E) -> Self;
-
-    /// Verifies that the subject is of the same type but has a different value
-    /// as some other value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
     /// let subject = "ea eu exercitation eu";
     /// assert_that!(subject).is_not_same_as("Ea eu exercitation");
     ///
+    /// assert_that!(42).is_same_as(42);
     /// assert_that!(41).is_not_same_as(42);
     /// ```
-    #[track_caller]
-    fn is_not_same_as(self, expected: E) -> Self;
-}
+    pub trait AssertSameAs<E> {
+        /// Verifies that the subject is of the same type and has the same value as
+        /// some other value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = String::from("adipiscing liber esse anim");
+        /// assert_that!(subject).is_same_as("adipiscing liber esse anim".to_string());
+        ///
+        /// assert_that!(42).is_same_as(42);
+        /// ```
+        #[track_caller]
+        fn is_same_as(self, expected: E) -> Self;
 
-/// Assert whether a value is equivalent to a value of type [`Value`] using
-/// field-by-field recursive comparison.
-///
-/// These assertions are intended for the field-by-field recursive comparison
-/// mode and are implemented for all types that implement [`serde::Serialize`].
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-/// use serde::Serialize;
-///
-/// #[derive(Serialize)]
-/// struct Person {
-///     id: u64,
-///     name: String,
-///     age: u8,
-///     email: Vec<String>,
-/// }
-///
-/// let person = Person {
-///     id: 456,
-///     name: "Silvia".into(),
-///     age: 25,
-///     email: vec!["silvia@domain.com".to_string()],
-/// };
-///
-/// assert_that!(person)
-///     .using_recursive_comparison()
-///     .ignoring_not_expected_fields()
-///     .is_equivalent_to(value!({
-///         name: "Silvia",
-///         age: 25_u8,
-///     }));
-/// ```
-///
-/// [`Value`]: crate::recursive_comparison::value::Value
-/// [`serde::Serialize`]: serde_core::Serialize
-#[cfg(feature = "recursive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
-pub trait AssertEquivalence<E> {
-    /// Verifies that the subject is equivalent to the expected value of type
-    /// [`Value`].
+        /// Verifies that the subject is of the same type but has a different value
+        /// as some other value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "ea eu exercitation eu";
+        /// assert_that!(subject).is_not_same_as("Ea eu exercitation");
+        ///
+        /// assert_that!(41).is_not_same_as(42);
+        /// ```
+        #[track_caller]
+        fn is_not_same_as(self, expected: E) -> Self;
+    }
+
+    /// Assert whether a value is equivalent to a value of type [`Value`] using
+    /// field-by-field recursive comparison.
     ///
-    /// The actual value (subject) and the expected value (parameter) are
-    /// compared field-by-field recursively.
-    ///
-    /// The intended and most convenient way to construct a [`Value`] instance
-    /// is using the [`value!`] macro.
+    /// These assertions are intended for the field-by-field recursive comparison
+    /// mode and are implemented for all types that implement [`serde::Serialize`].
     ///
     /// # Examples
     ///
@@ -197,152 +163,111 @@ pub trait AssertEquivalence<E> {
     ///     }));
     /// ```
     ///
-    /// See the documentation of the [`recursive_comparison`] module for more
-    /// details.
-    ///
-    /// [`value!`]: crate::prelude::value
     /// [`Value`]: crate::recursive_comparison::value::Value
-    /// [`recursive_comparison`]: crate::recursive_comparison
     /// [`serde::Serialize`]: serde_core::Serialize
-    #[track_caller]
-    fn is_equivalent_to(self, expected: E) -> Self;
+    #[cfg(feature = "recursive")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "recursive")))]
+    pub trait AssertEquivalence<E> {
+        /// Verifies that the subject is equivalent to the expected value of type
+        /// [`Value`].
+        ///
+        /// The actual value (subject) and the expected value (parameter) are
+        /// compared field-by-field recursively.
+        ///
+        /// The intended and most convenient way to construct a [`Value`] instance
+        /// is using the [`value!`] macro.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use serde::Serialize;
+        ///
+        /// #[derive(Serialize)]
+        /// struct Person {
+        ///     id: u64,
+        ///     name: String,
+        ///     age: u8,
+        ///     email: Vec<String>,
+        /// }
+        ///
+        /// let person = Person {
+        ///     id: 456,
+        ///     name: "Silvia".into(),
+        ///     age: 25,
+        ///     email: vec!["silvia@domain.com".to_string()],
+        /// };
+        ///
+        /// assert_that!(person)
+        ///     .using_recursive_comparison()
+        ///     .ignoring_not_expected_fields()
+        ///     .is_equivalent_to(value!({
+        ///         name: "Silvia",
+        ///         age: 25_u8,
+        ///     }));
+        /// ```
+        ///
+        /// See the documentation of the [`recursive_comparison`] module for more
+        /// details.
+        ///
+        /// [`value!`]: crate::prelude::value
+        /// [`Value`]: crate::recursive_comparison::value::Value
+        /// [`recursive_comparison`]: crate::recursive_comparison
+        /// [`serde::Serialize`]: serde_core::Serialize
+        #[track_caller]
+        fn is_equivalent_to(self, expected: E) -> Self;
 
-    /// Verifies that the subject is not equivalent to the expected value of
-    /// type [`Value`].
-    ///
-    /// The actual value (subject) and the expected value (parameter) are
-    /// compared field-by-field recursively. Fields of the actual value that
-    /// are not present in the actual value are always ignored.
-    ///
-    /// The intended and most convenient way to construct a [`Value`] instance
-    /// is using the [`value!`] macro.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use serde::Serialize;
-    ///
-    /// #[derive(Serialize)]
-    /// struct Person {
-    ///     id: u64,
-    ///     name: String,
-    ///     age: u8,
-    ///     email: Vec<String>,
-    /// }
-    ///
-    /// let person = Person {
-    ///     id: 456,
-    ///     name: "Silvia".into(),
-    ///     age: 25,
-    ///     email: vec!["silvia@domain.com".to_string()],
-    /// };
-    ///
-    /// assert_that!(person)
-    ///     .using_recursive_comparison()
-    ///     .is_not_equivalent_to(value!({
-    ///         name: "Silvia",
-    ///         age: 21_u8,
-    ///     }));
-    /// ```
-    ///
-    /// See the documentation of the [`recursive_comparison`] module for more
-    /// details.
-    ///
-    /// [`value!`]: crate::prelude::value
-    /// [`Value`]: crate::recursive_comparison::value::Value
-    /// [`recursive_comparison`]: crate::recursive_comparison
-    /// [`serde::Serialize`]: serde_core::Serialize
-    #[track_caller]
-    fn is_not_equivalent_to(self, expected: E) -> Self;
-}
+        /// Verifies that the subject is not equivalent to the expected value of
+        /// type [`Value`].
+        ///
+        /// The actual value (subject) and the expected value (parameter) are
+        /// compared field-by-field recursively. Fields of the actual value that
+        /// are not present in the actual value are always ignored.
+        ///
+        /// The intended and most convenient way to construct a [`Value`] instance
+        /// is using the [`value!`] macro.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use serde::Serialize;
+        ///
+        /// #[derive(Serialize)]
+        /// struct Person {
+        ///     id: u64,
+        ///     name: String,
+        ///     age: u8,
+        ///     email: Vec<String>,
+        /// }
+        ///
+        /// let person = Person {
+        ///     id: 456,
+        ///     name: "Silvia".into(),
+        ///     age: 25,
+        ///     email: vec!["silvia@domain.com".to_string()],
+        /// };
+        ///
+        /// assert_that!(person)
+        ///     .using_recursive_comparison()
+        ///     .is_not_equivalent_to(value!({
+        ///         name: "Silvia",
+        ///         age: 21_u8,
+        ///     }));
+        /// ```
+        ///
+        /// See the documentation of the [`recursive_comparison`] module for more
+        /// details.
+        ///
+        /// [`value!`]: crate::prelude::value
+        /// [`Value`]: crate::recursive_comparison::value::Value
+        /// [`recursive_comparison`]: crate::recursive_comparison
+        /// [`serde::Serialize`]: serde_core::Serialize
+        #[track_caller]
+        fn is_not_equivalent_to(self, expected: E) -> Self;
+    }
 
-/// Assert whether a single value is in a set of expected values.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!("two").is_in(["one", "two", "three"]);
-/// assert_that!(42).is_in([22, 42, 50, 88]);
-///
-/// assert_that!("zero").is_not_in(["one", "two", "three"]);
-/// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
-/// ```
-///
-/// The assertions [`is_in`] and [`is_not_in`] fail if the expected set of values
-/// is empty. This restrictive behavior is by design. In the vast majority of
-/// tests asserting against an empty set results in a "dead test". Asserting
-/// that a value is in an empty set always fails, while asserting that a value
-/// is not in an empty set always succeeds. So the assertion result does not
-/// depend on the actual value. This might not be what we want to assert.
-///
-/// ```
-/// # #[cfg(feature = "panic")]
-/// # {
-/// use asserting::prelude::*;
-///
-/// assert_that_code!(|| {
-///     assert_that!(42).is_in([]);  // always fails
-/// }).panics_with_message(
-///     r"expected 42 to be in []
-///   An assertion using `is_in()` was made against an empty collection.
-///   This would always fail, which is likely a bug in your test setup.
-///   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
-/// ");
-///
-/// assert_that_code!(|| {
-///     assert_that!(42).is_not_in([]);  // always fails
-/// }).panics_with_message(
-///     r"expected 42 to not be in []
-///   An assertion using `is_not_in()` was made against an empty collection.
-///   This would always succeed, which is likely a bug in your test setup.
-///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
-/// ");
-/// # }
-/// ```
-///
-/// If you need the mathematical correct behavior for some specific test, use
-/// the alternative methods [`is_in_maybe_empty`] and [`is_not_in_maybe_empty`].
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// # #[cfg(feature = "panic")]
-/// # {
-/// assert_that_code!(|| {
-///     assert_that!(42)
-///         .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
-///         .is_in_maybe_empty([]);  // always fails
-/// }).panics_with_message(
-///     r"expected 42 to be in []
-///           but was: 42
-///   which is not in: []
-/// ");
-/// # }
-///
-/// assert_that!(42).is_not_in_maybe_empty([]);  // always succeeds
-/// ```
-///
-/// [`is_in`]: Self::is_in
-/// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
-/// [`is_not_in`]: Self::is_not_in
-/// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
-pub trait AssertIsIn<I, E> {
-    /// Verifies that the actual value is in the set of expected values.
-    ///
-    /// The set of expected values can be given in any type of collection
-    /// that implements the `IntoIterator` trait.
-    ///
-    /// If the expected set of values is empty, this assertion always fails
-    /// regardless of the actual value. This is a so-called "dead test" as it
-    /// does not assert anything about the actual value. This might be a bug
-    /// or design flaw of the test case. The failure message of the failing
-    /// assertion gives a hint that this test might not be what you want.
-    ///
-    /// If you explicitly want to allow the empty set for some special test,
-    /// use the alternative [`is_in_maybe_empty`] method.
+    /// Assert whether a single value is in a set of expected values.
     ///
     /// # Examples
     ///
@@ -350,10 +275,24 @@ pub trait AssertIsIn<I, E> {
     /// use asserting::prelude::*;
     ///
     /// assert_that!("two").is_in(["one", "two", "three"]);
-    /// assert_that!(42).is_in([1, 2, 42, 5, 6]);
+    /// assert_that!(42).is_in([22, 42, 50, 88]);
     ///
+    /// assert_that!("zero").is_not_in(["one", "two", "three"]);
+    /// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
+    /// ```
+    ///
+    /// The assertions [`is_in`] and [`is_not_in`] fail if the expected set of values
+    /// is empty. This restrictive behavior is by design. In the vast majority of
+    /// tests asserting against an empty set results in a "dead test". Asserting
+    /// that a value is in an empty set always fails, while asserting that a value
+    /// is not in an empty set always succeeds. So the assertion result does not
+    /// depend on the actual value. This might not be what we want to assert.
+    ///
+    /// ```
     /// # #[cfg(feature = "panic")]
     /// # {
+    /// use asserting::prelude::*;
+    ///
     /// assert_that_code!(|| {
     ///     assert_that!(42).is_in([]);  // always fails
     /// }).panics_with_message(
@@ -362,35 +301,23 @@ pub trait AssertIsIn<I, E> {
     ///   This would always fail, which is likely a bug in your test setup.
     ///   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
     /// ");
+    ///
+    /// assert_that_code!(|| {
+    ///     assert_that!(42).is_not_in([]);  // always fails
+    /// }).panics_with_message(
+    ///     r"expected 42 to not be in []
+    ///   An assertion using `is_not_in()` was made against an empty collection.
+    ///   This would always succeed, which is likely a bug in your test setup.
+    ///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
+    /// ");
     /// # }
     /// ```
     ///
-    /// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
-    #[track_caller]
-    fn is_in(self, expected_values: I) -> Self;
-
-    /// Verifies that the actual value is in the set of expected values
-    /// with the empty set allowed.
-    ///
-    /// The set of expected values can be given in any type of collection
-    /// that implements the `IntoIterator` trait.
-    ///
-    /// This assertion is basically the same as the [`is_in`] method, but it
-    /// explicitly allows the empty set for the expected values. Asserting
-    /// against an empty set is most likely a "dead test", as the test always
-    /// fails independent of the actual value. So when using this method, make
-    /// sure your test is actually testing something.
-    ///
-    /// If there is no good reason for using this method, stick with the more
-    /// restrictive [`is_in`] method.
-    ///
-    /// # Examples
+    /// If you need the mathematical correct behavior for some specific test, use
+    /// the alternative methods [`is_in_maybe_empty`] and [`is_not_in_maybe_empty`].
     ///
     /// ```
     /// use asserting::prelude::*;
-    ///
-    /// assert_that!("two").is_in_maybe_empty(["one", "two", "three"]);
-    /// assert_that!(42).is_in_maybe_empty([1, 2, 42, 5, 6]);
     ///
     /// # #[cfg(feature = "panic")]
     /// # {
@@ -404,202 +331,186 @@ pub trait AssertIsIn<I, E> {
     ///   which is not in: []
     /// ");
     /// # }
-    /// ```
-    ///
-    /// [`is_in`]: Self::is_in
-    #[track_caller]
-    fn is_in_maybe_empty(self, expected_values: I) -> Self;
-
-    /// Verifies that the actual value is not in the set of expected values.
-    ///
-    /// The set of expected values can be given in any type of collection
-    /// that implements the `IntoIterator` trait.
-    ///
-    /// This assertion fails if the expected set of values is empty. This
-    /// behavior is different from the mathematically correct way. This is by
-    /// design as in the mathematical sense any element is not in the empty set.
-    /// But in the vast majority of tests this would be a "dead test" as the
-    /// assertion always succeeds independent of the actual value. In fact, the
-    /// test does not assert anything about the actual value.
-    ///
-    /// If for some test you need the mathematically correct interpretation, use
-    /// the alternative [`is_not_in_maybe_empty`] method.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!("zero").is_not_in(["one", "two", "three"]);
-    /// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
-    ///
-    /// # #[cfg(feature = "panic")]
-    /// # {
-    /// assert_that_code!(|| {
-    ///     assert_that!(42).is_not_in([]);  // always fails
-    /// }).panics_with_message(
-    ///     r"expected 42 to not be in []
-    ///   An assertion using `is_not_in()` was made against an empty collection.
-    ///   This would always succeed, which is likely a bug in your test setup.
-    ///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
-    /// ");
-    /// # }
-    /// ```
-    ///
-    /// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
-    #[track_caller]
-    fn is_not_in(self, expected_values: I) -> Self;
-
-    /// Verifies that the actual value is not in the set of expected values
-    /// with the empty set allowed.
-    ///
-    /// The set of expected values can be given in any type of collection
-    /// that implements the `IntoIterator` trait.
-    ///
-    /// This assertion is basically the same as the [`is_not_in`] method, but it
-    /// explicitly allows the empty set for the expected values. Asserting
-    /// against an empty set is most likely a "dead test", as the test always
-    /// succeeds independent of the actual value. So when using this method,
-    /// make sure your test is actually testing something.
-    ///
-    /// If there is no good reason for using this method, stick with the more
-    /// restrictive [`is_not_in`] method.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!("zero").is_not_in_maybe_empty(["one", "two", "three"]);
-    /// assert_that!(42).is_not_in_maybe_empty([1, 2, 3, 4, 5, 6]);
     ///
     /// assert_that!(42).is_not_in_maybe_empty([]);  // always succeeds
     /// ```
     ///
+    /// [`is_in`]: Self::is_in
+    /// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
     /// [`is_not_in`]: Self::is_not_in
-    #[track_caller]
-    fn is_not_in_maybe_empty(self, expected_values: I) -> Self;
-}
+    /// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
+    pub trait AssertIsIn<I, E> {
+        /// Verifies that the actual value is in the set of expected values.
+        ///
+        /// The set of expected values can be given in any type of collection
+        /// that implements the `IntoIterator` trait.
+        ///
+        /// If the expected set of values is empty, this assertion always fails
+        /// regardless of the actual value. This is a so-called "dead test" as it
+        /// does not assert anything about the actual value. This might be a bug
+        /// or design flaw of the test case. The failure message of the failing
+        /// assertion gives a hint that this test might not be what you want.
+        ///
+        /// If you explicitly want to allow the empty set for some special test,
+        /// use the alternative [`is_in_maybe_empty`] method.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!("two").is_in(["one", "two", "three"]);
+        /// assert_that!(42).is_in([1, 2, 42, 5, 6]);
+        ///
+        /// # #[cfg(feature = "panic")]
+        /// # {
+        /// assert_that_code!(|| {
+        ///     assert_that!(42).is_in([]);  // always fails
+        /// }).panics_with_message(
+        ///     r"expected 42 to be in []
+        ///   An assertion using `is_in()` was made against an empty collection.
+        ///   This would always fail, which is likely a bug in your test setup.
+        ///   If an empty collection should be allowed in your test, use `is_in_maybe_empty()`.
+        /// ");
+        /// # }
+        /// ```
+        ///
+        /// [`is_in_maybe_empty`]: Self::is_in_maybe_empty
+        #[track_caller]
+        fn is_in(self, expected_values: I) -> Self;
 
-/// Assert approximate equality for floating point numbers or temporal values
-/// like time, date and date-time.
-///
-/// These are comparisons for values that are challenging to compare exactly,
-/// such as floating-point numbers or temporal values. It compares the values
-/// tolerating a small margin of deviation.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-/// # #[cfg(feature = "float-cmp")]
-/// # {
-///
-/// assert_that!(10.0_f32 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
-/// assert_that!(10.0_f64 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
-///
-/// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
-/// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
-/// # }
-/// # #[cfg(feature = "jiff")]
-/// # {
-///
-/// use jiff::{civil::date};
-///
-/// let subject = date(2022, 1, 1)
-///     .at(12, 34, 56, 0)
-///     .in_tz("Europe/Vienna")
-///     .expect("invalid Zoned value");
-///
-/// assert_that(subject).is_close_to_with_margin(
-///     date(2022, 1, 1)
-///         .at(12, 34, 56, 0)
-///         .in_tz("UTC")
-///         .expect("invalid Zoned value"),
-///     60.minutes(),
-/// );
-/// # }
-/// # #[cfg(feature = "time")]
-/// # {
-///
-/// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
-///
-/// let subject = OffsetDateTime::new_in_offset(
-///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
-///     Time::from_hms(12, 34, 56).expect("invalid time value"),
-///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
-/// );
-///
-/// assert_that(subject).is_close_to_with_margin(
-///     OffsetDateTime::new_in_offset(
-///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
-///         Time::from_hms(12, 34, 56).expect("invalid time value"),
-///         UtcOffset::UTC,
-///     ),
-///     60.minutes(),
-/// );
-/// # }
-/// # #[cfg(feature = "chrono")]
-/// # {
-///
-/// use chrono::{TimeDelta, TimeZone, Utc};
-///
-/// let subject =
-///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
-///
-/// assert_that(subject).is_close_to_with_margin(
-///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-///     3.milliseconds(),
-/// );
-/// # }
-/// ```
-///
-/// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
-/// > Support in `asserting` is kept for backwards compatibility only. For
-/// > new code, consider using the `jiff` or `time` crate with the
-/// > corresponding feature in `asserting`.
-#[cfg(any(feature = "float-cmp", feature = "temporal",))]
-#[cfg_attr(docsrs, doc(cfg(any(feature = "float-cmp", feature = "temporal",))))]
-pub trait AssertIsCloseToWithinMargin<E, M> {
-    /// Verifies that the actual value is approximately equal to the expected
-    /// value.
+        /// Verifies that the actual value is in the set of expected values
+        /// with the empty set allowed.
+        ///
+        /// The set of expected values can be given in any type of collection
+        /// that implements the `IntoIterator` trait.
+        ///
+        /// This assertion is basically the same as the [`is_in`] method, but it
+        /// explicitly allows the empty set for the expected values. Asserting
+        /// against an empty set is most likely a "dead test", as the test always
+        /// fails independent of the actual value. So when using this method, make
+        /// sure your test is actually testing something.
+        ///
+        /// If there is no good reason for using this method, stick with the more
+        /// restrictive [`is_in`] method.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!("two").is_in_maybe_empty(["one", "two", "three"]);
+        /// assert_that!(42).is_in_maybe_empty([1, 2, 42, 5, 6]);
+        ///
+        /// # #[cfg(feature = "panic")]
+        /// # {
+        /// assert_that_code!(|| {
+        ///     assert_that!(42)
+        ///         .with_diff_format(DIFF_FORMAT_NO_HIGHLIGHT)
+        ///         .is_in_maybe_empty([]);  // always fails
+        /// }).panics_with_message(
+        ///     r"expected 42 to be in []
+        ///           but was: 42
+        ///   which is not in: []
+        /// ");
+        /// # }
+        /// ```
+        ///
+        /// [`is_in`]: Self::is_in
+        #[track_caller]
+        fn is_in_maybe_empty(self, expected_values: I) -> Self;
+
+        /// Verifies that the actual value is not in the set of expected values.
+        ///
+        /// The set of expected values can be given in any type of collection
+        /// that implements the `IntoIterator` trait.
+        ///
+        /// This assertion fails if the expected set of values is empty. This
+        /// behavior is different from the mathematically correct way. This is by
+        /// design as in the mathematical sense any element is not in the empty set.
+        /// But in the vast majority of tests this would be a "dead test" as the
+        /// assertion always succeeds independent of the actual value. In fact, the
+        /// test does not assert anything about the actual value.
+        ///
+        /// If for some test you need the mathematically correct interpretation, use
+        /// the alternative [`is_not_in_maybe_empty`] method.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!("zero").is_not_in(["one", "two", "three"]);
+        /// assert_that!(42).is_not_in([1, 2, 3, 4, 5, 6]);
+        ///
+        /// # #[cfg(feature = "panic")]
+        /// # {
+        /// assert_that_code!(|| {
+        ///     assert_that!(42).is_not_in([]);  // always fails
+        /// }).panics_with_message(
+        ///     r"expected 42 to not be in []
+        ///   An assertion using `is_not_in()` was made against an empty collection.
+        ///   This would always succeed, which is likely a bug in your test setup.
+        ///   If an empty collection should be allowed in your test, use `is_not_in_maybe_empty()`.
+        /// ");
+        /// # }
+        /// ```
+        ///
+        /// [`is_not_in_maybe_empty`]: Self::is_not_in_maybe_empty
+        #[track_caller]
+        fn is_not_in(self, expected_values: I) -> Self;
+
+        /// Verifies that the actual value is not in the set of expected values
+        /// with the empty set allowed.
+        ///
+        /// The set of expected values can be given in any type of collection
+        /// that implements the `IntoIterator` trait.
+        ///
+        /// This assertion is basically the same as the [`is_not_in`] method, but it
+        /// explicitly allows the empty set for the expected values. Asserting
+        /// against an empty set is most likely a "dead test", as the test always
+        /// succeeds independent of the actual value. So when using this method,
+        /// make sure your test is actually testing something.
+        ///
+        /// If there is no good reason for using this method, stick with the more
+        /// restrictive [`is_not_in`] method.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!("zero").is_not_in_maybe_empty(["one", "two", "three"]);
+        /// assert_that!(42).is_not_in_maybe_empty([1, 2, 3, 4, 5, 6]);
+        ///
+        /// assert_that!(42).is_not_in_maybe_empty([]);  // always succeeds
+        /// ```
+        ///
+        /// [`is_not_in`]: Self::is_not_in
+        #[track_caller]
+        fn is_not_in_maybe_empty(self, expected_values: I) -> Self;
+    }
+
+    /// Assert approximate equality for floating point numbers or temporal values
+    /// like time, date and date-time.
     ///
-    /// It is used to compare values of types that are not guaranteed to be
-    /// equal and are challenging to compare exactly. The most widely used
-    /// candidates are floating point numbers and temporal values.
+    /// These are comparisons for values that are challenging to compare exactly,
+    /// such as floating-point numbers or temporal values. It compares the values
+    /// tolerating a small margin of deviation.
     ///
-    /// # Floating Point Numbers
-    ///
-    /// Floating point numbers are not guaranteed to be equal due to rounding
-    /// errors caused by how they are represented in memory. The margin for
-    /// floats is specified by a tuple of an epsilon and an ULPS value.
+    /// # Examples
     ///
     /// ```
+    /// use asserting::prelude::*;
     /// # #[cfg(feature = "float-cmp")]
     /// # {
-    /// use asserting::prelude::*;
     ///
     /// assert_that!(10.0_f32 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
     /// assert_that!(10.0_f64 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
+    ///
+    /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
+    /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
     /// # }
-    /// ```
-    ///
-    /// The following articles describe the challenges with comparing floating
-    /// point numbers and the meaning of the epsilon and ULPS values:
-    ///
-    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
-    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
-    ///
-    /// # Date and Time Values
-    ///
-    /// Date and time values may vary if they are taken from a clock like the
-    /// system clock or a clock service. The margin for time values is
-    /// specified by a [`TemporalMargin`]. There are methods to conveniently
-    /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`ToTemporalMargin`] for all available methods.
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     /// # #[cfg(feature = "jiff")]
     /// # {
     ///
@@ -657,134 +568,213 @@ pub trait AssertIsCloseToWithinMargin<E, M> {
     /// > Support in `asserting` is kept for backwards compatibility only. For
     /// > new code, consider using the `jiff` or `time` crate with the
     /// > corresponding feature in `asserting`.
-    ///
-    /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
-    /// [`TemporalMargin`]: crate::temporal::TemporalMargin
-    #[track_caller]
-    fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
+    #[cfg(any(feature = "float-cmp", feature = "temporal",))]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = "float-cmp", feature = "temporal",))))]
+    pub trait AssertIsCloseToWithinMargin<E, M> {
+        /// Verifies that the actual value is approximately equal to the expected
+        /// value.
+        ///
+        /// It is used to compare values of types that are not guaranteed to be
+        /// equal and are challenging to compare exactly. The most widely used
+        /// candidates are floating point numbers and temporal values.
+        ///
+        /// # Floating Point Numbers
+        ///
+        /// Floating point numbers are not guaranteed to be equal due to rounding
+        /// errors caused by how they are represented in memory. The margin for
+        /// floats is specified by a tuple of an epsilon and an ULPS value.
+        ///
+        /// ```
+        /// # #[cfg(feature = "float-cmp")]
+        /// # {
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(10.0_f32 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
+        /// assert_that!(10.0_f64 / 3.0).is_close_to_with_margin(3.333, (0.001, 5));
+        /// # }
+        /// ```
+        ///
+        /// The following articles describe the challenges with comparing floating
+        /// point numbers and the meaning of the epsilon and ULPS values:
+        ///
+        /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+        /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+        ///
+        /// # Date and Time Values
+        ///
+        /// Date and time values may vary if they are taken from a clock like the
+        /// system clock or a clock service. The margin for time values is
+        /// specified by a [`TemporalMargin`]. There are methods to conveniently
+        /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
+        /// the extension trait [`ToTemporalMargin`] for all available methods.
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// # #[cfg(feature = "jiff")]
+        /// # {
+        ///
+        /// use jiff::{civil::date};
+        ///
+        /// let subject = date(2022, 1, 1)
+        ///     .at(12, 34, 56, 0)
+        ///     .in_tz("Europe/Vienna")
+        ///     .expect("invalid Zoned value");
+        ///
+        /// assert_that(subject).is_close_to_with_margin(
+        ///     date(2022, 1, 1)
+        ///         .at(12, 34, 56, 0)
+        ///         .in_tz("UTC")
+        ///         .expect("invalid Zoned value"),
+        ///     60.minutes(),
+        /// );
+        /// # }
+        /// # #[cfg(feature = "time")]
+        /// # {
+        ///
+        /// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
+        ///
+        /// let subject = OffsetDateTime::new_in_offset(
+        ///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+        ///     Time::from_hms(12, 34, 56).expect("invalid time value"),
+        ///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+        /// );
+        ///
+        /// assert_that(subject).is_close_to_with_margin(
+        ///     OffsetDateTime::new_in_offset(
+        ///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+        ///         Time::from_hms(12, 34, 56).expect("invalid time value"),
+        ///         UtcOffset::UTC,
+        ///     ),
+        ///     60.minutes(),
+        /// );
+        /// # }
+        /// # #[cfg(feature = "chrono")]
+        /// # {
+        ///
+        /// use chrono::{TimeDelta, TimeZone, Utc};
+        ///
+        /// let subject =
+        ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(3);
+        ///
+        /// assert_that(subject).is_close_to_with_margin(
+        ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        ///     3.milliseconds(),
+        /// );
+        /// # }
+        /// ```
+        ///
+        /// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
+        /// > Support in `asserting` is kept for backwards compatibility only. For
+        /// > new code, consider using the `jiff` or `time` crate with the
+        /// > corresponding feature in `asserting`.
+        ///
+        /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
+        /// [`TemporalMargin`]: crate::temporal::TemporalMargin
+        #[track_caller]
+        fn is_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
 
-    ///
-    /// It is used to compare values of types that are not guaranteed to be
-    /// equal and are challenging to compare exactly. The most widely used
-    /// candidates are floating point numbers and temporal values.
-    ///
-    /// # Floating Point Numbers
-    ///
-    /// Floating point numbers are not guaranteed to be equal due to rounding
-    /// errors caused by how they are represented in memory. The margin for
-    /// floats is specified by a tuple of an epsilon and an ULPS value.
-    ///
-    /// ```
-    /// # #[cfg(feature = "float-cmp")]
-    /// # {
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
-    /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
-    /// # }
-    /// ```
-    ///
-    /// The following articles describe the challenges with comparing floating
-    /// point numbers and the meaning of the epsilon and ULPS values:
-    ///
-    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
-    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
-    ///
-    /// # Date and Time Values
-    ///
-    /// Date and time values may vary if they are taken from a clock like the
-    /// system clock or a clock service. The margin for time values is
-    /// specified by a [`TemporalMargin`]. There are methods to conveniently
-    /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
-    /// the extension trait [`ToTemporalMargin`] for all available methods.
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// # #[cfg(feature = "jiff")]
-    /// # {
-    ///
-    /// use jiff::{civil::date};
-    ///
-    /// let subject = date(2022, 1, 1)
-    ///     .at(12, 34, 56, 0)
-    ///     .in_tz("Europe/Vienna")
-    ///     .expect("invalid Zoned value");
-    ///
-    /// assert_that(subject).is_not_close_to_with_margin(
-    ///     date(2022, 1, 1)
-    ///         .at(12, 34, 56, 0)
-    ///         .in_tz("UTC")
-    ///         .expect("invalid Zoned value"),
-    ///     59.minutes(),
-    /// );
-    /// # }
-    /// # #[cfg(feature = "time")]
-    /// # {
-    ///
-    /// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
-    ///
-    /// let subject = OffsetDateTime::new_in_offset(
-    ///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
-    ///     Time::from_hms(12, 34, 56).expect("invalid time value"),
-    ///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
-    /// );
-    ///
-    /// assert_that(subject).is_not_close_to_with_margin(
-    ///     OffsetDateTime::new_in_offset(
-    ///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
-    ///         Time::from_hms(12, 34, 56).expect("invalid time value"),
-    ///         UtcOffset::UTC,
-    ///     ),
-    ///     59.minutes(),
-    /// );
-    /// # }
-    /// # #[cfg(feature = "chrono")]
-    /// # {
-    ///
-    /// use chrono::{TimeDelta, TimeZone, Utc};
-    ///
-    /// let subject =
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(4);
-    ///
-    /// assert_that(subject).is_not_close_to_with_margin(
-    ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
-    ///     3.milliseconds(),
-    /// );
-    /// # }
-    /// ```
-    ///
-    /// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
-    /// > Support in `asserting` is kept for backwards compatibility only. For
-    /// > new code, consider using the `jiff` or `time` crate with the
-    /// > corresponding feature in `asserting`.
-    ///
-    /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
-    /// [`TemporalMargin`]: crate::temporal::TemporalMargin
-    #[track_caller]
-    fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
-}
+        ///
+        /// It is used to compare values of types that are not guaranteed to be
+        /// equal and are challenging to compare exactly. The most widely used
+        /// candidates are floating point numbers and temporal values.
+        ///
+        /// # Floating Point Numbers
+        ///
+        /// Floating point numbers are not guaranteed to be equal due to rounding
+        /// errors caused by how they are represented in memory. The margin for
+        /// floats is specified by a tuple of an epsilon and an ULPS value.
+        ///
+        /// ```
+        /// # #[cfg(feature = "float-cmp")]
+        /// # {
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(10.0_f32 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
+        /// assert_that!(10.0_f64 / 3.0).is_not_close_to_with_margin(3.333, (0.0001, 5));
+        /// # }
+        /// ```
+        ///
+        /// The following articles describe the challenges with comparing floating
+        /// point numbers and the meaning of the epsilon and ULPS values:
+        ///
+        /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+        /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+        ///
+        /// # Date and Time Values
+        ///
+        /// Date and time values may vary if they are taken from a clock like the
+        /// system clock or a clock service. The margin for time values is
+        /// specified by a [`TemporalMargin`]. There are methods to conveniently
+        /// construct [`TemporalMargin`] values, like `10.milliseconds()`. See
+        /// the extension trait [`ToTemporalMargin`] for all available methods.
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// # #[cfg(feature = "jiff")]
+        /// # {
+        ///
+        /// use jiff::{civil::date};
+        ///
+        /// let subject = date(2022, 1, 1)
+        ///     .at(12, 34, 56, 0)
+        ///     .in_tz("Europe/Vienna")
+        ///     .expect("invalid Zoned value");
+        ///
+        /// assert_that(subject).is_not_close_to_with_margin(
+        ///     date(2022, 1, 1)
+        ///         .at(12, 34, 56, 0)
+        ///         .in_tz("UTC")
+        ///         .expect("invalid Zoned value"),
+        ///     59.minutes(),
+        /// );
+        /// # }
+        /// # #[cfg(feature = "time")]
+        /// # {
+        ///
+        /// use time::{Date, Month, OffsetDateTime, Time, UtcOffset};
+        ///
+        /// let subject = OffsetDateTime::new_in_offset(
+        ///     Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+        ///     Time::from_hms(12, 34, 56).expect("invalid time value"),
+        ///     UtcOffset::from_hms(1, 0, 0).expect("invalid utc offset value"),
+        /// );
+        ///
+        /// assert_that(subject).is_not_close_to_with_margin(
+        ///     OffsetDateTime::new_in_offset(
+        ///         Date::from_calendar_date(2022, Month::January, 1).expect("invalid date value"),
+        ///         Time::from_hms(12, 34, 56).expect("invalid time value"),
+        ///         UtcOffset::UTC,
+        ///     ),
+        ///     59.minutes(),
+        /// );
+        /// # }
+        /// # #[cfg(feature = "chrono")]
+        /// # {
+        ///
+        /// use chrono::{TimeDelta, TimeZone, Utc};
+        ///
+        /// let subject =
+        ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap() + TimeDelta::milliseconds(4);
+        ///
+        /// assert_that(subject).is_not_close_to_with_margin(
+        ///     Utc.with_ymd_and_hms(2022, 1, 1, 12, 34, 56).unwrap(),
+        ///     3.milliseconds(),
+        /// );
+        /// # }
+        /// ```
+        ///
+        /// > **Note:** The `chrono` crate is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)).
+        /// > Support in `asserting` is kept for backwards compatibility only. For
+        /// > new code, consider using the `jiff` or `time` crate with the
+        /// > corresponding feature in `asserting`.
+        ///
+        /// [`ToTemporalMargin`]: crate::temporal::ToTemporalMargin
+        /// [`TemporalMargin`]: crate::temporal::TemporalMargin
+        #[track_caller]
+        fn is_not_close_to_with_margin(self, expected: E, margin: impl Into<M>) -> Self;
+    }
 
-/// Assert approximate equality for floating point numbers.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(5.0_f32 / 2.0).is_close_to(2.5);
-/// assert_that!(10.0_f64 / 8.0).is_close_to(1.25);
-///
-/// assert_that!(5.0_f32 / 2.5).is_not_close_to(2.01);
-/// assert_that!(10.0_f64 / 8.0).is_not_close_to(1.255);
-/// ```
-#[cfg(feature = "float-cmp")]
-#[cfg_attr(docsrs, doc(cfg(feature = "float-cmp")))]
-pub trait AssertIsCloseToWithDefaultMargin<E> {
-    /// Verifies that the actual value is approximately equal to the expected
-    /// value.
-    ///
-    /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
-    /// used.
+    /// Assert approximate equality for floating point numbers.
     ///
     /// # Examples
     ///
@@ -793,252 +783,252 @@ pub trait AssertIsCloseToWithDefaultMargin<E> {
     ///
     /// assert_that!(5.0_f32 / 2.0).is_close_to(2.5);
     /// assert_that!(10.0_f64 / 8.0).is_close_to(1.25);
+    ///
+    /// assert_that!(5.0_f32 / 2.5).is_not_close_to(2.01);
+    /// assert_that!(10.0_f64 / 8.0).is_not_close_to(1.255);
     /// ```
-    ///
-    /// The following articles describe the challenges with comparing floating
-    /// point numbers and the meaning of the epsilon and ULPS values:
-    ///
-    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
-    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
-    #[track_caller]
-    fn is_close_to(self, expected: E) -> Self;
+    #[cfg(feature = "float-cmp")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "float-cmp")))]
+    pub trait AssertIsCloseToWithDefaultMargin<E> {
+        /// Verifies that the actual value is approximately equal to the expected
+        /// value.
+        ///
+        /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
+        /// used.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5.0_f32 / 2.0).is_close_to(2.5);
+        /// assert_that!(10.0_f64 / 8.0).is_close_to(1.25);
+        /// ```
+        ///
+        /// The following articles describe the challenges with comparing floating
+        /// point numbers and the meaning of the epsilon and ULPS values:
+        ///
+        /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+        /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+        #[track_caller]
+        fn is_close_to(self, expected: E) -> Self;
 
-    /// Verifies that the actual value is not approximately equal to the expected
-    /// value.
+        /// Verifies that the actual value is not approximately equal to the expected
+        /// value.
+        ///
+        /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
+        /// used.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(10.0_f32 / 2.0).is_not_close_to(5.01);
+        /// assert_that!(10.0_f64 / 2.0).is_not_close_to(5.01);
+        /// ```
+        ///
+        /// The following articles describe the challenges with comparing floating
+        /// point numbers and the meaning of the epsilon and ULPS values:
+        ///
+        /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+        /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
+        #[track_caller]
+        fn is_not_close_to(self, expected: E) -> Self;
+    }
+
+    /// Assert whether a value is greater than or less than another value, as well
+    /// as at most as big or at least as big as another value.
     ///
-    /// For the approximation, a default margin with 4 * epsilon and 4 * ULPS is
-    /// used.
+    /// These assertions are implemented for all types that implement
+    /// `PartialOrd<E>` with `E` being the type of the expected value the subject
+    /// is being compared to.
     ///
     /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// assert_that!(10.0_f32 / 2.0).is_not_close_to(5.01);
-    /// assert_that!(10.0_f64 / 2.0).is_not_close_to(5.01);
-    /// ```
+    /// let some_result: u16 = 42;
     ///
-    /// The following articles describe the challenges with comparing floating
-    /// point numbers and the meaning of the epsilon and ULPS values:
+    /// assert_that!(some_result).is_at_most(43);
+    /// assert_that!(some_result).is_at_most(42);
+    /// assert_that!(some_result).is_at_least(42);
+    /// assert_that!(some_result).is_at_least(41);
+    /// assert_that!(some_result).is_greater_than(41);
+    /// assert_that!(some_result).is_less_than(43);
     ///
-    /// * [https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/](https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
-    /// * [https://floating-point-gui.de/errors/comparison/](https://floating-point-gui.de/errors/comparison/)
-    #[track_caller]
-    fn is_not_close_to(self, expected: E) -> Self;
-}
-
-/// Assert whether a value is greater than or less than another value, as well
-/// as at most as big or at least as big as another value.
-///
-/// These assertions are implemented for all types that implement
-/// `PartialOrd<E>` with `E` being the type of the expected value the subject
-/// is being compared to.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let some_result: u16 = 42;
-///
-/// assert_that!(some_result).is_at_most(43);
-/// assert_that!(some_result).is_at_most(42);
-/// assert_that!(some_result).is_at_least(42);
-/// assert_that!(some_result).is_at_least(41);
-/// assert_that!(some_result).is_greater_than(41);
-/// assert_that!(some_result).is_less_than(43);
-///
-/// let some_letter: char = 'M';
-///
-/// assert_that!(some_letter).is_before('P');
-/// assert_that!(some_letter).is_after('K');
-/// assert_that!(some_letter).is_between('A', 'Z');
-///
-/// # #[cfg(feature = "time")]
-/// # {
-/// use time::{Date, Month};
-///
-/// let some_date = Date::from_calendar_date(2025, Month::April, 20).expect("invalid date");
-///
-/// assert_that!(some_date).is_before(Date::from_calendar_date(2025, Month::April, 21).expect("invalid date"));
-/// assert_that!(some_date).is_after(Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"));
-/// assert_that!(some_date).is_between(
-///     Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"),
-///     Date::from_calendar_date(2025, Month::April, 21).expect("invalid date")
-/// );
-/// # }
-///```
-pub trait AssertOrder<E> {
-    /// Verifies that the subject is less than some expected value.
+    /// let some_letter: char = 'M';
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(4).is_less_than(5);
-    /// assert_that!(-1).is_less_than(1);
-    /// assert_that!(-2).is_less_than(-1);
-    /// assert_that!(0.5).is_less_than(1.0);
-    /// ```
-    #[track_caller]
-    fn is_less_than(self, expected: E) -> Self;
-
-    /// Verifies that the subject is greater than some expected value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(5).is_greater_than(4);
-    /// assert_that!(1).is_greater_than(-1);
-    /// assert_that!(-1).is_greater_than(-2);
-    /// assert_that!(0.5).is_greater_than(0.1);
-    /// ```
-    #[track_caller]
-    fn is_greater_than(self, expected: E) -> Self;
-
-    /// Verifies that the subject is less than or equal to some expected value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(4).is_at_most(5);
-    /// assert_that!(5).is_at_most(5);
-    /// assert_that!(-2).is_at_most(-1);
-    /// assert_that!(-2).is_at_most(-2);
-    /// assert_that!(0.9).is_at_most(1.0);
-    /// ```
-    #[track_caller]
-    fn is_at_most(self, expected: E) -> Self;
-
-    /// Verifies that the subject is greater than or equal to some expected
-    /// value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(5).is_at_least(4);
-    /// assert_that!(5).is_at_least(5);
-    /// assert_that!(-1).is_at_least(-2);
-    /// assert_that!(-2).is_at_least(-2);
-    /// assert_that!(1.4).is_at_least(1.0);
-    /// ```
-    #[track_caller]
-    fn is_at_least(self, expected: E) -> Self;
-
-    /// Verifies that the subject is before some expected value.
-    ///
-    /// This is equivalent to asserting a subject to be less than the expected
-    /// value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('M').is_before('N');
-    /// assert_that!(4).is_before(5);
-    /// assert_that!(0.8).is_before(1.0);
+    /// assert_that!(some_letter).is_before('P');
+    /// assert_that!(some_letter).is_after('K');
+    /// assert_that!(some_letter).is_between('A', 'Z');
     ///
     /// # #[cfg(feature = "time")]
     /// # {
     /// use time::{Date, Month};
     ///
-    /// assert_that!(Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"))
-    ///     .is_before(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"));
+    /// let some_date = Date::from_calendar_date(2025, Month::April, 20).expect("invalid date");
+    ///
+    /// assert_that!(some_date).is_before(Date::from_calendar_date(2025, Month::April, 21).expect("invalid date"));
+    /// assert_that!(some_date).is_after(Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"));
+    /// assert_that!(some_date).is_between(
+    ///     Date::from_calendar_date(2025, Month::April, 19).expect("invalid date"),
+    ///     Date::from_calendar_date(2025, Month::April, 21).expect("invalid date")
+    /// );
     /// # }
-    /// ```
-    #[track_caller]
-    fn is_before(self, expected: E) -> Self;
+    ///```
+    pub trait AssertOrder<E> {
+        /// Verifies that the subject is less than some expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(4).is_less_than(5);
+        /// assert_that!(-1).is_less_than(1);
+        /// assert_that!(-2).is_less_than(-1);
+        /// assert_that!(0.5).is_less_than(1.0);
+        /// ```
+        #[track_caller]
+        fn is_less_than(self, expected: E) -> Self;
 
-    /// Verifies that the subject is after some expected value.
-    ///
-    /// This is equivalent to asserting a subject to be greater than the
-    /// expected value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('N').is_after('M');
-    /// assert_that!(5).is_after(4);
-    /// assert_that!(1.2).is_after(1.0);
-    ///
-    /// # #[cfg(feature = "time")]
-    /// # {
-    /// use time::{Date, Month};
-    ///
-    /// assert_that!(Date::from_calendar_date(2025, Month::August, 1).expect("invalid date"))
-    ///     .is_after(Date::from_calendar_date(2025, Month::July, 31).expect("invalid date"));
-    /// # }
-    /// ```
-    #[track_caller]
-    fn is_after(self, expected: E) -> Self;
+        /// Verifies that the subject is greater than some expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5).is_greater_than(4);
+        /// assert_that!(1).is_greater_than(-1);
+        /// assert_that!(-1).is_greater_than(-2);
+        /// assert_that!(0.5).is_greater_than(0.1);
+        /// ```
+        #[track_caller]
+        fn is_greater_than(self, expected: E) -> Self;
 
-    /// Verifies that the subject is between a min value and a max value.
-    ///
-    /// Min and max values are included. This is equivalent to asserting a
-    /// subject to be greater than or equal to the min value and to be less than
-    /// or equal to the max value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('B').is_between('A', 'C');
-    /// assert_that!(5).is_between(4, 6);
-    /// assert_that!(1.5).is_between(0.9, 1.8);
-    ///
-    /// # #[cfg(feature = "time")]
-    /// # {
-    /// use time::{Date, Month};
-    ///
-    /// assert_that!(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"))
-    ///     .is_between(
-    ///         Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"),
-    ///         Date::from_calendar_date(2025, Month::June, 2).expect("invalid date"),
-    ///     );
-    /// # }
-    /// ```
-    #[track_caller]
-    fn is_between(self, min: E, max: E) -> Self;
-}
+        /// Verifies that the subject is less than or equal to some expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(4).is_at_most(5);
+        /// assert_that!(5).is_at_most(5);
+        /// assert_that!(-2).is_at_most(-1);
+        /// assert_that!(-2).is_at_most(-2);
+        /// assert_that!(0.9).is_at_most(1.0);
+        /// ```
+        #[track_caller]
+        fn is_at_most(self, expected: E) -> Self;
 
-/// Assert whether a value is within an expected range.
-///
-/// The expected range can be any of range.
-///
-/// These assertions are implemented for all types `T` that implement
-/// `PartialOrd<E>` with `E` being the type of the expected value. And `E` must
-/// implement `PartialOrd<T>`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(7).is_in_range(6..8);
-/// assert_that!(8).is_not_in_range(6..8);
-/// assert_that!(1234).is_in_range(6..);
-/// assert_that!(5).is_not_in_range(6..);
-/// assert_that!(-33).is_in_range(..-1);
-///
-/// assert_that!('M').is_in_range('A'..='Z');
-/// assert_that!('M').is_not_in_range('a'..='z');
-/// assert_that!('k').is_in_range('h'..'n');
-/// assert_that!('r').is_in_range('H'..);
-/// assert_that!('N').is_in_range(..'n');
-/// ```
-pub trait AssertInRange<E, D> {
-    /// Verifies that the subject is within the expected range.
+        /// Verifies that the subject is greater than or equal to some expected
+        /// value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5).is_at_least(4);
+        /// assert_that!(5).is_at_least(5);
+        /// assert_that!(-1).is_at_least(-2);
+        /// assert_that!(-2).is_at_least(-2);
+        /// assert_that!(1.4).is_at_least(1.0);
+        /// ```
+        #[track_caller]
+        fn is_at_least(self, expected: E) -> Self;
+
+        /// Verifies that the subject is before some expected value.
+        ///
+        /// This is equivalent to asserting a subject to be less than the expected
+        /// value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('M').is_before('N');
+        /// assert_that!(4).is_before(5);
+        /// assert_that!(0.8).is_before(1.0);
+        ///
+        /// # #[cfg(feature = "time")]
+        /// # {
+        /// use time::{Date, Month};
+        ///
+        /// assert_that!(Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"))
+        ///     .is_before(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"));
+        /// # }
+        /// ```
+        #[track_caller]
+        fn is_before(self, expected: E) -> Self;
+
+        /// Verifies that the subject is after some expected value.
+        ///
+        /// This is equivalent to asserting a subject to be greater than the
+        /// expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('N').is_after('M');
+        /// assert_that!(5).is_after(4);
+        /// assert_that!(1.2).is_after(1.0);
+        ///
+        /// # #[cfg(feature = "time")]
+        /// # {
+        /// use time::{Date, Month};
+        ///
+        /// assert_that!(Date::from_calendar_date(2025, Month::August, 1).expect("invalid date"))
+        ///     .is_after(Date::from_calendar_date(2025, Month::July, 31).expect("invalid date"));
+        /// # }
+        /// ```
+        #[track_caller]
+        fn is_after(self, expected: E) -> Self;
+
+        /// Verifies that the subject is between a min value and a max value.
+        ///
+        /// Min and max values are included. This is equivalent to asserting a
+        /// subject to be greater than or equal to the min value and to be less than
+        /// or equal to the max value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('B').is_between('A', 'C');
+        /// assert_that!(5).is_between(4, 6);
+        /// assert_that!(1.5).is_between(0.9, 1.8);
+        ///
+        /// # #[cfg(feature = "time")]
+        /// # {
+        /// use time::{Date, Month};
+        ///
+        /// assert_that!(Date::from_calendar_date(2025, Month::June, 1).expect("invalid date"))
+        ///     .is_between(
+        ///         Date::from_calendar_date(2025, Month::May, 30).expect("invalid date"),
+        ///         Date::from_calendar_date(2025, Month::June, 2).expect("invalid date"),
+        ///     );
+        /// # }
+        /// ```
+        #[track_caller]
+        fn is_between(self, min: E, max: E) -> Self;
+    }
+
+    /// Assert whether a value is within an expected range.
+    ///
+    /// The expected range can be any of range.
+    ///
+    /// These assertions are implemented for all types `T` that implement
+    /// `PartialOrd<E>` with `E` being the type of the expected value. And `E` must
+    /// implement `PartialOrd<T>`.
     ///
     /// # Examples
     ///
@@ -1046,160 +1036,167 @@ pub trait AssertInRange<E, D> {
     /// use asserting::prelude::*;
     ///
     /// assert_that!(7).is_in_range(6..8);
-    /// assert_that!(7).is_in_range(7..8);
-    /// assert_that!(7).is_in_range(6..=7);
-    /// assert_that!(123).is_in_range(10..);
-    /// assert_that!(-33).is_in_range(..-10);
+    /// assert_that!(8).is_not_in_range(6..8);
+    /// assert_that!(1234).is_in_range(6..);
+    /// assert_that!(5).is_not_in_range(6..);
+    /// assert_that!(-33).is_in_range(..-1);
     ///
-    /// assert_that!(0.5).is_in_range(0.0..1.0);
-    ///
-    /// assert_that!('K').is_in_range('A'..'M');
-    /// assert_that!('g').is_in_range('a'..='z');
-    /// assert_that!('!').is_in_range(..'A');
-    /// assert_that!('~').is_in_range('z'..);
+    /// assert_that!('M').is_in_range('A'..='Z');
+    /// assert_that!('M').is_not_in_range('a'..='z');
+    /// assert_that!('k').is_in_range('h'..'n');
+    /// assert_that!('r').is_in_range('H'..);
+    /// assert_that!('N').is_in_range(..'n');
     /// ```
-    #[track_caller]
-    fn is_in_range<R>(self, range: R) -> Self
-    where
-        R: RangeBounds<E>,
-        D: Represent<R>;
+    pub trait AssertInRange<E, D> {
+        /// Verifies that the subject is within the expected range.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(7).is_in_range(6..8);
+        /// assert_that!(7).is_in_range(7..8);
+        /// assert_that!(7).is_in_range(6..=7);
+        /// assert_that!(123).is_in_range(10..);
+        /// assert_that!(-33).is_in_range(..-10);
+        ///
+        /// assert_that!(0.5).is_in_range(0.0..1.0);
+        ///
+        /// assert_that!('K').is_in_range('A'..'M');
+        /// assert_that!('g').is_in_range('a'..='z');
+        /// assert_that!('!').is_in_range(..'A');
+        /// assert_that!('~').is_in_range('z'..);
+        /// ```
+        #[track_caller]
+        fn is_in_range<R>(self, range: R) -> Self
+        where
+            R: RangeBounds<E>,
+            D: Represent<R>;
 
-    /// Verifies that the subject is not within the expected range.
+        /// Verifies that the subject is not within the expected range.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(10).is_not_in_range(1..10);
+        /// assert_that!(10).is_not_in_range(1..=9);
+        ///
+        /// assert_that!(1.0).is_not_in_range(0.0..1.0);
+        ///
+        /// assert_that!('C').is_not_in_range('A'..'C');
+        /// assert_that!('D').is_not_in_range('A'..='C');
+        /// assert_that!('b').is_not_in_range('A'..='Z');
+        /// ```
+        #[track_caller]
+        fn is_not_in_range<R>(self, range: R) -> Self
+        where
+            R: RangeBounds<E>,
+            D: Represent<R>;
+    }
+
+    /// Assert whether a numeric value is negative or positive.
     ///
     /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// assert_that!(10).is_not_in_range(1..10);
-    /// assert_that!(10).is_not_in_range(1..=9);
-    ///
-    /// assert_that!(1.0).is_not_in_range(0.0..1.0);
-    ///
-    /// assert_that!('C').is_not_in_range('A'..'C');
-    /// assert_that!('D').is_not_in_range('A'..='C');
-    /// assert_that!('b').is_not_in_range('A'..='Z');
-    /// ```
-    #[track_caller]
-    fn is_not_in_range<R>(self, range: R) -> Self
-    where
-        R: RangeBounds<E>,
-        D: Represent<R>;
-}
-
-/// Assert whether a numeric value is negative or positive.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(-42).is_negative();
-/// assert_that!(42).is_positive();
-/// assert_that!(0).is_not_negative();
-/// assert_that!(1).is_not_negative();
-/// assert_that!(0).is_not_positive();
-/// assert_that!(-1).is_not_positive();
-///
-/// assert_that!(-0.1).is_negative();
-/// assert_that!(0.1).is_positive();
-/// assert_that!(0.0).is_not_negative();
-/// assert_that!(0.1).is_not_negative();
-/// assert_that!(0.0).is_not_positive();
-/// assert_that!(-0.1).is_not_positive();
-/// ```
-pub trait AssertSignum {
-    /// Verifies that the subject is a negative number.
-    ///
-    /// This is equivalent to asserting that a number is less than 0.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(-5).is_negative();
-    /// assert_that!(-0.9).is_negative();
-    /// ```
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(0).is_negative();
-    /// ```
-    #[track_caller]
-    fn is_negative(self) -> Self;
-
-    /// Verifies that the subject is a non-negative number.
-    ///
-    /// This is equivalent to asserting that a number is greater than or equal
-    /// to 0.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(5).is_not_negative();
-    /// assert_that!(1.3).is_not_negative();
+    /// assert_that!(-42).is_negative();
+    /// assert_that!(42).is_positive();
     /// assert_that!(0).is_not_negative();
-    /// ```
-    #[track_caller]
-    fn is_not_negative(self) -> Self;
-
-    /// Verifies that the subject is a positive number.
-    ///
-    /// This is equivalent to asserting that a number is greater than 0.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(5).is_positive();
-    /// assert_that!(2.7).is_positive();
-    /// ```
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(0).is_positive();
-    /// ```
-    #[track_caller]
-    fn is_positive(self) -> Self;
-
-    /// Verifies that the subject is a non-positive number.
-    ///
-    /// This is equivalent to asserting that a number is less than or equal to
-    /// 0.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(-5).is_not_positive();
-    /// assert_that!(-0.9).is_not_positive();
+    /// assert_that!(1).is_not_negative();
     /// assert_that!(0).is_not_positive();
+    /// assert_that!(-1).is_not_positive();
+    ///
+    /// assert_that!(-0.1).is_negative();
+    /// assert_that!(0.1).is_positive();
+    /// assert_that!(0.0).is_not_negative();
+    /// assert_that!(0.1).is_not_negative();
+    /// assert_that!(0.0).is_not_positive();
+    /// assert_that!(-0.1).is_not_positive();
     /// ```
-    #[track_caller]
-    fn is_not_positive(self) -> Self;
-}
+    pub trait AssertSignum {
+        /// Verifies that the subject is a negative number.
+        ///
+        /// This is equivalent to asserting that a number is less than 0.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(-5).is_negative();
+        /// assert_that!(-0.9).is_negative();
+        /// ```
+        ///
+        /// ```should_panic
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(0).is_negative();
+        /// ```
+        #[track_caller]
+        fn is_negative(self) -> Self;
 
-/// Assert the additive and multiplicative identity of a number.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(0).is_zero();
-/// assert_that!(1).is_one();
-/// assert_that!(0.0).is_zero();
-/// assert_that!(1.0).is_one();
-/// ```
-pub trait AssertNumericIdentity {
-    /// Verifies whether the subject is the additive identity (zero).
+        /// Verifies that the subject is a non-negative number.
+        ///
+        /// This is equivalent to asserting that a number is greater than or equal
+        /// to 0.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5).is_not_negative();
+        /// assert_that!(1.3).is_not_negative();
+        /// assert_that!(0).is_not_negative();
+        /// ```
+        #[track_caller]
+        fn is_not_negative(self) -> Self;
+
+        /// Verifies that the subject is a positive number.
+        ///
+        /// This is equivalent to asserting that a number is greater than 0.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(5).is_positive();
+        /// assert_that!(2.7).is_positive();
+        /// ```
+        ///
+        /// ```should_panic
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(0).is_positive();
+        /// ```
+        #[track_caller]
+        fn is_positive(self) -> Self;
+
+        /// Verifies that the subject is a non-positive number.
+        ///
+        /// This is equivalent to asserting that a number is less than or equal to
+        /// 0.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(-5).is_not_positive();
+        /// assert_that!(-0.9).is_not_positive();
+        /// assert_that!(0).is_not_positive();
+        /// ```
+        #[track_caller]
+        fn is_not_positive(self) -> Self;
+    }
+
+    /// Assert the additive and multiplicative identity of a number.
     ///
     /// # Examples
     ///
@@ -1207,109 +1204,96 @@ pub trait AssertNumericIdentity {
     /// use asserting::prelude::*;
     ///
     /// assert_that!(0).is_zero();
-    /// assert_that!(0.0).is_zero();
-    /// ```
-    #[track_caller]
-    fn is_zero(self) -> Self;
-
-    /// Verifies whether the subject is the multiplicative identity (one).
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
     /// assert_that!(1).is_one();
+    /// assert_that!(0.0).is_zero();
     /// assert_that!(1.0).is_one();
-    #[track_caller]
-    fn is_one(self) -> Self;
-}
+    /// ```
+    pub trait AssertNumericIdentity {
+        /// Verifies whether the subject is the additive identity (zero).
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(0).is_zero();
+        /// assert_that!(0.0).is_zero();
+        /// ```
+        #[track_caller]
+        fn is_zero(self) -> Self;
 
-/// Assert whether a numeric value is infinite or finite.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(0.1).is_finite();
-/// assert_that!(0.0).is_finite();
-/// assert_that!(f32::INFINITY).is_infinite();
-/// assert_that!(f32::NEG_INFINITY).is_infinite();
-/// assert_that!(f64::INFINITY).is_infinite();
-/// assert_that!(f64::NEG_INFINITY).is_infinite();
-/// ```
-///
-/// Assert negative and positive infinity:
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(f64::INFINITY).is_positive().is_infinite();
-/// assert_that!(f64::NEG_INFINITY).is_negative().is_infinite();
-/// ```
-pub trait AssertInfinity {
-    /// Verifies that the subject is an infinite number.
+        /// Verifies whether the subject is the multiplicative identity (one).
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(1).is_one();
+        /// assert_that!(1.0).is_one();
+        #[track_caller]
+        fn is_one(self) -> Self;
+    }
+
+    /// Assert whether a numeric value is infinite or finite.
     ///
     /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
+    /// assert_that!(0.1).is_finite();
+    /// assert_that!(0.0).is_finite();
     /// assert_that!(f32::INFINITY).is_infinite();
+    /// assert_that!(f32::NEG_INFINITY).is_infinite();
     /// assert_that!(f64::INFINITY).is_infinite();
+    /// assert_that!(f64::NEG_INFINITY).is_infinite();
+    /// ```
     ///
-    /// assert_that!(f32::INFINITY).is_positive().is_infinite();
-    /// assert_that!(f32::NEG_INFINITY).is_negative().is_infinite();
+    /// Assert negative and positive infinity:
+    ///
+    /// ```
+    /// use asserting::prelude::*;
     ///
     /// assert_that!(f64::INFINITY).is_positive().is_infinite();
     /// assert_that!(f64::NEG_INFINITY).is_negative().is_infinite();
     /// ```
-    #[track_caller]
-    fn is_infinite(self) -> Self;
+    pub trait AssertInfinity {
+        /// Verifies that the subject is an infinite number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(f32::INFINITY).is_infinite();
+        /// assert_that!(f64::INFINITY).is_infinite();
+        ///
+        /// assert_that!(f32::INFINITY).is_positive().is_infinite();
+        /// assert_that!(f32::NEG_INFINITY).is_negative().is_infinite();
+        ///
+        /// assert_that!(f64::INFINITY).is_positive().is_infinite();
+        /// assert_that!(f64::NEG_INFINITY).is_negative().is_infinite();
+        /// ```
+        #[track_caller]
+        fn is_infinite(self) -> Self;
 
-    /// Verifies that the subject is a finite number.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(2.96).is_finite();
-    /// assert_that!(0.0).is_finite();
-    /// assert_that!(-123.45).is_finite();
-    /// ```
-    #[track_caller]
-    fn is_finite(self) -> Self;
-}
+        /// Verifies that the subject is a finite number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(2.96).is_finite();
+        /// assert_that!(0.0).is_finite();
+        /// assert_that!(-123.45).is_finite();
+        /// ```
+        #[track_caller]
+        fn is_finite(self) -> Self;
+    }
 
-/// Assert whether a numeric value is not a number.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!(0.1).is_a_number();
-/// assert_that!(0.0).is_a_number();
-/// assert_that!(f32::NAN).is_not_a_number();
-/// assert_that!(f64::NAN).is_not_a_number();
-/// ```
-pub trait AssertNotANumber {
-    /// Verifies that the subject is not a number.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!(f32::NAN).is_not_a_number();
-    /// assert_that!(f64::NAN).is_not_a_number();
-    /// ```
-    #[track_caller]
-    fn is_not_a_number(self) -> Self;
-
-    /// Verifies that the subject is a number.
+    /// Assert whether a numeric value is not a number.
     ///
     /// # Examples
     ///
@@ -1318,164 +1302,175 @@ pub trait AssertNotANumber {
     ///
     /// assert_that!(0.1).is_a_number();
     /// assert_that!(0.0).is_a_number();
-    /// assert_that!(-0.1).is_a_number();
+    /// assert_that!(f32::NAN).is_not_a_number();
+    /// assert_that!(f64::NAN).is_not_a_number();
     /// ```
-    #[track_caller]
-    fn is_a_number(self) -> Self;
-}
+    pub trait AssertNotANumber {
+        /// Verifies that the subject is not a number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(f32::NAN).is_not_a_number();
+        /// assert_that!(f64::NAN).is_not_a_number();
+        /// ```
+        #[track_caller]
+        fn is_not_a_number(self) -> Self;
 
-/// Assert decimal number specific properties.
-pub trait AssertDecimalNumber {
-    /// Verifies the scale of a decimal number.
-    ///
-    /// It compares the scale, the total number of digits to the right of the
-    /// decimal point (including insignificant leading zeros), to the expected
-    /// scale.
-    ///
-    /// # Examples
-    ///
-    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "bigdecimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "bigdecimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use bigdecimal::BigDecimal;
-    ///
-    /// let subject: BigDecimal = "42.0839".parse().unwrap();
-    /// assert_that!(subject).has_scale_of(4);
-    ///
-    /// let subject: BigDecimal = "1.053700".parse().unwrap();
-    /// assert_that!(&subject).has_scale_of(6);
-    /// assert_that!(subject.normalized()).has_scale_of(4);
-    /// # }
-    /// ```
-    ///
-    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "rust-decimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "rust-decimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use rust_decimal::Decimal;
-    ///
-    /// let subject: Decimal = "42.0839".parse().unwrap();
-    /// assert_that!(subject).has_scale_of(4);
-    ///
-    /// let subject: Decimal = "1.053700".parse().unwrap();
-    /// assert_that!(subject).has_scale_of(6);
-    /// assert_that!(subject.normalize()).has_scale_of(4);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_scale_of(self, expected_scale: i64) -> Self;
+        /// Verifies that the subject is a number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(0.1).is_a_number();
+        /// assert_that!(0.0).is_a_number();
+        /// assert_that!(-0.1).is_a_number();
+        /// ```
+        #[track_caller]
+        fn is_a_number(self) -> Self;
+    }
 
-    /// Verifies the precision of a decimal number.
-    ///
-    /// It compares the precision, the total number of digits in the non-scaled
-    /// integer representation, to the expected precision.
-    ///
-    /// # Examples
-    ///
-    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "bigdecimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "bigdecimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use bigdecimal::BigDecimal;
-    ///
-    /// let subject: BigDecimal = "42.0839".parse().unwrap();
-    ///
-    /// assert_that!(subject).has_precision_of(6);
-    /// # }
-    /// ```
-    ///
-    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "rust-decimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "rust-decimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use rust_decimal::Decimal;
-    ///
-    /// let subject: Decimal = "42.083916".parse().unwrap();
-    /// assert_that!(subject).has_precision_of(29);
-    ///
-    /// let subject: Decimal = "1.05".parse().unwrap();
-    /// assert_that!(subject).has_precision_of(29);
-    /// # }
-    /// ```
-    ///
-    /// Note: `rust_decimal::Decimal` is a fixed precision decimal number. The
-    /// actual precision is always 29.
-    #[track_caller]
-    fn has_precision_of(self, expected_precision: u64) -> Self;
+    /// Assert decimal number specific properties.
+    pub trait AssertDecimalNumber {
+        /// Verifies the scale of a decimal number.
+        ///
+        /// It compares the scale, the total number of digits to the right of the
+        /// decimal point (including insignificant leading zeros), to the expected
+        /// scale.
+        ///
+        /// # Examples
+        ///
+        /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "bigdecimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "bigdecimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use bigdecimal::BigDecimal;
+        ///
+        /// let subject: BigDecimal = "42.0839".parse().unwrap();
+        /// assert_that!(subject).has_scale_of(4);
+        ///
+        /// let subject: BigDecimal = "1.053700".parse().unwrap();
+        /// assert_that!(&subject).has_scale_of(6);
+        /// assert_that!(subject.normalized()).has_scale_of(4);
+        /// # }
+        /// ```
+        ///
+        /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "rust-decimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "rust-decimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use rust_decimal::Decimal;
+        ///
+        /// let subject: Decimal = "42.0839".parse().unwrap();
+        /// assert_that!(subject).has_scale_of(4);
+        ///
+        /// let subject: Decimal = "1.053700".parse().unwrap();
+        /// assert_that!(subject).has_scale_of(6);
+        /// assert_that!(subject.normalize()).has_scale_of(4);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_scale_of(self, expected_scale: i64) -> Self;
 
-    /// Verifies that a decimal number has zero fractional digits (is equivalent
-    /// to an integer).
-    ///
-    /// # Examples
-    ///
-    /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "bigdecimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "bigdecimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use bigdecimal::BigDecimal;
-    ///
-    /// let subject: BigDecimal = "14_752.0".parse().unwrap();
-    ///
-    /// assert_that!(subject).is_integer();
-    /// # }
-    /// ```
-    ///
-    /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "rust-decimal"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "rust-decimal")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use rust_decimal::Decimal;
-    ///
-    /// let subject: Decimal = "14_752.0".parse().unwrap();
-    ///
-    /// assert_that!(subject).is_integer();
-    /// # }
-    /// ```
-    #[track_caller]
-    fn is_integer(self) -> Self;
-}
+        /// Verifies the precision of a decimal number.
+        ///
+        /// It compares the precision, the total number of digits in the non-scaled
+        /// integer representation, to the expected precision.
+        ///
+        /// # Examples
+        ///
+        /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "bigdecimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "bigdecimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use bigdecimal::BigDecimal;
+        ///
+        /// let subject: BigDecimal = "42.0839".parse().unwrap();
+        ///
+        /// assert_that!(subject).has_precision_of(6);
+        /// # }
+        /// ```
+        ///
+        /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "rust-decimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "rust-decimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use rust_decimal::Decimal;
+        ///
+        /// let subject: Decimal = "42.083916".parse().unwrap();
+        /// assert_that!(subject).has_precision_of(29);
+        ///
+        /// let subject: Decimal = "1.05".parse().unwrap();
+        /// assert_that!(subject).has_precision_of(29);
+        /// # }
+        /// ```
+        ///
+        /// Note: `rust_decimal::Decimal` is a fixed precision decimal number. The
+        /// actual precision is always 29.
+        #[track_caller]
+        fn has_precision_of(self, expected_precision: u64) -> Self;
 
-/// Assert whether some value or expression is true or false.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = 42 > 41;
-/// assert_that!(subject).is_true();
-///
-/// assert_that!(12 == 12).is_true();
-///
-/// assert_that!(42 < 42).is_false();
-/// ```
-pub trait AssertBoolean {
-    /// Verifies that the subject is true.
+        /// Verifies that a decimal number has zero fractional digits (is equivalent
+        /// to an integer).
+        ///
+        /// # Examples
+        ///
+        /// For `bigdecimal::BigDecimal` (requires crate feature `bigdecimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "bigdecimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "bigdecimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use bigdecimal::BigDecimal;
+        ///
+        /// let subject: BigDecimal = "14_752.0".parse().unwrap();
+        ///
+        /// assert_that!(subject).is_integer();
+        /// # }
+        /// ```
+        ///
+        /// For `rust_decimal::Decimal` (requires crate feature `rust-decimal`):
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "rust-decimal"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "rust-decimal")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use rust_decimal::Decimal;
+        ///
+        /// let subject: Decimal = "14_752.0".parse().unwrap();
+        ///
+        /// assert_that!(subject).is_integer();
+        /// # }
+        /// ```
+        #[track_caller]
+        fn is_integer(self) -> Self;
+    }
+
+    /// Assert whether some value or expression is true or false.
     ///
     /// # Examples
     ///
@@ -1487,62 +1482,45 @@ pub trait AssertBoolean {
     ///
     /// assert_that!(12 == 12).is_true();
     ///
-    /// assert_that!(41 < 42).is_true();
-    /// ```
-    #[track_caller]
-    fn is_true(self) -> Self;
-
-    /// Verifies that the subject is false.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = 42 > 43;
-    /// assert_that!(subject).is_false();
-    ///
-    /// assert_that!(12 == 13).is_false();
-    ///
     /// assert_that!(42 < 42).is_false();
     /// ```
-    #[track_caller]
-    fn is_false(self) -> Self;
-}
+    pub trait AssertBoolean {
+        /// Verifies that the subject is true.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = 42 > 41;
+        /// assert_that!(subject).is_true();
+        ///
+        /// assert_that!(12 == 12).is_true();
+        ///
+        /// assert_that!(41 < 42).is_true();
+        /// ```
+        #[track_caller]
+        fn is_true(self) -> Self;
 
-/// Assert properties or classifications of a character.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that!('b').is_lowercase();
-/// assert_that!('G').is_uppercase();
-/// assert_that!('H').is_alphabetic();
-/// assert_that!('z').is_alphanumeric();
-/// assert_that!('9').is_alphanumeric();
-/// assert_that!('7').is_digit(8);
-/// assert_that!('9').is_digit(10);
-/// assert_that!('F').is_digit(16);
-/// assert_that!('\t').is_whitespace();
-/// assert_that!('\u{1b}').is_control_char();
-/// assert_that!('@').is_ascii();
-/// ```
-///
-/// To assert ASCII uppercase or lowercase, we combine the assertions `is_ascii`
-/// and `is_uppercase` or `is_lowercase` in chained assertions.
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// assert_that('c').is_ascii().is_lowercase();
-/// assert_that('M').is_ascii().is_uppercase();
-/// assert_that('a').is_ascii().is_alphabetic();
-/// assert_that('\t').is_ascii().is_control_char();
-/// ```
-pub trait AssertChar {
-    /// Verify that a character is lowercase.
+        /// Verifies that the subject is false.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = 42 > 43;
+        /// assert_that!(subject).is_false();
+        ///
+        /// assert_that!(12 == 13).is_false();
+        ///
+        /// assert_that!(42 < 42).is_false();
+        /// ```
+        #[track_caller]
+        fn is_false(self) -> Self;
+    }
+
+    /// Assert properties or classifications of a character.
     ///
     /// # Examples
     ///
@@ -1550,165 +1528,148 @@ pub trait AssertChar {
     /// use asserting::prelude::*;
     ///
     /// assert_that!('b').is_lowercase();
-    /// assert_that!('n').is_lowercase();
-    /// ```
-    #[track_caller]
-    fn is_lowercase(self) -> Self;
-
-    /// Verify that a character is uppercase.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
     /// assert_that!('G').is_uppercase();
-    /// assert_that!('N').is_uppercase();
-    /// ```
-    #[track_caller]
-    fn is_uppercase(self) -> Self;
-
-    /// Verify that a character is an ASCII character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('a').is_ascii();
-    /// assert_that!('5').is_ascii();
-    /// assert_that!('#').is_ascii();
-    /// assert_that!('@').is_ascii();
-    /// ```
-    #[track_caller]
-    fn is_ascii(self) -> Self;
-
-    /// Verify that a character is an alphabetic character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('b').is_alphabetic();
-    /// assert_that!('Z').is_alphabetic();
-    /// ```
-    #[track_caller]
-    fn is_alphabetic(self) -> Self;
-
-    /// Verify that a character is an alphabetic character or a digit.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
+    /// assert_that!('H').is_alphabetic();
     /// assert_that!('z').is_alphanumeric();
     /// assert_that!('9').is_alphanumeric();
-    /// ```
-    #[track_caller]
-    fn is_alphanumeric(self) -> Self;
-
-    /// Verify that a character is a control character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// assert_that!('\t').is_control_char();
-    /// assert_that!('\u{1b}').is_control_char();
-    /// ```
-    #[track_caller]
-    fn is_control_char(self) -> Self;
-
-    /// Verify that a character is a digit within the given radix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
     /// assert_that!('7').is_digit(8);
     /// assert_that!('9').is_digit(10);
     /// assert_that!('F').is_digit(16);
+    /// assert_that!('\t').is_whitespace();
+    /// assert_that!('\u{1b}').is_control_char();
+    /// assert_that!('@').is_ascii();
     /// ```
-    #[track_caller]
-    fn is_digit(self, radix: u32) -> Self;
-
-    /// Verify that a character is whitespace.
     ///
-    /// # Examples
+    /// To assert ASCII uppercase or lowercase, we combine the assertions `is_ascii`
+    /// and `is_uppercase` or `is_lowercase` in chained assertions.
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
-    /// assert_that!(' ').is_whitespace();
-    /// assert_that!('\t').is_whitespace();
+    /// assert_that('c').is_ascii().is_lowercase();
+    /// assert_that('M').is_ascii().is_uppercase();
+    /// assert_that('a').is_ascii().is_alphabetic();
+    /// assert_that('\t').is_ascii().is_control_char();
     /// ```
-    #[track_caller]
-    fn is_whitespace(self) -> Self;
-}
+    pub trait AssertChar {
+        /// Verify that a character is lowercase.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('b').is_lowercase();
+        /// assert_that!('n').is_lowercase();
+        /// ```
+        #[track_caller]
+        fn is_lowercase(self) -> Self;
 
-/// Assert whether a string, collection or iterator is empty or not.
-///
-/// These assertions are implemented for all types `T` that implement the
-/// trait [`IsEmptyProperty`](crate::properties::IsEmptyProperty). This
-/// property trait is implemented for string like types and collection like
-/// types of the `std` lib. For example:
-///
-/// * `String`, `&str`, `OsString`, `CString`, etc.
-/// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
-/// * `HashMap`, `HashSet`, `BTreeSet`, etc.
-///
-/// # Examples
-///
-/// ```
-/// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
-/// use asserting::prelude::*;
-///
-/// let some_string = String::new();
-/// assert_that!(some_string).is_empty();
-///
-/// let some_str = "ad praesent aliqua qui";
-/// assert_that!(some_str).is_not_empty();
-///
-/// let some_vec: Vec<String> = vec![];
-/// assert_that!(some_vec).is_empty();
-///
-/// let some_array = [12, 24, 36, 48];
-/// assert_that!(some_array).is_not_empty();
-///
-/// let some_slice: &[_] = &['a', 'b', 'c'][..];
-/// assert_that!(some_slice).is_not_empty();
-///
-/// let some_btree_set = BTreeSet::<i64>::new();
-/// assert_that!(&some_btree_set).is_empty();
-///
-/// let some_dequeue = VecDeque::<String>::new();
-/// assert_that!(some_dequeue).is_empty();
-/// ```
-///
-/// with crate feature `std` enabled:
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {
-/// # }
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use std::collections::{HashMap, HashSet};
-/// use asserting::prelude::*;
-///
-/// let some_set: HashSet<_> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-/// assert_that!(&some_set).is_not_empty();
-///
-/// let some_map: HashMap<String, usize> = HashMap::new();
-/// assert_that!(some_map).is_empty();
-/// # }
-/// ```
-pub trait AssertEmptiness {
-    /// Verifies that the subject is empty.
+        /// Verify that a character is uppercase.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('G').is_uppercase();
+        /// assert_that!('N').is_uppercase();
+        /// ```
+        #[track_caller]
+        fn is_uppercase(self) -> Self;
+
+        /// Verify that a character is an ASCII character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('a').is_ascii();
+        /// assert_that!('5').is_ascii();
+        /// assert_that!('#').is_ascii();
+        /// assert_that!('@').is_ascii();
+        /// ```
+        #[track_caller]
+        fn is_ascii(self) -> Self;
+
+        /// Verify that a character is an alphabetic character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('b').is_alphabetic();
+        /// assert_that!('Z').is_alphabetic();
+        /// ```
+        #[track_caller]
+        fn is_alphabetic(self) -> Self;
+
+        /// Verify that a character is an alphabetic character or a digit.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('z').is_alphanumeric();
+        /// assert_that!('9').is_alphanumeric();
+        /// ```
+        #[track_caller]
+        fn is_alphanumeric(self) -> Self;
+
+        /// Verify that a character is a control character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('\t').is_control_char();
+        /// assert_that!('\u{1b}').is_control_char();
+        /// ```
+        #[track_caller]
+        fn is_control_char(self) -> Self;
+
+        /// Verify that a character is a digit within the given radix.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!('7').is_digit(8);
+        /// assert_that!('9').is_digit(10);
+        /// assert_that!('F').is_digit(16);
+        /// ```
+        #[track_caller]
+        fn is_digit(self, radix: u32) -> Self;
+
+        /// Verify that a character is whitespace.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that!(' ').is_whitespace();
+        /// assert_that!('\t').is_whitespace();
+        /// ```
+        #[track_caller]
+        fn is_whitespace(self) -> Self;
+    }
+
+    /// Assert whether a string, collection or iterator is empty or not.
+    ///
+    /// These assertions are implemented for all types `T` that implement the
+    /// trait [`IsEmptyProperty`](crate::properties::IsEmptyProperty). This
+    /// property trait is implemented for string like types and collection like
+    /// types of the `std` lib. For example:
+    ///
+    /// * `String`, `&str`, `OsString`, `CString`, etc.
+    /// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
+    /// * `HashMap`, `HashSet`, `BTreeSet`, etc.
     ///
     /// # Examples
     ///
@@ -1719,14 +1680,17 @@ pub trait AssertEmptiness {
     /// let some_string = String::new();
     /// assert_that!(some_string).is_empty();
     ///
+    /// let some_str = "ad praesent aliqua qui";
+    /// assert_that!(some_str).is_not_empty();
+    ///
     /// let some_vec: Vec<String> = vec![];
     /// assert_that!(some_vec).is_empty();
     ///
-    /// let some_array: [char; 0] = [];
-    /// assert_that!(some_array).is_empty();
+    /// let some_array = [12, 24, 36, 48];
+    /// assert_that!(some_array).is_not_empty();
     ///
-    /// let some_slice: &[char] = &[][..];
-    /// assert_that!(some_slice).is_empty();
+    /// let some_slice: &[_] = &['a', 'b', 'c'][..];
+    /// assert_that!(some_slice).is_not_empty();
     ///
     /// let some_btree_set = BTreeSet::<i64>::new();
     /// assert_that!(&some_btree_set).is_empty();
@@ -1734,105 +1698,89 @@ pub trait AssertEmptiness {
     /// let some_dequeue = VecDeque::<String>::new();
     /// assert_that!(some_dequeue).is_empty();
     /// ```
-    #[track_caller]
-    fn is_empty(self) -> Self;
-
-    /// Verifies that the subject is not empty.
     ///
-    /// # Examples
+    /// with crate feature `std` enabled:
     ///
     /// ```
-    /// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+    /// # #[cfg(not(feature = "std"))]
+    /// # fn main() {
+    /// # }
+    /// # #[cfg(feature = "std")]
+    /// # fn main() {
+    /// use std::collections::{HashMap, HashSet};
     /// use asserting::prelude::*;
     ///
-    /// let some_str = "ad praesent aliqua qui";
-    /// assert_that!(some_str).is_not_empty();
+    /// let some_set: HashSet<_> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+    /// assert_that!(&some_set).is_not_empty();
     ///
-    /// let some_vec = vec![1, 2, 3];
-    /// assert_that!(some_vec).is_not_empty();
-    ///
-    /// let some_array = [12, 24, 36, 48];
-    /// assert_that!(some_array).is_not_empty();
-    ///
-    /// let some_slice: &[_] = &['a', 'b', 'c'][..];
-    /// assert_that!(some_slice).is_not_empty();
+    /// let some_map: HashMap<String, usize> = HashMap::new();
+    /// assert_that!(some_map).is_empty();
+    /// # }
     /// ```
-    #[track_caller]
-    fn is_not_empty(self) -> Self;
-}
+    pub trait AssertEmptiness {
+        /// Verifies that the subject is empty.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_string = String::new();
+        /// assert_that!(some_string).is_empty();
+        ///
+        /// let some_vec: Vec<String> = vec![];
+        /// assert_that!(some_vec).is_empty();
+        ///
+        /// let some_array: [char; 0] = [];
+        /// assert_that!(some_array).is_empty();
+        ///
+        /// let some_slice: &[char] = &[][..];
+        /// assert_that!(some_slice).is_empty();
+        ///
+        /// let some_btree_set = BTreeSet::<i64>::new();
+        /// assert_that!(&some_btree_set).is_empty();
+        ///
+        /// let some_dequeue = VecDeque::<String>::new();
+        /// assert_that!(some_dequeue).is_empty();
+        /// ```
+        #[track_caller]
+        fn is_empty(self) -> Self;
 
-/// Assert the length of a subject.
-///
-/// These assertions are implemented for all types `T` that implement the
-/// trait [`LengthProperty`](crate::properties::LengthProperty). This
-/// property trait is implemented for string like types and collection like
-/// types of the `std` lib. For example:
-///
-/// * `String`, `&str`, `OsString`, `OsStr`
-/// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
-/// * `HashMap`, `HashSet`, `BTreeSet`, etc.
-///
-/// # Examples
-///
-/// ```
-/// use std::collections::{BTreeSet, VecDeque};
-/// use asserting::prelude::*;
-///
-/// let some_str = "takimata te iriure nonummy";
-/// assert_that!(some_str).has_length(26);
-/// assert_that!(some_str).has_length_in_range(12..32);
-/// assert_that!(some_str).has_length_in_range(12..=32);
-/// assert_that!(some_str).has_length_in_range(12..);
-/// assert_that!(some_str).has_length_in_range(..32);
-/// assert_that!(some_str).has_length_in_range(..=32);
-/// assert_that!(some_str).has_length_less_than(27);
-/// assert_that!(some_str).has_length_greater_than(25);
-/// assert_that!(some_str).has_at_most_length(26);
-/// assert_that!(some_str).has_at_most_length(30);
-/// assert_that!(some_str).has_at_least_length(26);
-/// assert_that!(some_str).has_at_least_length(20);
-///
-/// let some_vec = vec!['m', 'Q', 'k', 'b'];
-/// assert_that!(&some_vec).has_length(4);
-/// assert_that!(&some_vec).has_length_in_range(2..6);
-/// assert_that!(&some_vec).has_length_in_range(2..=6);
-/// assert_that!(&some_vec).has_length_in_range(2..);
-/// assert_that!(&some_vec).has_length_in_range(..6);
-/// assert_that!(&some_vec).has_length_in_range(..=6);
-/// assert_that!(&some_vec).has_length_less_than(5);
-/// assert_that!(&some_vec).has_length_greater_than(3);
-/// assert_that!(&some_vec).has_at_most_length(4);
-/// assert_that!(&some_vec).has_at_most_length(10);
-/// assert_that!(&some_vec).has_at_least_length(4);
-/// assert_that!(&some_vec).has_at_least_length(1);
-///
-/// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-/// assert_that!(some_btree_set).has_length(8);
-///
-/// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-/// assert_that!(&some_dequeue).has_length(3);
-/// ```
-///
-/// with crate feature `std` enabled:
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {
-/// # }
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use std::collections::{HashMap, HashSet};
-/// use asserting::prelude::*;
-///
-/// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-/// assert_that!(some_set).has_length(8);
-///
-/// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-/// assert_that!(&some_map).has_length(4);
-/// # }
-/// ```
-pub trait AssertHasLength<E, D> {
-    /// Verifies that the subject has the expected length.
+        /// Verifies that the subject is not empty.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "ad praesent aliqua qui";
+        /// assert_that!(some_str).is_not_empty();
+        ///
+        /// let some_vec = vec![1, 2, 3];
+        /// assert_that!(some_vec).is_not_empty();
+        ///
+        /// let some_array = [12, 24, 36, 48];
+        /// assert_that!(some_array).is_not_empty();
+        ///
+        /// let some_slice: &[_] = &['a', 'b', 'c'][..];
+        /// assert_that!(some_slice).is_not_empty();
+        /// ```
+        #[track_caller]
+        fn is_not_empty(self) -> Self;
+    }
+
+    /// Assert the length of a subject.
+    ///
+    /// These assertions are implemented for all types `T` that implement the
+    /// trait [`LengthProperty`](crate::properties::LengthProperty). This
+    /// property trait is implemented for string like types and collection like
+    /// types of the `std` lib. For example:
+    ///
+    /// * `String`, `&str`, `OsString`, `OsStr`
+    /// * `Vec`, array, slice, `VecDeque`, `LinkedList`, etc.
+    /// * `HashMap`, `HashSet`, `BTreeSet`, etc.
     ///
     /// # Examples
     ///
@@ -1842,9 +1790,31 @@ pub trait AssertHasLength<E, D> {
     ///
     /// let some_str = "takimata te iriure nonummy";
     /// assert_that!(some_str).has_length(26);
+    /// assert_that!(some_str).has_length_in_range(12..32);
+    /// assert_that!(some_str).has_length_in_range(12..=32);
+    /// assert_that!(some_str).has_length_in_range(12..);
+    /// assert_that!(some_str).has_length_in_range(..32);
+    /// assert_that!(some_str).has_length_in_range(..=32);
+    /// assert_that!(some_str).has_length_less_than(27);
+    /// assert_that!(some_str).has_length_greater_than(25);
+    /// assert_that!(some_str).has_at_most_length(26);
+    /// assert_that!(some_str).has_at_most_length(30);
+    /// assert_that!(some_str).has_at_least_length(26);
+    /// assert_that!(some_str).has_at_least_length(20);
     ///
     /// let some_vec = vec!['m', 'Q', 'k', 'b'];
     /// assert_that!(&some_vec).has_length(4);
+    /// assert_that!(&some_vec).has_length_in_range(2..6);
+    /// assert_that!(&some_vec).has_length_in_range(2..=6);
+    /// assert_that!(&some_vec).has_length_in_range(2..);
+    /// assert_that!(&some_vec).has_length_in_range(..6);
+    /// assert_that!(&some_vec).has_length_in_range(..=6);
+    /// assert_that!(&some_vec).has_length_less_than(5);
+    /// assert_that!(&some_vec).has_length_greater_than(3);
+    /// assert_that!(&some_vec).has_at_most_length(4);
+    /// assert_that!(&some_vec).has_at_most_length(10);
+    /// assert_that!(&some_vec).has_at_least_length(4);
+    /// assert_that!(&some_vec).has_at_least_length(1);
     ///
     /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
     /// assert_that!(some_btree_set).has_length(8);
@@ -1871,313 +1841,328 @@ pub trait AssertHasLength<E, D> {
     /// assert_that!(&some_map).has_length(4);
     /// # }
     /// ```
-    #[track_caller]
-    fn has_length(self, expected_length: E) -> Self;
+    pub trait AssertHasLength<E, D> {
+        /// Verifies that the subject has the expected length.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_length(26);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_length(4);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(some_btree_set).has_length(8);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_length(3);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(some_set).has_length(8);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_length(4);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_length(self, expected_length: E) -> Self;
 
-    /// Verifies that the subject has a length in the expected range.
-    ///
-    /// The expected range can be any type of range.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::collections::{BTreeSet, VecDeque};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_str = "takimata te iriure nonummy";
-    /// assert_that!(some_str).has_length_in_range(12..32);
-    /// assert_that!(some_str).has_length_in_range(12..=32);
-    /// assert_that!(some_str).has_length_in_range(12..);
-    /// assert_that!(some_str).has_length_in_range(..32);
-    /// assert_that!(some_str).has_length_in_range(..=32);
-    ///
-    /// let some_vec = vec!['m', 'Q', 'k', 'b'];
-    /// assert_that!(&some_vec).has_length_in_range(2..6);
-    /// assert_that!(&some_vec).has_length_in_range(2..=6);
-    /// assert_that!(&some_vec).has_length_in_range(2..);
-    /// assert_that!(&some_vec).has_length_in_range(..6);
-    /// assert_that!(&some_vec).has_length_in_range(..=6);
-    ///
-    /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-    /// assert_that!(&some_btree_set).has_length_in_range(6..10);
-    /// assert_that!(&some_btree_set).has_length_in_range(6..=10);
-    /// assert_that!(&some_btree_set).has_length_in_range(8..);
-    /// assert_that!(&some_btree_set).has_length_in_range(..9);
-    /// assert_that!(&some_btree_set).has_length_in_range(..=8);
-    ///
-    /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-    /// assert_that!(&some_dequeue).has_length_in_range(2..5);
-    /// assert_that!(&some_dequeue).has_length_in_range(2..=5);
-    /// assert_that!(&some_dequeue).has_length_in_range(3..);
-    /// assert_that!(&some_dequeue).has_length_in_range(..4);
-    /// assert_that!(&some_dequeue).has_length_in_range(..=3);
-    /// ```
-    ///
-    /// with crate feature `std` enabled:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {
-    /// # }
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use std::collections::{HashMap, HashSet};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-    /// assert_that!(&some_set).has_length_in_range(4..12);
-    /// assert_that!(&some_set).has_length_in_range(4..=12);
-    /// assert_that!(&some_set).has_length_in_range(8..);
-    /// assert_that!(&some_set).has_length_in_range(..9);
-    /// assert_that!(&some_set).has_length_in_range(..=8);
-    ///
-    /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-    /// assert_that!(&some_map).has_length_in_range(2..8);
-    /// assert_that!(&some_map).has_length_in_range(2..=8);
-    /// assert_that!(&some_map).has_length_in_range(4..);
-    /// assert_that!(&some_map).has_length_in_range(..5);
-    /// assert_that!(&some_map).has_length_in_range(..=4);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_length_in_range<U>(self, expected_range: U) -> Self
-    where
-        U: RangeBounds<usize>,
-        D: Represent<U>;
+        /// Verifies that the subject has a length in the expected range.
+        ///
+        /// The expected range can be any type of range.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_length_in_range(12..32);
+        /// assert_that!(some_str).has_length_in_range(12..=32);
+        /// assert_that!(some_str).has_length_in_range(12..);
+        /// assert_that!(some_str).has_length_in_range(..32);
+        /// assert_that!(some_str).has_length_in_range(..=32);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_length_in_range(2..6);
+        /// assert_that!(&some_vec).has_length_in_range(2..=6);
+        /// assert_that!(&some_vec).has_length_in_range(2..);
+        /// assert_that!(&some_vec).has_length_in_range(..6);
+        /// assert_that!(&some_vec).has_length_in_range(..=6);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(&some_btree_set).has_length_in_range(6..10);
+        /// assert_that!(&some_btree_set).has_length_in_range(6..=10);
+        /// assert_that!(&some_btree_set).has_length_in_range(8..);
+        /// assert_that!(&some_btree_set).has_length_in_range(..9);
+        /// assert_that!(&some_btree_set).has_length_in_range(..=8);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_length_in_range(2..5);
+        /// assert_that!(&some_dequeue).has_length_in_range(2..=5);
+        /// assert_that!(&some_dequeue).has_length_in_range(3..);
+        /// assert_that!(&some_dequeue).has_length_in_range(..4);
+        /// assert_that!(&some_dequeue).has_length_in_range(..=3);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(&some_set).has_length_in_range(4..12);
+        /// assert_that!(&some_set).has_length_in_range(4..=12);
+        /// assert_that!(&some_set).has_length_in_range(8..);
+        /// assert_that!(&some_set).has_length_in_range(..9);
+        /// assert_that!(&some_set).has_length_in_range(..=8);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_length_in_range(2..8);
+        /// assert_that!(&some_map).has_length_in_range(2..=8);
+        /// assert_that!(&some_map).has_length_in_range(4..);
+        /// assert_that!(&some_map).has_length_in_range(..5);
+        /// assert_that!(&some_map).has_length_in_range(..=4);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_length_in_range<U>(self, expected_range: U) -> Self
+        where
+            U: RangeBounds<usize>,
+            D: Represent<U>;
 
-    /// Verifies that the subject has a length that is less than the expected
-    /// length.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::collections::{BTreeSet, VecDeque};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_str = "takimata te iriure nonummy";
-    /// assert_that!(some_str).has_length_less_than(40);
-    /// assert_that!(some_str).has_length_less_than(27);
-    ///
-    /// let some_vec = vec!['m', 'Q', 'k', 'b'];
-    /// assert_that!(&some_vec).has_length_less_than(10);
-    /// assert_that!(&some_vec).has_length_less_than(5);
-    ///
-    /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-    /// assert_that!(&some_btree_set).has_length_less_than(20);
-    /// assert_that!(&some_btree_set).has_length_less_than(9);
-    ///
-    /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-    /// assert_that!(&some_dequeue).has_length_less_than(10);
-    /// assert_that!(&some_dequeue).has_length_less_than(4);
-    /// ```
-    ///
-    /// with crate feature `std` enabled:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {
-    /// # }
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use std::collections::{HashMap, HashSet};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-    /// assert_that!(&some_set).has_length_less_than(15);
-    /// assert_that!(&some_set).has_length_less_than(9);
-    ///
-    /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-    /// assert_that!(&some_map).has_length_less_than(10);
-    /// assert_that!(&some_map).has_length_less_than(5);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_length_less_than(self, expected_length: E) -> Self;
+        /// Verifies that the subject has a length that is less than the expected
+        /// length.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_length_less_than(40);
+        /// assert_that!(some_str).has_length_less_than(27);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_length_less_than(10);
+        /// assert_that!(&some_vec).has_length_less_than(5);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(&some_btree_set).has_length_less_than(20);
+        /// assert_that!(&some_btree_set).has_length_less_than(9);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_length_less_than(10);
+        /// assert_that!(&some_dequeue).has_length_less_than(4);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(&some_set).has_length_less_than(15);
+        /// assert_that!(&some_set).has_length_less_than(9);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_length_less_than(10);
+        /// assert_that!(&some_map).has_length_less_than(5);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_length_less_than(self, expected_length: E) -> Self;
 
-    /// Verifies that the subject has a length that is greater than the expected
-    /// length.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::collections::{BTreeSet, VecDeque};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_str = "takimata te iriure nonummy";
-    /// assert_that!(some_str).has_length_greater_than(20);
-    /// assert_that!(some_str).has_length_greater_than(25);
-    ///
-    /// let some_vec = vec!['m', 'Q', 'k', 'b'];
-    /// assert_that!(&some_vec).has_length_greater_than(1);
-    /// assert_that!(&some_vec).has_length_greater_than(3);
-    ///
-    /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-    /// assert_that!(&some_btree_set).has_length_greater_than(4);
-    /// assert_that!(&some_btree_set).has_length_greater_than(7);
-    ///
-    /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-    /// assert_that!(&some_dequeue).has_length_greater_than(1);
-    /// assert_that!(&some_dequeue).has_length_greater_than(2);
-    /// ```
-    ///
-    /// with crate feature `std` enabled:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {
-    /// # }
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use std::collections::{HashMap, HashSet};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-    /// assert_that!(&some_set).has_length_greater_than(4);
-    /// assert_that!(&some_set).has_length_greater_than(7);
-    ///
-    /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-    /// assert_that!(&some_map).has_length_greater_than(2);
-    /// assert_that!(&some_map).has_length_greater_than(3);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_length_greater_than(self, expected_length: E) -> Self;
+        /// Verifies that the subject has a length that is greater than the expected
+        /// length.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_length_greater_than(20);
+        /// assert_that!(some_str).has_length_greater_than(25);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_length_greater_than(1);
+        /// assert_that!(&some_vec).has_length_greater_than(3);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(&some_btree_set).has_length_greater_than(4);
+        /// assert_that!(&some_btree_set).has_length_greater_than(7);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_length_greater_than(1);
+        /// assert_that!(&some_dequeue).has_length_greater_than(2);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(&some_set).has_length_greater_than(4);
+        /// assert_that!(&some_set).has_length_greater_than(7);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_length_greater_than(2);
+        /// assert_that!(&some_map).has_length_greater_than(3);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_length_greater_than(self, expected_length: E) -> Self;
 
-    /// Verifies that the subject has a length that is at most the expected
-    /// length.
-    ///
-    /// In other words, the length shall be less than or equal to the expected
-    /// length.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::collections::{BTreeSet, VecDeque};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_str = "takimata te iriure nonummy";
-    /// assert_that!(some_str).has_at_most_length(30);
-    /// assert_that!(some_str).has_at_most_length(26);
-    ///
-    /// let some_vec = vec!['m', 'Q', 'k', 'b'];
-    /// assert_that!(&some_vec).has_at_most_length(10);
-    /// assert_that!(&some_vec).has_at_most_length(4);
-    ///
-    /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-    /// assert_that!(&some_btree_set).has_at_most_length(12);
-    /// assert_that!(&some_btree_set).has_at_most_length(8);
-    ///
-    /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-    /// assert_that!(&some_dequeue).has_at_most_length(10);
-    /// assert_that!(&some_dequeue).has_at_most_length(3);
-    /// ```
-    ///
-    /// with crate feature `std` enabled:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {
-    /// # }
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use std::collections::{HashMap, HashSet};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-    /// assert_that!(&some_set).has_at_most_length(15);
-    /// assert_that!(&some_set).has_at_most_length(8);
-    ///
-    /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-    /// assert_that!(&some_map).has_at_most_length(10);
-    /// assert_that!(&some_map).has_at_most_length(4);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_at_most_length(self, expected_length: E) -> Self;
+        /// Verifies that the subject has a length that is at most the expected
+        /// length.
+        ///
+        /// In other words, the length shall be less than or equal to the expected
+        /// length.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_at_most_length(30);
+        /// assert_that!(some_str).has_at_most_length(26);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_at_most_length(10);
+        /// assert_that!(&some_vec).has_at_most_length(4);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(&some_btree_set).has_at_most_length(12);
+        /// assert_that!(&some_btree_set).has_at_most_length(8);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_at_most_length(10);
+        /// assert_that!(&some_dequeue).has_at_most_length(3);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(&some_set).has_at_most_length(15);
+        /// assert_that!(&some_set).has_at_most_length(8);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_at_most_length(10);
+        /// assert_that!(&some_map).has_at_most_length(4);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_at_most_length(self, expected_length: E) -> Self;
 
-    /// Verifies that the subject has a length that is at least the expected
-    /// length.
-    ///
-    /// In other words, the length shall be greater than or equal to the
-    /// expected length.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::collections::{BTreeSet, VecDeque};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_str = "takimata te iriure nonummy";
-    /// assert_that!(some_str).has_at_least_length(20);
-    /// assert_that!(some_str).has_at_least_length(26);
-    ///
-    /// let some_vec = vec!['m', 'Q', 'k', 'b'];
-    /// assert_that!(&some_vec).has_at_least_length(1);
-    /// assert_that!(&some_vec).has_at_least_length(4);
-    ///
-    /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
-    /// assert_that!(&some_btree_set).has_at_least_length(4);
-    /// assert_that!(&some_btree_set).has_at_least_length(8);
-    ///
-    /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
-    /// assert_that!(&some_dequeue).has_at_least_length(1);
-    /// assert_that!(&some_dequeue).has_at_least_length(3);
-    /// ```
-    ///
-    /// with crate feature `std` enabled:
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {
-    /// # }
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use std::collections::{HashMap, HashSet};
-    /// use asserting::prelude::*;
-    ///
-    /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
-    /// assert_that!(&some_set).has_at_least_length(4);
-    /// assert_that!(&some_set).has_at_least_length(8);
-    ///
-    /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
-    /// assert_that!(&some_map).has_at_least_length(2);
-    /// assert_that!(&some_map).has_at_least_length(4);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn has_at_least_length(self, expected_length: E) -> Self;
-}
+        /// Verifies that the subject has a length that is at least the expected
+        /// length.
+        ///
+        /// In other words, the length shall be greater than or equal to the
+        /// expected length.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::collections::{BTreeSet, VecDeque};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_str = "takimata te iriure nonummy";
+        /// assert_that!(some_str).has_at_least_length(20);
+        /// assert_that!(some_str).has_at_least_length(26);
+        ///
+        /// let some_vec = vec!['m', 'Q', 'k', 'b'];
+        /// assert_that!(&some_vec).has_at_least_length(1);
+        /// assert_that!(&some_vec).has_at_least_length(4);
+        ///
+        /// let some_btree_set = BTreeSet::from_iter([1, 3, 5, 7, 11, 13, 17, 19]);
+        /// assert_that!(&some_btree_set).has_at_least_length(4);
+        /// assert_that!(&some_btree_set).has_at_least_length(8);
+        ///
+        /// let some_dequeue = VecDeque::from_iter(["one", "two", "three"]);
+        /// assert_that!(&some_dequeue).has_at_least_length(1);
+        /// assert_that!(&some_dequeue).has_at_least_length(3);
+        /// ```
+        ///
+        /// with crate feature `std` enabled:
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {
+        /// # }
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use std::collections::{HashMap, HashSet};
+        /// use asserting::prelude::*;
+        ///
+        /// let some_set: HashSet<u8> = [1, 3, 5, 7, 11, 13, 17, 19].into_iter().collect();
+        /// assert_that!(&some_set).has_at_least_length(4);
+        /// assert_that!(&some_set).has_at_least_length(8);
+        ///
+        /// let some_map: HashMap<char, usize> = [('A', 25), ('B', 2), ('C', 12), ('D', 18)].into_iter().collect();
+        /// assert_that!(&some_map).has_at_least_length(2);
+        /// assert_that!(&some_map).has_at_least_length(4);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn has_at_least_length(self, expected_length: E) -> Self;
+    }
 
-/// Assert the number of characters contained in a string or similar container.
-///
-/// These assertions are implemented for all types `T` that implement the trait
-/// [`CharCountProperty`](crate::properties::CharCountProperty). This property
-/// is implemented for `String` and `&str`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
-/// assert_that!(subject).has_length(28);
-/// assert_that!(subject).has_char_count(25);
-///
-/// let subject = "imper diet al zzril";
-/// assert_that!(subject).has_length(19);
-/// assert_that!(subject).has_char_count(19);
-///
-/// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
-/// assert_that!(subject).has_char_count_in_range(12..=36);
-/// assert_that!(subject).has_char_count_less_than(26);
-/// assert_that!(subject).has_char_count_greater_than(24);
-/// assert_that!(subject).has_at_most_char_count(30);
-/// assert_that!(subject).has_at_most_char_count(25);
-/// assert_that!(subject).has_at_least_char_count(20);
-/// assert_that!(subject).has_at_least_char_count(25);
-/// ```
-pub trait AssertHasCharCount<E, D> {
-    /// Verifies that the subject contains the expected number of characters.
+    /// Assert the number of characters contained in a string or similar container.
+    ///
+    /// These assertions are implemented for all types `T` that implement the trait
+    /// [`CharCountProperty`](crate::properties::CharCountProperty). This property
+    /// is implemented for `String` and `&str`.
     ///
     /// # Examples
     ///
@@ -2191,113 +2176,121 @@ pub trait AssertHasCharCount<E, D> {
     /// let subject = "imper diet al zzril";
     /// assert_that!(subject).has_length(19);
     /// assert_that!(subject).has_char_count(19);
-    /// ```
-    #[track_caller]
-    fn has_char_count(self, expected: E) -> Self;
-
-    /// Verifies that the subject contains a number of characters that is in the
-    /// expected range.
-    ///
-    /// The expected range must be a closed range with both ends inclusive.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
-    /// assert_that!(subject).has_char_count_in_range(12..36);
     /// assert_that!(subject).has_char_count_in_range(12..=36);
-    /// ```
-    #[track_caller]
-    fn has_char_count_in_range<U>(self, range: U) -> Self
-    where
-        U: RangeBounds<usize>,
-        D: Represent<U>;
-
-    /// Verifies that the subject contains less than the expected number of
-    /// characters.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
     /// assert_that!(subject).has_char_count_less_than(26);
-    /// ```
-    #[track_caller]
-    fn has_char_count_less_than(self, expected: E) -> Self;
-
-    /// Verifies that the subject contains more than the expected number of
-    /// characters.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
     /// assert_that!(subject).has_char_count_greater_than(24);
-    /// ```
-    #[track_caller]
-    fn has_char_count_greater_than(self, expected: E) -> Self;
-
-    /// Verifies that the subject contains at least the expected number of
-    /// characters.
-    ///
-    /// In other words, the number of characters shall be less than or equal
-    /// to the expected number.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
     /// assert_that!(subject).has_at_most_char_count(30);
     /// assert_that!(subject).has_at_most_char_count(25);
-    /// ```
-    #[track_caller]
-    fn has_at_most_char_count(self, expected: E) -> Self;
-
-    /// Verifies that the subject contains at least the expected number of
-    /// characters.
-    ///
-    /// In other words, the number of characters shall be greater than or equal
-    /// to the expected number.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
     /// assert_that!(subject).has_at_least_char_count(20);
     /// assert_that!(subject).has_at_least_char_count(25);
     /// ```
-    #[track_caller]
-    fn has_at_least_char_count(self, expected: E) -> Self;
-}
+    pub trait AssertHasCharCount<E, D> {
+        /// Verifies that the subject contains the expected number of characters.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_length(28);
+        /// assert_that!(subject).has_char_count(25);
+        ///
+        /// let subject = "imper diet al zzril";
+        /// assert_that!(subject).has_length(19);
+        /// assert_that!(subject).has_char_count(19);
+        /// ```
+        #[track_caller]
+        fn has_char_count(self, expected: E) -> Self;
 
-/// Assert whether a subject of the `Option` type holds some value or has none.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = Some("nisl possim nobis non".to_string());
-/// assert_that!(subject).is_some();
-///
-/// #[derive(Debug)]
-/// struct MyType;
-///
-/// let subject: Option<MyType> = None;
-/// assert_that!(subject).is_none();
-/// ```
-pub trait AssertOption {
-    /// Verifies that the subject has some value.
+        /// Verifies that the subject contains a number of characters that is in the
+        /// expected range.
+        ///
+        /// The expected range must be a closed range with both ends inclusive.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_char_count_in_range(12..36);
+        /// assert_that!(subject).has_char_count_in_range(12..=36);
+        /// ```
+        #[track_caller]
+        fn has_char_count_in_range<U>(self, range: U) -> Self
+        where
+            U: RangeBounds<usize>,
+            D: Represent<U>;
+
+        /// Verifies that the subject contains less than the expected number of
+        /// characters.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_char_count_less_than(26);
+        /// ```
+        #[track_caller]
+        fn has_char_count_less_than(self, expected: E) -> Self;
+
+        /// Verifies that the subject contains more than the expected number of
+        /// characters.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_char_count_greater_than(24);
+        /// ```
+        #[track_caller]
+        fn has_char_count_greater_than(self, expected: E) -> Self;
+
+        /// Verifies that the subject contains at least the expected number of
+        /// characters.
+        ///
+        /// In other words, the number of characters shall be less than or equal
+        /// to the expected number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_at_most_char_count(30);
+        /// assert_that!(subject).has_at_most_char_count(25);
+        /// ```
+        #[track_caller]
+        fn has_at_most_char_count(self, expected: E) -> Self;
+
+        /// Verifies that the subject contains at least the expected number of
+        /// characters.
+        ///
+        /// In other words, the number of characters shall be greater than or equal
+        /// to the expected number.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "imper \u{0180} diet al \u{02AA} \u{01AF} zzril";
+        /// assert_that!(subject).has_at_least_char_count(20);
+        /// assert_that!(subject).has_at_least_char_count(25);
+        /// ```
+        #[track_caller]
+        fn has_at_least_char_count(self, expected: E) -> Self;
+    }
+
+    /// Assert whether a subject of the `Option` type holds some value or has none.
     ///
     /// # Examples
     ///
@@ -2310,56 +2303,52 @@ pub trait AssertOption {
     /// #[derive(Debug)]
     /// struct MyType;
     ///
-    /// let subject = Some(MyType);
-    /// assert_that!(subject).is_some();
-    /// ```
-    #[track_caller]
-    fn is_some(self) -> Self;
-
-    /// Verifies that the subject has no value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject: Option<String> = None;
-    /// assert_that!(subject).is_none();
-    ///
-    /// #[derive(Debug)]
-    /// struct MyType;
-    ///
     /// let subject: Option<MyType> = None;
     /// assert_that!(subject).is_none();
     /// ```
-    #[track_caller]
-    fn is_none(self) -> Self;
-}
+    pub trait AssertOption {
+        /// Verifies that the subject has some value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = Some("nisl possim nobis non".to_string());
+        /// assert_that!(subject).is_some();
+        ///
+        /// #[derive(Debug)]
+        /// struct MyType;
+        ///
+        /// let subject = Some(MyType);
+        /// assert_that!(subject).is_some();
+        /// ```
+        #[track_caller]
+        fn is_some(self) -> Self;
 
-/// Assert the value of an option by mapping the subject.
-///
-/// If the option is none, the assertion fails.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
-/// assert_that!(subject).some().contains_exactly([1, 2, 3]);
-///
-/// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
-/// assert_that!(subject).some().is_not_empty();
-/// ```
-pub trait AssertOptionValue {
-    /// A spec-like type that contains the option's value as the subject, which
-    /// is returned by the mapping assertion method.
+        /// Verifies that the subject has no value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Option<String> = None;
+        /// assert_that!(subject).is_none();
+        ///
+        /// #[derive(Debug)]
+        /// struct MyType;
+        ///
+        /// let subject: Option<MyType> = None;
+        /// assert_that!(subject).is_none();
+        /// ```
+        #[track_caller]
+        fn is_none(self) -> Self;
+    }
+
+    /// Assert the value of an option by mapping the subject.
     ///
-    /// If the subject is an `Option<T>`, this is usually `Spec<'a, T, R>`.
-    type Some;
-
-    /// Maps the subject to the option's value if it has some. Otherwise, this
-    /// assertion fails.
+    /// If the option is none, the assertion fails.
     ///
     /// # Examples
     ///
@@ -2372,25 +2361,32 @@ pub trait AssertOptionValue {
     /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
     /// assert_that!(subject).some().is_not_empty();
     /// ```
-    #[track_caller]
-    fn some(self) -> Self::Some;
-}
+    pub trait AssertOptionValue {
+        /// A spec-like type that contains the option's value as the subject, which
+        /// is returned by the mapping assertion method.
+        ///
+        /// If the subject is an `Option<T>`, this is usually `Spec<'a, T, R>`.
+        type Some;
 
-/// Assert whether a subject of the `Result` type holds some value or an error.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Result<f64, String> = Ok(-3.14);
-/// assert_that!(subject).is_ok();
-///
-/// let subject: Result<(), String> = Err("consequat sanctus ea exercitation".to_string());
-/// assert_that!(subject).is_err();
-/// ```
-pub trait AssertResult {
-    /// Verifies that the subject has an ok value.
+        /// Maps the subject to the option's value if it has some. Otherwise, this
+        /// assertion fails.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Option<Vec<usize>> = Some(vec![1, 2, 3]);
+        /// assert_that!(subject).some().contains_exactly([1, 2, 3]);
+        ///
+        /// let subject: Option<&str> = Some("ullamco cupiditat diam hendrerit");
+        /// assert_that!(subject).some().is_not_empty();
+        /// ```
+        #[track_caller]
+        fn some(self) -> Self::Some;
+    }
+
+    /// Assert whether a subject of the `Result` type holds some value or an error.
     ///
     /// # Examples
     ///
@@ -2399,52 +2395,39 @@ pub trait AssertResult {
     ///
     /// let subject: Result<f64, String> = Ok(-3.14);
     /// assert_that!(subject).is_ok();
-    /// ```
-    #[track_caller]
-    fn is_ok(self) -> Self;
-
-    /// Verifies that the subject has an err value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject: Result<(), String> = Err("consequat sanctus ea exercitation".to_string());
     /// assert_that!(subject).is_err();
     /// ```
-    #[track_caller]
-    fn is_err(self) -> Self;
-}
+    pub trait AssertResult {
+        /// Verifies that the subject has an ok value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<f64, String> = Ok(-3.14);
+        /// assert_that!(subject).is_ok();
+        /// ```
+        #[track_caller]
+        fn is_ok(self) -> Self;
 
-/// Assert the ok-value or error of a result by mapping the subject.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
-/// assert_that!(subject).ok().is_not_empty();
-///
-/// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
-/// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
-/// ```
-pub trait AssertResultValue {
-    /// A spec-like type that contains the result's ok value as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, T, R>`.
-    type Ok;
-    /// A spec-like type that contains the result's error value as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, E, R>`.
-    type Err;
+        /// Verifies that the subject has an err value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<(), String> = Err("consequat sanctus ea exercitation".to_string());
+        /// assert_that!(subject).is_err();
+        /// ```
+        #[track_caller]
+        fn is_err(self) -> Self;
+    }
 
-    /// Maps the subject to the result's ok value.
-    ///
-    /// If the result is an error, this method panics.
+    /// Assert the ok-value or error of a result by mapping the subject.
     ///
     /// # Examples
     ///
@@ -2453,57 +2436,65 @@ pub trait AssertResultValue {
     ///
     /// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
     /// assert_that!(subject).ok().is_not_empty();
-    /// ```
-    #[track_caller]
-    fn ok(self) -> Self::Ok;
-
-    /// Maps the subject to the result's err value.
-    ///
-    /// If the result is an ok value, this method panics.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
     /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
     /// ```
-    #[track_caller]
-    fn err(self) -> Self::Err;
-}
+    pub trait AssertResultValue {
+        /// A spec-like type that contains the result's ok value as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, T, R>`.
+        type Ok;
+        /// A spec-like type that contains the result's error value as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// If the subject is a `Result<T, E>`, this is usually `Spec<'a, E, R>`.
+        type Err;
 
-/// Assert that a subject of some container type holds a value that is equal to
-/// the expected one.
-///
-/// This assertion is implemented for the `Option` type and the `Result` type.
-/// For `Option` it compares the value to the expected one if it has some or
-/// fails if it holds none. For `Result` it compares the ok value to the
-/// expected one if it is an ok or fails if it holds an error.
-///
-/// The value type of the `Option` or `Result` must implement `PartialEq<E>`
-/// where `E` is the type of the expected value.
-///
-/// To assert the error value of a `Result` use [`AssertHasError::has_error`].
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = Some(-3.14);
-/// assert_that!(subject).has_value(-3.14);
-///
-/// let subject: Result<f64, String> = Ok(6.28);
-/// assert_that!(subject).has_value(6.28);
-/// ```
-pub trait AssertHasValue<E> {
-    /// Verifies that the subject holds a value that is equal to the expected
-    /// one.
+        /// Maps the subject to the result's ok value.
+        ///
+        /// If the result is an error, this method panics.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<Vec<usize>, String> = Ok(vec![1, 2, 3]);
+        /// assert_that!(subject).ok().is_not_empty();
+        /// ```
+        #[track_caller]
+        fn ok(self) -> Self::Ok;
+
+        /// Maps the subject to the result's err value.
+        ///
+        /// If the result is an ok value, this method panics.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<u64, String> = Err("te anim adipisici mollit".to_string());
+        /// assert_that!(subject).err().is_equal_to("te anim adipisici mollit");
+        /// ```
+        #[track_caller]
+        fn err(self) -> Self::Err;
+    }
+
+    /// Assert that a subject of some container type holds a value that is equal to
+    /// the expected one.
     ///
-    /// For `Option` it compares the value in `Some(value)` and for `Result`
-    /// it compares the value in `Ok(value)`. If an `Option` is `None` or a
-    /// `Result` is `Err(error)` then the assertion fails.
+    /// This assertion is implemented for the `Option` type and the `Result` type.
+    /// For `Option` it compares the value to the expected one if it has some or
+    /// fails if it holds none. For `Result` it compares the ok value to the
+    /// expected one if it is an ok or fails if it holds an error.
+    ///
+    /// The value type of the `Option` or `Result` must implement `PartialEq<E>`
+    /// where `E` is the type of the expected value.
+    ///
+    /// To assert the error value of a `Result` use [`AssertHasError::has_error`].
     ///
     /// # Examples
     ///
@@ -2516,33 +2507,37 @@ pub trait AssertHasValue<E> {
     /// let subject: Result<f64, String> = Ok(6.28);
     /// assert_that!(subject).has_value(6.28);
     /// ```
-    #[track_caller]
-    fn has_value(self, expected: E) -> Self;
-}
+    pub trait AssertHasValue<E> {
+        /// Verifies that the subject holds a value that is equal to the expected
+        /// one.
+        ///
+        /// For `Option` it compares the value in `Some(value)` and for `Result`
+        /// it compares the value in `Ok(value)`. If an `Option` is `None` or a
+        /// `Result` is `Err(error)` then the assertion fails.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = Some(-3.14);
+        /// assert_that!(subject).has_value(-3.14);
+        ///
+        /// let subject: Result<f64, String> = Ok(6.28);
+        /// assert_that!(subject).has_value(6.28);
+        /// ```
+        #[track_caller]
+        fn has_value(self, expected: E) -> Self;
+    }
 
-/// Assert that a subject of some container type holds an error value that is
-/// equal to the expected one.
-///
-/// This assertion is implemented for the `Result` type. It compares the value
-/// in `Err(value)` with the expected one. The error type in the `Result` must
-/// implement `PartialEq<E>` where `E` is the type of the expected error value.
-///
-/// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject: Result<(), String> = Err("labore gubergren ut ipsum".to_string());
-/// assert_that!(subject).has_error("labore gubergren ut ipsum");
-/// ```
-pub trait AssertHasError<E> {
-    /// Verifies that the subject holds an error value that is equal to the
-    /// expected one.
+    /// Assert that a subject of some container type holds an error value that is
+    /// equal to the expected one.
     ///
-    /// For `Result` it compares the value in `Err(value)`. If the `Result`
-    /// holds an `Ok(value)`, the assertion fails.
+    /// This assertion is implemented for the `Result` type. It compares the value
+    /// in `Err(value)` with the expected one. The error type in the `Result` must
+    /// implement `PartialEq<E>` where `E` is the type of the expected error value.
+    ///
+    /// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
     ///
     /// # Examples
     ///
@@ -2552,47 +2547,37 @@ pub trait AssertHasError<E> {
     /// let subject: Result<(), String> = Err("labore gubergren ut ipsum".to_string());
     /// assert_that!(subject).has_error("labore gubergren ut ipsum");
     /// ```
-    #[track_caller]
-    fn has_error(self, expected: E) -> Self;
-}
+    pub trait AssertHasError<E> {
+        /// Verifies that the subject holds an error value that is equal to the
+        /// expected one.
+        ///
+        /// For `Result` it compares the value in `Err(value)`. If the `Result`
+        /// holds an `Ok(value)`, the assertion fails.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<(), String> = Err("labore gubergren ut ipsum".to_string());
+        /// assert_that!(subject).has_error("labore gubergren ut ipsum");
+        /// ```
+        #[track_caller]
+        fn has_error(self, expected: E) -> Self;
+    }
 
-/// Assert that a subject of some container type holds an error value that has
-/// a message equal to the expected message.
-///
-/// This is useful for opaque error types that do not implement
-/// `PartialEq`. Since the `std::error::Error` trait requires that error
-/// types implement `Display`, the string representation of the error value
-/// is compared to an expected message string.
-///
-/// This assertion is implemented for the `Result` type. It compares the string
-/// representation of the error value with the expected message.
-///
-/// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
-///
-/// # Examples
-///
-/// ```
-/// use anyhow::anyhow;
-/// use asserting::prelude::*;
-///
-/// let subject: Result<(), anyhow::Error> = Err(anyhow!("mollit in ullamcorper no".to_string()));
-/// assert_that!(subject).has_error_message("mollit in ullamcorper no");
-/// ```
-pub trait AssertHasErrorMessage<E> {
-    /// A spec-like type that contains the error message as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// This is usually a `Spec<'a, String, R>`.
-    type ErrorMessage;
-
-    /// Verifies that the subject is an error value with the expected message.
+    /// Assert that a subject of some container type holds an error value that has
+    /// a message equal to the expected message.
     ///
     /// This is useful for opaque error types that do not implement
     /// `PartialEq`. Since the `std::error::Error` trait requires that error
     /// types implement `Display`, the string representation of the error value
     /// is compared to an expected message string.
     ///
-    /// This method panics if the actual subject is not an error value.
+    /// This assertion is implemented for the `Result` type. It compares the string
+    /// representation of the error value with the expected message.
+    ///
+    /// To assert the ok value of a `Result` use [`AssertHasValue::has_value`].
     ///
     /// # Examples
     ///
@@ -2603,111 +2588,38 @@ pub trait AssertHasErrorMessage<E> {
     /// let subject: Result<(), anyhow::Error> = Err(anyhow!("mollit in ullamcorper no".to_string()));
     /// assert_that!(subject).has_error_message("mollit in ullamcorper no");
     /// ```
-    #[track_caller]
-    fn has_error_message(self, expected_message: E) -> Self::ErrorMessage;
-}
+    pub trait AssertHasErrorMessage<E> {
+        /// A spec-like type that contains the error message as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// This is usually a `Spec<'a, String, R>`.
+        type ErrorMessage;
 
-/// Assert the source of any type that implements `std::error::Error`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-/// use std::error::Error;
-/// use std::fmt::{self, Display};
-///
-/// #[derive(Debug)]
-/// struct SuperError {
-///     source: SourceError,
-/// }
-///
-/// impl Display for SuperError {
-///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-///         write!(f, "super-error caused by {}", self.source)
-///     }
-/// }
-///
-/// impl Error for SuperError {
-///     fn source(&self) -> Option<&(dyn Error + 'static)> {
-///         Some(&self.source)
-///     }
-/// }
-///
-/// #[derive(Debug, PartialEq)]
-/// enum SourceError {
-///     Foo,
-///     Bar,
-/// }
-///
-/// impl Display for SourceError {
-///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-///         match self {
-///             Self::Foo => f.write_str("foo error"),
-///             Self::Bar => f.write_str("bar error"),
-///         }
-///     }
-/// }
-///
-/// impl Error for SourceError {}
-///
-/// assert_that!(&SourceError::Foo).has_no_source();
-///
-/// let error = SuperError {
-///     source: SourceError::Foo,
-/// };
-///
-/// assert_that!(&error).has_source();
-/// assert_that!(&error).has_source_message("foo error");
-/// ```
-pub trait AssertErrorHasSource {
-    /// A spec-like type that contains the source message as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// This is usually a `Spec<'a, String, R>`.
-    type SourceMessage;
+        /// Verifies that the subject is an error value with the expected message.
+        ///
+        /// This is useful for opaque error types that do not implement
+        /// `PartialEq`. Since the `std::error::Error` trait requires that error
+        /// types implement `Display`, the string representation of the error value
+        /// is compared to an expected message string.
+        ///
+        /// This method panics if the actual subject is not an error value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use anyhow::anyhow;
+        /// use asserting::prelude::*;
+        ///
+        /// let subject: Result<(), anyhow::Error> = Err(anyhow!("mollit in ullamcorper no".to_string()));
+        /// assert_that!(subject).has_error_message("mollit in ullamcorper no");
+        /// ```
+        #[track_caller]
+        fn has_error_message(self, expected_message: E) -> Self::ErrorMessage;
+    }
 
-    /// Verifies that an error has no source.
+    /// Assert the source of any type that implements `std::error::Error`.
     ///
-    /// # Example
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::error::Error;
-    /// use std::fmt::{self, Display};
-    ///
-    /// #[derive(Debug, PartialEq)]
-    /// enum SimpleError {
-    ///     Foo,
-    ///     Bar,
-    /// }
-    ///
-    /// impl Display for SimpleError {
-    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    ///         match self {
-    ///             Self::Foo => f.write_str("foo error"),
-    ///             Self::Bar => f.write_str("bar error"),
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// impl Error for SimpleError {}
-    ///
-    ///
-    /// let error = SimpleError::Bar;
-    ///
-    /// assert_that!(&error).has_no_source();
-    ///
-    /// // error in result
-    /// let result: Result<Vec<i32>, SimpleError> = Err(SimpleError::Foo);
-    ///
-    /// assert_that!(&result).err().has_no_source();
-    /// ```
-    #[track_caller]
-    fn has_no_source(self) -> Self;
-
-    /// Verifies that an error has some source.
-    ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -2748,108 +2660,190 @@ pub trait AssertErrorHasSource {
     ///
     /// impl Error for SourceError {}
     ///
+    /// assert_that!(&SourceError::Foo).has_no_source();
     ///
     /// let error = SuperError {
     ///     source: SourceError::Foo,
     /// };
     ///
     /// assert_that!(&error).has_source();
-    ///
-    /// // error in result
-    /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
-    ///     source: SourceError::Bar,
-    /// });
-    ///
-    /// assert_that!(result).err().has_source();
+    /// assert_that!(&error).has_source_message("foo error");
     /// ```
-    #[track_caller]
-    fn has_source(self) -> Self;
+    pub trait AssertErrorHasSource {
+        /// A spec-like type that contains the source message as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// This is usually a `Spec<'a, String, R>`.
+        type SourceMessage;
 
-    /// Verifies that an error has some source which converted to a string
-    /// equals the expected message.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::error::Error;
-    /// use std::fmt::{self, Display};
-    ///
-    /// #[derive(Debug)]
-    /// struct SuperError {
-    ///     source: SourceError,
-    /// }
-    ///
-    /// impl Display for SuperError {
-    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    ///         write!(f, "super-error caused by {}", self.source)
-    ///     }
-    /// }
-    ///
-    /// impl Error for SuperError {
-    ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
-    ///         Some(&self.source)
-    ///     }
-    /// }
-    ///
-    /// #[derive(Debug, PartialEq)]
-    /// enum SourceError {
-    ///     Foo,
-    ///     Bar,
-    /// }
-    ///
-    /// impl Display for SourceError {
-    ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    ///         match self {
-    ///             Self::Foo => f.write_str("foo error"),
-    ///             Self::Bar => f.write_str("bar error"),
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// impl Error for SourceError {}
-    ///
-    ///
-    /// let error = SuperError {
-    ///     source: SourceError::Bar,
-    /// };
-    ///
-    /// assert_that!(&error).has_source_message("bar error");
-    ///
-    /// // error in result
-    /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
-    ///     source: SourceError::Foo,
-    /// });
-    ///
-    /// assert_that!(result).err().has_source_message("foo error");
-    /// ```
-    #[track_caller]
-    fn has_source_message(self, expected_source_message: impl Into<String>) -> Self::SourceMessage;
-}
+        /// Verifies that an error has no source.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::error::Error;
+        /// use std::fmt::{self, Display};
+        ///
+        /// #[derive(Debug, PartialEq)]
+        /// enum SimpleError {
+        ///     Foo,
+        ///     Bar,
+        /// }
+        ///
+        /// impl Display for SimpleError {
+        ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         match self {
+        ///             Self::Foo => f.write_str("foo error"),
+        ///             Self::Bar => f.write_str("bar error"),
+        ///         }
+        ///     }
+        /// }
+        ///
+        /// impl Error for SimpleError {}
+        ///
+        ///
+        /// let error = SimpleError::Bar;
+        ///
+        /// assert_that!(&error).has_no_source();
+        ///
+        /// // error in result
+        /// let result: Result<Vec<i32>, SimpleError> = Err(SimpleError::Foo);
+        ///
+        /// assert_that!(&result).err().has_no_source();
+        /// ```
+        #[track_caller]
+        fn has_no_source(self) -> Self;
 
-/// Assert a type formatted into a debug string.
-///
-/// The subject's type must implement `Debug` and the expected type must
-/// implement `AsRef<str>`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// #[derive(Debug)]
-/// struct Foo {
-///     hello: String,
-/// }
-///
-/// let subject = Foo { hello: "World".into() };
-///
-/// assert_that!(&subject).has_debug_string("Foo { hello: \"World\" }");
-/// assert_that!(&subject).does_not_have_debug_string("Bar { hello: \"World\" }");
-/// ```
-pub trait AssertHasDebugString<E> {
-    /// Verifies that a subject formatted for debugging results in the expected
-    /// string.
+        /// Verifies that an error has some source.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::error::Error;
+        /// use std::fmt::{self, Display};
+        ///
+        /// #[derive(Debug)]
+        /// struct SuperError {
+        ///     source: SourceError,
+        /// }
+        ///
+        /// impl Display for SuperError {
+        ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         write!(f, "super-error caused by {}", self.source)
+        ///     }
+        /// }
+        ///
+        /// impl Error for SuperError {
+        ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+        ///         Some(&self.source)
+        ///     }
+        /// }
+        ///
+        /// #[derive(Debug, PartialEq)]
+        /// enum SourceError {
+        ///     Foo,
+        ///     Bar,
+        /// }
+        ///
+        /// impl Display for SourceError {
+        ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         match self {
+        ///             Self::Foo => f.write_str("foo error"),
+        ///             Self::Bar => f.write_str("bar error"),
+        ///         }
+        ///     }
+        /// }
+        ///
+        /// impl Error for SourceError {}
+        ///
+        ///
+        /// let error = SuperError {
+        ///     source: SourceError::Foo,
+        /// };
+        ///
+        /// assert_that!(&error).has_source();
+        ///
+        /// // error in result
+        /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
+        ///     source: SourceError::Bar,
+        /// });
+        ///
+        /// assert_that!(result).err().has_source();
+        /// ```
+        #[track_caller]
+        fn has_source(self) -> Self;
+
+        /// Verifies that an error has some source which converted to a string
+        /// equals the expected message.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::error::Error;
+        /// use std::fmt::{self, Display};
+        ///
+        /// #[derive(Debug)]
+        /// struct SuperError {
+        ///     source: SourceError,
+        /// }
+        ///
+        /// impl Display for SuperError {
+        ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         write!(f, "super-error caused by {}", self.source)
+        ///     }
+        /// }
+        ///
+        /// impl Error for SuperError {
+        ///     fn source(&self) -> Option<&(dyn Error + 'static)> {
+        ///         Some(&self.source)
+        ///     }
+        /// }
+        ///
+        /// #[derive(Debug, PartialEq)]
+        /// enum SourceError {
+        ///     Foo,
+        ///     Bar,
+        /// }
+        ///
+        /// impl Display for SourceError {
+        ///     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         match self {
+        ///             Self::Foo => f.write_str("foo error"),
+        ///             Self::Bar => f.write_str("bar error"),
+        ///         }
+        ///     }
+        /// }
+        ///
+        /// impl Error for SourceError {}
+        ///
+        ///
+        /// let error = SuperError {
+        ///     source: SourceError::Bar,
+        /// };
+        ///
+        /// assert_that!(&error).has_source_message("bar error");
+        ///
+        /// // error in result
+        /// let result: Result<Vec<i32>, SuperError> = Err(SuperError {
+        ///     source: SourceError::Foo,
+        /// });
+        ///
+        /// assert_that!(result).err().has_source_message("foo error");
+        /// ```
+        #[track_caller]
+        fn has_source_message(
+            self,
+            expected_source_message: impl Into<String>,
+        ) -> Self::SourceMessage;
+    }
+
+    /// Assert a type formatted into a debug string.
+    ///
+    /// The subject's type must implement `Debug` and the expected type must
+    /// implement `AsRef<str>`.
     ///
     /// # Examples
     ///
@@ -2863,59 +2857,53 @@ pub trait AssertHasDebugString<E> {
     ///
     /// let subject = Foo { hello: "World".into() };
     ///
-    /// assert_that!(subject).has_debug_string("Foo { hello: \"World\" }");
+    /// assert_that!(&subject).has_debug_string("Foo { hello: \"World\" }");
+    /// assert_that!(&subject).does_not_have_debug_string("Bar { hello: \"World\" }");
     /// ```
-    #[track_caller]
-    fn has_debug_string(self, expected: E) -> Self;
+    pub trait AssertHasDebugString<E> {
+        /// Verifies that a subject formatted for debugging results in the expected
+        /// string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// #[derive(Debug)]
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(subject).has_debug_string("Foo { hello: \"World\" }");
+        /// ```
+        #[track_caller]
+        fn has_debug_string(self, expected: E) -> Self;
 
-    /// Verifies that a subject formatted for debugging does not result in the
-    /// expected string.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// #[derive(Debug)]
-    /// struct Foo {
-    ///     hello: String,
-    /// }
-    ///
-    /// let subject = Foo { hello: "World".into() };
-    ///
-    /// assert_that!(subject).does_not_have_debug_string("Hello World");
-    /// ```
-    #[track_caller]
-    fn does_not_have_debug_string(self, expected: E) -> Self;
-}
+        /// Verifies that a subject formatted for debugging does not result in the
+        /// expected string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// #[derive(Debug)]
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(subject).does_not_have_debug_string("Hello World");
+        /// ```
+        #[track_caller]
+        fn does_not_have_debug_string(self, expected: E) -> Self;
+    }
 
-/// Mapping the subject into its debug string representation to do assertions on
-/// its debug string.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// #[derive(Debug)]
-/// struct Foo {
-///     hello: String,
-/// }
-///
-/// let subject = Foo { hello: "World".into() };
-///
-/// assert_that!(&subject).debug_string().contains("World");
-/// assert_that!(&subject).debug_string().does_not_start_with("Bar");
-/// ```
-pub trait AssertDebugString {
-    /// A spec-like type that contains the debug string as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// This is usually a `Spec<'a, String, R>`.
-    type DebugString;
-
-    /// Maps the subject into its debug string representation to do assertions
-    /// on its debug string.
+    /// Mapping the subject into its debug string representation to do assertions on
+    /// its debug string.
     ///
     /// # Examples
     ///
@@ -2932,38 +2920,39 @@ pub trait AssertDebugString {
     /// assert_that!(&subject).debug_string().contains("World");
     /// assert_that!(&subject).debug_string().does_not_start_with("Bar");
     /// ```
-    #[track_caller]
-    fn debug_string(self) -> Self::DebugString;
-}
+    pub trait AssertDebugString {
+        /// A spec-like type that contains the debug string as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// This is usually a `Spec<'a, String, R>`.
+        type DebugString;
 
-/// Assert a type formatted into a display string.
-///
-/// The subject's type must implement `Display` and the expected type must
-/// implement `AsRef<str>`.
-///
-/// # Examples
-///
-/// ```
-/// use core::fmt::{self, Display};
-/// use asserting::prelude::*;
-///
-/// struct Foo {
-///     hello: String,
-/// }
-///
-/// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-///         write!(f, "Hello {}", self.hello)
-///     }
-/// }
-///
-/// let subject = Foo { hello: "World".into() };
-///
-/// assert_that!(&subject).has_display_string("Hello World");
-/// assert_that!(&subject).does_not_have_display_string("Foo { hello: \"World\" }");
-/// ```
-pub trait AssertHasDisplayString<E> {
-    /// Verifies that a subject formatted for display results in the expected
-    /// string.
+        /// Maps the subject into its debug string representation to do assertions
+        /// on its debug string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// #[derive(Debug)]
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(&subject).debug_string().contains("World");
+        /// assert_that!(&subject).debug_string().does_not_start_with("Bar");
+        /// ```
+        #[track_caller]
+        fn debug_string(self) -> Self::DebugString;
+    }
+
+    /// Assert a type formatted into a display string.
+    ///
+    /// The subject's type must implement `Display` and the expected type must
+    /// implement `AsRef<str>`.
     ///
     /// # Examples
     ///
@@ -2983,67 +2972,61 @@ pub trait AssertHasDisplayString<E> {
     /// let subject = Foo { hello: "World".into() };
     ///
     /// assert_that!(&subject).has_display_string("Hello World");
-    /// ```
-    #[track_caller]
-    fn has_display_string(self, expected: E) -> Self;
-
-    /// Verifies that a subject formatted for display does not result in the
-    /// expected string.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use core::fmt::{self, Display};
-    /// use asserting::prelude::*;
-    ///
-    /// struct Foo {
-    ///     hello: String,
-    /// }
-    ///
-    /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    ///         write!(f, "Hello {}", self.hello)
-    ///     }
-    /// }
-    ///
-    /// let subject = Foo { hello: "World".into() };
-    ///
     /// assert_that!(&subject).does_not_have_display_string("Foo { hello: \"World\" }");
     /// ```
-    #[track_caller]
-    fn does_not_have_display_string(self, expected: E) -> Self;
-}
+    pub trait AssertHasDisplayString<E> {
+        /// Verifies that a subject formatted for display results in the expected
+        /// string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use core::fmt::{self, Display};
+        /// use asserting::prelude::*;
+        ///
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         write!(f, "Hello {}", self.hello)
+        ///     }
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(&subject).has_display_string("Hello World");
+        /// ```
+        #[track_caller]
+        fn has_display_string(self, expected: E) -> Self;
 
-/// Mapping the subject into its display string representation to do assertions
-/// on its display string.
-///
-/// # Examples
-///
-/// ```
-/// use core::fmt::{self, Display};
-/// use asserting::prelude::*;
-///
-/// struct Foo {
-///     hello: String,
-/// }
-///
-/// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-///         write!(f, "Hello, {}", self.hello)
-///     }
-/// }
-///
-/// let subject = Foo { hello: "World".into() };
-///
-/// assert_that!(&subject).display_string().is_equal_to("Hello, World");
-/// assert_that!(&subject).display_string().does_not_end_with('!');
-/// ```
-pub trait AssertDisplayString {
-    /// A spec-like type that contains the display string as the subject,
-    /// which is returned by the mapping assertion method.
-    ///
-    /// This is usually a `Spec<'a, String, R>`.
-    type DisplayString;
+        /// Verifies that a subject formatted for display does not result in the
+        /// expected string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use core::fmt::{self, Display};
+        /// use asserting::prelude::*;
+        ///
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         write!(f, "Hello {}", self.hello)
+        ///     }
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(&subject).does_not_have_display_string("Foo { hello: \"World\" }");
+        /// ```
+        #[track_caller]
+        fn does_not_have_display_string(self, expected: E) -> Self;
+    }
 
-    /// Maps the subject into its display string representation to do assertions
+    /// Mapping the subject into its display string representation to do assertions
     /// on its display string.
     ///
     /// # Examples
@@ -3066,35 +3049,41 @@ pub trait AssertDisplayString {
     /// assert_that!(&subject).display_string().is_equal_to("Hello, World");
     /// assert_that!(&subject).display_string().does_not_end_with('!');
     /// ```
-    #[track_caller]
-    fn display_string(self) -> Self::DisplayString;
-}
+    pub trait AssertDisplayString {
+        /// A spec-like type that contains the display string as the subject,
+        /// which is returned by the mapping assertion method.
+        ///
+        /// This is usually a `Spec<'a, String, R>`.
+        type DisplayString;
 
-/// Assert that a string contains a substring or character.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = "doming vulputate proident eum";
-///
-/// assert_that!(subject).contains("tate p");
-/// assert_that!(subject).contains('u');
-/// assert_that!(subject).starts_with("dom");
-/// assert_that!(subject).starts_with('d');
-/// assert_that!(subject).ends_with("t eum");
-/// assert_that!(subject).ends_with('m');
-///
-/// assert_that!(subject).does_not_contain("pat");
-/// assert_that!(subject).does_not_contain('k');
-/// assert_that!(subject).does_not_start_with("omi");
-/// assert_that!(subject).does_not_start_with('o');
-/// assert_that!(subject).does_not_end_with("meum");
-/// assert_that!(subject).does_not_end_with('u');
-/// ```
-pub trait AssertStringPattern<E> {
-    /// Verifies that a string contains a substring or character.
+        /// Maps the subject into its display string representation to do assertions
+        /// on its display string.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use core::fmt::{self, Display};
+        /// use asserting::prelude::*;
+        ///
+        /// struct Foo {
+        ///     hello: String,
+        /// }
+        ///
+        /// impl Display for Foo {fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        ///         write!(f, "Hello, {}", self.hello)
+        ///     }
+        /// }
+        ///
+        /// let subject = Foo { hello: "World".into() };
+        ///
+        /// assert_that!(&subject).display_string().is_equal_to("Hello, World");
+        /// assert_that!(&subject).display_string().does_not_end_with('!');
+        /// ```
+        #[track_caller]
+        fn display_string(self) -> Self::DisplayString;
+    }
+
+    /// Assert that a string contains a substring or character.
     ///
     /// # Examples
     ///
@@ -3105,104 +3094,109 @@ pub trait AssertStringPattern<E> {
     ///
     /// assert_that!(subject).contains("tate p");
     /// assert_that!(subject).contains('u');
-    /// ```
-    #[track_caller]
-    fn contains(self, pattern: E) -> Self;
-
-    /// Verifies that a string does not contain a substring or character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "consequat nihil sanctus commodo";
-    ///
-    /// assert_that!(subject).does_not_contain("nixil");
-    /// assert_that!(subject).does_not_contain('v');
-    /// ```
-    #[track_caller]
-    fn does_not_contain(self, pattern: E) -> Self;
-
-    /// Verifies that a string starts with a substring or character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "doming vulputate proident eum";
-    ///
     /// assert_that!(subject).starts_with("dom");
     /// assert_that!(subject).starts_with('d');
-    /// ```
-    #[track_caller]
-    fn starts_with(self, pattern: E) -> Self;
-
-    /// Verifies that a string does not start with a substring or character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "ex nulla nostrud proident";
-    ///
-    /// assert_that!(subject).does_not_start_with("nulla");
-    /// assert_that!(subject).does_not_start_with('v');
-    /// ```
-    #[track_caller]
-    fn does_not_start_with(self, pattern: E) -> Self;
-
-    /// Verifies that a string ends with a substring or character.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "doming vulputate proident eum";
-    ///
     /// assert_that!(subject).ends_with("t eum");
     /// assert_that!(subject).ends_with('m');
+    ///
+    /// assert_that!(subject).does_not_contain("pat");
+    /// assert_that!(subject).does_not_contain('k');
+    /// assert_that!(subject).does_not_start_with("omi");
+    /// assert_that!(subject).does_not_start_with('o');
+    /// assert_that!(subject).does_not_end_with("meum");
+    /// assert_that!(subject).does_not_end_with('u');
     /// ```
-    #[track_caller]
-    fn ends_with(self, pattern: E) -> Self;
+    pub trait AssertStringPattern<E> {
+        /// Verifies that a string contains a substring or character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "doming vulputate proident eum";
+        ///
+        /// assert_that!(subject).contains("tate p");
+        /// assert_that!(subject).contains('u');
+        /// ```
+        #[track_caller]
+        fn contains(self, pattern: E) -> Self;
 
-    /// Verifies that a string does not end with a substring or character.
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "sunt lorem at duo";
-    ///
-    /// assert_that!(subject).does_not_end_with("duos");
-    /// assert_that!(subject).does_not_end_with('v');
-    /// ```
-    #[track_caller]
-    fn does_not_end_with(self, pattern: E) -> Self;
-}
+        /// Verifies that a string does not contain a substring or character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "consequat nihil sanctus commodo";
+        ///
+        /// assert_that!(subject).does_not_contain("nixil");
+        /// assert_that!(subject).does_not_contain('v');
+        /// ```
+        #[track_caller]
+        fn does_not_contain(self, pattern: E) -> Self;
 
-/// Assert that a string contains any char from a collection of chars.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = "vel aliquip doming eros";
-///
-/// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
-/// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
-/// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z'][..]);
-///
-/// assert_that!(subject).does_not_contain_any_of(['x', 'y', 'z']);
-/// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z']);
-/// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z'][..]);
-/// ```
-pub trait AssertStringContainsAnyOf<E> {
-    /// Verifies that a string contains any char from a collection of
-    /// characters.
+        /// Verifies that a string starts with a substring or character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "doming vulputate proident eum";
+        ///
+        /// assert_that!(subject).starts_with("dom");
+        /// assert_that!(subject).starts_with('d');
+        /// ```
+        #[track_caller]
+        fn starts_with(self, pattern: E) -> Self;
+
+        /// Verifies that a string does not start with a substring or character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "ex nulla nostrud proident";
+        ///
+        /// assert_that!(subject).does_not_start_with("nulla");
+        /// assert_that!(subject).does_not_start_with('v');
+        /// ```
+        #[track_caller]
+        fn does_not_start_with(self, pattern: E) -> Self;
+
+        /// Verifies that a string ends with a substring or character.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "doming vulputate proident eum";
+        ///
+        /// assert_that!(subject).ends_with("t eum");
+        /// assert_that!(subject).ends_with('m');
+        /// ```
+        #[track_caller]
+        fn ends_with(self, pattern: E) -> Self;
+
+        /// Verifies that a string does not end with a substring or character.
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "sunt lorem at duo";
+        ///
+        /// assert_that!(subject).does_not_end_with("duos");
+        /// assert_that!(subject).does_not_end_with('v');
+        /// ```
+        #[track_caller]
+        fn does_not_end_with(self, pattern: E) -> Self;
+    }
+
+    /// Assert that a string contains any char from a collection of chars.
     ///
     /// # Examples
     ///
@@ -3213,48 +3207,49 @@ pub trait AssertStringContainsAnyOf<E> {
     ///
     /// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
     /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
-    /// assert_that!(subject).contains_any_of(&['a', 'b',  'm', 'z'][..]);
+    /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z'][..]);
+    ///
+    /// assert_that!(subject).does_not_contain_any_of(['x', 'y', 'z']);
+    /// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z']);
+    /// assert_that!(subject).does_not_contain_any_of(&['x', 'y', 'z'][..]);
     /// ```
-    #[track_caller]
-    fn contains_any_of(self, expected: E) -> Self;
+    pub trait AssertStringContainsAnyOf<E> {
+        /// Verifies that a string contains any char from a collection of
+        /// characters.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "vel aliquip doming eros";
+        ///
+        /// assert_that!(subject).contains_any_of(['a', 'b', 'm', 'z']);
+        /// assert_that!(subject).contains_any_of(&['a', 'b', 'm', 'z']);
+        /// assert_that!(subject).contains_any_of(&['a', 'b',  'm', 'z'][..]);
+        /// ```
+        #[track_caller]
+        fn contains_any_of(self, expected: E) -> Self;
 
-    /// Verifies that a string does not contain any char from a collection of
-    /// characters.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = "sunt lorem at duo";
-    ///
-    /// assert_that!(subject).does_not_contain_any_of(['v', 'w', 'x']);
-    /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x']);
-    /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x'][..]);
-    /// ```
-    #[track_caller]
-    fn does_not_contain_any_of(self, expected: E) -> Self;
-}
+        /// Verifies that a string does not contain any char from a collection of
+        /// characters.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = "sunt lorem at duo";
+        ///
+        /// assert_that!(subject).does_not_contain_any_of(['v', 'w', 'x']);
+        /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x']);
+        /// assert_that!(subject).does_not_contain_any_of(&['v', 'w', 'x'][..]);
+        /// ```
+        #[track_caller]
+        fn does_not_contain_any_of(self, expected: E) -> Self;
+    }
 
-/// Assert that a string matches a regex pattern.
-///
-/// # Example
-///
-/// ```
-/// # #[cfg(not(feature = "regex"))]
-/// # fn main() {}
-/// # #[cfg(feature = "regex")]
-/// # fn main() {
-/// use asserting::prelude::*;
-///
-/// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
-/// assert_that("tation odio placerat in").does_not_match(r"^[A-Z0-9 ]+$");
-/// # }
-/// ```
-#[cfg(feature = "regex")]
-#[cfg_attr(docsrs, doc(cfg(feature = "regex")))]
-pub trait AssertStringMatches {
-    /// Verifies that a string matches a regex pattern.
+    /// Assert that a string matches a regex pattern.
     ///
     /// # Example
     ///
@@ -3266,72 +3261,61 @@ pub trait AssertStringMatches {
     /// use asserting::prelude::*;
     ///
     /// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
-    /// # }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the given regex pattern is invalid or exceeds the
-    /// size limit.
-    #[track_caller]
-    fn matches(self, regex_pattern: &str) -> Self;
-
-    /// Verifies that a string does not match a regex pattern.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "regex"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "regex")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    ///
     /// assert_that("tation odio placerat in").does_not_match(r"^[A-Z0-9 ]+$");
     /// # }
     /// ```
-    ///
-    /// # Panics
-    ///
-    /// This method panics if the given regex pattern is invalid or exceeds the
-    /// size limit.
-    #[track_caller]
-    fn does_not_match(self, regex_pattern: &str) -> Self;
-}
+    #[cfg(feature = "regex")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "regex")))]
+    pub trait AssertStringMatches {
+        /// Verifies that a string matches a regex pattern.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "regex"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "regex")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that("tation odio placerat in").matches(r"\b\w{8}\b");
+        /// # }
+        /// ```
+        ///
+        /// # Panics
+        ///
+        /// This method panics if the given regex pattern is invalid or exceeds the
+        /// size limit.
+        #[track_caller]
+        fn matches(self, regex_pattern: &str) -> Self;
 
-/// Assert that an iterator or collection contains the expected value.
-///
-/// This assertion is implemented for any collection or iterator of items that
-/// implement `PartialEq<E>` with `E` being the type of the expected value.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-/// use std::collections::BTreeMap;
-///
-/// let some_array = [1, 3, 5, 7];
-/// assert_that!(some_array).contains(5);
-///
-/// let some_slice = &['b', 'X', 'k', 'G'][..];
-/// assert_that!(some_slice).contains(&'X');
-///
-/// let some_vec = vec![12, 4, 6, 10, 8];
-/// assert_that!(some_vec).contains(12);
-///
-/// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-/// assert_that!(some_btree_map).contains(('b', 0));
-/// ```
-pub trait AssertIteratorContains<E> {
-    /// A spec-like type that contains the collected values from the iterator as
-    /// the subject, which is returned by the mapping assertion methods.
-    ///
-    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
-    /// yielded by the iterator.
-    type Sequence;
+        /// Verifies that a string does not match a regex pattern.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "regex"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "regex")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        ///
+        /// assert_that("tation odio placerat in").does_not_match(r"^[A-Z0-9 ]+$");
+        /// # }
+        /// ```
+        ///
+        /// # Panics
+        ///
+        /// This method panics if the given regex pattern is invalid or exceeds the
+        /// size limit.
+        #[track_caller]
+        fn does_not_match(self, regex_pattern: &str) -> Self;
+    }
 
-    /// Verifies that the actual collection/iterator contains at least one
-    /// element that is equal to the expected value.
+    /// Assert that an iterator or collection contains the expected value.
+    ///
+    /// This assertion is implemented for any collection or iterator of items that
+    /// implement `PartialEq<E>` with `E` being the type of the expected value.
     ///
     /// # Examples
     ///
@@ -3351,387 +3335,380 @@ pub trait AssertIteratorContains<E> {
     /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
     /// assert_that!(some_btree_map).contains(('b', 0));
     /// ```
-    #[track_caller]
-    fn contains(self, element: E) -> Self::Sequence;
+    pub trait AssertIteratorContains<E> {
+        /// A spec-like type that contains the collected values from the iterator as
+        /// the subject, which is returned by the mapping assertion methods.
+        ///
+        /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+        /// yielded by the iterator.
+        type Sequence;
 
-    /// Verifies that the actual collection/iterator does not contain an element
-    /// that is equal to the expected value.
+        /// Verifies that the actual collection/iterator contains at least one
+        /// element that is equal to the expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains(5);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains(&'X');
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains(12);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains(('b', 0));
+        /// ```
+        #[track_caller]
+        fn contains(self, element: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator does not contain an element
+        /// that is equal to the expected value.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).does_not_contain(2);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).does_not_contain(&'Y');
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).does_not_contain(5);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).does_not_contain(('d', 5));
+        /// ```
+        #[track_caller]
+        fn does_not_contain(self, element: E) -> Self::Sequence;
+    }
+
+    /// Assert values in a collection.
+    ///
+    /// These assertions do not rely on the order in which the collection iterates
+    /// over its values. They are implemented for any iterator over items that
+    /// implement `PartialEq<E>` with `E` being the type of the items in the
+    /// expected collection or iterator.
+    pub trait AssertIteratorContainsInAnyOrder<E> {
+        /// A spec-like type that contains the collected values from the iterator as
+        /// the subject, which is returned by the mapping assertion methods.
+        ///
+        /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+        /// yielded by the iterator.
+        type Sequence;
+
+        /// Verifies that the actual collection/iterator contains exactly the given
+        /// values and nothing else in any order.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_exactly_in_any_order([3, 1, 5, 7]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_exactly_in_any_order(&['X', 'k', 'b', 'G']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_exactly_in_any_order([8, 10, 6, 4, 12]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_exactly_in_any_order([('b', 0), ('a', 3), ('c', 8)]);
+        /// ```
+        #[track_caller]
+        fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains at least one of
+        /// the specified values.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_any_of([2, 3, 4]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_any_of(&['a', 'b', 'c', 'd']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_any_of([1, 2, 3, 4, 5]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_any_of([('x', 2), ('a', 3), ('y', 7)]);
+        /// ```
+        #[track_caller]
+        fn contains_any_of(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator does not contain any of
+        /// the specified values.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).does_not_contain_any_of([2, 4, 6]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).does_not_contain_any_of(&['a', 'A', 'c', 'd']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).does_not_contain_any_of([1, 2, 3, 5, 7]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).does_not_contain_any_of([('x', 2), ('z', 3), ('y', 7)]);
+        /// ```
+        #[track_caller]
+        fn does_not_contain_any_of(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains the given values
+        /// in any order.
+        ///
+        /// The collection/iterator may contain more values than the given ones, but
+        /// at least all the specified ones.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_all_of([3, 1, 5]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_all_of(&['k', 'b']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_all_of([4, 6, 10, 12]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_all_of([('a', 3), ('b', 0)]);
+        /// ```
+        #[track_caller]
+        fn contains_all_of(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains only the given
+        /// values and nothing else in any order and ignoring duplicates.
+        ///
+        /// The collection may contain fewer values than the expected ones.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_only([0, 5, 3, 1, 7, 9]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_only(&['X', 'a', 'k', 'b', 'G', 'A']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_only([2, 4, 6, 8, 10, 12, 14, 0]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_only([('a', 3), ('b', 0), ('c', 8), ('d', 4)]);
+        /// ```
+        #[track_caller]
+        fn contains_only(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains only the given
+        /// values in any order and each of them only once.
+        ///
+        /// The collection may contain fewer values than the expected ones.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_only_once([0, 1, 3, 5, 7, 9]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_only_once(&['a', 'b', 'X', 'k', 'G']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_only_once([4, 6, 8, 10, 12, 15, 20]);
+        /// ```
+        #[track_caller]
+        fn contains_only_once(self, expected: E) -> Self::Sequence;
+    }
+
+    /// Assert values in an ordered collection.
+    ///
+    /// These assertions are applicable to collections which iterate over their
+    /// values in a defined order.
+    pub trait AssertIteratorContainsInOrder<E> {
+        /// A spec-like type that contains the collected values from the iterator as
+        /// the subject, which is returned by the mapping assertion methods.
+        ///
+        /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
+        /// yielded by the iterator.
+        type Sequence;
+
+        /// Verifies that the actual collection/iterator contains exactly the given
+        /// values and nothing else in the given order.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).contains_exactly([1, 3, 5, 7]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_exactly(&['b', 'X', 'k', 'G']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_exactly([12, 4, 6, 10, 8]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_exactly([('a', 3), ('b', 0), ('c', 8)]);
+        /// ```
+        #[track_caller]
+        fn contains_exactly(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains the given sequence
+        /// of values in the given order and without extra values between the
+        /// sequence values.
+        ///
+        /// May contain more values as in the given sequence before and after the
+        /// sequence.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7, 9];
+        /// assert_that!(some_array).contains_sequence([3, 5, 7]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_sequence(&['b', 'X']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_sequence([6, 10, 8]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_sequence([('a', 3), ('b', 0), ('c', 8)]);
+        /// ```
+        #[track_caller]
+        fn contains_sequence(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains all the given
+        /// values and in the given order, possibly with other values between them.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7, 9];
+        /// assert_that!(some_array).contains_all_in_order([3, 5, 9]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).contains_all_in_order(&['b', 'G']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).contains_all_in_order([12, 4, 10, 8]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).contains_all_in_order([('a', 3), ('c', 8)]);
+        /// ```
+        #[track_caller]
+        fn contains_all_in_order(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains the given values
+        /// as the first elements in order.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).starts_with([1, 3, 5]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).starts_with(&['b', 'X']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).starts_with([12, 4, 6]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).starts_with([('a', 3), ('b', 0)]);
+        /// ```
+        #[track_caller]
+        fn starts_with(self, expected: E) -> Self::Sequence;
+
+        /// Verifies that the actual collection/iterator contains the given values
+        /// as the last elements in order.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let some_array = [1, 3, 5, 7];
+        /// assert_that!(some_array).ends_with([3, 5, 7]);
+        ///
+        /// let some_slice = &['b', 'X', 'k', 'G'][..];
+        /// assert_that!(some_slice).ends_with(&['k', 'G']);
+        ///
+        /// let some_vec = vec![12, 4, 6, 10, 8];
+        /// assert_that!(some_vec).ends_with([10, 8]);
+        ///
+        /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
+        /// assert_that!(some_btree_map).ends_with([('b', 0), ('c', 8)]);
+        /// ```
+        #[track_caller]
+        fn ends_with(self, expected: E) -> Self::Sequence;
+    }
+
+    /// Assert the order of the values within a collection.
+    ///
+    /// These assertions are applicable to ordered collections only.
+    pub trait AssertIsSorted {
+        /// Verifies that the actual collection is sorted in ascending order.
+        #[track_caller]
+        fn is_sorted_ascending(self) -> Self;
+
+        /// Verifies that the actual collection is sorted in descending order.
+        #[track_caller]
+        fn is_sorted_descending(self) -> Self;
+    }
+
+    /// Assert that the code under test panics, panics with a certain message or
+    /// does not panic.
     ///
     /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).does_not_contain(2);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).does_not_contain(&'Y');
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).does_not_contain(5);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).does_not_contain(('d', 5));
-    /// ```
-    #[track_caller]
-    fn does_not_contain(self, element: E) -> Self::Sequence;
-}
-
-/// Assert values in a collection.
-///
-/// These assertions do not rely on the order in which the collection iterates
-/// over its values. They are implemented for any iterator over items that
-/// implement `PartialEq<E>` with `E` being the type of the items in the
-/// expected collection or iterator.
-pub trait AssertIteratorContainsInAnyOrder<E> {
-    /// A spec-like type that contains the collected values from the iterator as
-    /// the subject, which is returned by the mapping assertion methods.
-    ///
-    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
-    /// yielded by the iterator.
-    type Sequence;
-
-    /// Verifies that the actual collection/iterator contains exactly the given
-    /// values and nothing else in any order.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_exactly_in_any_order([3, 1, 5, 7]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_exactly_in_any_order(&['X', 'k', 'b', 'G']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_exactly_in_any_order([8, 10, 6, 4, 12]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_exactly_in_any_order([('b', 0), ('a', 3), ('c', 8)]);
-    /// ```
-    #[track_caller]
-    fn contains_exactly_in_any_order(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains at least one of
-    /// the specified values.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_any_of([2, 3, 4]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_any_of(&['a', 'b', 'c', 'd']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_any_of([1, 2, 3, 4, 5]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_any_of([('x', 2), ('a', 3), ('y', 7)]);
-    /// ```
-    #[track_caller]
-    fn contains_any_of(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator does not contain any of
-    /// the specified values.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).does_not_contain_any_of([2, 4, 6]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).does_not_contain_any_of(&['a', 'A', 'c', 'd']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).does_not_contain_any_of([1, 2, 3, 5, 7]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).does_not_contain_any_of([('x', 2), ('z', 3), ('y', 7)]);
-    /// ```
-    #[track_caller]
-    fn does_not_contain_any_of(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains the given values
-    /// in any order.
-    ///
-    /// The collection/iterator may contain more values than the given ones, but
-    /// at least all the specified ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_all_of([3, 1, 5]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_all_of(&['k', 'b']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_all_of([4, 6, 10, 12]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_all_of([('a', 3), ('b', 0)]);
-    /// ```
-    #[track_caller]
-    fn contains_all_of(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains only the given
-    /// values and nothing else in any order and ignoring duplicates.
-    ///
-    /// The collection may contain fewer values than the expected ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_only([0, 5, 3, 1, 7, 9]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_only(&['X', 'a', 'k', 'b', 'G', 'A']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_only([2, 4, 6, 8, 10, 12, 14, 0]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_only([('a', 3), ('b', 0), ('c', 8), ('d', 4)]);
-    /// ```
-    #[track_caller]
-    fn contains_only(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains only the given
-    /// values in any order and each of them only once.
-    ///
-    /// The collection may contain fewer values than the expected ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_only_once([0, 1, 3, 5, 7, 9]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_only_once(&['a', 'b', 'X', 'k', 'G']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_only_once([4, 6, 8, 10, 12, 15, 20]);
-    /// ```
-    #[track_caller]
-    fn contains_only_once(self, expected: E) -> Self::Sequence;
-}
-
-/// Assert values in an ordered collection.
-///
-/// These assertions are applicable to collections which iterate over their
-/// values in a defined order.
-pub trait AssertIteratorContainsInOrder<E> {
-    /// A spec-like type that contains the collected values from the iterator as
-    /// the subject, which is returned by the mapping assertion methods.
-    ///
-    /// Usually this a `Spec<'a, Vec<T>, R>` with T as the type of the items
-    /// yielded by the iterator.
-    type Sequence;
-
-    /// Verifies that the actual collection/iterator contains exactly the given
-    /// values and nothing else in the given order.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).contains_exactly([1, 3, 5, 7]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_exactly(&['b', 'X', 'k', 'G']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_exactly([12, 4, 6, 10, 8]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_exactly([('a', 3), ('b', 0), ('c', 8)]);
-    /// ```
-    #[track_caller]
-    fn contains_exactly(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains the given sequence
-    /// of values in the given order and without extra values between the
-    /// sequence values.
-    ///
-    /// May contain more values as in the given sequence before and after the
-    /// sequence.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7, 9];
-    /// assert_that!(some_array).contains_sequence([3, 5, 7]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_sequence(&['b', 'X']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_sequence([6, 10, 8]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_sequence([('a', 3), ('b', 0), ('c', 8)]);
-    /// ```
-    #[track_caller]
-    fn contains_sequence(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains all the given
-    /// values and in the given order, possibly with other values between them.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7, 9];
-    /// assert_that!(some_array).contains_all_in_order([3, 5, 9]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).contains_all_in_order(&['b', 'G']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).contains_all_in_order([12, 4, 10, 8]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).contains_all_in_order([('a', 3), ('c', 8)]);
-    /// ```
-    #[track_caller]
-    fn contains_all_in_order(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains the given values
-    /// as the first elements in order.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).starts_with([1, 3, 5]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).starts_with(&['b', 'X']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).starts_with([12, 4, 6]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).starts_with([('a', 3), ('b', 0)]);
-    /// ```
-    #[track_caller]
-    fn starts_with(self, expected: E) -> Self::Sequence;
-
-    /// Verifies that the actual collection/iterator contains the given values
-    /// as the last elements in order.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let some_array = [1, 3, 5, 7];
-    /// assert_that!(some_array).ends_with([3, 5, 7]);
-    ///
-    /// let some_slice = &['b', 'X', 'k', 'G'][..];
-    /// assert_that!(some_slice).ends_with(&['k', 'G']);
-    ///
-    /// let some_vec = vec![12, 4, 6, 10, 8];
-    /// assert_that!(some_vec).ends_with([10, 8]);
-    ///
-    /// let some_btree_map = BTreeMap::from_iter([('a', 3), ('b', 0), ('c', 8)]);
-    /// assert_that!(some_btree_map).ends_with([('b', 0), ('c', 8)]);
-    /// ```
-    #[track_caller]
-    fn ends_with(self, expected: E) -> Self::Sequence;
-}
-
-/// Assert the order of the values within a collection.
-///
-/// These assertions are applicable to ordered collections only.
-pub trait AssertIsSorted {
-    /// Verifies that the actual collection is sorted in ascending order.
-    #[track_caller]
-    fn is_sorted_ascending(self) -> Self;
-
-    /// Verifies that the actual collection is sorted in descending order.
-    #[track_caller]
-    fn is_sorted_descending(self) -> Self;
-}
-
-/// Assert that the code under test panics, panics with a certain message or
-/// does not panic.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// fn do_something(input: &str) {
-///     if input.is_empty() {
-///         panic!("input is empty");
-///     }
-/// }
-///
-/// assert_that_code!(|| {
-///     do_something("correct input");
-/// }).does_not_panic();
-///
-/// assert_that_code!(|| {
-///     do_something("");
-/// }).panics();
-///
-/// assert_that_code!(|| {
-///     do_something("");
-/// }).panics_with_message("input is empty");
-/// ```
-#[cfg(feature = "panic")]
-#[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
-pub trait AssertCodePanics {
-    /// A spec-like type that contains the mapped type as subject, which is
-    /// returned by mapping assertion methods.
-    ///
-    /// For closures only one assertion method can be called. Therefore, the
-    /// spec-like type contains unit, to prevent calling more assertions.
-    /// Usually the mapped type is a `Spec<'a, (), R>`.
-    type Mapped;
-
-    /// Verifies that the actual code under test does not panic.
-    ///
-    /// # Example
     ///
     /// ```
     /// use asserting::prelude::*;
@@ -3745,106 +3722,89 @@ pub trait AssertCodePanics {
     /// assert_that_code!(|| {
     ///     do_something("correct input");
     /// }).does_not_panic();
-    /// ```
-    #[track_caller]
-    fn does_not_panic(self) -> Self::Mapped;
-
-    /// Verifies that the actual code under test panics with any message.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn do_something(input: &str) {
-    ///     if input.is_empty() {
-    ///         panic!("input is empty");
-    ///     }
-    /// }
     ///
     /// assert_that_code!(|| {
     ///     do_something("");
     /// }).panics();
-    /// ```
-    #[track_caller]
-    fn panics(self) -> Self::Mapped;
-
-    /// Verifies that the actual code under test panics with the given
-    /// message.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// fn do_something(input: &str) {
-    ///     if input.is_empty() {
-    ///         panic!("input is empty");
-    ///     }
-    /// }
     ///
     /// assert_that_code!(|| {
     ///     do_something("");
     /// }).panics_with_message("input is empty");
     /// ```
-    #[track_caller]
-    fn panics_with_message(self, message: impl Into<String>) -> Self::Mapped;
-}
+    #[cfg(feature = "panic")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "panic")))]
+    pub trait AssertCodePanics {
+        /// A spec-like type that contains the mapped type as subject, which is
+        /// returned by mapping assertion methods.
+        ///
+        /// For closures only one assertion method can be called. Therefore, the
+        /// spec-like type contains unit, to prevent calling more assertions.
+        /// Usually the mapped type is a `Spec<'a, (), R>`.
+        type Mapped;
 
-/// Assertions for the keys of a map.
-///
-/// # Examples
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {}
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use asserting::prelude::*;
-/// use std::collections::HashMap;
-///
-/// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_key(5);
-/// assert_that!(&subject).does_not_contain_key(3);
-/// assert_that!(&subject).contains_keys([4, 8]);
-/// assert_that!(&subject).does_not_contain_keys([3, 2, 7]);
-/// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
-/// # }
-/// ```
-///
-/// ```
-/// use asserting::prelude::*;
-/// use hashbrown::HashMap;
-///
-/// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_key(4);
-/// assert_that!(&subject).does_not_contain_key(7);
-/// assert_that!(&subject).contains_keys([1, 5]);
-/// assert_that!(&subject).does_not_contain_keys([2, 7, 6]);
-/// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
-/// ```
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {}
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use asserting::prelude::*;
-/// use std::collections::BTreeMap;
-///
-/// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_key(4);
-/// assert_that!(&subject).does_not_contain_key(2);
-/// assert_that!(&subject).contains_keys([1, 4, 8]);
-/// assert_that!(&subject).does_not_contain_keys([2, 3, 6]);
-/// assert_that!(&subject).contains_exactly_keys([4, 5, 8, 1]);
-/// # }
-/// ```
-pub trait AssertMapContainsKey<E> {
-    /// Verify that the actual map contains a mapping for the given key.
+        /// Verifies that the actual code under test does not panic.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// fn do_something(input: &str) {
+        ///     if input.is_empty() {
+        ///         panic!("input is empty");
+        ///     }
+        /// }
+        ///
+        /// assert_that_code!(|| {
+        ///     do_something("correct input");
+        /// }).does_not_panic();
+        /// ```
+        #[track_caller]
+        fn does_not_panic(self) -> Self::Mapped;
+
+        /// Verifies that the actual code under test panics with any message.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// fn do_something(input: &str) {
+        ///     if input.is_empty() {
+        ///         panic!("input is empty");
+        ///     }
+        /// }
+        ///
+        /// assert_that_code!(|| {
+        ///     do_something("");
+        /// }).panics();
+        /// ```
+        #[track_caller]
+        fn panics(self) -> Self::Mapped;
+
+        /// Verifies that the actual code under test panics with the given
+        /// message.
+        ///
+        /// # Example
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// fn do_something(input: &str) {
+        ///     if input.is_empty() {
+        ///         panic!("input is empty");
+        ///     }
+        /// }
+        ///
+        /// assert_that_code!(|| {
+        ///     do_something("");
+        /// }).panics_with_message("input is empty");
+        /// ```
+        #[track_caller]
+        fn panics_with_message(self, message: impl Into<String>) -> Self::Mapped;
+    }
+
+    /// Assertions for the keys of a map.
     ///
     /// # Examples
     ///
@@ -3859,104 +3819,10 @@ pub trait AssertMapContainsKey<E> {
     /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
     /// assert_that!(&subject).contains_key(5);
-    /// assert_that!(subject).contains_key(1);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_key(4);
-    /// assert_that!(subject).contains_key(8);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_key(4);
-    /// assert_that!(subject).contains_key(5);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn contains_key(self, expected_key: E) -> Self;
-
-    /// Verify that the actual map does not contain any mapping for the given
-    /// key.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_key(2);
-    /// assert_that!(subject).does_not_contain_key(3);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_key(6);
-    /// assert_that!(subject).does_not_contain_key(7);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
     /// assert_that!(&subject).does_not_contain_key(3);
-    /// assert_that!(subject).does_not_contain_key(9);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn does_not_contain_key(self, expected_key: E) -> Self;
-
-    /// Verify that the actual map contains a mapping for each of the given
-    /// keys.
-    ///
-    /// The order of the keys is not relevant and duplicates are ignored.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_keys([4, 5]);
-    /// assert_that!(&subject).contains_keys([8, 1, 5]);
-    /// assert_that!(&subject).contains_keys([8, 1, 1]);
+    /// assert_that!(&subject).contains_keys([4, 8]);
+    /// assert_that!(&subject).does_not_contain_keys([3, 2, 7]);
+    /// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
     /// # }
     /// ```
     ///
@@ -3966,9 +3832,11 @@ pub trait AssertMapContainsKey<E> {
     ///
     /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
+    /// assert_that!(&subject).contains_key(4);
+    /// assert_that!(&subject).does_not_contain_key(7);
     /// assert_that!(&subject).contains_keys([1, 5]);
-    /// assert_that!(&subject).contains_keys([8, 1, 4]);
-    /// assert_that!(&subject).contains_keys([8, 4, 4]);
+    /// assert_that!(&subject).does_not_contain_keys([2, 7, 6]);
+    /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
     /// ```
     ///
     /// ```
@@ -3981,171 +3849,265 @@ pub trait AssertMapContainsKey<E> {
     ///
     /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
-    /// assert_that!(&subject).contains_keys([1, 4, 5, 8]);
-    /// assert_that!(&subject).contains_keys([5, 4, 8]);
-    /// assert_that!(&subject).contains_keys([5, 5, 8]);
+    /// assert_that!(&subject).contains_key(4);
+    /// assert_that!(&subject).does_not_contain_key(2);
+    /// assert_that!(&subject).contains_keys([1, 4, 8]);
+    /// assert_that!(&subject).does_not_contain_keys([2, 3, 6]);
+    /// assert_that!(&subject).contains_exactly_keys([4, 5, 8, 1]);
     /// # }
     /// ```
-    #[track_caller]
-    fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
+    pub trait AssertMapContainsKey<E> {
+        /// Verify that the actual map contains a mapping for the given key.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_key(5);
+        /// assert_that!(subject).contains_key(1);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_key(4);
+        /// assert_that!(subject).contains_key(8);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_key(4);
+        /// assert_that!(subject).contains_key(5);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn contains_key(self, expected_key: E) -> Self;
 
-    /// Verify that the actual map does not contain any mapping for one of the
-    /// given keys.
-    ///
-    /// The order of the keys is not relevant and duplicates are ignored.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_keys([2, 3]);
-    /// assert_that!(&subject).does_not_contain_keys([6, 3, 7]);
-    /// assert_that!(&subject).does_not_contain_keys([3, 6, 3]);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_keys([6, 7]);
-    /// assert_that!(&subject).does_not_contain_keys([3, 2, 6]);
-    /// assert_that!(&subject).does_not_contain_keys([7, 2, 7]);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_keys([2, 3, 6, 7]);
-    /// assert_that!(&subject).does_not_contain_keys([7, 3, 6]);
-    /// assert_that!(&subject).does_not_contain_keys([2, 2, 9]);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
+        /// Verify that the actual map does not contain any mapping for the given
+        /// key.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_key(2);
+        /// assert_that!(subject).does_not_contain_key(3);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_key(6);
+        /// assert_that!(subject).does_not_contain_key(7);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_key(3);
+        /// assert_that!(subject).does_not_contain_key(9);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn does_not_contain_key(self, expected_key: E) -> Self;
 
-    /// Verifies that the actual map contains a mapping for each of the expected
-    /// keys but no more.
-    ///
-    /// The order of the keys is not relevant and duplicates are ignored.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8, 8]);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([1, 1, 4, 5, 8]);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([5, 4, 1, 8]);
-    /// assert_that!(&subject).contains_exactly_keys([5, 4, 4, 1, 8]);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn contains_exactly_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
-}
+        /// Verify that the actual map contains a mapping for each of the given
+        /// keys.
+        ///
+        /// The order of the keys is not relevant and duplicates are ignored.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_keys([4, 5]);
+        /// assert_that!(&subject).contains_keys([8, 1, 5]);
+        /// assert_that!(&subject).contains_keys([8, 1, 1]);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_keys([1, 5]);
+        /// assert_that!(&subject).contains_keys([8, 1, 4]);
+        /// assert_that!(&subject).contains_keys([8, 4, 4]);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_keys([1, 4, 5, 8]);
+        /// assert_that!(&subject).contains_keys([5, 4, 8]);
+        /// assert_that!(&subject).contains_keys([5, 5, 8]);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn contains_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
 
-/// Assertions for the values of a map.
-///
-/// # Examples
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {}
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use asserting::prelude::*;
-/// use std::collections::HashMap;
-///
-/// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_value("five");
-/// assert_that!(&subject).does_not_contain_value("three");
-/// assert_that!(&subject).contains_values(["four", "eight"]);
-/// assert_that!(&subject).does_not_contain_values(["three", "two", "seven"]);
-/// # }
-/// ```
-///
-/// ```
-/// use asserting::prelude::*;
-/// use hashbrown::HashMap;
-///
-/// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_value("four");
-/// assert_that!(&subject).does_not_contain_value("seven");
-/// assert_that!(&subject).contains_values(["one", "five"]);
-/// assert_that!(&subject).does_not_contain_values(["two", "seven", "six"]);
-/// ```
-///
-/// ```
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() {}
-/// # #[cfg(feature = "std")]
-/// # fn main() {
-/// use asserting::prelude::*;
-/// use std::collections::BTreeMap;
-///
-/// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-///
-/// assert_that!(&subject).contains_value("four");
-/// assert_that!(&subject).does_not_contain_value("two");
-/// assert_that!(&subject).contains_values(["four", "one", "eight"]);
-/// assert_that!(&subject).does_not_contain_values(["two", "three", "six"]);
-/// # }
-/// ```
-pub trait AssertMapContainsValue<E> {
-    /// Verify that the actual map contains at least one mapping where the value
-    /// is equal to the expected one.
+        /// Verify that the actual map does not contain any mapping for one of the
+        /// given keys.
+        ///
+        /// The order of the keys is not relevant and duplicates are ignored.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_keys([2, 3]);
+        /// assert_that!(&subject).does_not_contain_keys([6, 3, 7]);
+        /// assert_that!(&subject).does_not_contain_keys([3, 6, 3]);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_keys([6, 7]);
+        /// assert_that!(&subject).does_not_contain_keys([3, 2, 6]);
+        /// assert_that!(&subject).does_not_contain_keys([7, 2, 7]);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_keys([2, 3, 6, 7]);
+        /// assert_that!(&subject).does_not_contain_keys([7, 3, 6]);
+        /// assert_that!(&subject).does_not_contain_keys([2, 2, 9]);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn does_not_contain_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
+
+        /// Verifies that the actual map contains a mapping for each of the expected
+        /// keys but no more.
+        ///
+        /// The order of the keys is not relevant and duplicates are ignored.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8, 8]);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_exactly_keys([4, 1, 5, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([1, 1, 4, 5, 8]);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_exactly_keys([1, 4, 5, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([5, 4, 1, 8]);
+        /// assert_that!(&subject).contains_exactly_keys([5, 4, 4, 1, 8]);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn contains_exactly_keys(self, expected_keys: impl IntoIterator<Item = E>) -> Self;
+    }
+
+    /// Assertions for the values of a map.
     ///
     /// # Examples
     ///
@@ -4160,7 +4122,9 @@ pub trait AssertMapContainsValue<E> {
     /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
     /// assert_that!(&subject).contains_value("five");
-    /// assert_that!(subject).contains_value("one");
+    /// assert_that!(&subject).does_not_contain_value("three");
+    /// assert_that!(&subject).contains_values(["four", "eight"]);
+    /// assert_that!(&subject).does_not_contain_values(["three", "two", "seven"]);
     /// # }
     /// ```
     ///
@@ -4170,8 +4134,10 @@ pub trait AssertMapContainsValue<E> {
     ///
     /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
-    /// assert_that!(&subject).contains_value("one");
-    /// assert_that!(subject).contains_value("eight");
+    /// assert_that!(&subject).contains_value("four");
+    /// assert_that!(&subject).does_not_contain_value("seven");
+    /// assert_that!(&subject).contains_values(["one", "five"]);
+    /// assert_that!(&subject).does_not_contain_values(["two", "seven", "six"]);
     /// ```
     ///
     /// ```
@@ -4185,498 +4151,467 @@ pub trait AssertMapContainsValue<E> {
     /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
     ///
     /// assert_that!(&subject).contains_value("four");
-    /// assert_that!(subject).contains_value("five");
-    /// # }
-    /// ```
-    #[track_caller]
-    fn contains_value(self, expected_value: E) -> Self;
-
-    /// Verify that the actual map does not contain any mapping where the value
-    /// is equal to the expected one.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
     /// assert_that!(&subject).does_not_contain_value("two");
-    /// assert_that!(subject).does_not_contain_value("three");
+    /// assert_that!(&subject).contains_values(["four", "one", "eight"]);
+    /// assert_that!(&subject).does_not_contain_values(["two", "three", "six"]);
     /// # }
     /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_value("six");
-    /// assert_that!(subject).does_not_contain_value("seven");
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_value("three");
-    /// assert_that!(subject).does_not_contain_value("nine");
-    /// # }
-    /// ```
-    #[track_caller]
-    fn does_not_contain_value(self, expected_value: E) -> Self;
+    pub trait AssertMapContainsValue<E> {
+        /// Verify that the actual map contains at least one mapping where the value
+        /// is equal to the expected one.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_value("five");
+        /// assert_that!(subject).contains_value("one");
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_value("one");
+        /// assert_that!(subject).contains_value("eight");
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_value("four");
+        /// assert_that!(subject).contains_value("five");
+        /// # }
+        /// ```
+        #[track_caller]
+        fn contains_value(self, expected_value: E) -> Self;
 
-    /// Verify that the actual map contains at least one mapping for each of the
-    /// given values, where the mapping contains one of the expected values.
-    ///
-    /// The order of the values is not relevant and duplicates are ignored.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_values(["four", "five"]);
-    /// assert_that!(&subject).contains_values(["eight", "one", "five"]);
-    /// assert_that!(&subject).contains_values(["eight", "one", "one"]);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_values(["one", "five"]);
-    /// assert_that!(&subject).contains_values(["eight", "one", "four"]);
-    /// assert_that!(&subject).contains_values(["eight", "four", "four"]);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).contains_values(["one", "four", "five", "eight"]);
-    /// assert_that!(&subject).contains_values(["five", "four", "eight"]);
-    /// assert_that!(&subject).contains_values(["five", "five", "eight"]);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
+        /// Verify that the actual map does not contain any mapping where the value
+        /// is equal to the expected one.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_value("two");
+        /// assert_that!(subject).does_not_contain_value("three");
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_value("six");
+        /// assert_that!(subject).does_not_contain_value("seven");
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_value("three");
+        /// assert_that!(subject).does_not_contain_value("nine");
+        /// # }
+        /// ```
+        #[track_caller]
+        fn does_not_contain_value(self, expected_value: E) -> Self;
 
-    /// Verify that the actual map does not contain any mapping where the value
-    /// is one of the given values.
-    ///
-    /// The order of the values is not relevant and duplicates are ignored.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_values(["two", "three"]);
-    /// assert_that!(&subject).does_not_contain_values(["six", "three", "seven"]);
-    /// assert_that!(&subject).does_not_contain_values(["three", "six", "three"]);
-    /// # }
-    /// ```
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    /// use hashbrown::HashMap;
-    ///
-    /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_values(["six", "seven"]);
-    /// assert_that!(&subject).does_not_contain_values(["three", "two", "six"]);
-    /// assert_that!(&subject).does_not_contain_values(["seven", "two", "seven"]);
-    /// ```
-    ///
-    /// ```
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() {}
-    /// # #[cfg(feature = "std")]
-    /// # fn main() {
-    /// use asserting::prelude::*;
-    /// use std::collections::BTreeMap;
-    ///
-    /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
-    ///
-    /// assert_that!(&subject).does_not_contain_values(["two", "three", "six", "seven"]);
-    /// assert_that!(&subject).does_not_contain_values(["seven", "three", "six"]);
-    /// assert_that!(&subject).does_not_contain_values(["two", "two", "nine"]);
-    /// # }
-    /// ```
-    #[track_caller]
-    fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
-}
+        /// Verify that the actual map contains at least one mapping for each of the
+        /// given values, where the mapping contains one of the expected values.
+        ///
+        /// The order of the values is not relevant and duplicates are ignored.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_values(["four", "five"]);
+        /// assert_that!(&subject).contains_values(["eight", "one", "five"]);
+        /// assert_that!(&subject).contains_values(["eight", "one", "one"]);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_values(["one", "five"]);
+        /// assert_that!(&subject).contains_values(["eight", "one", "four"]);
+        /// assert_that!(&subject).contains_values(["eight", "four", "four"]);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).contains_values(["one", "four", "five", "eight"]);
+        /// assert_that!(&subject).contains_values(["five", "four", "eight"]);
+        /// assert_that!(&subject).contains_values(["five", "five", "eight"]);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn contains_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
 
-/// Execute assertions on every element of a collection or iterator.
-///
-/// Iterators over the elements of a collection or an iterator and executes one
-/// or multiple assertions on each of those elements. The failure report
-/// contains detailed information for each element for which one or multiple
-/// assertions failed.
-pub trait AssertElements<'a, I>
-where
-    I: IntoIterator,
-{
-    /// A spec-like type that is returned by the methods of this trait.
-    type Output;
+        /// Verify that the actual map does not contain any mapping where the value
+        /// is one of the given values.
+        ///
+        /// The order of the values is not relevant and duplicates are ignored.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_values(["two", "three"]);
+        /// assert_that!(&subject).does_not_contain_values(["six", "three", "seven"]);
+        /// assert_that!(&subject).does_not_contain_values(["three", "six", "three"]);
+        /// # }
+        /// ```
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        /// use hashbrown::HashMap;
+        ///
+        /// let subject: HashMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_values(["six", "seven"]);
+        /// assert_that!(&subject).does_not_contain_values(["three", "two", "six"]);
+        /// assert_that!(&subject).does_not_contain_values(["seven", "two", "seven"]);
+        /// ```
+        ///
+        /// ```
+        /// # #[cfg(not(feature = "std"))]
+        /// # fn main() {}
+        /// # #[cfg(feature = "std")]
+        /// # fn main() {
+        /// use asserting::prelude::*;
+        /// use std::collections::BTreeMap;
+        ///
+        /// let subject: BTreeMap<_, _> = [(4, "four"), (1, "one"), (5, "five"), (8, "eight")].into();
+        ///
+        /// assert_that!(&subject).does_not_contain_values(["two", "three", "six", "seven"]);
+        /// assert_that!(&subject).does_not_contain_values(["seven", "three", "six"]);
+        /// assert_that!(&subject).does_not_contain_values(["two", "two", "nine"]);
+        /// # }
+        /// ```
+        #[track_caller]
+        fn does_not_contain_values(self, expected_values: impl IntoIterator<Item = E>) -> Self;
+    }
 
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If all elements are
-    /// asserted successfully, the whole assertion succeeds.
+    /// Execute assertions on every element of a collection or iterator.
     ///
-    /// It iterates over all elements of the collection or iterator and collects
-    /// the failure messages for those elements where the assertion fails. In
-    /// other words, it does not stop iterating when the assertion for one
-    /// element fails.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let numbers = [2, 4, 6, 8, 10];
-    ///
-    /// assert_that!(numbers).each_element(|e|
-    ///     e.is_greater_than(2)
-    ///         .is_at_most(7)
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected numbers [0] to be greater than 2
-    ///    but was: 2
-    ///   expected: > 2
-    ///
-    /// expected numbers [3] to be at most 7
-    ///    but was: 8
-    ///   expected: <= 7
-    ///
-    /// expected numbers [4] to be at most 7
-    ///    but was: 10
-    ///   expected: <= 7
-    /// ```
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    fn each_element<A, B>(self, assert: A) -> Self::Output
+    /// Iterators over the elements of a collection or an iterator and executes one
+    /// or multiple assertions on each of those elements. The failure report
+    /// contains detailed information for each element for which one or multiple
+    /// assertions failed.
+    pub trait AssertElements<'a, I>
     where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
-        B: GetFailures;
+        I: IntoIterator,
+    {
+        /// A spec-like type that is returned by the methods of this trait.
+        type Output;
 
-    /// Iterates over the elements of a collection or an iterator and executes
-    /// the given assertions for each of those elements. If the assertion of any
-    /// element is successful, the iteration stops and the whole assertion
-    /// succeeds.
-    ///
-    /// If the assertion fails for all elements, the failures of the assertion
-    /// for all elements are collected.
-    ///
-    /// The failure messages contain the position of the element within the
-    /// collection or iterator. The position is 0-based. So a failure message
-    /// for the first element contains `[0]`, the second `[1]`, and so on.
-    ///
-    /// # Example
-    ///
-    /// The following assertion:
-    ///
-    /// ```should_panic
-    /// use asserting::prelude::*;
-    ///
-    /// let digit_names = ["one", "two", "three"];
-    ///
-    /// assert_that!(digit_names).any_element(|e|
-    ///     e.contains('x')
-    /// );
-    /// ```
-    ///
-    /// will print:
-    ///
-    /// ```console
-    /// expected digit_names [0] to contain 'x'
-    ///    but was: "one"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [1] to contain 'x'
-    ///    but was: "two"
-    ///   expected: 'x'
-    ///
-    /// expected digit_names [2] to contain 'x'
-    ///    but was: "three"
-    ///   expected: 'x'
-    /// ```
-    #[allow(clippy::return_self_not_must_use)]
-    #[track_caller]
-    fn any_element<A, B>(self, assert: A) -> Self::Output
-    where
-        A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
-        B: GetFailures;
-}
+        /// Iterates over the elements of a collection or an iterator and executes
+        /// the given assertions for each of those elements. If all elements are
+        /// asserted successfully, the whole assertion succeeds.
+        ///
+        /// It iterates over all elements of the collection or iterator and collects
+        /// the failure messages for those elements where the assertion fails. In
+        /// other words, it does not stop iterating when the assertion for one
+        /// element fails.
+        ///
+        /// The failure messages contain the position of the element within the
+        /// collection or iterator. The position is 0-based. So a failure message
+        /// for the first element contains `[0]`, the second `[1]`, and so on.
+        ///
+        /// # Example
+        ///
+        /// The following assertion:
+        ///
+        /// ```should_panic
+        /// use asserting::prelude::*;
+        ///
+        /// let numbers = [2, 4, 6, 8, 10];
+        ///
+        /// assert_that!(numbers).each_element(|e|
+        ///     e.is_greater_than(2)
+        ///         .is_at_most(7)
+        /// );
+        /// ```
+        ///
+        /// will print:
+        ///
+        /// ```console
+        /// expected numbers [0] to be greater than 2
+        ///    but was: 2
+        ///   expected: > 2
+        ///
+        /// expected numbers [3] to be at most 7
+        ///    but was: 8
+        ///   expected: <= 7
+        ///
+        /// expected numbers [4] to be at most 7
+        ///    but was: 10
+        ///   expected: <= 7
+        /// ```
+        #[allow(clippy::return_self_not_must_use)]
+        #[track_caller]
+        fn each_element<A, B>(self, assert: A) -> Self::Output
+        where
+            A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
+            B: GetFailures;
 
-/// Filter assertions for elements of a collection or an iterator.
-///
-/// Filtering is used to target the assertions on specific elements of a
-/// collection or an iterator, such as a single element or elements matching a
-/// condition.
-///
-/// # Examples
-///
-/// Filtering elements:
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = ["single"];
-/// assert_that!(subject).single_element().is_equal_to("single");
-///
-/// let subject = [1, 2, 3, 4, 5];
-/// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
-/// ```
-///
-/// Some elements satisfy a predicate:
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = [1, 41, 43, 42, 5];
-/// assert_that!(subject).any_satisfies(|e| *e == 42);
-///
-/// let subject = [43, 44, 45, 46, 47];
-/// assert_that!(subject).all_satisfy(|e| *e > 42);
-///
-/// let subject = [42, 43, 44, 45, 46];
-/// assert_that!(subject).none_satisfies(|e| *e < 42);
-/// ```
-pub trait AssertFilteredElements<T> {
-    /// A spec-like type that contains a single element as the subject that is
-    /// extracted from the iterator.
-    ///
-    /// Usually this is a `Spec<'a, T, R>`.
-    type SingleElement;
-    /// A spec-like type that contains multiple or all elements of an iterator
-    /// as the subject.
-    ///
-    /// Usually this is a `Spec<'a, Vec<T>, R>`.
-    type MultipleElements;
+        /// Iterates over the elements of a collection or an iterator and executes
+        /// the given assertions for each of those elements. If the assertion of any
+        /// element is successful, the iteration stops and the whole assertion
+        /// succeeds.
+        ///
+        /// If the assertion fails for all elements, the failures of the assertion
+        /// for all elements are collected.
+        ///
+        /// The failure messages contain the position of the element within the
+        /// collection or iterator. The position is 0-based. So a failure message
+        /// for the first element contains `[0]`, the second `[1]`, and so on.
+        ///
+        /// # Example
+        ///
+        /// The following assertion:
+        ///
+        /// ```should_panic
+        /// use asserting::prelude::*;
+        ///
+        /// let digit_names = ["one", "two", "three"];
+        ///
+        /// assert_that!(digit_names).any_element(|e|
+        ///     e.contains('x')
+        /// );
+        /// ```
+        ///
+        /// will print:
+        ///
+        /// ```console
+        /// expected digit_names [0] to contain 'x'
+        ///    but was: "one"
+        ///   expected: 'x'
+        ///
+        /// expected digit_names [1] to contain 'x'
+        ///    but was: "two"
+        ///   expected: 'x'
+        ///
+        /// expected digit_names [2] to contain 'x'
+        ///    but was: "three"
+        ///   expected: 'x'
+        /// ```
+        #[allow(clippy::return_self_not_must_use)]
+        #[track_caller]
+        fn any_element<A, B>(self, assert: A) -> Self::Output
+        where
+            A: Fn(Spec<'a, <I as IntoIterator>::Item, DebugRepresentation, CollectFailures>) -> B,
+            B: GetFailures;
+    }
 
-    /// Verify that the iterator contains exactly one element and return a
-    /// [`Spec`] for that single element.
+    /// Filter assertions for elements of a collection or an iterator.
+    ///
+    /// Filtering is used to target the assertions on specific elements of a
+    /// collection or an iterator, such as a single element or elements matching a
+    /// condition.
     ///
     /// # Examples
+    ///
+    /// Filtering elements:
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
     /// let subject = ["single"];
-    ///
     /// assert_that!(subject).single_element().is_equal_to("single");
-    /// ```
-    #[track_caller]
-    fn single_element(self) -> Self::SingleElement;
-
-    /// Filter the elements of a collection or an iterator on a condition and
-    /// return a [`Spec`] only containing the elements that match the condition.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject = [1, 2, 3, 4, 5];
-    /// assert_that!(subject)
-    ///     .filtered_on(|e| e & 1 == 0)
-    ///     .contains_exactly_in_any_order([2, 4]);
-    ///
-    /// let subject = ["one", "two", "three", "four"];
-    /// assert_that!(subject)
-    ///     .filtered_on(|e| e.len() == 5)
-    ///     .single_element()
-    ///     .is_equal_to("three");
+    /// assert_that!(subject).filtered_on(|e| e & 1 == 0).contains_exactly_in_any_order([2, 4]);
     /// ```
-    #[track_caller]
-    fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
-    where
-        C: FnMut(&T) -> bool;
-
-    /// Verify that any element of a collection or an iterator satisfies a given
-    /// predicate.
     ///
-    /// # Examples
+    /// Some elements satisfy a predicate:
     ///
     /// ```
     /// use asserting::prelude::*;
     ///
     /// let subject = [1, 41, 43, 42, 5];
     /// assert_that!(subject).any_satisfies(|e| *e == 42);
-    /// ```
-    #[track_caller]
-    fn any_satisfies<P>(self, predicate: P) -> Self::MultipleElements
-    where
-        P: FnMut(&T) -> bool;
-
-    /// Verify that all elements of a collection or an iterator satisfy a given
-    /// predicate.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject = [43, 44, 45, 46, 47];
     /// assert_that!(subject).all_satisfy(|e| *e > 42);
-    /// ```
-    #[track_caller]
-    fn all_satisfy<P>(self, predicate: P) -> Self::MultipleElements
-    where
-        P: FnMut(&T) -> bool;
-
-    /// Verify that none of the elements of a collection or an iterator
-    /// satisfies a given predicate.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
     ///
     /// let subject = [42, 43, 44, 45, 46];
     /// assert_that!(subject).none_satisfies(|e| *e < 42);
     /// ```
-    #[track_caller]
-    fn none_satisfies<P>(self, predicate: P) -> Self::MultipleElements
-    where
-        P: FnMut(&T) -> bool;
-}
+    pub trait AssertFilteredElements<T> {
+        /// A spec-like type that contains a single element as the subject that is
+        /// extracted from the iterator.
+        ///
+        /// Usually this is a `Spec<'a, T, R>`.
+        type SingleElement;
+        /// A spec-like type that contains multiple or all elements of an iterator
+        /// as the subject.
+        ///
+        /// Usually this is a `Spec<'a, Vec<T>, R>`.
+        type MultipleElements;
 
-/// Extract one or multiple elements of a collection or an iterator that yields
-/// its elements in a defined order to call assertions on the extracted
-/// elements.
-///
-/// Extraction is used to target the assertions on specific elements of a
-/// collection or an iterator, such as the first or last element.
-///
-/// See also the [`AssertOrderedElementsRef`] trait for extracting multiple
-/// elements from the same ordered collection or iterator for individual
-/// assertions.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = ["one", "two", "three", "four", "five"];
-///
-/// assert_that!(subject).first_element().is_equal_to("one");
-/// assert_that!(subject).last_element().is_equal_to("five");
-/// assert_that!(subject).nth_element(3).is_equal_to("four");
-/// assert_that!(subject)
-///     .elements_at([0, 2, 4])
-///     .contains_exactly(["one", "three", "five"]);
-/// ```
-pub trait AssertOrderedElements {
-    /// A spec-like type that contains a single element as the subject that is
-    /// extracted from the iterator.
-    ///
-    /// Usually this is a `Spec<'a, T, R>`.
-    type SingleElement;
-    /// A spec-like type that contains multiple or all elements of an iterator
-    /// as the subject.
-    ///
-    /// Usually this is a `Spec<'a, Vec<T>, R>`.
-    type MultipleElements;
+        /// Verify that the iterator contains exactly one element and return a
+        /// [`Spec`] for that single element.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["single"];
+        ///
+        /// assert_that!(subject).single_element().is_equal_to("single");
+        /// ```
+        #[track_caller]
+        fn single_element(self) -> Self::SingleElement;
 
-    /// Verify that a collection or an iterator contains at least one element
-    /// and return a [`Spec`] for the first element.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject).first_element().is_equal_to("one");
-    /// ```
-    #[track_caller]
-    fn first_element(self) -> Self::SingleElement;
+        /// Filter the elements of a collection or an iterator on a condition and
+        /// return a [`Spec`] only containing the elements that match the condition.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = [1, 2, 3, 4, 5];
+        /// assert_that!(subject)
+        ///     .filtered_on(|e| e & 1 == 0)
+        ///     .contains_exactly_in_any_order([2, 4]);
+        ///
+        /// let subject = ["one", "two", "three", "four"];
+        /// assert_that!(subject)
+        ///     .filtered_on(|e| e.len() == 5)
+        ///     .single_element()
+        ///     .is_equal_to("three");
+        /// ```
+        #[track_caller]
+        fn filtered_on<C>(self, condition: C) -> Self::MultipleElements
+        where
+            C: FnMut(&T) -> bool;
 
-    /// Verify that a collection or an iterator contains at least one element
-    /// and return a [`Spec`] for the last element.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject).last_element().is_equal_to("three");
-    /// ```
-    #[track_caller]
-    fn last_element(self) -> Self::SingleElement;
+        /// Verify that any element of a collection or an iterator satisfies a given
+        /// predicate.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = [1, 41, 43, 42, 5];
+        /// assert_that!(subject).any_satisfies(|e| *e == 42);
+        /// ```
+        #[track_caller]
+        fn any_satisfies<P>(self, predicate: P) -> Self::MultipleElements
+        where
+            P: FnMut(&T) -> bool;
 
-    /// Verify that a collection or an iterator contains at least n + 1 elements
-    /// and return a [`Spec`] for the nth element.
-    ///
-    /// The index n is zero-based (similar to the `nth` method of iterators).
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject).nth_element(0).is_equal_to("one");
-    /// assert_that!(subject).nth_element(1).is_equal_to("two");
-    /// assert_that!(subject).nth_element(2).is_equal_to("three");
-    /// ```
-    #[track_caller]
-    fn nth_element(self, n: usize) -> Self::SingleElement;
+        /// Verify that all elements of a collection or an iterator satisfy a given
+        /// predicate.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = [43, 44, 45, 46, 47];
+        /// assert_that!(subject).all_satisfy(|e| *e > 42);
+        /// ```
+        #[track_caller]
+        fn all_satisfy<P>(self, predicate: P) -> Self::MultipleElements
+        where
+            P: FnMut(&T) -> bool;
 
-    /// Pick the elements of a collection or an iterator at the given positions
-    /// and return a [`Spec`] only containing the selected elements.
+        /// Verify that none of the elements of a collection or an iterator
+        /// satisfies a given predicate.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = [42, 43, 44, 45, 46];
+        /// assert_that!(subject).none_satisfies(|e| *e < 42);
+        /// ```
+        #[track_caller]
+        fn none_satisfies<P>(self, predicate: P) -> Self::MultipleElements
+        where
+            P: FnMut(&T) -> bool;
+    }
+
+    /// Extract one or multiple elements of a collection or an iterator that yields
+    /// its elements in a defined order to call assertions on the extracted
+    /// elements.
+    ///
+    /// Extraction is used to target the assertions on specific elements of a
+    /// collection or an iterator, such as the first or last element.
+    ///
+    /// See also the [`AssertOrderedElementsRef`] trait for extracting multiple
+    /// elements from the same ordered collection or iterator for individual
+    /// assertions.
     ///
     /// # Examples
     ///
@@ -4685,119 +4620,108 @@ pub trait AssertOrderedElements {
     ///
     /// let subject = ["one", "two", "three", "four", "five"];
     ///
+    /// assert_that!(subject).first_element().is_equal_to("one");
+    /// assert_that!(subject).last_element().is_equal_to("five");
+    /// assert_that!(subject).nth_element(3).is_equal_to("four");
     /// assert_that!(subject)
     ///     .elements_at([0, 2, 4])
     ///     .contains_exactly(["one", "three", "five"]);
     /// ```
-    #[track_caller]
-    fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
-}
+    pub trait AssertOrderedElements {
+        /// A spec-like type that contains a single element as the subject that is
+        /// extracted from the iterator.
+        ///
+        /// Usually this is a `Spec<'a, T, R>`.
+        type SingleElement;
+        /// A spec-like type that contains multiple or all elements of an iterator
+        /// as the subject.
+        ///
+        /// Usually this is a `Spec<'a, Vec<T>, R>`.
+        type MultipleElements;
 
-/// Extract one or multiple elements of a collection or an iterator that yields
-/// its elements in a defined order to call assertions on the extracted
-/// elements.
-///
-/// Extraction is used to target the assertions on specific elements of a
-/// collection or an iterator, such as the first or last element.
-///
-/// The methods of this trait can be used in combination with the `and` method
-/// to extract multiple elements from a collection for individual assertions.
-/// The downside is that the elements of the collection or iterator must
-/// implement the `ToOwned` trait.
-///
-/// If you only want to call a single extraction method on the same collection
-/// or iterator, you can use the methods of the [`AssertOrderedElements`] trait.
-/// These methods do not require that the elements of the collection implement
-/// `ToOwned` or `Clone`.
-///
-/// # Examples
-///
-/// ```
-/// use asserting::prelude::*;
-///
-/// let subject = ["one", "two", "three", "four", "five"];
-///
-/// assert_that!(subject)
-///     .first_element_ref().is_equal_to("one")
-///     .and()
-///     .last_element_ref().is_equal_to("five")
-///     .and()
-///     .nth_element_ref(3).is_equal_to("four")
-///     .and()
-///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"]);
-/// ```
-pub trait AssertOrderedElementsRef {
-    /// A spec-like type that contains a single element as the subject that is
-    /// extracted from the iterator.
-    ///
-    /// Usually this is a `Spec<'a, T, R>`.
-    type SingleElement;
-    /// A spec-like type that contains multiple or all elements of an iterator
-    /// as the subject.
-    ///
-    /// Usually this is a `Spec<'a, Vec<T>, R>`.
-    type MultipleElements;
+        /// Verify that a collection or an iterator contains at least one element
+        /// and return a [`Spec`] for the first element.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject).first_element().is_equal_to("one");
+        /// ```
+        #[track_caller]
+        fn first_element(self) -> Self::SingleElement;
 
-    /// Verify that a collection or an iterator contains at least one element
-    /// and return a [`Spec`] for the first element.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject)
-    ///     .first_element_ref().is_equal_to("one")
-    ///     .and()
-    ///     .last_element_ref().is_equal_to("three");
-    /// ```
-    #[track_caller]
-    fn first_element_ref(self) -> Self::SingleElement;
+        /// Verify that a collection or an iterator contains at least one element
+        /// and return a [`Spec`] for the last element.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject).last_element().is_equal_to("three");
+        /// ```
+        #[track_caller]
+        fn last_element(self) -> Self::SingleElement;
 
-    /// Verify that a collection or an iterator contains at least one element
-    /// and return a [`Spec`] for the last element.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject)
-    ///     .last_element_ref().is_equal_to("three")
-    ///     .and()
-    ///     .first_element_ref().is_equal_to("one");
-    /// ```
-    #[track_caller]
-    fn last_element_ref(self) -> Self::SingleElement;
+        /// Verify that a collection or an iterator contains at least n + 1 elements
+        /// and return a [`Spec`] for the nth element.
+        ///
+        /// The index n is zero-based (similar to the `nth` method of iterators).
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject).nth_element(0).is_equal_to("one");
+        /// assert_that!(subject).nth_element(1).is_equal_to("two");
+        /// assert_that!(subject).nth_element(2).is_equal_to("three");
+        /// ```
+        #[track_caller]
+        fn nth_element(self, n: usize) -> Self::SingleElement;
 
-    /// Verify that a collection or an iterator contains at least n + 1 elements
-    /// and return a [`Spec`] for the nth element.
-    ///
-    /// The index n is zero-based (similar to the `nth` method of iterators).
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use asserting::prelude::*;
-    ///
-    /// let subject = ["one", "two", "three"];
-    ///
-    /// assert_that!(subject)
-    ///     .nth_element_ref(0).is_equal_to("one")
-    ///     .and()
-    ///     .nth_element_ref(1).is_equal_to("two")
-    ///     .and()
-    ///     .nth_element_ref(2).is_equal_to("three");
-    /// ```
-    #[track_caller]
-    fn nth_element_ref(self, n: usize) -> Self::SingleElement;
+        /// Pick the elements of a collection or an iterator at the given positions
+        /// and return a [`Spec`] only containing the selected elements.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three", "four", "five"];
+        ///
+        /// assert_that!(subject)
+        ///     .elements_at([0, 2, 4])
+        ///     .contains_exactly(["one", "three", "five"]);
+        /// ```
+        #[track_caller]
+        fn elements_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
+    }
 
-    /// Pick the elements of a collection or an iterator at the given positions
-    /// and return a [`Spec`] only containing the selected elements.
+    /// Extract one or multiple elements of a collection or an iterator that yields
+    /// its elements in a defined order to call assertions on the extracted
+    /// elements.
+    ///
+    /// Extraction is used to target the assertions on specific elements of a
+    /// collection or an iterator, such as the first or last element.
+    ///
+    /// The methods of this trait can be used in combination with the `and` method
+    /// to extract multiple elements from a collection for individual assertions.
+    /// The downside is that the elements of the collection or iterator must
+    /// implement the `ToOwned` trait.
+    ///
+    /// If you only want to call a single extraction method on the same collection
+    /// or iterator, you can use the methods of the [`AssertOrderedElements`] trait.
+    /// These methods do not require that the elements of the collection implement
+    /// `ToOwned` or `Clone`.
     ///
     /// # Examples
     ///
@@ -4807,10 +4731,103 @@ pub trait AssertOrderedElementsRef {
     /// let subject = ["one", "two", "three", "four", "five"];
     ///
     /// assert_that!(subject)
-    ///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"])
+    ///     .first_element_ref().is_equal_to("one")
     ///     .and()
-    ///     .elements_ref_at([1, 3]).contains_exactly(["two", "four"]);
+    ///     .last_element_ref().is_equal_to("five")
+    ///     .and()
+    ///     .nth_element_ref(3).is_equal_to("four")
+    ///     .and()
+    ///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"]);
     /// ```
-    #[track_caller]
-    fn elements_ref_at(self, indices: impl IntoIterator<Item = usize>) -> Self::MultipleElements;
+    pub trait AssertOrderedElementsRef {
+        /// A spec-like type that contains a single element as the subject that is
+        /// extracted from the iterator.
+        ///
+        /// Usually this is a `Spec<'a, T, R>`.
+        type SingleElement;
+        /// A spec-like type that contains multiple or all elements of an iterator
+        /// as the subject.
+        ///
+        /// Usually this is a `Spec<'a, Vec<T>, R>`.
+        type MultipleElements;
+
+        /// Verify that a collection or an iterator contains at least one element
+        /// and return a [`Spec`] for the first element.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject)
+        ///     .first_element_ref().is_equal_to("one")
+        ///     .and()
+        ///     .last_element_ref().is_equal_to("three");
+        /// ```
+        #[track_caller]
+        fn first_element_ref(self) -> Self::SingleElement;
+
+        /// Verify that a collection or an iterator contains at least one element
+        /// and return a [`Spec`] for the last element.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject)
+        ///     .last_element_ref().is_equal_to("three")
+        ///     .and()
+        ///     .first_element_ref().is_equal_to("one");
+        /// ```
+        #[track_caller]
+        fn last_element_ref(self) -> Self::SingleElement;
+
+        /// Verify that a collection or an iterator contains at least n + 1 elements
+        /// and return a [`Spec`] for the nth element.
+        ///
+        /// The index n is zero-based (similar to the `nth` method of iterators).
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three"];
+        ///
+        /// assert_that!(subject)
+        ///     .nth_element_ref(0).is_equal_to("one")
+        ///     .and()
+        ///     .nth_element_ref(1).is_equal_to("two")
+        ///     .and()
+        ///     .nth_element_ref(2).is_equal_to("three");
+        /// ```
+        #[track_caller]
+        fn nth_element_ref(self, n: usize) -> Self::SingleElement;
+
+        /// Pick the elements of a collection or an iterator at the given positions
+        /// and return a [`Spec`] only containing the selected elements.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use asserting::prelude::*;
+        ///
+        /// let subject = ["one", "two", "three", "four", "five"];
+        ///
+        /// assert_that!(subject)
+        ///     .elements_ref_at([0, 2, 4]).contains_exactly(["one", "three", "five"])
+        ///     .and()
+        ///     .elements_ref_at([1, 3]).contains_exactly(["two", "four"]);
+        /// ```
+        #[track_caller]
+        fn elements_ref_at(
+            self,
+            indices: impl IntoIterator<Item = usize>,
+        ) -> Self::MultipleElements;
+    }
 }

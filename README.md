@@ -123,8 +123,7 @@ is set, no colors are used regardless of the configured highlight mode.
 ## Available Assertions
 
 The `asserting` crate provides a broad set of assertions for testing and validation purposes. An
-overview of the available assertions can be found in the
-[Available Assertions](docs/available-assertions.md) document.
+overview of the available assertions can be found in the documentation of the [`assertions`] module.
 
 All provided assertions are defined by an assertion-trait in the [`assertions`] module. Each
 assertion method comes with a short explanation of how to use it and examples in the API
