@@ -1136,6 +1136,13 @@ mod c_string;
 mod char;
 mod char_count;
 #[cfg(feature = "chrono")]
+#[cfg_attr(
+    not(test),
+    deprecated(
+        since = "0.7.1",
+        note = "`chrono` is unmaintained (see [RUSTSEC-2026-0543](https://rustsec.org/advisories/RUSTSEC-2026-0543.html)); consider using `jiff` or `time`; `jiff` and `time` are supported by `asserting` as well."
+    )
+)]
 mod chrono;
 mod collection;
 #[cfg(all(feature = "std", feature = "colored"))]
