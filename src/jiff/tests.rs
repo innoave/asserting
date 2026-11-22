@@ -3,7 +3,7 @@
 use crate::prelude::*;
 use crate::temporal::TemporalMargin;
 use jiff::civil::{Date, DateTime, Time, date, datetime, time};
-use jiff::{SignedDuration, Span, Timestamp, Zoned};
+use jiff::{SignedDuration, Span, Timestamp, ZonedDateTime};
 
 #[test]
 fn temporal_margin_of_nanoseconds_to_duration() {
@@ -477,7 +477,7 @@ fn verify_civil_datetime_is_close_to_within_milliseconds_plus_margin_fails() {
 }
 
 #[test]
-fn zoned_is_equal_to() {
+fn zoneddatetime_is_equal_to() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -492,7 +492,7 @@ fn zoned_is_equal_to() {
 }
 
 #[test]
-fn zoned_is_before() {
+fn zoneddatetime_is_before() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -507,7 +507,7 @@ fn zoned_is_before() {
 }
 
 #[test]
-fn zoned_is_after() {
+fn zoneddatetime_is_after() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -522,7 +522,7 @@ fn zoned_is_after() {
 }
 
 #[test]
-fn zoned_is_between() {
+fn zoneddatetime_is_between() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -541,7 +541,7 @@ fn zoned_is_between() {
 }
 
 #[test]
-fn zoned_is_close_to_within_milliseconds_exact_equal() {
+fn zoneddatetime_is_close_to_within_milliseconds_exact_equal() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -557,7 +557,7 @@ fn zoned_is_close_to_within_milliseconds_exact_equal() {
 }
 
 #[test]
-fn zoned_is_close_to_within_milliseconds_plus_margin() {
+fn zoneddatetime_is_close_to_within_milliseconds_plus_margin() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -574,7 +574,7 @@ fn zoned_is_close_to_within_milliseconds_plus_margin() {
 }
 
 #[test]
-fn zoned_is_close_to_within_milliseconds_minus_margin() {
+fn zoneddatetime_is_close_to_within_milliseconds_minus_margin() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("UTC")
@@ -591,7 +591,7 @@ fn zoned_is_close_to_within_milliseconds_minus_margin() {
 }
 
 #[test]
-fn verify_zoned_is_close_to_within_seconds_minus_margin_fails() {
+fn verify_zoneddatetime_is_close_to_within_seconds_minus_margin_fails() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 53, 0)
         .in_tz("UTC")
@@ -620,7 +620,7 @@ fn verify_zoned_is_close_to_within_seconds_minus_margin_fails() {
 }
 
 #[test]
-fn verify_zoned_is_close_to_within_seconds_plus_margin_fails() {
+fn verify_zoneddatetime_is_close_to_within_seconds_plus_margin_fails() {
     let subject = date(2022, 1, 1)
         .at(12, 35, 0, 0)
         .in_tz("UTC")
@@ -648,7 +648,7 @@ fn verify_zoned_is_close_to_within_seconds_plus_margin_fails() {
 }
 
 #[test]
-fn zoned_is_close_to_within_minutes_different_utc_offset() {
+fn zoneddatetime_is_close_to_within_minutes_different_utc_offset() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("Europe/Vienna")
@@ -664,7 +664,7 @@ fn zoned_is_close_to_within_minutes_different_utc_offset() {
 }
 
 #[test]
-fn verify_zoned_is_close_to_within_minutes_different_utc_offset_fails() {
+fn verify_zoneddatetime_is_close_to_within_minutes_different_utc_offset_fails() {
     let subject = date(2022, 1, 1)
         .at(12, 34, 56, 0)
         .in_tz("Europe/Vienna")
@@ -740,8 +740,8 @@ fn extracting_ref_civil_datetime_is_close_to_within_milliseconds() {
 }
 
 #[test]
-fn extracting_ref_zoned_utc_is_close_to_within_minutes() {
-    struct MyZoned(Zoned);
+fn extracting_ref_zoneddatetime_utc_is_close_to_within_minutes() {
+    struct MyZoned(ZonedDateTime);
 
     let subject = MyZoned(
         date(2023, 11, 30)
@@ -762,8 +762,8 @@ fn extracting_ref_zoned_utc_is_close_to_within_minutes() {
 }
 
 #[test]
-fn extracting_ref_zoned_tz_is_close_to_within_minutes() {
-    struct MyZoned(Zoned);
+fn extracting_ref_zoneddatetime_tz_is_close_to_within_minutes() {
+    struct MyZoned(ZonedDateTime);
 
     let subject = MyZoned(
         date(2023, 11, 30)

@@ -8,7 +8,7 @@ use crate::spec::{
 };
 use crate::temporal::{TemporalMargin, ToDuration};
 use jiff::civil::{Date, DateTime, Time};
-use jiff::{SignedDuration, Span, Timestamp, Zoned};
+use jiff::{SignedDuration, Span, Timestamp, ZonedDateTime};
 
 #[cfg(test)]
 mod tests;
@@ -265,29 +265,34 @@ where
 
 impl Invertible for IsCloseTo<DateTime, TemporalMargin> {}
 
-impl<D, R> AssertIsCloseToWithinMargin<Zoned, TemporalMargin> for Spec<'_, Zoned, D, R>
+impl<D, R> AssertIsCloseToWithinMargin<ZonedDateTime, TemporalMargin>
+    for Spec<'_, ZonedDateTime, D, R>
 where
-    D: Represent<Zoned> + Represent<TemporalMargin>,
+    D: Represent<ZonedDateTime> + Represent<TemporalMargin>,
     R: FailingStrategy,
 {
-    fn is_close_to_with_margin(self, expected: Zoned, margin: impl Into<TemporalMargin>) -> Self {
+    fn is_close_to_with_margin(
+        self,
+        expected: ZonedDateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
     }
 
     fn is_not_close_to_with_margin(
         self,
-        expected: Zoned,
+        expected: ZonedDateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
     }
 }
 
-impl<D> Expectation<Zoned, D> for IsCloseTo<Zoned, TemporalMargin>
+impl<D> Expectation<ZonedDateTime, D> for IsCloseTo<ZonedDateTime, TemporalMargin>
 where
-    D: Represent<Zoned> + Represent<TemporalMargin>,
+    D: Represent<ZonedDateTime> + Represent<TemporalMargin>,
 {
-    fn test(&mut self, subject: &Zoned) -> bool {
+    fn test(&mut self, subject: &ZonedDateTime) -> bool {
         if *subject < self.expected {
             subject.duration_until(&self.expected) <= self.margin.to_duration()
         } else {
@@ -298,7 +303,7 @@ where
     fn message(
         &self,
         expression: &Expression<'_>,
-        actual: &Zoned,
+        actual: &ZonedDateTime,
         inverted: bool,
         representation: &D,
         format: &DiffFormat,
@@ -316,7 +321,7 @@ where
     }
 }
 
-impl Invertible for IsCloseTo<Zoned, TemporalMargin> {}
+impl Invertible for IsCloseTo<ZonedDateTime, TemporalMargin> {}
 
 impl<O, D> AssertIsCloseToWithinMargin<Timestamp, TemporalMargin>
     for DerivedSpec<'_, O, Timestamp, D>
@@ -399,18 +404,23 @@ where
     }
 }
 
-impl<O, D> AssertIsCloseToWithinMargin<Zoned, TemporalMargin> for DerivedSpec<'_, O, Zoned, D>
+impl<O, D> AssertIsCloseToWithinMargin<ZonedDateTime, TemporalMargin>
+    for DerivedSpec<'_, O, ZonedDateTime, D>
 where
-    D: Represent<Zoned> + Represent<TemporalMargin>,
+    D: Represent<ZonedDateTime> + Represent<TemporalMargin>,
     O: DoFail,
 {
-    fn is_close_to_with_margin(self, expected: Zoned, margin: impl Into<TemporalMargin>) -> Self {
+    fn is_close_to_with_margin(
+        self,
+        expected: ZonedDateTime,
+        margin: impl Into<TemporalMargin>,
+    ) -> Self {
         self.expecting(is_close_to(expected).within_margin(margin))
     }
 
     fn is_not_close_to_with_margin(
         self,
-        expected: Zoned,
+        expected: ZonedDateTime,
         margin: impl Into<TemporalMargin>,
     ) -> Self {
         self.expecting(not(is_close_to(expected).within_margin(margin)))
